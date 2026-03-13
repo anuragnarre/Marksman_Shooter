@@ -1,0 +1,35 @@
+{
+  "name": "@shooting-platform/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000 --hostname 0.0.0.0",
+    "dev:mobile": "node -e \"const{execSync}=require('child_process');const ip=execSync('hostname -I').toString().trim().split(' ')[0];console.log('\\n  Starting dev server (LAN mode)');console.log('  WSL2 IP: '+ip);console.log('\\n  On Windows run ONCE (as Admin):');console.log('  powershell -ExecutionPolicy Bypass -File mobile-dev.ps1');console.log('\\n  Then open on phone: http://'+ip+':3000\\n');\" && next dev --port 3000 --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/list": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "@shooting-platform/shared-types": "*",
+    "next": "15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.3.3"
+  }
+}

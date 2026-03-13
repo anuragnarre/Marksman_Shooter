@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment files — never commit secrets
+.env
+.env.local
+.env.*.local
+apps/api/.env
+apps/vision/.env
+
+# Python virtual environments
+apps/vision/.venv/
+apps/vision/.venv-linux/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+*.egg-info/
+
+# Prisma generated client (regenerated on deploy)
+apps/api/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude local settings
+.claude/settings.local.json

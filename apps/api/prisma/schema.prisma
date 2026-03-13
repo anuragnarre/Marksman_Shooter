@@ -1,0 +1,199 @@
+// apps/api/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SHOOTER
+  COACH
+  SOLDIER
+}
+
+enum ConnectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  sessions         Session[]         @relation("ShooterSessions")
+  coachConnections CoachConnection[] @relation("ShooterConnections")
+  coachOf          CoachConnection[] @relation("CoachConnections")
+  feedbacks        CoachFeedback[]
+  coachEvents      TrainingEvent[]   @relation("CoachEvents")
+  shooterEvents    EventAssignee[]   @relation("ShooterEvents")
+  scheduleRequestsAsShooter ScheduleRequest[] @relation("ShooterRequests")
+  scheduleRequestsAsCoach   ScheduleRequest[] @relation("CoachRequests")
+  trainingPlans    TrainingPlan[]
+}
+
+model Session {
+  id            String    @id @default(uuid())
+  shooterId     String
+  discipline    String
+  distance      Int
+  weaponType    String
+  numberOfShots Int
+  sessionDate   DateTime
+  trainingMode  String?
+  createdAt     DateTime  @default(now())
+  deletedAt     DateTime?
+
+  shooter         User             @relation("ShooterSessions", fields: [shooterId], references: [id])
+  shots           Shot[]
+  feedback        CoachFeedback[]
+  sessionContext  SessionContext?
+
+  @@index([shooterId])
+}
+
+model Shot {
+  id         String   @id @default(uuid())
+  sessionId  String
+  shotNumber Int
+  score      Float
+  x          Float
+  y          Float
+  timestamp  DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId])
+}
+
+model CoachConnection {
+  id          String           @id @default(uuid())
+  shooterId   String
+  coachId     String
+  status      ConnectionStatus @default(PENDING)
+  initiatedBy String           @default("SHOOTER") // 'SHOOTER' | 'COACH'
+  createdAt   DateTime         @default(now())
+
+  shooter User @relation("ShooterConnections", fields: [shooterId], references: [id])
+  coach   User @relation("CoachConnections", fields: [coachId], references: [id])
+
+  @@index([shooterId])
+  @@index([coachId])
+}
+
+model CoachFeedback {
+  id        String   @id @default(uuid())
+  coachId   String
+  sessionId String
+  feedback  String
+  createdAt DateTime @default(now())
+
+  coach   User    @relation(fields: [coachId], references: [id])
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@index([coachId])
+  @@index([sessionId])
+}
+
+enum EventType {
+  SESSION
+  TASK
+  PLAN
+  REMINDER
+  COMPETITION
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model TrainingEvent {
+  id               String    @id @default(uuid())
+  title            String
+  description      String?
+  eventType        EventType @default(SESSION)
+  start            DateTime
+  end              DateTime
+  allDay           Boolean   @default(false)
+  color            String?
+  recurringGroupId String?
+  coachId          String
+  coach            User      @relation("CoachEvents", fields: [coachId], references: [id])
+  assignees        EventAssignee[]
+  scheduleRequests ScheduleRequest[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@index([coachId])
+  @@index([recurringGroupId])
+}
+
+model EventAssignee {
+  id        String        @id @default(uuid())
+  eventId   String
+  event     TrainingEvent @relation(fields: [eventId], references: [id])
+  shooterId String
+  shooter   User          @relation("ShooterEvents", fields: [shooterId], references: [id])
+  status    String        @default("PENDING")
+
+  @@unique([eventId, shooterId])
+  @@index([eventId])
+  @@index([shooterId])
+}
+
+model SessionContext {
+  id               String   @id @default(uuid())
+  sessionId        String   @unique
+  session          Session  @relation(fields: [sessionId], references: [id])
+  heartRate        Int?
+  perceivedEffort  Int?
+  windCondition    String?
+  temperature      Float?
+  notes            String?
+  createdAt        DateTime @default(now())
+}
+
+model TrainingPlan {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  content      Json
+  weekStart    DateTime
+  generatedAt  DateTime @default(now())
+  focusAreas   String[]
+}
+
+model ScheduleRequest {
+  id               String        @id @default(uuid())
+  eventId          String
+  event            TrainingEvent @relation(fields: [eventId], references: [id])
+  shooterId        String
+  shooter          User          @relation("ShooterRequests", fields: [shooterId], references: [id])
+  coachId          String
+  coach            User          @relation("CoachRequests", fields: [coachId], references: [id])
+  status           RequestStatus @default(PENDING)
+  suggestedStart   DateTime?
+  suggestedEnd     DateTime?
+  suggestedTitle   String?
+  notes            String?
+  coachNote        String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  resolvedAt       DateTime?
+
+  @@index([eventId])
+  @@index([shooterId])
+  @@index([coachId])
+  @@index([status])
+}
