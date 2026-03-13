@@ -17,6 +17,9 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "paths": {
+      "@shooting-platform/shared-types": ["src/shared-types"]
+    }
   }
 }
