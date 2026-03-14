@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SessionContextDto } from './dto/session-context.dto';
-import { DeepAnalysis, TrainingPlan } from '@shooting-platform/shared-types';
+import { DeepAnalysis, TrainingPlan, UserRole } from '@shooting-platform/shared-types';
 
 const MODEL = 'llama-3.3-70b-versatile';
 
@@ -34,20 +34,22 @@ export class PerformanceService {
 
   // ── Deep Analysis ──────────────────────────────────────────────────────────
 
-  async getDeepAnalysis(userId: string, sessionId: string): Promise<DeepAnalysis> {
+  async getDeepAnalysis(
+    userId: string,
+    sessionId: string,
+    role: UserRole = 'SHOOTER',
+    shooterIdHint?: string,
+  ): Promise<DeepAnalysis> {
     const session = await this.prisma.session.findFirst({
       where: { id: sessionId, deletedAt: null },
       include: { shots: { orderBy: { shotNumber: 'asc' } } },
     });
     if (!session) throw new NotFoundException(`Session ${sessionId} not found`);
 
-    // Coaches can view their shooters' sessions; shooters/soldiers only own
-    if (session.shooterId !== userId) {
-      const connection = await this.prisma.coachConnection.findFirst({
-        where: { coachId: userId, shooterId: session.shooterId, status: 'APPROVED' },
-      });
-      if (!connection) throw new ForbiddenException('Access denied');
+    if (shooterIdHint && shooterIdHint !== session.shooterId) {
+      throw new ForbiddenException('Session does not belong to the requested shooter');
     }
+    await this.assertActorCanAccessShooter(userId, role, session.shooterId);
 
     const shots = session.shots;
     if (shots.length === 0) {
@@ -112,11 +114,18 @@ export class PerformanceService {
     userId: string,
     sessionId: string,
     dto: SessionContextDto,
+    role: UserRole = 'SHOOTER',
+    shooterIdHint?: string,
   ) {
     const session = await this.prisma.session.findFirst({
-      where: { id: sessionId, shooterId: userId, deletedAt: null },
+      where: { id: sessionId, deletedAt: null },
+      select: { shooterId: true },
     });
     if (!session) throw new NotFoundException(`Session ${sessionId} not found`);
+    if (shooterIdHint && shooterIdHint !== session.shooterId) {
+      throw new ForbiddenException('Session does not belong to the requested shooter');
+    }
+    await this.assertActorCanAccessShooter(userId, role, session.shooterId);
 
     return this.prisma.sessionContext.upsert({
       where: { sessionId },
@@ -127,10 +136,16 @@ export class PerformanceService {
 
   // ── Training Plan Generation ───────────────────────────────────────────────
 
-  async generateTrainingPlan(userId: string): Promise<TrainingPlan> {
+  async generateTrainingPlan(
+    userId: string,
+    role: UserRole = 'SHOOTER',
+    shooterId?: string,
+  ): Promise<TrainingPlan> {
+    const targetShooterId = await this.resolveShooterId(userId, role, shooterId);
+
     // Fetch last 10 sessions
     const sessions = await this.prisma.session.findMany({
-      where: { shooterId: userId, deletedAt: null },
+      where: { shooterId: targetShooterId, deletedAt: null },
       include: { shots: { orderBy: { shotNumber: 'asc' } } },
       orderBy: { sessionDate: 'desc' },
       take: 10,
@@ -144,7 +159,7 @@ export class PerformanceService {
     const analyses: DeepAnalysis[] = [];
     for (const s of sessions) {
       try {
-        const da = await this.getDeepAnalysis(userId, s.id);
+        const da = await this.getDeepAnalysis(userId, s.id, role, targetShooterId);
         analyses.push(da);
       } catch {
         // skip sessions we can't analyze
@@ -241,7 +256,7 @@ Each week should have 3-4 training sessions. Progress from foundational to advan
 
     const saved = await this.prisma.trainingPlan.create({
       data: {
-        userId,
+        userId: targetShooterId,
         content: planContent,
         weekStart,
         focusAreas: planContent.focusAreas ?? [],
@@ -251,12 +266,55 @@ Each week should have 3-4 training sessions. Progress from foundational to advan
     return this.formatPlan(saved);
   }
 
-  async getTrainingPlans(userId: string): Promise<TrainingPlan[]> {
+  async getTrainingPlans(
+    userId: string,
+    role: UserRole = 'SHOOTER',
+    shooterId?: string,
+  ): Promise<TrainingPlan[]> {
+    const targetShooterId = await this.resolveShooterId(userId, role, shooterId);
     const plans = await this.prisma.trainingPlan.findMany({
-      where: { userId },
+      where: { userId: targetShooterId },
       orderBy: { generatedAt: 'desc' },
     });
     return plans.map((p) => this.formatPlan(p));
+  }
+
+  private async resolveShooterId(
+    actorId: string,
+    role: UserRole,
+    shooterId?: string,
+  ): Promise<string> {
+    if (role === 'COACH') {
+      if (!shooterId) throw new ForbiddenException('shooterId is required for coach access');
+      await this.assertCoachCanAccessShooter(actorId, shooterId);
+      return shooterId;
+    }
+    return actorId;
+  }
+
+  private async assertActorCanAccessShooter(actorId: string, role: UserRole, shooterId: string): Promise<void> {
+    if (role === 'COACH') {
+      await this.assertCoachCanAccessShooter(actorId, shooterId);
+      return;
+    }
+    if (actorId !== shooterId) throw new ForbiddenException('Access denied');
+  }
+
+  private async assertCoachCanAccessShooter(coachId: string, shooterId: string): Promise<void> {
+    const [connection, managedProfile] = await Promise.all([
+      this.prisma.coachConnection.findFirst({
+        where: { coachId, shooterId, status: 'APPROVED' },
+        select: { id: true },
+      }),
+      this.prisma.shooterProfile.findFirst({
+        where: { userId: shooterId, managedByCoachId: coachId, isManaged: true },
+        select: { id: true },
+      }),
+    ]);
+
+    if (!connection && !managedProfile) {
+      throw new ForbiddenException('No approved coaching relationship with this shooter');
+    }
   }
 
   // ── Private Helpers ────────────────────────────────────────────────────────

@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from '../../components/AppShell';
 import { apiFetch } from '../../lib/api';
+import { formatSessionStart } from '../../lib/session-time';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
+import { useCoachShooter } from '../../lib/use-coach-shooter';
 import type {
   Session,
   AiCoachAnalysis,
@@ -34,6 +36,13 @@ const SEVERITY_META: Record<AiCoachSeverity, { label: string; color: string; bor
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function AiCoachPage() {
+  const {
+    isCoach,
+    shooters,
+    selectedShooter,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
   const [sessions,  setSessions]  = useState<Session[]>([]);
   const [selected,  setSelected]  = useState<string>('');
   const [analysis,  setAnalysis]  = useState<AiCoachAnalysis | null>(null);
@@ -42,14 +51,28 @@ export default function AiCoachPage() {
   const [error,     setError]     = useState<string | null>(null);
 
   useEffect(() => {
-    apiFetch<Session[]>('/sessions')
+    if (isCoach && !selectedShooterId) {
+      setSessions([]);
+      setSelected('');
+      setAnalysis(null);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setAnalysis(null);
+    const query = isCoach && selectedShooterId
+      ? `?shooterId=${encodeURIComponent(selectedShooterId)}`
+      : '';
+    apiFetch<Session[]>(`/sessions${query}`)
       .then((s) => {
         setSessions(s);
         if (s.length > 0) setSelected(s[0].id);
+        else setSelected('');
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isCoach, selectedShooterId]);
 
   async function runAnalysis() {
     if (!selected) return;
@@ -88,7 +111,31 @@ export default function AiCoachPage() {
             Powered by Claude Opus 4.6. Select a session and get expert coaching feedback based on
             your shot placement, scoring patterns, and technical fundamentals.
           </p>
+          {isCoach && (
+            <p className="text-[#4A5568] text-xs mt-2">
+              Viewing shooter: <span className="text-[#F0F4FF]">{selectedShooter?.name ?? 'None selected'}</span>
+            </p>
+          )}
         </div>
+
+        {isCoach && (
+          <div className="card p-4 animate-slide-up">
+            <label className="label mb-2 block">Shooter</label>
+            <select
+              value={selectedShooterId ?? ''}
+              onChange={(e) => setSelectedShooterId(e.target.value || null)}
+              className="field w-full sm:max-w-sm"
+            >
+              {shooters.length === 0 && <option value="">No connected shooters</option>}
+              {shooters.map((shooter) => (
+                <option key={shooter.id} value={shooter.id}>
+                  {shooter.name}
+                  {shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* ── Session selector ────────────────────────────────────────────── */}
         <div className="animate-slide-up relative rounded-xl border border-[#1E2433] bg-[#0E1118] p-6 overflow-hidden">
@@ -111,9 +158,7 @@ export default function AiCoachPage() {
               >
                 {sessions.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {new Date(s.sessionDate).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric',
-                    })} — {s.discipline} {s.distance}m · {s.numberOfShots} shots
+                    {formatSessionStart(s.sessionDate, { includeYear: true })} — {s.discipline} {s.distance}m · {s.numberOfShots} shots
                   </option>
                 ))}
               </select>

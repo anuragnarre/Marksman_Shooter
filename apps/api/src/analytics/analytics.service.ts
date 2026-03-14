@@ -7,11 +7,45 @@ import {
   OverviewAnalytics,
   SessionTrendPoint,
   RingDistributionBucket,
+  UserRole,
 } from '@shooting-platform/shared-types';
 
 @Injectable()
 export class AnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async computeForSessionForActor(
+    actorId: string,
+    role: UserRole,
+    sessionId: string,
+  ): Promise<AnalyticsResult> {
+    const session = await this.prisma.session.findFirst({
+      where: { id: sessionId, deletedAt: null },
+      select: { shooterId: true },
+    });
+    if (!session) throw new NotFoundException(`Session ${sessionId} not found`);
+
+    await this.assertActorCanAccessShooter(actorId, role, session.shooterId);
+    return this.computeForSession(sessionId);
+  }
+
+  async computeOverviewForActor(
+    actorId: string,
+    role: UserRole,
+    shooterId?: string,
+  ): Promise<OverviewAnalytics> {
+    const targetShooterId = await this.resolveShooterId(actorId, role, shooterId);
+    return this.computeOverview(targetShooterId);
+  }
+
+  async computeWeaponSummaryForActor(
+    actorId: string,
+    role: UserRole,
+    shooterId?: string,
+  ): Promise<WeaponPerformance[]> {
+    const targetShooterId = await this.resolveShooterId(actorId, role, shooterId);
+    return this.computeWeaponSummary(targetShooterId);
+  }
 
   async computeForSession(sessionId: string): Promise<AnalyticsResult> {
     const session = await this.prisma.session.findFirst({
@@ -221,6 +255,46 @@ export class AnalyticsService {
       ringDistribution,
       topDiscipline,
     };
+  }
+
+  private async resolveShooterId(
+    actorId: string,
+    role: UserRole,
+    shooterId?: string,
+  ): Promise<string> {
+    if (role === 'COACH') {
+      if (!shooterId) throw new NotFoundException('shooterId is required for coach access');
+      await this.assertCoachCanAccessShooter(actorId, shooterId);
+      return shooterId;
+    }
+    return actorId;
+  }
+
+  private async assertActorCanAccessShooter(actorId: string, role: UserRole, shooterId: string): Promise<void> {
+    if (role === 'COACH') {
+      await this.assertCoachCanAccessShooter(actorId, shooterId);
+      return;
+    }
+    if (actorId !== shooterId) {
+      throw new NotFoundException('Session not found');
+    }
+  }
+
+  private async assertCoachCanAccessShooter(coachId: string, shooterId: string): Promise<void> {
+    const [connection, managedProfile] = await Promise.all([
+      this.prisma.coachConnection.findFirst({
+        where: { coachId, shooterId, status: 'APPROVED' },
+        select: { id: true },
+      }),
+      this.prisma.shooterProfile.findFirst({
+        where: { userId: shooterId, managedByCoachId: coachId, isManaged: true },
+        select: { id: true },
+      }),
+    ]);
+
+    if (!connection && !managedProfile) {
+      throw new NotFoundException('Shooter not found');
+    }
   }
 }
 

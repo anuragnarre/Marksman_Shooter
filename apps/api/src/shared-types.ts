@@ -11,6 +11,30 @@ export interface User {
   email: string;
   role: UserRole;
   createdAt: Date;
+  shooterProfile?: ShooterProfile | null;
+}
+
+export interface ShooterProfile {
+  id: string;
+  userId: string;
+  shooterCode: string;
+  primaryWeapon?: string | null;
+  managedByCoachId?: string | null;
+  isManaged: boolean;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface CreateManagedShooterProfileRequest {
+  name: string;
+  shooterCode: string;
+  primaryWeapon?: string;
+}
+
+export interface UpdateManagedShooterProfileRequest {
+  name?: string;
+  shooterCode?: string;
+  primaryWeapon?: string | null;
 }
 
 export interface Session {
@@ -100,6 +124,74 @@ export interface CoachFeedback {
   feedback: string;
   createdAt: Date;
   coach?: User;
+}
+
+export interface CoachShooterPerformanceSummary {
+  shooterId: string;
+  totalSessions: number;
+  totalShots: number;
+  averageScore: number;
+  bestScore: number;
+  lastSessionDate: string | null;
+}
+
+export interface CoachDashboardShooterSummary {
+  shooterId: string;
+  shooterName: string;
+  shooterCode?: string | null;
+  primaryWeapon?: string | null;
+  isManaged: boolean;
+  totalSessions: number;
+  totalShots: number;
+  averageScore: number;
+  bestScore: number;
+  consistency: number;
+  recentForm: number;
+  lastSessionDate: string | null;
+}
+
+export interface CoachDashboardRecentSession {
+  sessionId: string;
+  shooterId: string;
+  shooterName: string;
+  sessionDate: string;
+  discipline: string;
+  weaponType: string;
+  trainingMode?: string | null;
+  totalShots: number;
+  averageScore: number;
+  groupRadius: number;
+}
+
+export interface CoachDashboardScheduleItem {
+  eventId: string;
+  title: string;
+  eventType: EventType;
+  start: string;
+  end: string;
+  allDay: boolean;
+  assigneeCount: number;
+  shooterNames: string[];
+}
+
+export interface CoachDashboardAnalyticsOverview {
+  totalShooters: number;
+  activeShooters30d: number;
+  totalSessions: number;
+  totalShots: number;
+  averageScore: number;
+  xRingRate: number;
+  pendingRequests: number;
+  upcomingItems7d: number;
+  plannedTasks: number;
+}
+
+export interface CoachDashboardData {
+  generatedAt: string;
+  analytics: CoachDashboardAnalyticsOverview;
+  shooterSummaries: CoachDashboardShooterSummary[];
+  recentSessions: CoachDashboardRecentSession[];
+  schedule: CoachDashboardScheduleItem[];
 }
 
 // ── Analytics ────────────────────────────────────────────────────────────────

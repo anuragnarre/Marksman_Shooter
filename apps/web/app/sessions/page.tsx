@@ -8,8 +8,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 import { AppShell } from '../../components/AppShell';
+import { formatSessionStart } from '../../lib/session-time';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { useCoachShooter } from '../../lib/use-coach-shooter';
 import type { Session } from '@shooting-platform/shared-types';
 import { TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 
@@ -63,6 +65,14 @@ function computeStats(sessions: Session[]) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SessionsPage() {
+  const {
+    isCoach,
+    shooters,
+    selectedShooter,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
+
   const [sessions,  setSessions]  = useState<Session[]>([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState<string | null>(null);
@@ -70,19 +80,32 @@ export default function SessionsPage() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
   function load() {
+    if (isCoach && !selectedShooterId) {
+      setSessions([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    apiFetch<Session[]>('/sessions')
+    const path = isCoach
+      ? `/sessions?shooterId=${encodeURIComponent(selectedShooterId ?? '')}`
+      : '/sessions';
+
+    apiFetch<Session[]>(path)
       .then(setSessions)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [isCoach, selectedShooterId]);
 
   async function handleDelete(id: string) {
     setDeleting(id);
     try {
-      await apiFetch(`/sessions/${id}`, { method: 'DELETE' });
+      const path = isCoach
+        ? `/sessions/${id}?shooterId=${encodeURIComponent(selectedShooterId ?? '')}`
+        : `/sessions/${id}`;
+      await apiFetch(path, { method: 'DELETE' });
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to delete session');
@@ -105,14 +128,40 @@ export default function SessionsPage() {
           <div>
             <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">Training Sessions</h1>
             <p className="text-[#4A5568] text-sm mt-1">
-              All your recorded training sessions
+              {isCoach
+                ? `Sessions for ${selectedShooter?.name ?? 'selected shooter'}`
+                : 'All your recorded training sessions'}
             </p>
           </div>
-          <Link href="/sessions/new" className="btn btn-primary text-sm py-2.5 px-4 sm:px-5 shrink-0">
+          <Link
+            href={isCoach && selectedShooterId
+              ? `/sessions/new?shooterId=${encodeURIComponent(selectedShooterId)}`
+              : '/sessions/new'}
+            className="btn btn-primary text-sm py-2.5 px-4 sm:px-5 shrink-0"
+          >
             <span className="hidden xs:inline">+ New Session</span>
             <span className="xs:hidden">+ New</span>
           </Link>
         </div>
+
+        {isCoach && (
+          <div className="card p-4 animate-slide-up">
+            <label className="label block mb-2">Shooter</label>
+            <select
+              value={selectedShooterId ?? ''}
+              onChange={(e) => setSelectedShooterId(e.target.value || null)}
+              className="field w-full sm:max-w-sm"
+            >
+              {shooters.length === 0 && <option value="">No connected shooters</option>}
+              {shooters.map((shooter) => (
+                <option key={shooter.id} value={shooter.id}>
+                  {shooter.name}
+                  {shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* ── Quick stats ─────────────────────────────────────────────────── */}
         {!loading && sessions.length > 0 && (
@@ -229,6 +278,9 @@ function SessionRow({
         <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-wide">
           {date.toLocaleDateString('en-US', { month: 'short' })}
         </p>
+        <p className="text-[#4A5568] text-[10px] font-data mt-0.5 leading-none">
+          {new Date(session.sessionDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+        </p>
       </div>
 
       {/* Main info */}
@@ -249,6 +301,10 @@ function SessionRow({
           )}
         </div>
         <div className="flex items-center gap-3 mt-0.5 text-[#4A5568] text-[11px] font-display uppercase tracking-wide">
+          <span className="text-[#8892A4] normal-case tracking-normal font-data">
+            Started {formatSessionStart(session.sessionDate)}
+          </span>
+          <span className="opacity-30">·</span>
           <span>{session.distance}m</span>
           <span className="opacity-30">·</span>
           <span>{session.numberOfShots} shots planned</span>

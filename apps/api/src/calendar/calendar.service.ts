@@ -20,6 +20,17 @@ const EVENT_INCLUDE = {
 export class CalendarService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isSelfManagedEvent(
+    event: { coachId: string; assignees: { shooterId: string }[] },
+    userId: string,
+  ) {
+    return (
+      event.coachId === userId &&
+      event.assignees.length === 1 &&
+      event.assignees[0]?.shooterId === userId
+    );
+  }
+
   // ── Parse a date string safely, falling back to a default ─────────────────
   private safeDate(value: string, fallback: Date): Date {
     // '+' is decoded as space in URL query strings — restore it
@@ -67,7 +78,20 @@ export class CalendarService {
   }
 
   // ── Create event (with optional recurrence expansion) ────────────────────
-  async createEvent(coachId: string, dto: CreateEventDto) {
+  async createEvent(actorId: string, actorRole: string, dto: CreateEventDto) {
+    const isCoach = actorRole === 'COACH';
+    const assigneeIds = isCoach ? dto.assigneeIds ?? [] : [actorId];
+
+    if (!isCoach && dto.assigneeIds !== undefined) {
+      const validSelfOnly = dto.assigneeIds.length === 1 && dto.assigneeIds[0] === actorId;
+      if (!validSelfOnly) {
+        throw new ForbiddenException('Shooters can only assign calendar items to themselves');
+      }
+    }
+    if (isCoach) {
+      await this.assertCoachCanAssignShooters(actorId, assigneeIds);
+    }
+
     const groupId = dto.recurringType && dto.recurringType !== 'none'
       ? crypto.randomUUID()
       : null;
@@ -86,10 +110,10 @@ export class CalendarService {
             allDay:          dto.allDay ?? false,
             color:           dto.color ?? null,
             recurringGroupId: groupId,
-            coachId,
-            assignees: dto.assigneeIds?.length
+            coachId:         actorId,
+            assignees: assigneeIds.length
               ? {
-                  create: dto.assigneeIds.map((sid) => ({
+                  create: assigneeIds.map((sid) => ({
                     shooterId: sid,
                     status: 'PENDING',
                   })),
@@ -105,15 +129,26 @@ export class CalendarService {
   }
 
   // ── Update single event ────────────────────────────────────────────────────
-  async updateEvent(coachId: string, eventId: string, dto: UpdateEventDto) {
+  async updateEvent(actorId: string, actorRole: string, eventId: string, dto: UpdateEventDto) {
+    const isCoach = actorRole === 'COACH';
     const event = await this.prisma.trainingEvent.findFirst({
       where: { id: eventId, deletedAt: null },
+      include: { assignees: { select: { shooterId: true } } },
     });
     if (!event) throw new NotFoundException('Event not found');
-    if (event.coachId !== coachId) throw new ForbiddenException('Not your event');
+    if (event.coachId !== actorId) throw new ForbiddenException('Not your event');
+
+    if (!isCoach && !this.isSelfManagedEvent(event, actorId)) {
+      throw new ForbiddenException('You can only edit your own training items');
+    }
+
+    if (!isCoach && dto.assigneeIds !== undefined) {
+      throw new ForbiddenException('Shooters cannot reassign calendar items');
+    }
 
     // Rebuild assignees if provided
-    if (dto.assigneeIds !== undefined) {
+    if (isCoach && dto.assigneeIds !== undefined) {
+      await this.assertCoachCanAssignShooters(actorId, dto.assigneeIds);
       await this.prisma.eventAssignee.deleteMany({ where: { eventId } });
       if (dto.assigneeIds.length > 0) {
         await this.prisma.eventAssignee.createMany({
@@ -145,12 +180,17 @@ export class CalendarService {
   }
 
   // ── Delete single event ────────────────────────────────────────────────────
-  async deleteEvent(coachId: string, eventId: string) {
+  async deleteEvent(actorId: string, actorRole: string, eventId: string) {
+    const isCoach = actorRole === 'COACH';
     const event = await this.prisma.trainingEvent.findFirst({
       where: { id: eventId, deletedAt: null },
+      include: { assignees: { select: { shooterId: true } } },
     });
     if (!event) throw new NotFoundException('Event not found');
-    if (event.coachId !== coachId) throw new ForbiddenException('Not your event');
+    if (event.coachId !== actorId) throw new ForbiddenException('Not your event');
+    if (!isCoach && !this.isSelfManagedEvent(event, actorId)) {
+      throw new ForbiddenException('You can only delete your own training items');
+    }
 
     await this.prisma.trainingEvent.update({
       where: { id: eventId },
@@ -160,9 +200,21 @@ export class CalendarService {
   }
 
   // ── Delete all events in a recurring group ─────────────────────────────────
-  async deleteRecurringGroup(coachId: string, groupId: string) {
+  async deleteRecurringGroup(actorId: string, actorRole: string, groupId: string) {
+    const isCoach = actorRole === 'COACH';
+    const events = await this.prisma.trainingEvent.findMany({
+      where: { recurringGroupId: groupId, coachId: actorId, deletedAt: null },
+      select: { id: true, coachId: true, assignees: { select: { shooterId: true } } },
+    });
+
+    if (!isCoach && events.some((event) => !this.isSelfManagedEvent(event, actorId))) {
+      throw new ForbiddenException('You can only delete recurring items you created for yourself');
+    }
+
+    if (events.length === 0) return { deleted: true };
+
     await this.prisma.trainingEvent.updateMany({
-      where: { recurringGroupId: groupId, coachId, deletedAt: null },
+      where: { id: { in: events.map((event) => event.id) } },
       data: { deletedAt: new Date() },
     });
     return { deleted: true };
@@ -170,13 +222,25 @@ export class CalendarService {
 
   // ── Get connected shooters (for assignee picker) ───────────────────────────
   async getConnectedShooters(coachId: string) {
-    const connections = await this.prisma.coachConnection.findMany({
-      where: { coachId, status: 'APPROVED' },
-      include: {
-        shooter: { select: { id: true, name: true, email: true, role: true, createdAt: true } },
-      },
-    });
-    return connections.map((c) => c.shooter);
+    const [connections, managedProfiles] = await Promise.all([
+      this.prisma.coachConnection.findMany({
+        where: { coachId, status: 'APPROVED' },
+        include: {
+          shooter: { select: { id: true, name: true, email: true, role: true, createdAt: true } },
+        },
+      }),
+      this.prisma.shooterProfile.findMany({
+        where: { managedByCoachId: coachId, isManaged: true },
+        include: {
+          user: { select: { id: true, name: true, email: true, role: true, createdAt: true } },
+        },
+      }),
+    ]);
+
+    const byId = new Map<string, { id: string; name: string; email: string; role: string; createdAt: Date }>();
+    for (const c of connections) byId.set(c.shooter.id, c.shooter);
+    for (const profile of managedProfiles) byId.set(profile.user.id, profile.user);
+    return Array.from(byId.values());
   }
 
   // ── Private: expand dates for recurring events ────────────────────────────
@@ -217,5 +281,31 @@ export class CalendarService {
     }
 
     return dates;
+  }
+
+  private async assertCoachCanAssignShooters(coachId: string, shooterIds: string[]): Promise<void> {
+    if (shooterIds.length === 0) return;
+
+    const uniqueShooterIds = Array.from(new Set(shooterIds));
+    const [connections, managedProfiles] = await Promise.all([
+      this.prisma.coachConnection.findMany({
+        where: { coachId, status: 'APPROVED', shooterId: { in: uniqueShooterIds } },
+        select: { shooterId: true },
+      }),
+      this.prisma.shooterProfile.findMany({
+        where: { managedByCoachId: coachId, isManaged: true, userId: { in: uniqueShooterIds } },
+        select: { userId: true },
+      }),
+    ]);
+
+    const allowedIds = new Set<string>([
+      ...connections.map((c) => c.shooterId),
+      ...managedProfiles.map((p) => p.userId),
+    ]);
+
+    const forbiddenShooterId = uniqueShooterIds.find((id) => !allowedIds.has(id));
+    if (forbiddenShooterId) {
+      throw new ForbiddenException('You can only assign events to your connected or managed shooters');
+    }
   }
 }

@@ -134,18 +134,18 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
       </div>
 
       {/* ── Table ────────────────────────────────────────────────────────── */}
-      <div className="overflow-x-auto">
-        <table className="w-full" role="table" aria-label="Shot data">
+      <div className="overflow-x-auto overscroll-x-contain">
+        <table className="w-full min-w-[520px] sm:min-w-full" role="table" aria-label="Shot data">
           <thead>
             <tr className="border-b border-[#1E2433] bg-[rgba(10,13,18,0.95)]">
-              <th className="text-left py-2.5 px-4 label text-[10px] w-10">#</th>
-              <th className="text-left py-2.5 px-3 label text-[10px]">Ring</th>
-              <th className="text-right py-2.5 px-4 label text-[10px]">Score</th>
-              <th className="text-left py-2.5 px-4 label text-[10px]">Direction</th>
-              <th className="text-right py-2.5 px-3 label text-[10px] hidden sm:table-cell">X</th>
-              <th className="text-right py-2.5 px-3 label text-[10px] hidden sm:table-cell">Y</th>
-              <th className="text-right py-2.5 px-4 label text-[10px] hidden md:table-cell">Time</th>
-              <th className="text-center py-2.5 px-3 label text-[10px] hidden lg:table-cell w-8">Δ</th>
+              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] w-10 font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
+              <th className="text-left py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Ring</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
+              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden md:table-cell">Time</th>
+              <th className="text-center py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden lg:table-cell w-8">Δ</th>
             </tr>
           </thead>
 
@@ -171,12 +171,12 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         className="group border-b border-[#1E2433]/40 hover:bg-[#161B26] transition-colors duration-100"
                       >
                         {/* Shot # */}
-                        <td className="py-2.5 px-4 text-[#4A5568] font-data text-xs tabular-nums">
+                        <td className="py-2.5 px-2.5 sm:px-4 text-[#4A5568] font-data text-xs tabular-nums">
                           {shot.shotNumber}
                         </td>
 
                         {/* Ring badge */}
-                        <td className="py-2.5 px-3">
+                        <td className="py-2.5 px-2.5 sm:px-3">
                           <span
                             className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-display font-bold tracking-wide"
                             style={{ color: ring.color, background: ring.bg }}
@@ -186,7 +186,7 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         </td>
 
                         {/* Score */}
-                        <td className="py-2.5 px-4 text-right">
+                        <td className="py-2.5 px-2.5 sm:px-4 text-right">
                           <span
                             className="font-data font-bold text-base tabular-nums"
                             style={{ color: ring.color }}
@@ -196,7 +196,7 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         </td>
 
                         {/* Direction */}
-                        <td className="py-2.5 px-4">
+                        <td className="py-2.5 px-2.5 sm:px-4">
                           <span className="inline-flex items-center gap-1.5">
                             <span
                               className="text-base leading-none select-none"
@@ -215,26 +215,26 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         </td>
 
                         {/* X coordinate */}
-                        <td className="py-2.5 px-3 text-right font-data text-xs tabular-nums hidden sm:table-cell">
+                        <td className="py-2.5 px-2.5 sm:px-3 text-right font-data text-xs tabular-nums hidden sm:table-cell">
                           <span style={{ color: xColor(shot.x) }}>
                             {shot.x >= 0 ? '+' : ''}{shot.x.toFixed(2)}
                           </span>
                         </td>
 
                         {/* Y coordinate */}
-                        <td className="py-2.5 px-3 text-right font-data text-xs tabular-nums hidden sm:table-cell">
+                        <td className="py-2.5 px-2.5 sm:px-3 text-right font-data text-xs tabular-nums hidden sm:table-cell">
                           <span style={{ color: yColor(shot.y) }}>
                             {shot.y >= 0 ? '+' : ''}{shot.y.toFixed(2)}
                           </span>
                         </td>
 
                         {/* Timestamp */}
-                        <td className="py-2.5 px-4 text-right font-data text-[11px] text-[#4A5568] tabular-nums hidden md:table-cell">
+                        <td className="py-2.5 px-2.5 sm:px-4 text-right font-data text-[11px] text-[#4A5568] tabular-nums hidden md:table-cell">
                           {fmtTime(shot.timestamp)}
                         </td>
 
                         {/* Trend Δ */}
-                        <td className="py-2.5 px-3 text-center hidden lg:table-cell">
+                        <td className="py-2.5 px-2.5 sm:px-3 text-center hidden lg:table-cell">
                           {trend === null ? (
                             <span className="text-[#4A5568] text-xs">—</span>
                           ) : trend > 0.05 ? (
@@ -258,32 +258,32 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                   {/* ── Series summary row ──────────────────────────────── */}
                   {highlightSeries && (
                     <tr className="border-y border-[#1E2433] bg-[rgba(245,166,35,0.04)]">
-                      <td className="py-2 px-4">
+                      <td className="py-2 px-2.5 sm:px-4">
                         <span className="text-[10px] font-display font-bold uppercase tracking-widest text-accent">
                           S{si + 1}
                         </span>
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="py-2 px-2.5 sm:px-3">
                         <span className="text-[10px] font-display text-[#4A5568] uppercase tracking-wide">
                           {group.length} shots
                         </span>
                       </td>
-                      <td className="py-2 px-4 text-right">
+                      <td className="py-2 px-2.5 sm:px-4 text-right">
                         <span className="font-data font-bold text-accent text-sm tabular-nums">
                           {seriesAvg.toFixed(2)}
                         </span>
                         <span className="text-[10px] text-[#4A5568] ml-1">avg</span>
                       </td>
                       {/* Direction col — series direction distribution hint */}
-                      <td className="py-2 px-4">
+                      <td className="py-2 px-2.5 sm:px-4">
                         <SeriesDirectionHint shots={group} />
                       </td>
-                      <td className="py-2 px-3 hidden sm:table-cell">
+                      <td className="py-2 px-2.5 sm:px-3 hidden sm:table-cell">
                         <span className="text-[10px] text-[#4A5568] font-data tabular-nums">
                           Σ {seriesTotal.toFixed(1)}
                         </span>
                       </td>
-                      <td className="py-2 px-3 hidden sm:table-cell">
+                      <td className="py-2 px-2.5 sm:px-3 hidden sm:table-cell">
                         <span className="text-[10px] text-[#4A5568] font-data tabular-nums">
                           {seriesMin.toFixed(1)}–{seriesMax.toFixed(1)}
                         </span>

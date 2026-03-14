@@ -11,6 +11,7 @@ interface TopBarProps {
   title: string;
   isLive?: boolean;
   sidebarWidth?: number;
+  safeTopInset?: string;
 }
 
 const ROLE_COLOR: Record<string, string> = {
@@ -19,16 +20,23 @@ const ROLE_COLOR: Record<string, string> = {
   SOLDIER: '#00E5A0',
 };
 
-export function TopBar({ title, isLive = false, sidebarWidth = 244 }: TopBarProps) {
+export function TopBar({
+  title,
+  isLive = false,
+  sidebarWidth = 244,
+  safeTopInset = 'env(safe-area-inset-top, 0px)',
+}: TopBarProps) {
   const { user } = useAuth();
   const roleColor = user?.role ? (ROLE_COLOR[user.role] ?? '#F5A623') : '#F5A623';
 
   return (
     <header
-      className="fixed top-0 right-0 z-topbar h-[58px] flex items-center px-5
+      className="fixed top-0 right-0 z-topbar relative overflow-hidden flex items-center px-4 sm:px-5
                  transition-all duration-300 ease-spring"
       style={{
         left: sidebarWidth,
+        height: `calc(58px + ${safeTopInset})`,
+        paddingTop: `calc(${safeTopInset} + 8px)`,
         background: 'rgba(6, 8, 16, 0.82)',
         backdropFilter: 'blur(24px) saturate(180%)',
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
@@ -36,6 +44,16 @@ export function TopBar({ title, isLive = false, sidebarWidth = 244 }: TopBarProp
         boxShadow: '0 1px 0 rgba(245,166,35,0.07), 0 4px 24px rgba(0,0,0,0.4)',
       }}
     >
+      {/* Color wash across the notch/status-bar safe area */}
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: `max(${safeTopInset}, 10px)`,
+          background:
+            'linear-gradient(90deg, rgba(245,166,35,0.20) 0%, rgba(79,195,247,0.16) 45%, rgba(0,229,160,0.12) 100%)',
+        }}
+      />
+
       {/* Animated bottom gradient border */}
       <div
         className="absolute bottom-0 left-0 right-0 h-px"

@@ -51,6 +51,9 @@ export class ScheduleRequestsService {
     }
 
     const coachId = assignee.event.coachId;
+    if (coachId === shooterId) {
+      throw new BadRequestException('Self-managed calendar items do not need a change request');
+    }
 
     const request = await this.prisma.scheduleRequest.create({
       data: {

@@ -9,6 +9,7 @@ import {
   Cell, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import { apiFetch } from '../../lib/api';
+import { formatSessionStart } from '../../lib/session-time';
 import { useAuth } from '../../contexts/auth-context';
 import { AppShell } from '../../components/AppShell';
 import { MetricCard } from '../../components/ui/MetricCard';
@@ -16,6 +17,8 @@ import { TargetCanvas } from '../../components/TargetCanvas';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard, SkeletonRow } from '../../components/ui/SkeletonCard';
 import type {
+  CoachDashboardData,
+  CreateManagedShooterProfileRequest,
   Session, Shot, User, WeaponPerformance,
   OverviewAnalytics, SessionTrendPoint,
 } from '@shooting-platform/shared-types';
@@ -891,73 +894,70 @@ function ShooterView() {
                 All sessions →
               </Link>
             </div>
-            <div className="mt-4">
+            <div className="mt-3 overflow-x-auto overscroll-x-contain">
               {sessions.length === 0 ? (
                 <EmptySessionsState />
               ) : (
-                <table className="w-full text-sm" role="table">
-                  <thead>
-                    <tr className="border-b border-[#1E2433]">
-                      <th className="text-left py-3 px-5 label">Date</th>
-                      <th className="text-left py-3 px-5 label hidden sm:table-cell">Discipline</th>
-                      <th className="text-right py-3 px-5 label">Avg Score</th>
-                      <th className="text-right py-3 px-5 label hidden md:table-cell">Shots</th>
-                      <th className="text-right py-3 px-5 label hidden lg:table-cell">Group R.</th>
-                      <th className="py-3 px-5" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessions.slice(0, 8).map((s, i) => {
-                      const tp = trendBySessionId.get(s.id);
-                      const avg = tp?.avgScore;
-                      const avgCol = avg !== undefined ? shotColor(avg) : '#8892A4';
-                      return (
-                        <tr
-                          key={s.id}
-                          className="table-row-hover border-b border-[#1E2433]/50 animate-fade-in"
-                          style={{ animationDelay: `${i * 30}ms` }}
-                        >
-                          <td className="py-3 px-5">
-                            <span className="score-value text-xs text-[#8892A4]">
-                              {new Date(s.sessionDate).toLocaleDateString('en-US', {
-                                month: 'short', day: 'numeric',
-                              })}
+                <div className="min-w-[860px]">
+                  <div
+                    className="grid border-y border-[#1E2433] bg-[rgba(10,13,18,0.92)]"
+                    style={{ gridTemplateColumns: '200px 220px 120px 100px 120px 100px' }}
+                  >
+                    {['Session Start', 'Discipline', 'Avg Score', 'Shots', 'Group R.', ''].map((header, idx) => (
+                      <div
+                        key={`${header}-${idx}`}
+                        className={`py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap ${idx >= 2 && idx <= 4 ? 'text-right' : 'text-left'} ${idx === 5 ? 'text-right' : ''}`}
+                      >
+                        {header}
+                      </div>
+                    ))}
+                  </div>
+                  {sessions.slice(0, 8).map((s, i) => {
+                    const tp = trendBySessionId.get(s.id);
+                    const avg = tp?.avgScore;
+                    const avgCol = avg !== undefined ? shotColor(avg) : '#8892A4';
+                    return (
+                      <div
+                        key={s.id}
+                        className="table-row-hover border-b border-[#1E2433]/50 animate-fade-in grid items-center"
+                        style={{
+                          animationDelay: `${i * 30}ms`,
+                          gridTemplateColumns: '200px 220px 120px 100px 120px 100px',
+                        }}
+                      >
+                        <div className="py-3 px-5 whitespace-nowrap">
+                          <span className="score-value text-xs text-[#8892A4] whitespace-nowrap">{formatSessionStart(s.sessionDate)}</span>
+                        </div>
+                        <div className="py-3 px-5 whitespace-nowrap">
+                          <StatusBadge variant="discipline" label={s.discipline} size="sm" />
+                        </div>
+                        <div className="py-3 px-5 text-right whitespace-nowrap">
+                          {avg !== undefined ? (
+                            <span className="score-value text-sm font-semibold" style={{ color: avgCol }}>
+                              {avg.toFixed(2)}
                             </span>
-                          </td>
-                          <td className="py-3 px-5 hidden sm:table-cell">
-                            <StatusBadge variant="discipline" label={s.discipline} size="sm" />
-                          </td>
-                          <td className="py-3 px-5 text-right">
-                            {avg !== undefined ? (
-                              <span
-                                className="score-value text-sm font-semibold"
-                                style={{ color: avgCol }}
-                              >
-                                {avg.toFixed(2)}
-                              </span>
-                            ) : (
-                              <span className="text-[#4A5568] text-xs">—</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-5 text-right score-value text-[#F0F4FF] text-xs hidden md:table-cell">
-                            {tp?.totalShots ?? s.numberOfShots}
-                          </td>
-                          <td className="py-3 px-5 text-right score-value text-[#4FC3F7] text-xs hidden lg:table-cell">
-                            {tp ? tp.groupRadius.toFixed(2) : '—'}
-                          </td>
-                          <td className="py-3 px-5 text-right">
-                            <Link
-                              href={`/sessions/${s.id}`}
-                              className="text-accent hover:text-amber-300 text-xs font-display font-semibold uppercase tracking-wide transition-colors"
-                            >
-                              View →
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                          ) : (
+                            <span className="text-[#4A5568] text-xs">—</span>
+                          )}
+                        </div>
+                        <div className="py-3 px-5 text-right score-value text-[#F0F4FF] text-xs whitespace-nowrap">
+                          {tp?.totalShots ?? s.numberOfShots}
+                        </div>
+                        <div className="py-3 px-5 text-right score-value text-[#4FC3F7] text-xs whitespace-nowrap">
+                          {tp ? tp.groupRadius.toFixed(2) : '—'}
+                        </div>
+                        <div className="py-3 px-5 text-right whitespace-nowrap">
+                          <Link
+                            href={`/sessions/${s.id}`}
+                            className="text-accent hover:text-amber-300 text-xs font-display font-semibold uppercase tracking-wide transition-colors"
+                          >
+                            View →
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
@@ -1327,7 +1327,7 @@ function SoldierView() {
         <div className="flex items-center justify-between p-5 pb-0">
           <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">Recent Sessions</h3>
         </div>
-        <div className="mt-4">
+        <div className="mt-3 overflow-x-auto overscroll-x-contain">
           {loading ? (
             <div className="px-5 pb-4 space-y-0">
               {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} animationDelay={i * 40} />)}
@@ -1335,13 +1335,20 @@ function SoldierView() {
           ) : sessions.length === 0 ? (
             <EmptySessionsState />
           ) : (
-            <table className="w-full text-sm" role="table">
-              <thead>
-                <tr className="border-b border-[#1E2433]">
-                  <th className="text-left py-3 px-5 label">Date</th>
-                  <th className="text-left py-3 px-5 label hidden sm:table-cell">Weapon</th>
-                  <th className="text-left py-3 px-5 label hidden md:table-cell">Mode</th>
-                  <th className="text-right py-3 px-5 label">Shots</th>
+            <table className="w-full min-w-[860px] table-fixed text-sm" role="table">
+              <colgroup>
+                <col className="w-[200px]" />
+                <col className="w-[220px]" />
+                <col className="w-[160px]" />
+                <col className="w-[100px]" />
+                <col className="w-[100px]" />
+              </colgroup>
+              <thead className="bg-[rgba(10,13,18,0.92)]">
+                <tr className="border-y border-[#1E2433]">
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Session Start</th>
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap hidden sm:table-cell">Weapon</th>
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap hidden md:table-cell">Mode</th>
+                  <th className="text-right py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Shots</th>
                   <th className="py-3 px-5" />
                 </tr>
               </thead>
@@ -1352,14 +1359,10 @@ function SoldierView() {
                     className="table-row-hover border-b border-[#1E2433]/50 animate-fade-in"
                     style={{ animationDelay: `${i * 30}ms` }}
                   >
-                    <td className="py-3 px-5">
-                      <span className="score-value text-xs text-[#8892A4]">
-                        {new Date(s.sessionDate).toLocaleDateString('en-US', {
-                          month: 'short', day: 'numeric', year: '2-digit',
-                        })}
-                      </span>
+                    <td className="py-3 px-5 whitespace-nowrap align-middle">
+                      <span className="score-value text-xs text-[#8892A4] whitespace-nowrap">{formatSessionStart(s.sessionDate, { includeYear: true })}</span>
                     </td>
-                    <td className="py-3 px-5 text-[#8892A4] text-xs hidden sm:table-cell">
+                    <td className="py-3 px-5 text-[#8892A4] text-xs hidden sm:table-cell whitespace-nowrap align-middle truncate">
                       {s.weaponType}
                     </td>
                     <td className="py-3 px-5 hidden md:table-cell">
@@ -1378,7 +1381,7 @@ function SoldierView() {
                     <td className="py-3 px-5 text-right score-value text-[#F0F4FF]">
                       {s.numberOfShots}
                     </td>
-                    <td className="py-3 px-5 text-right">
+                    <td className="py-3 px-5 text-right whitespace-nowrap align-middle">
                       <Link
                         href={`/sessions/${s.id}`}
                         className="text-accent hover:text-amber-300 text-xs font-display font-semibold uppercase tracking-wide transition-colors"
@@ -1399,42 +1402,71 @@ function SoldierView() {
 
 // ── CoachView ──────────────────────────────────────────────────────────────────
 
-function ShooterCard({ shooter, delay }: { shooter: User; delay: number }) {
-  return (
-    <Link
-      href="/coach/shooters"
-      className="card p-4 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 animate-slide-up block"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
-          <span className="text-accent font-display font-bold">{shooter.name.charAt(0)}</span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-[#F0F4FF] font-semibold text-sm truncate">{shooter.name}</p>
-          <p className="text-[#4A5568] text-[10px] truncate">{shooter.email}</p>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 function CoachView() {
   const { user } = useAuth();
-  const [shooters, setShooters]     = useState<User[]>([]);
-  const [pendingCount, setPending]  = useState(0);
+  const [dashboard, setDashboard]   = useState<CoachDashboardData | null>(null);
   const [loading, setLoading]       = useState(true);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [creatingManaged, setCreatingManaged] = useState(false);
+  const [managedSuccess, setManagedSuccess] = useState<string | null>(null);
+  const [managedError, setManagedError] = useState<string | null>(null);
+  const [managedForm, setManagedForm] = useState<CreateManagedShooterProfileRequest>({
+    name: '',
+    shooterCode: '',
+    primaryWeapon: '',
+  });
+
+  const shooterSummaries = dashboard?.shooterSummaries ?? [];
+  const analytics = dashboard?.analytics;
+  const recentSessions = dashboard?.recentSessions ?? [];
+  const schedule = dashboard?.schedule ?? [];
+  const managedCount = shooterSummaries.filter((shooter) => shooter.isManaged).length;
+  const trendData = [...recentSessions]
+    .slice(0, 10)
+    .reverse()
+    .map((session) => ({
+      date: fmtDateShort(session.sessionDate),
+      avgScore: session.averageScore,
+      shots: session.totalShots,
+    }));
+
+  function loadCoachData() {
+    setLoading(true);
+    apiFetch<CoachDashboardData>('/coach/dashboard')
+      .then(setDashboard)
+      .catch((e: Error) => setManagedError(e.message))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
-    Promise.all([
-      apiFetch<User[]>('/coach/shooters').catch(() => [] as User[]),
-      apiFetch<unknown[]>('/coach/incoming-invites').catch(() => [] as unknown[]),
-    ]).then(([s, invites]) => {
-      setShooters(s);
-      setPending(invites.length);
-    }).finally(() => setLoading(false));
+    loadCoachData();
   }, []);
+
+  async function handleCreateManagedShooter() {
+    if (!managedForm.name.trim() || !managedForm.shooterCode.trim()) return;
+
+    setManagedError(null);
+    setManagedSuccess(null);
+    setCreatingManaged(true);
+
+    try {
+      const created = await apiFetch<User>('/coach/managed-shooters', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: managedForm.name.trim(),
+          shooterCode: managedForm.shooterCode.trim().toUpperCase(),
+          primaryWeapon: managedForm.primaryWeapon?.trim() || undefined,
+        }),
+      });
+
+      setManagedForm({ name: '', shooterCode: '', primaryWeapon: '' });
+      setManagedSuccess(`Created managed shooter profile for ${created.name}.`);
+      loadCoachData();
+    } catch (e) {
+      setManagedError(e instanceof Error ? e.message : 'Failed to create managed shooter');
+    } finally {
+      setCreatingManaged(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -1444,140 +1476,328 @@ function CoachView() {
           {getGreeting()}, Coach {user?.name?.split(' ')[0]}.
         </h2>
         <p className="text-[#8892A4] text-sm mt-1">
-          {shooters.length} shooter{shooters.length !== 1 ? 's' : ''} connected.
+          Professional overview for your entire training roster.
         </p>
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard
           label="Active Shooters"
-          value={shooters.length}
+          value={analytics?.totalShooters ?? 0}
           decimals={0}
           color="accent"
           animationDelay={0}
           icon={<TargetIcon />}
         />
         <MetricCard
-          label="Pending Requests"
-          value={pendingCount}
+          label="Active (30d)"
+          value={analytics?.activeShooters30d ?? 0}
           decimals={0}
           color="blue"
           animationDelay={60}
           icon={<ZapIcon />}
         />
         <MetricCard
-          label="Total Athletes"
-          value={shooters.length + pendingCount}
+          label="Roster Sessions"
+          value={analytics?.totalSessions ?? 0}
           decimals={0}
           color="emerald"
           animationDelay={120}
+          icon={<ChartIcon />}
+        />
+        <MetricCard
+          label="Roster Shots"
+          value={analytics?.totalShots ?? 0}
+          decimals={0}
+          color="blue"
+          animationDelay={180}
+          icon={<BulletIcon />}
+        />
+        <MetricCard
+          label="Team Avg Score"
+          value={analytics?.averageScore ?? 0}
+          decimals={2}
+          color="accent"
+          animationDelay={240}
+          icon={<TrophyIcon />}
+        />
+        <MetricCard
+          label="X-Ring Rate"
+          value={analytics?.xRingRate ?? 0}
+          decimals={1}
+          color="emerald"
+          unit="%"
+          animationDelay={300}
           icon={<StarIcon />}
+        />
+        <MetricCard
+          label="Pending Requests"
+          value={analytics?.pendingRequests ?? 0}
+          decimals={0}
+          color="blue"
+          animationDelay={360}
+          icon={<ZapIcon />}
+        />
+        <MetricCard
+          label="Upcoming 7 Days"
+          value={analytics?.upcomingItems7d ?? 0}
+          decimals={0}
+          color="accent"
+          animationDelay={420}
+          icon={<FireIcon />}
         />
       </div>
 
-      {/* Activity feed */}
-      {!loading && shooters.length > 0 && (
-        <div className="card p-5 animate-slide-up stagger-3">
-          <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide mb-4">
-            Athlete Roster
-          </h3>
-          <div className="space-y-2">
-            {shooters.slice(0, 5).map((shooter, i) => (
-              <div
-                key={shooter.id}
-                className="flex items-center justify-between py-3 border-b border-[#1E2433]/50 animate-fade-in"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
-                    <span className="text-accent font-display font-bold text-xs">{shooter.name.charAt(0)}</span>
-                  </div>
-                  <div>
-                    <p className="text-[#F0F4FF] font-semibold text-sm">{shooter.name}</p>
-                    <p className="text-[#4A5568] text-[10px]">{shooter.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <StatusBadge variant="shooter" size="sm" />
-                  <Link
-                    href="/coach/shooters"
-                    className="text-accent hover:text-amber-300 text-xs font-display font-semibold uppercase tracking-wide transition-colors"
-                  >
-                    View →
-                  </Link>
-                </div>
-              </div>
-            ))}
+      {/* Managed shooter creation */}
+      <div className="card p-5 animate-slide-up stagger-2">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-[#00E5A0]/10 border border-[#00E5A0]/20 flex items-center justify-center shrink-0">
+            <span className="text-[#00E5A0]"><TargetIcon /></span>
           </div>
-          {shooters.length > 5 && (
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">
+              Create Managed Shooter Profile
+            </h3>
+            <p className="text-[#4A5568] text-xs mt-0.5 mb-4">
+              Use this for students without their own device/account. You can manage all training records for them.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input
+                type="text"
+                placeholder="Shooter name"
+                value={managedForm.name}
+                onChange={(e) => setManagedForm((prev) => ({ ...prev, name: e.target.value }))}
+                className="field text-sm"
+              />
+              <input
+                type="text"
+                placeholder="Shooter ID"
+                value={managedForm.shooterCode}
+                onChange={(e) => setManagedForm((prev) => ({ ...prev, shooterCode: e.target.value }))}
+                className="field text-sm uppercase"
+              />
+              <input
+                type="text"
+                placeholder="Primary weapon (optional)"
+                value={managedForm.primaryWeapon ?? ''}
+                onChange={(e) => setManagedForm((prev) => ({ ...prev, primaryWeapon: e.target.value }))}
+                className="field text-sm"
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => void handleCreateManagedShooter()}
+                disabled={creatingManaged || !managedForm.name.trim() || !managedForm.shooterCode.trim()}
+                className="btn btn-primary text-sm px-4 py-2 disabled:opacity-40"
+              >
+                {creatingManaged ? 'Creating…' : 'Create Managed Profile'}
+              </button>
+              {managedSuccess && <span className="text-[#00E5A0] text-xs">{managedSuccess}</span>}
+              {managedError && <span className="text-[#FF4D6D] text-xs">{managedError}</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div className="xl:col-span-2 card p-5 animate-slide-up stagger-3">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">
+              Shooter Performance Summaries
+            </h3>
             <Link
               href="/coach/shooters"
-              className="block text-center text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors mt-4 pt-4 border-t border-[#1E2433]"
+              className="text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors"
             >
-              View all {shooters.length} shooters →
+              Manage Shooters →
             </Link>
+          </div>
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} animationDelay={i * 40} />)}
+            </div>
+          ) : shooterSummaries.length === 0 ? (
+            <EmptyShootersState />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] text-sm">
+                <thead>
+                  <tr className="border-b border-[#1E2433]">
+                    <th className="text-left py-2.5 px-2 label">Shooter</th>
+                    <th className="text-right py-2.5 px-2 label">Avg</th>
+                    <th className="text-right py-2.5 px-2 label">Best</th>
+                    <th className="text-right py-2.5 px-2 label">Sessions</th>
+                    <th className="text-right py-2.5 px-2 label">Shots</th>
+                    <th className="text-right py-2.5 px-2 label">Consistency</th>
+                    <th className="text-right py-2.5 px-2 label">Last Session</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shooterSummaries.slice(0, 12).map((summary) => (
+                    <tr key={summary.shooterId} className="border-b border-[#1E2433]/40">
+                      <td className="py-2.5 px-2">
+                        <p className="text-[#F0F4FF] font-semibold text-sm">{summary.shooterName}</p>
+                        <p className="text-[#4A5568] text-[10px]">
+                          {summary.shooterCode ? `ID ${summary.shooterCode}` : 'Connected shooter'}
+                          {summary.primaryWeapon ? ` · ${summary.primaryWeapon}` : ''}
+                          {summary.isManaged ? ' · Managed' : ''}
+                        </p>
+                      </td>
+                      <td className="py-2.5 px-2 text-right font-data font-bold text-[#00E5A0]">{summary.averageScore.toFixed(2)}</td>
+                      <td className="py-2.5 px-2 text-right font-data text-[#F5A623]">{summary.bestScore.toFixed(1)}</td>
+                      <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalSessions}</td>
+                      <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalShots}</td>
+                      <td className="py-2.5 px-2 text-right font-data text-[#4FC3F7]">{summary.consistency.toFixed(1)}</td>
+                      <td className="py-2.5 px-2 text-right text-[#8892A4] text-xs">
+                        {summary.lastSessionDate
+                          ? formatSessionStart(summary.lastSessionDate, { includeYear: true })
+                          : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
+        </div>
+
+        <div className="card p-5 animate-slide-up stagger-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">
+              Training Schedule & Tasks
+            </h3>
+            <Link
+              href="/calendar"
+              className="text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors"
+            >
+              Open Calendar →
+            </Link>
+          </div>
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} animationDelay={i * 40} />)}
+            </div>
+          ) : schedule.length === 0 ? (
+            <p className="text-[#4A5568] text-sm">No upcoming scheduled tasks.</p>
+          ) : (
+            <div className="space-y-3">
+              {schedule.map((item) => (
+                <div key={item.eventId} className="rounded-lg border border-[#1E2433] bg-[#161B26]/40 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[#F0F4FF] text-sm font-semibold truncate">{item.title}</p>
+                    <span className="text-[10px] font-display uppercase tracking-wide text-[#4FC3F7]">
+                      {item.eventType}
+                    </span>
+                  </div>
+                  <p className="text-[#8892A4] text-xs mt-1">
+                    {formatSessionStart(item.start, { includeYear: true })}
+                  </p>
+                  <p className="text-[#4A5568] text-[11px] mt-1">
+                    {item.assigneeCount} assignee{item.assigneeCount !== 1 ? 's' : ''}{item.shooterNames.length > 0 ? ` · ${item.shooterNames.slice(0, 2).join(', ')}` : ''}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {trendData.length > 1 && (
+        <div className="card p-5 animate-slide-up stagger-5">
+          <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide mb-4">
+            Team Momentum (Recent Sessions)
+          </h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <ComposedChart data={trendData} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
+              <CartesianGrid stroke="#1E2433" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="date" tick={{ fill: '#4A5568', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="score" tick={{ fill: '#4A5568', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="shots" orientation="right" tick={{ fill: '#4A5568', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<GlassTooltip />} />
+              <Bar yAxisId="shots" dataKey="shots" fill="#4FC3F7" fillOpacity={0.35} radius={[3, 3, 0, 0]} />
+              <Line yAxisId="score" type="monotone" dataKey="avgScore" stroke="#F5A623" strokeWidth={2} dot={{ r: 3 }} />
+            </ComposedChart>
+          </ResponsiveContainer>
         </div>
       )}
 
-      {/* Shooters grid */}
-      <div className="card p-5 animate-slide-up stagger-4">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">
-            Your Shooters
-          </h3>
+      <div className="card animate-slide-up stagger-6">
+        <div className="flex items-center justify-between p-5 pb-0">
+          <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">Recent Shooting Sessions</h3>
           <Link
-            href="/coach/shooters"
+            href="/sessions"
             className="text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors"
           >
-            View all →
+            All Sessions →
           </Link>
         </div>
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <SkeletonCard key={i} height={80} animationDelay={i * 60} />
-            ))}
-          </div>
-        ) : shooters.length === 0 ? (
-          <EmptyShootersState />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {shooters.map((shooter, i) => (
-              <ShooterCard key={shooter.id} shooter={shooter} delay={i * 60} />
-            ))}
-          </div>
-        )}
+        <div className="mt-3 overflow-x-auto overscroll-x-contain">
+          {loading ? (
+            <div className="px-5 pb-4 space-y-0">
+              {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} animationDelay={i * 40} />)}
+            </div>
+          ) : recentSessions.length === 0 ? (
+            <EmptySessionsState />
+          ) : (
+            <table className="w-full min-w-[880px] table-fixed text-sm" role="table">
+              <thead className="bg-[rgba(10,13,18,0.92)]">
+                <tr className="border-y border-[#1E2433]">
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Session Start</th>
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Shooter</th>
+                  <th className="text-left py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap hidden md:table-cell">Discipline</th>
+                  <th className="text-right py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Avg</th>
+                  <th className="text-right py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap">Shots</th>
+                  <th className="text-right py-3 px-5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] text-[#64708C] whitespace-nowrap hidden lg:table-cell">Group R.</th>
+                  <th className="py-3 px-5" />
+                </tr>
+              </thead>
+              <tbody>
+                {recentSessions.slice(0, 10).map((session, i) => (
+                  <tr
+                    key={session.sessionId}
+                    className="table-row-hover border-b border-[#1E2433]/50 animate-fade-in"
+                    style={{ animationDelay: `${i * 30}ms` }}
+                  >
+                    <td className="py-3 px-5 whitespace-nowrap align-middle text-[#8892A4] text-xs">
+                      {formatSessionStart(session.sessionDate, { includeYear: true })}
+                    </td>
+                    <td className="py-3 px-5 text-[#F0F4FF] font-semibold text-sm">{session.shooterName}</td>
+                    <td className="py-3 px-5 text-[#8892A4] text-xs hidden md:table-cell">{session.discipline}</td>
+                    <td className="py-3 px-5 text-right font-data font-bold text-[#00E5A0]">{session.averageScore.toFixed(2)}</td>
+                    <td className="py-3 px-5 text-right score-value text-[#F0F4FF]">{session.totalShots}</td>
+                    <td className="py-3 px-5 text-right score-value text-[#4FC3F7] hidden lg:table-cell">{session.groupRadius.toFixed(2)}</td>
+                    <td className="py-3 px-5 text-right whitespace-nowrap align-middle">
+                      <Link
+                        href={`/sessions/${session.sessionId}?shooterId=${encodeURIComponent(session.shooterId)}`}
+                        className="text-accent hover:text-amber-300 text-xs font-display font-semibold uppercase tracking-wide transition-colors"
+                      >
+                        View →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
-      {/* Invite link card */}
-      <div className="card p-5 animate-slide-up stagger-5">
+      <div className="card p-5 animate-slide-up stagger-7">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-[#4FC3F7]/10 border border-[#4FC3F7]/20 flex items-center justify-center shrink-0">
             <span className="text-[#4FC3F7]"><ZapIcon /></span>
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-display font-semibold text-base text-[#F0F4FF] tracking-wide">
-              Invite a Shooter
+              Coach Operations Hub
             </h3>
             <p className="text-[#4A5568] text-xs mt-0.5 mb-4">
-              Share your coach profile so athletes can request to connect.
+              Manage connections, invites, roster profiles, and detailed shooter records from one place.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="shooter@example.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-[#161B26] border border-[#1E2433] text-[#F0F4FF] text-sm placeholder-[#4A5568] focus:outline-none focus:border-[#4FC3F7]/50 transition-colors"
-              />
-              <Link
-                href="/coach/shooters"
-                className="btn btn-primary text-sm px-4 shrink-0"
-              >
-                Invite
-              </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/coach/shooters" className="btn btn-primary text-sm px-4">Open Shooter Manager</Link>
+              <Link href="/calendar" className="btn btn-ghost text-sm px-4">Open Calendar</Link>
             </div>
           </div>
         </div>

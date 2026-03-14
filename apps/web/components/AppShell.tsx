@@ -77,6 +77,11 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
 
   if (!isLoggedIn) return null;
 
+  // Mobile-first safe area: keep content clear of status bars/notches even when env() reports 0.
+  const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
+  const topOffset = `calc(58px + ${safeTopInset})`;
+  const bottomOffsetMobile = 'calc(84px + env(safe-area-inset-bottom, 0px))';
+
   return (
     <div className="min-h-screen grid-bg relative overflow-x-hidden">
 
@@ -103,18 +108,23 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
       />
 
       <Sidebar />
-      <TopBar title={title} isLive={isLive} sidebarWidth={isMobile ? 0 : sidebarW} />
+      <TopBar
+        title={title}
+        isLive={isLive}
+        sidebarWidth={isMobile ? 0 : sidebarW}
+        safeTopInset={safeTopInset}
+      />
 
       {/* Main content */}
       <main
         className="relative z-10 min-h-screen transition-all duration-300 ease-spring"
         style={{
-          paddingTop:    '58px',
+          paddingTop:    topOffset,
           paddingLeft:   isMobile ? 0 : sidebarW,
-          paddingBottom: isMobile ? 84 : 0,
+          paddingBottom: isMobile ? bottomOffsetMobile : 0,
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-5 sm:py-8">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
           {children}
         </div>
       </main>

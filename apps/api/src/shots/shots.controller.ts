@@ -20,7 +20,6 @@ import { JwtPayload, Shot } from '@shooting-platform/shared-types';
 
 @Controller('shots')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('SHOOTER', 'SOLDIER')
 export class ShotsController {
   constructor(private readonly shotsService: ShotsService) {}
 
@@ -30,6 +29,7 @@ export class ShotsController {
    * multipart/form-data with field "file" (PDF | CSV | JSON) and query param sessionId
    */
   @Post('import')
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
@@ -39,6 +39,7 @@ export class ShotsController {
     @CurrentUser() user: JwtPayload,
     @UploadedFile() file: Express.Multer.File | undefined,
     @Query('sessionId') sessionId: string,
+    @Query('shooterId') shooterId: string | undefined,
   ): Promise<Shot[]> {
     if (!file) {
       throw new BadRequestException('No file uploaded');
@@ -46,7 +47,7 @@ export class ShotsController {
     if (!sessionId) {
       throw new BadRequestException('sessionId query parameter is required');
     }
-    return this.shotsService.importFromFile(sessionId, user.sub, file);
+    return this.shotsService.importFromFile(sessionId, user.sub, user.role, file, shooterId);
   }
 
   /**
@@ -55,11 +56,13 @@ export class ShotsController {
    * JSON body with sessionId and shots array
    */
   @Post('manual')
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
   async createManual(
     @CurrentUser() user: JwtPayload,
     @Body() dto: ManualShotsDto,
+    @Query('shooterId') shooterId: string | undefined,
   ): Promise<Shot[]> {
-    return this.shotsService.createManual(dto, user.sub);
+    return this.shotsService.createManual(dto, user.sub, user.role, shooterId);
   }
 
   /**
@@ -68,6 +71,7 @@ export class ShotsController {
    * multipart/form-data with field "file" (image) and query param sessionId
    */
   @Post('photo')
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
@@ -84,6 +88,7 @@ export class ShotsController {
     @CurrentUser() user: JwtPayload,
     @UploadedFile() file: Express.Multer.File | undefined,
     @Query('sessionId') sessionId: string,
+    @Query('shooterId') shooterId: string | undefined,
   ): Promise<Shot[]> {
     if (!file) {
       throw new BadRequestException('No image file uploaded');
@@ -91,6 +96,6 @@ export class ShotsController {
     if (!sessionId) {
       throw new BadRequestException('sessionId query parameter is required');
     }
-    return this.shotsService.analyzePhoto(sessionId, user.sub, file);
+    return this.shotsService.analyzePhoto(sessionId, user.sub, user.role, file, shooterId);
   }
 }

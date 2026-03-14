@@ -5,12 +5,14 @@
 // Each form section is a card that slides up on load. The submit button
 // has the primary amber shimmer hover treatment.
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '../../../lib/api';
 import { AppShell } from '../../../components/AppShell';
 import { useAuth } from '../../../contexts/auth-context';
+import { toLocalDateTimeInput } from '../../../lib/session-time';
+import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { Session } from '@shooting-platform/shared-types';
 import { ARMY_WEAPONS, TRAINING_MODES, TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 
@@ -27,6 +29,26 @@ const WEAPON_TYPES = [
 export default function NewSessionPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const {
+    isCoach,
+    shooters,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
+  const [shooterIdFromUrl, setShooterIdFromUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const id = new URLSearchParams(window.location.search).get('shooterId');
+    setShooterIdFromUrl(id);
+  }, []);
+
+  const targetShooterId = isCoach
+    ? (shooterIdFromUrl && shooters.some((s) => s.id === shooterIdFromUrl)
+      ? shooterIdFromUrl
+      : selectedShooterId)
+    : null;
+
   const isSoldier = user?.role === 'SOLDIER';
 
   const weaponList = isSoldier ? [...ARMY_WEAPONS] : WEAPON_TYPES;
@@ -36,7 +58,7 @@ export default function NewSessionPage() {
   const [customWeapon, setCustomWeapon]   = useState('');
   const [distance, setDistance]           = useState(isSoldier ? 25 : 10);
   const [numberOfShots, setShots]         = useState(60);
-  const [sessionDate, setSessionDate]     = useState(new Date().toISOString().slice(0, 10));
+  const [sessionDate, setSessionDate]     = useState(toLocalDateTimeInput(new Date()));
   const [trainingMode, setTrainingMode]   = useState<string>(TRAINING_MODES[0]);
   const [error, setError]                 = useState<string | null>(null);
   const [loading, setLoading]             = useState(false);
@@ -50,16 +72,27 @@ export default function NewSessionPage() {
     setLoading(true);
 
     const body: Record<string, unknown> = {
-      discipline, weaponType: resolvedWeapon, distance, numberOfShots, sessionDate,
+      discipline,
+      weaponType: resolvedWeapon,
+      distance,
+      numberOfShots,
+      sessionDate: new Date(sessionDate).toISOString(),
     };
     if (isSoldier) body.trainingMode = trainingMode;
 
     try {
-      const session = await apiFetch<Session>('/sessions', {
+      const path = isCoach
+        ? `/sessions?shooterId=${encodeURIComponent(targetShooterId ?? '')}`
+        : '/sessions';
+      const session = await apiFetch<Session>(path, {
         method: 'POST',
         body: JSON.stringify(body),
       });
-      router.push(`/sessions/${session.id}`);
+      router.push(
+        isCoach && targetShooterId
+          ? `/sessions/${session.id}?shooterId=${encodeURIComponent(targetShooterId)}`
+          : `/sessions/${session.id}`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create session');
     } finally {
@@ -103,6 +136,24 @@ export default function NewSessionPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {isCoach && (
+              <div>
+                <label className="label">Shooter</label>
+                <select
+                  className="field bg-[#161B26]"
+                  value={targetShooterId ?? ''}
+                  onChange={(e) => setSelectedShooterId(e.target.value || null)}
+                  required
+                >
+                  {shooters.length === 0 && <option value="">No connected shooters</option>}
+                  {shooters.map((shooter) => (
+                    <option key={shooter.id} value={shooter.id}>
+                      {shooter.name}{shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Discipline */}
             <div>
@@ -191,11 +242,11 @@ export default function NewSessionPage() {
               </div>
             </div>
 
-            {/* Date */}
+            {/* Start Timestamp */}
             <div>
-              <label htmlFor="sessionDate" className="label">Session Date</label>
+              <label htmlFor="sessionDate" className="label">Session Start Timestamp</label>
               <input
-                id="sessionDate" type="date" required
+                id="sessionDate" type="datetime-local" required
                 value={sessionDate} onChange={(e) => setSessionDate(e.target.value)}
                 className="field"
               />
@@ -209,7 +260,11 @@ export default function NewSessionPage() {
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="btn btn-primary w-full mt-2">
+            <button
+              type="submit"
+              disabled={loading || (isCoach && !targetShooterId)}
+              className="btn btn-primary w-full mt-2 disabled:opacity-40"
+            >
               {loading ? (
                 <span className="flex items-center gap-2">
                   <Spinner /> Creating session...

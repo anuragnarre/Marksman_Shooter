@@ -10,6 +10,8 @@ import {
 } from 'recharts';
 import { AppShell } from '../../components/AppShell';
 import { apiFetch } from '../../lib/api';
+import { formatSessionStart } from '../../lib/session-time';
+import { useCoachShooter } from '../../lib/use-coach-shooter';
 import type { Session, AnalyticsResult, DeepAnalysis } from '@shooting-platform/shared-types';
 
 type DateRange = '7d' | '30d' | '90d';
@@ -23,6 +25,13 @@ interface SessionMeta {
 }
 
 export default function PerformancePage() {
+  const {
+    isCoach,
+    shooters,
+    selectedShooter,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
   const [sessions,  setSessions]  = useState<Session[]>([]);    // full session+shots (for heatmap)
   const [metas,     setMetas]     = useState<SessionMeta[]>([]);
   const [analytics, setAnalytics] = useState<Map<string, AnalyticsResult>>(new Map());
@@ -34,13 +43,25 @@ export default function PerformancePage() {
   const rangeDays: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90 };
 
   const load = useCallback(async () => {
+    if (isCoach && !selectedShooterId) {
+      setSessions([]);
+      setMetas([]);
+      setAnalytics(new Map());
+      setAnalyses(new Map());
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - rangeDays[range]);
+      const shooterQuery = isCoach && selectedShooterId
+        ? `?shooterId=${encodeURIComponent(selectedShooterId)}`
+        : '';
 
       // Step 1: session list (fast, no shots)
-      const allMeta = await apiFetch<SessionMeta[]>('/sessions');
+      const allMeta = await apiFetch<SessionMeta[]>(`/sessions${shooterQuery}`);
       const filtered = allMeta.filter((s) => new Date(s.sessionDate) >= cutoff);
       setMetas(filtered);
 
@@ -48,7 +69,11 @@ export default function PerformancePage() {
       const [sessionArr, analyticsArr, analysesArr] = await Promise.all([
         Promise.all(
           filtered.map((s) =>
-            apiFetch<Session>(`/sessions/${s.id}`).catch(() => null),
+            apiFetch<Session>(
+              isCoach && selectedShooterId
+                ? `/sessions/${s.id}?shooterId=${encodeURIComponent(selectedShooterId)}`
+                : `/sessions/${s.id}`,
+            ).catch(() => null),
           ),
         ),
         Promise.all(
@@ -58,7 +83,11 @@ export default function PerformancePage() {
         ),
         Promise.all(
           filtered.map((s) =>
-            apiFetch<DeepAnalysis>(`/performance/deep-analysis/${s.id}`).catch(() => null),
+            apiFetch<DeepAnalysis>(
+              isCoach && selectedShooterId
+                ? `/performance/deep-analysis/${s.id}?shooterId=${encodeURIComponent(selectedShooterId)}`
+                : `/performance/deep-analysis/${s.id}`,
+            ).catch(() => null),
           ),
         ),
       ]);
@@ -78,7 +107,7 @@ export default function PerformancePage() {
     } finally {
       setLoading(false);
     }
-  }, [range]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [range, isCoach, selectedShooterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { void load(); }, [load]);
 
@@ -153,10 +182,19 @@ export default function PerformancePage() {
           <div className="flex items-center justify-between flex-wrap gap-3 animate-slide-up">
             <div>
               <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">Performance</h1>
-              <p className="text-[#4A5568] text-sm mt-1">Heatmaps, fatigue trends, and deep analysis</p>
+              <p className="text-[#4A5568] text-sm mt-1">
+                {isCoach
+                  ? `Heatmaps and trends for ${selectedShooter?.name ?? 'selected shooter'}`
+                  : 'Heatmaps, fatigue trends, and deep analysis'}
+              </p>
             </div>
             <div className="flex gap-2">
-              <Link href="/performance/training-plan" className="btn text-xs py-2 px-3">
+              <Link
+                href={isCoach && selectedShooterId
+                  ? `/performance/training-plan?shooterId=${encodeURIComponent(selectedShooterId)}`
+                  : '/performance/training-plan'}
+                className="btn text-xs py-2 px-3"
+              >
                 Training Plan
               </Link>
               <Link href="/performance/pose" className="btn btn-ghost text-xs py-2 px-3">
@@ -164,6 +202,25 @@ export default function PerformancePage() {
               </Link>
             </div>
           </div>
+
+          {isCoach && (
+            <div className="card p-4 animate-slide-up">
+              <label className="label block mb-2">Shooter</label>
+              <select
+                value={selectedShooterId ?? ''}
+                onChange={(e) => setSelectedShooterId(e.target.value || null)}
+                className="field w-full sm:max-w-sm"
+              >
+                {shooters.length === 0 && <option value="">No connected shooters</option>}
+                {shooters.map((shooter) => (
+                  <option key={shooter.id} value={shooter.id}>
+                    {shooter.name}
+                    {shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Date range selector */}
           <div className="flex gap-2 flex-wrap animate-slide-up">
@@ -267,6 +324,7 @@ export default function PerformancePage() {
                     key={s.id}
                     session={s}
                     analysis={analyses.get(s.id)}
+                    shooterIdQuery={isCoach ? selectedShooterId ?? undefined : undefined}
                   />
                 ))}
               </div>
@@ -276,7 +334,12 @@ export default function PerformancePage() {
           {metas.length === 0 && (
             <div className="card p-8 text-center">
               <p className="text-[#4A5568] text-sm">No sessions in the selected period.</p>
-              <Link href="/sessions/new" className="btn text-xs py-2 mt-4 inline-block">
+              <Link
+                href={isCoach && selectedShooterId
+                  ? `/sessions/new?shooterId=${encodeURIComponent(selectedShooterId)}`
+                  : '/sessions/new'}
+                className="btn text-xs py-2 mt-4 inline-block"
+              >
                 Start a Session
               </Link>
             </div>
@@ -293,9 +356,11 @@ export default function PerformancePage() {
 function DeepAnalysisCard({
   session,
   analysis,
+  shooterIdQuery,
 }: {
   session: SessionMeta;
   analysis?: DeepAnalysis;
+  shooterIdQuery?: string;
 }) {
   return (
     <div className="card p-4 space-y-3">
@@ -303,11 +368,13 @@ function DeepAnalysisCard({
         <div>
           <p className="font-display font-semibold text-sm text-[#F0F4FF]">{session.discipline}</p>
           <p className="text-[#4A5568] text-xs mt-0.5">
-            {new Date(session.sessionDate).toLocaleDateString()}
+            {formatSessionStart(session.sessionDate, { includeYear: true })}
           </p>
         </div>
         <Link
-          href={`/sessions/${session.id}`}
+          href={shooterIdQuery
+            ? `/sessions/${session.id}?shooterId=${encodeURIComponent(shooterIdQuery)}`
+            : `/sessions/${session.id}`}
           className="text-xs font-display text-[#F5A623] hover:underline"
         >
           View

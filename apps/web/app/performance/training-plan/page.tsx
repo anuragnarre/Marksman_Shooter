@@ -5,27 +5,60 @@
 import React, { useEffect, useState } from 'react';
 import { AppShell } from '../../../components/AppShell';
 import { apiFetch } from '../../../lib/api';
+import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { TrainingPlan, TrainingPlanWeek, TrainingPlanSession } from '@shooting-platform/shared-types';
 
 export default function TrainingPlanPage() {
+  const {
+    isCoach,
+    shooters,
+    selectedShooter,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
   const [plans,      setPlans]      = useState<TrainingPlan[]>([]);
   const [generating, setGenerating] = useState(false);
   const [loading,    setLoading]    = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [error,      setError]      = useState<string | null>(null);
+  const [shooterIdFromUrl, setShooterIdFromUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    void apiFetch<TrainingPlan[]>('/performance/training-plans')
+    if (typeof window === 'undefined') return;
+    const id = new URLSearchParams(window.location.search).get('shooterId');
+    setShooterIdFromUrl(id);
+  }, []);
+
+  useEffect(() => {
+    if (isCoach && shooterIdFromUrl && shooters.some((s) => s.id === shooterIdFromUrl) && shooterIdFromUrl !== selectedShooterId) {
+      setSelectedShooterId(shooterIdFromUrl);
+      return;
+    }
+    if (isCoach && !selectedShooterId) {
+      setPlans([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const query = isCoach && selectedShooterId
+      ? `?shooterId=${encodeURIComponent(selectedShooterId)}`
+      : '';
+    void apiFetch<TrainingPlan[]>(`/performance/training-plans${query}`)
       .then(setPlans)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [isCoach, selectedShooterId, setSelectedShooterId, shooterIdFromUrl, shooters]);
 
   async function handleGenerate() {
+    if (isCoach && !selectedShooterId) return;
     setGenerating(true);
     setError(null);
     try {
-      const plan = await apiFetch<TrainingPlan>('/performance/training-plan', { method: 'POST' });
+      const query = isCoach && selectedShooterId
+        ? `?shooterId=${encodeURIComponent(selectedShooterId)}`
+        : '';
+      const plan = await apiFetch<TrainingPlan>(`/performance/training-plan${query}`, { method: 'POST' });
       setPlans((prev) => [plan, ...prev]);
       setExpandedId(plan.id);
     } catch (e: any) {
@@ -45,16 +78,39 @@ export default function TrainingPlanPage() {
         <div className="flex items-start justify-between animate-slide-up">
           <div>
             <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">Training Plan</h1>
-            <p className="text-[#4A5568] text-sm mt-1">AI-generated 4-week personalised programme</p>
+            <p className="text-[#4A5568] text-sm mt-1">
+              {isCoach
+                ? `AI-generated programme for ${selectedShooter?.name ?? 'selected shooter'}`
+                : 'AI-generated 4-week personalised programme'}
+            </p>
           </div>
           <button
             onClick={handleGenerate}
-            disabled={generating}
+            disabled={generating || (isCoach && !selectedShooterId)}
             className="btn btn-primary text-xs py-2 px-4 shrink-0"
           >
             {generating ? 'Analysing...' : 'Generate New Plan'}
           </button>
         </div>
+
+        {isCoach && (
+          <div className="card p-4 animate-slide-up">
+            <label className="label block mb-2">Shooter</label>
+            <select
+              value={selectedShooterId ?? ''}
+              onChange={(e) => setSelectedShooterId(e.target.value || null)}
+              className="field w-full sm:max-w-sm"
+            >
+              {shooters.length === 0 && <option value="">No connected shooters</option>}
+              {shooters.map((shooter) => (
+                <option key={shooter.id} value={shooter.id}>
+                  {shooter.name}
+                  {shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Generating state */}
         {generating && (

@@ -6,13 +6,16 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/auth-context';
 import { useRouter } from 'next/navigation';
+import { useIsMobile } from '../lib/use-mobile';
 
 // ── Entry Point ──────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const { user }  = useAuth();
   const router    = useRouter();
+  const isMobile  = useIsMobile();
   const [mounted, setMounted] = useState(false);
+  const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
@@ -23,22 +26,24 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#080A0F] text-[#F0F4FF] overflow-x-hidden">
-      <Nav />
-      <Hero />
-      <DisciplineMarquee />
-      <LiveStats />
-      <BentoFeatures />
-      <HowItWorks />
-      <CoachSection />
-      <CtaBanner />
-      <Footer />
+      <Nav safeTopInset={safeTopInset} />
+      <div style={{ paddingTop: safeTopInset }}>
+        <Hero />
+        <DisciplineMarquee />
+        <LiveStats />
+        <BentoFeatures />
+        <HowItWorks />
+        <CoachSection />
+        <CtaBanner />
+        <Footer />
+      </div>
     </div>
   );
 }
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
 
-function Nav() {
+function Nav({ safeTopInset }: { safeTopInset: string }) {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
 
@@ -69,14 +74,30 @@ function Nav() {
   return (
     <>
       <nav
-        className="fixed top-0 inset-x-0 z-50 transition-all duration-500"
-        style={scrolled ? {
-          background: 'rgba(6,8,16,0.95)',
-          backdropFilter: 'blur(32px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(32px) saturate(200%)',
-          boxShadow: '0 1px 0 rgba(245,166,35,0.07), 0 8px 40px rgba(0,0,0,0.55)',
-        } : { background: 'transparent' }}
+        className="fixed top-0 inset-x-0 z-50 transition-all duration-500 relative overflow-hidden"
+        style={
+          scrolled
+            ? {
+                paddingTop: safeTopInset,
+                background: 'rgba(6,8,16,0.95)',
+                backdropFilter: 'blur(32px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(32px) saturate(200%)',
+                boxShadow: '0 1px 0 rgba(245,166,35,0.07), 0 8px 40px rgba(0,0,0,0.55)',
+              }
+            : {
+                paddingTop: safeTopInset,
+                background: 'transparent',
+              }
+        }
       >
+        <div
+          className="absolute top-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: safeTopInset,
+            background:
+              'linear-gradient(90deg, rgba(245,166,35,0.20) 0%, rgba(79,195,247,0.16) 45%, rgba(0,229,160,0.12) 100%)',
+          }}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] sm:h-[68px] flex items-center justify-between gap-4">
 
           {/* Logo */}
@@ -199,8 +220,9 @@ function Nav() {
 
         {/* Panel — slides in from top */}
         <div
-          className="absolute top-[60px] inset-x-0 transition-transform duration-300"
+          className="absolute inset-x-0 transition-transform duration-300"
           style={{
+            top: `calc(60px + ${safeTopInset})`,
             background: 'rgba(6,8,16,0.98)',
             borderBottom: '1px solid rgba(245,166,35,0.1)',
             boxShadow: '0 20px 60px rgba(0,0,0,0.7)',

@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '../../../lib/api';
+import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { SkeletonCard, SkeletonRow } from '../../../components/ui/SkeletonCard';
 import type { Session, WeaponPerformance } from '@shooting-platform/shared-types';
@@ -137,10 +138,11 @@ export default function SoldierAnalyticsPage() {
               {filtered.length === 0 ? (
                 <p className="text-[#4A5568] text-sm text-center py-12">No sessions for this weapon.</p>
               ) : (
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto overscroll-x-contain">
+                <table className="w-full min-w-[620px] text-sm">
                   <thead>
                     <tr className="border-b border-[#1E2433]">
-                      <th className="text-left py-3 px-5 label">Date</th>
+                      <th className="text-left py-3 px-5 label">Session Start</th>
                       <th className="text-left py-3 px-5 label hidden sm:table-cell">Weapon</th>
                       <th className="text-left py-3 px-5 label hidden md:table-cell">Mode</th>
                       <th className="text-right py-3 px-5 label">Dist</th>
@@ -157,7 +159,7 @@ export default function SoldierAnalyticsPage() {
                       >
                         <td className="py-3 px-5">
                           <span className="score-value text-xs text-[#8892A4]">
-                            {new Date(s.sessionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                            {formatSessionStart(s.sessionDate, { includeYear: true })}
                           </span>
                         </td>
                         <td className="py-3 px-5 text-[#8892A4] text-xs hidden sm:table-cell truncate max-w-[120px]">
@@ -190,6 +192,7 @@ export default function SoldierAnalyticsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </>

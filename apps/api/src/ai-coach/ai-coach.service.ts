@@ -129,10 +129,17 @@ export class AiCoachService {
     }
 
     if (requesterRole === 'COACH') {
-      const connection = await this.prisma.coachConnection.findFirst({
-        where: { coachId: requesterId, shooterId: session.shooterId, status: 'APPROVED' },
-      });
-      if (!connection) {
+      const [connection, managedProfile] = await Promise.all([
+        this.prisma.coachConnection.findFirst({
+          where: { coachId: requesterId, shooterId: session.shooterId, status: 'APPROVED' },
+          select: { id: true },
+        }),
+        this.prisma.shooterProfile.findFirst({
+          where: { userId: session.shooterId, managedByCoachId: requesterId, isManaged: true },
+          select: { id: true },
+        }),
+      ]);
+      if (!connection && !managedProfile) {
         throw new ForbiddenException('No approved coaching relationship with this shooter');
       }
     }

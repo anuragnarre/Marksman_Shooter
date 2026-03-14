@@ -38,6 +38,8 @@ model User {
   scheduleRequestsAsShooter ScheduleRequest[] @relation("ShooterRequests")
   scheduleRequestsAsCoach   ScheduleRequest[] @relation("CoachRequests")
   trainingPlans    TrainingPlan[]
+  shooterProfile   ShooterProfile? @relation("UserShooterProfile")
+  managedShooterProfiles ShooterProfile[] @relation("ManagedShooterProfiles")
 }
 
 model Session {
@@ -196,4 +198,19 @@ model ScheduleRequest {
   @@index([shooterId])
   @@index([coachId])
   @@index([status])
+}
+
+model ShooterProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation("UserShooterProfile", fields: [userId], references: [id])
+  shooterCode     String   @unique
+  primaryWeapon   String?
+  managedByCoachId String?
+  managedByCoach  User?    @relation("ManagedShooterProfiles", fields: [managedByCoachId], references: [id])
+  isManaged       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([managedByCoachId])
 }

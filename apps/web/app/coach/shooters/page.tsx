@@ -12,10 +12,18 @@ import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { AppShell } from '../../../components/AppShell';
 import { apiFetch } from '../../../lib/api';
+import { formatSessionStart } from '../../../lib/session-time';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
 import { SkeletonCard, SkeletonRow } from '../../../components/ui/SkeletonCard';
 import { useAuth } from '../../../contexts/auth-context';
-import type { CoachConnection, Session, User } from '@shooting-platform/shared-types';
+import type {
+  CoachConnection,
+  CoachShooterPerformanceSummary,
+  CreateManagedShooterProfileRequest,
+  Session,
+  UpdateManagedShooterProfileRequest,
+  User,
+} from '@shooting-platform/shared-types';
 
 type Tier = 'gold' | 'silver' | 'bronze' | 'default';
 function getTier(sessions: Session[]): Tier {
@@ -41,6 +49,20 @@ const INVITE_STYLE: Record<InviteStatus, string> = {
   REJECTED: 'text-[#FF4D6D] border-[#FF4D6D]/30 bg-[#FF4D6D]/10',
 };
 
+function parseQuickScores(input: string): Array<{ shotNumber: number; score: number; x: number; y: number }> {
+  const values = input
+    .split(/[\s,]+/)
+    .map((value) => Number(value.trim()))
+    .filter((value) => Number.isFinite(value));
+
+  return values.map((score, idx) => ({
+    shotNumber: idx + 1,
+    score: Math.max(0, Math.min(10.9, score)),
+    x: 0,
+    y: 0,
+  }));
+}
+
 export default function CoachShootersPage() {
   const { user } = useAuth();
 
@@ -55,6 +77,31 @@ export default function CoachShootersPage() {
   const [loadingReqs,     setLoadingReqs]     = useState(true);
   const [error,           setError]           = useState<string | null>(null);
   const [newRequest,      setNewRequest]      = useState(false); // WS badge
+  const [performance,     setPerformance]     = useState<CoachShooterPerformanceSummary | null>(null);
+  const [managedCreate,   setManagedCreate]   = useState<CreateManagedShooterProfileRequest>({
+    name: '',
+    shooterCode: '',
+    primaryWeapon: '',
+  });
+  const [managedEdit,     setManagedEdit]     = useState<UpdateManagedShooterProfileRequest>({
+    name: '',
+    shooterCode: '',
+    primaryWeapon: '',
+  });
+  const [creatingManaged, setCreatingManaged] = useState(false);
+  const [savingManaged,   setSavingManaged]   = useState(false);
+  const [managedMsg,      setManagedMsg]      = useState<string | null>(null);
+  const [sessionMsg,      setSessionMsg]      = useState<string | null>(null);
+  const [sessionBusy,     setSessionBusy]     = useState(false);
+  const [sessionForm,     setSessionForm]     = useState({
+    discipline: '10m Air Rifle',
+    distance: 10,
+    weaponType: '',
+    numberOfShots: 10,
+    sessionDate: new Date().toISOString().slice(0, 16),
+    trainingMode: '',
+  });
+  const [quickScores, setQuickScores] = useState('');
 
   // Invite panel
   const [inviteEmail,      setInviteEmail]      = useState('');
@@ -70,18 +117,32 @@ export default function CoachShootersPage() {
   // ── Load data ─────────────────────────────────────────────────────────────
 
   function loadData() {
-    apiFetch<User[]>('/coach/shooters')
-      .then(setShooters)
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoadingShooters(false));
-
     Promise.all([
+      apiFetch<User[]>('/coach/shooters'),
+      apiFetch<User[]>('/coach/managed-shooters').catch(() => [] as User[]),
       apiFetch<CoachConnection[]>('/coach/requests'),
       apiFetch<CoachConnection[]>('/coach/outgoing-invites'),
     ])
-      .then(([reqs, out]) => { setRequests(reqs); setOutgoing(out); })
-      .catch(() => {})
-      .finally(() => setLoadingReqs(false));
+      .then(([connected, managed, reqs, out]) => {
+        const byId = new Map<string, User>();
+        for (const shooter of connected) byId.set(shooter.id, shooter);
+        for (const managedShooter of managed) {
+          byId.set(managedShooter.id, {
+            ...byId.get(managedShooter.id),
+            ...managedShooter,
+            shooterProfile: managedShooter.shooterProfile ?? byId.get(managedShooter.id)?.shooterProfile,
+          });
+        }
+
+        setShooters(Array.from(byId.values()));
+        setRequests(reqs);
+        setOutgoing(out);
+      })
+      .catch((e: Error) => setError(e.message))
+      .finally(() => {
+        setLoadingShooters(false);
+        setLoadingReqs(false);
+      });
   }
 
   useEffect(() => {
@@ -170,13 +231,132 @@ export default function CoachShootersPage() {
     }
   }
 
+  async function handleCreateManagedProfile() {
+    if (!managedCreate.name.trim() || !managedCreate.shooterCode.trim()) return;
+
+    setManagedMsg(null);
+    setCreatingManaged(true);
+    try {
+      const created = await apiFetch<User>('/coach/managed-shooters', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: managedCreate.name.trim(),
+          shooterCode: managedCreate.shooterCode.trim().toUpperCase(),
+          primaryWeapon: managedCreate.primaryWeapon?.trim() || undefined,
+        }),
+      });
+      setManagedCreate({ name: '', shooterCode: '', primaryWeapon: '' });
+      setManagedMsg(`Managed profile created for ${created.name}.`);
+      loadData();
+    } catch (e) {
+      setManagedMsg(e instanceof Error ? e.message : 'Failed to create managed profile');
+    } finally {
+      setCreatingManaged(false);
+    }
+  }
+
+  async function handleSaveManagedProfile() {
+    if (!selectedShooter || !selectedShooter.shooterProfile?.isManaged) return;
+    if (!managedEdit.name?.trim() || !managedEdit.shooterCode?.trim()) return;
+
+    setManagedMsg(null);
+    setSavingManaged(true);
+    try {
+      const updated = await apiFetch<User>(`/coach/managed-shooters/${selectedShooter.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: managedEdit.name.trim(),
+          shooterCode: managedEdit.shooterCode.trim().toUpperCase(),
+          primaryWeapon: managedEdit.primaryWeapon?.trim() || '',
+        }),
+      });
+
+      setShooters((prev) => prev.map((shooter) => (shooter.id === updated.id ? updated : shooter)));
+      setSelectedShooter(updated);
+      setManagedMsg('Managed shooter profile updated.');
+    } catch (e) {
+      setManagedMsg(e instanceof Error ? e.message : 'Failed to update managed profile');
+    } finally {
+      setSavingManaged(false);
+    }
+  }
+
+  async function handleCreateSessionForSelectedShooter() {
+    if (!selectedShooter) return;
+    if (!selectedShooter.shooterProfile?.isManaged) {
+      setSessionMsg('Session creation from coach account is available for managed profiles only.');
+      return;
+    }
+
+    setSessionBusy(true);
+    setSessionMsg(null);
+    try {
+      const created = await apiFetch<Session>(`/coach/shooters/${selectedShooter.id}/sessions`, {
+        method: 'POST',
+        body: JSON.stringify({
+          discipline: sessionForm.discipline,
+          distance: Number(sessionForm.distance),
+          weaponType: sessionForm.weaponType || selectedShooter.shooterProfile.primaryWeapon || '10m Air Rifle',
+          numberOfShots: Number(sessionForm.numberOfShots),
+          sessionDate: new Date(sessionForm.sessionDate).toISOString(),
+          trainingMode: sessionForm.trainingMode || undefined,
+        }),
+      });
+
+      const parsedShots = parseQuickScores(quickScores);
+      if (parsedShots.length > 0) {
+        await apiFetch(`/coach/shooters/${selectedShooter.id}/sessions/${created.id}/shots`, {
+          method: 'POST',
+          body: JSON.stringify({ shots: parsedShots }),
+        });
+      }
+
+      setQuickScores('');
+      setSessionMsg(`Session ${formatSessionStart(created.sessionDate)} created.`);
+      await selectShooter(selectedShooter);
+      loadData();
+    } catch (e) {
+      setSessionMsg(e instanceof Error ? e.message : 'Failed to create session');
+    } finally {
+      setSessionBusy(false);
+    }
+  }
+
+  async function handleDeleteSession(sessionId: string) {
+    if (!selectedShooter || !selectedShooter.shooterProfile?.isManaged) return;
+
+    try {
+      await apiFetch(`/coach/shooters/${selectedShooter.id}/sessions/${sessionId}`, { method: 'DELETE' });
+      setSessionMsg('Session removed.');
+      await selectShooter(selectedShooter);
+    } catch (e) {
+      setSessionMsg(e instanceof Error ? e.message : 'Failed to remove session');
+    }
+  }
+
   async function selectShooter(shooter: User) {
     setSelectedShooter(shooter);
     setLoadingSessions(true);
     setSessions([]);
+    setPerformance(null);
+    setManagedMsg(null);
+    setSessionMsg(null);
+    setManagedEdit({
+      name: shooter.name,
+      shooterCode: shooter.shooterProfile?.shooterCode ?? '',
+      primaryWeapon: shooter.shooterProfile?.primaryWeapon ?? '',
+    });
+    setSessionForm((prev) => ({
+      ...prev,
+      weaponType: shooter.shooterProfile?.primaryWeapon ?? prev.weaponType,
+    }));
     try {
-      const data = await apiFetch<Session[]>(`/coach/shooters/${shooter.id}/sessions`);
+      const [data, summary] = await Promise.all([
+        apiFetch<Session[]>(`/coach/shooters/${shooter.id}/sessions`),
+        apiFetch<CoachShooterPerformanceSummary>(`/coach/shooters/${shooter.id}/performance`),
+      ]);
       setSessions(data);
+      setPerformance(summary);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load sessions');
     } finally {
@@ -340,7 +520,56 @@ export default function CoachShootersPage() {
           )}
         </div>
 
-        {/* ── 3. Sent invitations (outgoing coach-initiated) ─────────────── */}
+        {/* ── 3. Create managed shooter profile ─────────────────────────── */}
+        <div className="card animate-slide-up">
+          <div className="px-5 py-4 border-b border-[#1E2433]">
+            <h3 className="text-accent font-display font-bold text-sm uppercase tracking-wide">
+              Create Managed Shooter Profile
+            </h3>
+            <p className="text-[#4A5568] text-xs mt-1">
+              For students without their own account/device. You can manage their sessions and data from this coach account.
+            </p>
+          </div>
+          <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input
+              type="text"
+              value={managedCreate.name}
+              onChange={(e) => setManagedCreate((prev) => ({ ...prev, name: e.target.value }))}
+              placeholder="Shooter name"
+              className="field text-sm"
+            />
+            <input
+              type="text"
+              value={managedCreate.shooterCode}
+              onChange={(e) => setManagedCreate((prev) => ({ ...prev, shooterCode: e.target.value }))}
+              placeholder="Shooter ID"
+              className="field text-sm uppercase"
+            />
+            <input
+              type="text"
+              value={managedCreate.primaryWeapon ?? ''}
+              onChange={(e) => setManagedCreate((prev) => ({ ...prev, primaryWeapon: e.target.value }))}
+              placeholder="Primary weapon (optional)"
+              className="field text-sm"
+            />
+          </div>
+          <div className="px-5 pb-5 flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => void handleCreateManagedProfile()}
+              disabled={creatingManaged || !managedCreate.name.trim() || !managedCreate.shooterCode.trim()}
+              className="btn btn-primary text-xs py-2 px-4 disabled:opacity-40"
+            >
+              {creatingManaged ? 'Creating…' : 'Create Profile'}
+            </button>
+            {managedMsg && (
+              <span className={`text-xs ${managedMsg.includes('Failed') || managedMsg.includes('already') ? 'text-[#FF4D6D]' : 'text-[#00E5A0]'}`}>
+                {managedMsg}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* ── 4. Sent invitations (outgoing coach-initiated) ─────────────── */}
         {outgoing.length > 0 && (
           <div className="animate-slide-up">
             <p className="label mb-3">Sent Invitations ({outgoing.length})</p>
@@ -381,7 +610,7 @@ export default function CoachShootersPage() {
           </div>
         )}
 
-        {/* ── 4. Connected shooters grid ────────────────────────────────── */}
+        {/* ── 5. Connected shooters grid ────────────────────────────────── */}
         <div className="animate-slide-up">
           <p className="label mb-3">Connected Shooters ({shooters.length})</p>
 
@@ -408,7 +637,7 @@ export default function CoachShootersPage() {
           )}
         </div>
 
-        {/* ── 5. Session viewer ─────────────────────────────────────────── */}
+        {/* ── 6. Session viewer ─────────────────────────────────────────── */}
         {selectedShooter && (
           <div className="card animate-slide-up">
             <div className="flex items-center justify-between p-5 pb-4 border-b border-[#1E2433]">
@@ -416,10 +645,145 @@ export default function CoachShootersPage() {
                 <h2 className="font-display font-bold text-lg text-[#F0F4FF]">
                   {selectedShooter.name}
                 </h2>
-                <p className="text-[#4A5568] text-xs mt-0.5">{selectedShooter.email}</p>
+                <p className="text-[#4A5568] text-xs mt-0.5">
+                  {selectedShooter.shooterProfile?.isManaged
+                    ? `ID: ${selectedShooter.shooterProfile.shooterCode}`
+                    : selectedShooter.email}
+                </p>
               </div>
-              <StatusBadge variant="shooter" size="sm" />
+              <div className="flex items-center gap-2">
+                {selectedShooter.shooterProfile?.isManaged && (
+                  <span className="text-[10px] px-2 py-0.5 rounded border border-[#00E5A0]/30 bg-[#00E5A0]/10 text-[#00E5A0] font-display uppercase tracking-widest">
+                    Managed
+                  </span>
+                )}
+                <StatusBadge variant="shooter" size="sm" />
+              </div>
             </div>
+
+            {selectedShooter.shooterProfile?.isManaged && (
+              <div className="px-5 py-4 border-b border-[#1E2433] space-y-4 bg-[rgba(0,229,160,0.03)]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-[#1E2433] bg-[#101522] p-3">
+                    <p className="label">Total Sessions</p>
+                    <p className="score-value text-xl text-[#F0F4FF] mt-1">{performance?.totalSessions ?? 0}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#1E2433] bg-[#101522] p-3">
+                    <p className="label">Average Score</p>
+                    <p className="score-value text-xl text-[#00E5A0] mt-1">{(performance?.averageScore ?? 0).toFixed(2)}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#1E2433] bg-[#101522] p-3">
+                    <p className="label">Best Score</p>
+                    <p className="score-value text-xl text-accent mt-1">{(performance?.bestScore ?? 0).toFixed(1)}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="label mb-2">Managed Profile Details</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={managedEdit.name ?? ''}
+                      onChange={(e) => setManagedEdit((prev) => ({ ...prev, name: e.target.value }))}
+                      className="field text-sm"
+                      placeholder="Shooter name"
+                    />
+                    <input
+                      type="text"
+                      value={managedEdit.shooterCode ?? ''}
+                      onChange={(e) => setManagedEdit((prev) => ({ ...prev, shooterCode: e.target.value }))}
+                      className="field text-sm uppercase"
+                      placeholder="Shooter ID"
+                    />
+                    <input
+                      type="text"
+                      value={managedEdit.primaryWeapon ?? ''}
+                      onChange={(e) => setManagedEdit((prev) => ({ ...prev, primaryWeapon: e.target.value }))}
+                      className="field text-sm"
+                      placeholder="Primary weapon"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <button
+                      onClick={() => void handleSaveManagedProfile()}
+                      disabled={savingManaged}
+                      className="btn btn-ghost text-xs py-2 px-4"
+                    >
+                      {savingManaged ? 'Saving…' : 'Save Managed Profile'}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="label mb-2">Add Session + Training Data</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={sessionForm.discipline}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, discipline: e.target.value }))}
+                      className="field text-sm"
+                      placeholder="Discipline"
+                    />
+                    <input
+                      type="text"
+                      value={sessionForm.weaponType}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, weaponType: e.target.value }))}
+                      className="field text-sm"
+                      placeholder="Weapon type"
+                    />
+                    <input
+                      type="number"
+                      min={1}
+                      value={sessionForm.distance}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, distance: Number(e.target.value) || 10 }))}
+                      className="field text-sm"
+                      placeholder="Distance"
+                    />
+                    <input
+                      type="number"
+                      min={1}
+                      value={sessionForm.numberOfShots}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, numberOfShots: Number(e.target.value) || 10 }))}
+                      className="field text-sm"
+                      placeholder="Number of shots"
+                    />
+                    <input
+                      type="datetime-local"
+                      value={sessionForm.sessionDate}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, sessionDate: e.target.value }))}
+                      className="field text-sm"
+                    />
+                    <input
+                      type="text"
+                      value={sessionForm.trainingMode}
+                      onChange={(e) => setSessionForm((prev) => ({ ...prev, trainingMode: e.target.value }))}
+                      className="field text-sm"
+                      placeholder="Training mode (optional)"
+                    />
+                  </div>
+                  <textarea
+                    value={quickScores}
+                    onChange={(e) => setQuickScores(e.target.value)}
+                    placeholder="Quick scores (optional): 10.2, 9.8, 10.5 ..."
+                    className="field w-full mt-2 min-h-[72px] text-sm"
+                  />
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => void handleCreateSessionForSelectedShooter()}
+                      disabled={sessionBusy}
+                      className="btn btn-primary text-xs py-2 px-4"
+                    >
+                      {sessionBusy ? 'Saving…' : 'Create Session'}
+                    </button>
+                    {sessionMsg && (
+                      <span className={`text-xs ${sessionMsg.includes('Failed') ? 'text-[#FF4D6D]' : 'text-[#4FC3F7]'}`}>
+                        {sessionMsg}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {loadingSessions ? (
               <div className="p-5 space-y-0">
@@ -433,10 +797,11 @@ export default function CoachShootersPage() {
                 <p className="text-[#4A5568] text-sm mt-1">This shooter hasn't recorded any sessions.</p>
               </div>
             ) : (
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto overscroll-x-contain">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr className="border-b border-[#1E2433]">
-                    <th className="text-left py-3 px-5 label">Date</th>
+                    <th className="text-left py-3 px-5 label">Session Start</th>
                     <th className="text-left py-3 px-5 label hidden sm:table-cell">Discipline</th>
                     <th className="text-right py-3 px-5 label">Shots</th>
                     <th className="py-3 px-5 text-right label">Feedback</th>
@@ -444,10 +809,17 @@ export default function CoachShootersPage() {
                 </thead>
                 <tbody>
                   {sessions.map((s, i) => (
-                    <SessionRow key={s.id} session={s} delay={i * 30} />
+                    <SessionRow
+                      key={s.id}
+                      session={s}
+                      delay={i * 30}
+                      canDelete={Boolean(selectedShooter.shooterProfile?.isManaged)}
+                      onDelete={() => void handleDeleteSession(s.id)}
+                    />
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}
@@ -487,13 +859,22 @@ function ShooterCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-[#F0F4FF] font-semibold text-sm truncate">{shooter.name}</p>
+            {shooter.shooterProfile?.isManaged && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded border border-[#00E5A0]/30 bg-[#00E5A0]/10 text-[#00E5A0] font-display uppercase tracking-widest">
+                Managed
+              </span>
+            )}
             {TIER_LABEL[tier] && (
               <span className="text-[9px] font-display font-bold uppercase tracking-widest text-accent shrink-0">
                 {TIER_LABEL[tier]}
               </span>
             )}
           </div>
-          <p className="text-[#4A5568] text-[10px] truncate">{shooter.email}</p>
+          <p className="text-[#4A5568] text-[10px] truncate">
+            {shooter.shooterProfile?.isManaged
+              ? `ID ${shooter.shooterProfile.shooterCode}${shooter.shooterProfile.primaryWeapon ? ` · ${shooter.shooterProfile.primaryWeapon}` : ''}`
+              : shooter.email}
+          </p>
         </div>
         {selected && <span className="text-accent text-sm shrink-0">›</span>}
       </div>
@@ -503,7 +884,17 @@ function ShooterCard({
 
 // ── Session Row ───────────────────────────────────────────────────────────────
 
-function SessionRow({ session, delay }: { session: Session; delay: number }) {
+function SessionRow({
+  session,
+  delay,
+  canDelete,
+  onDelete,
+}: {
+  session: Session;
+  delay: number;
+  canDelete?: boolean;
+  onDelete?: () => void;
+}) {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [text, setText]                 = useState('');
   const [sending, setSending]           = useState(false);
@@ -535,9 +926,7 @@ function SessionRow({ session, delay }: { session: Session; delay: number }) {
       >
         <td className="py-3 px-5">
           <span className="score-value text-xs text-[#8892A4]">
-            {new Date(session.sessionDate).toLocaleDateString('en-US', {
-              month: 'short', day: 'numeric', year: '2-digit',
-            })}
+            {formatSessionStart(session.sessionDate, { includeYear: true })}
           </span>
         </td>
         <td className="py-3 px-5 hidden sm:table-cell">
@@ -547,16 +936,26 @@ function SessionRow({ session, delay }: { session: Session; delay: number }) {
           {session.numberOfShots}
         </td>
         <td className="py-3 px-5 text-right">
-          {sent ? (
-            <span className="text-xs text-[#00E5A0] font-display uppercase tracking-wide">Sent ✓</span>
-          ) : (
-            <button
-              onClick={() => setFeedbackOpen((v) => !v)}
-              className="text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors"
-            >
-              {feedbackOpen ? 'Cancel' : 'Feedback'}
-            </button>
-          )}
+          <div className="flex items-center justify-end gap-3">
+            {canDelete && (
+              <button
+                onClick={onDelete}
+                className="text-[10px] text-[#FF4D6D] hover:text-[#ff7f95] font-display uppercase tracking-wide transition-colors"
+              >
+                Delete
+              </button>
+            )}
+            {sent ? (
+              <span className="text-xs text-[#00E5A0] font-display uppercase tracking-wide">Sent ✓</span>
+            ) : (
+              <button
+                onClick={() => setFeedbackOpen((v) => !v)}
+                className="text-xs text-accent hover:text-amber-300 font-display uppercase tracking-widest transition-colors"
+              >
+                {feedbackOpen ? 'Cancel' : 'Feedback'}
+              </button>
+            )}
+          </div>
         </td>
       </tr>
 
@@ -599,7 +998,7 @@ function EmptyShootersState() {
       </svg>
       <p className="text-[#F0F4FF] font-display font-bold text-xl">No connected shooters</p>
       <p className="text-[#4A5568] text-sm mt-2 max-w-xs">
-        Approve an incoming request or invite a shooter using the panel above.
+        Approve a request, invite by email, or create a managed shooter profile above.
       </p>
     </div>
   );

@@ -35,37 +35,37 @@ export class CalendarController {
 
   /** Coach creates an event (with optional recurrence) */
   @Post('events')
-  @Roles('COACH')
+  @Roles('COACH', 'SHOOTER')
   async createEvent(@CurrentUser() user: JwtPayload, @Body() dto: CreateEventDto) {
-    return this.calendarService.createEvent(user.sub, dto);
+    return this.calendarService.createEvent(user.sub, user.role, dto);
   }
 
   /** Coach updates a single event */
   @Put('events/:id')
-  @Roles('COACH')
+  @Roles('COACH', 'SHOOTER')
   async updateEvent(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
     @Body() dto: UpdateEventDto,
   ) {
-    return this.calendarService.updateEvent(user.sub, id, dto);
+    return this.calendarService.updateEvent(user.sub, user.role, id, dto);
   }
 
   /** Coach deletes a single event */
   @Delete('events/:id')
-  @Roles('COACH')
+  @Roles('COACH', 'SHOOTER')
   async deleteEvent(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
-    return this.calendarService.deleteEvent(user.sub, id);
+    return this.calendarService.deleteEvent(user.sub, user.role, id);
   }
 
   /** Coach deletes all events in a recurring group */
   @Delete('events/recurring/:groupId')
-  @Roles('COACH')
+  @Roles('COACH', 'SHOOTER')
   async deleteRecurring(
     @CurrentUser() user: JwtPayload,
     @Param('groupId') groupId: string,
   ) {
-    return this.calendarService.deleteRecurringGroup(user.sub, groupId);
+    return this.calendarService.deleteRecurringGroup(user.sub, user.role, groupId);
   }
 
   /** Coach gets their connected shooters (for assignee picker) */

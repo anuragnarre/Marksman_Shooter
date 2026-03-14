@@ -13,6 +13,7 @@ import { apiFetch } from '../../lib/api';
 import { AppShell } from '../../components/AppShell';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { useIsMobile } from '../../lib/use-mobile';
+import { useCoachShooter } from '../../lib/use-coach-shooter';
 import type {
   OverviewAnalytics,
   SessionTrendPoint,
@@ -280,7 +281,13 @@ function KpiCard({
 
 // ── Session Row ───────────────────────────────────────────────────────────────
 
-function SessionRow({ session }: { session: SessionTrendPoint }) {
+function SessionRow({
+  session,
+  shooterIdQuery,
+}: {
+  session: SessionTrendPoint;
+  shooterIdQuery?: string;
+}) {
   return (
     <tr className="border-b hover:bg-[#161B26] transition-colors group" style={{ borderColor: `${C.border}66` }}>
       <td className="py-2.5 px-5 font-data tabular-nums text-[11px]" style={{ color: C.dim }}>
@@ -313,7 +320,9 @@ function SessionRow({ session }: { session: SessionTrendPoint }) {
       </td>
       <td className="py-2.5 px-5">
         <Link
-          href={`/sessions/${session.sessionId}`}
+          href={shooterIdQuery
+            ? `/sessions/${session.sessionId}?shooterId=${encodeURIComponent(shooterIdQuery)}`
+            : `/sessions/${session.sessionId}`}
           className="opacity-60 group-hover:opacity-100 transition-opacity text-[10px] font-display uppercase tracking-widest hover:underline"
           style={{ color: C.amber }}
         >
@@ -354,6 +363,12 @@ interface SessionWithShots extends Session {
 
 export default function AnalyticsPage() {
   const isMobile = useIsMobile();
+  const {
+    isCoach,
+    shooters,
+    selectedShooterId,
+    setSelectedShooterId,
+  } = useCoachShooter();
   const [overview, setOverview] = useState<OverviewAnalytics | null>(null);
   const [sessions, setSessions] = useState<SessionWithShots[]>([]);
   const [loading, setLoading] = useState(true);
@@ -363,9 +378,18 @@ export default function AnalyticsPage() {
   const scatterSize = isMobile ? 300 : 360;
 
   useEffect(() => {
+    if (isCoach && !selectedShooterId) {
+      setOverview(null);
+      setSessions([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const query = isCoach ? `?shooterId=${encodeURIComponent(selectedShooterId ?? '')}` : '';
     Promise.all([
-      apiFetch<OverviewAnalytics>('/analytics/overview'),
-      apiFetch<SessionWithShots[]>('/sessions'),
+      apiFetch<OverviewAnalytics>(`/analytics/overview${query}`),
+      apiFetch<SessionWithShots[]>(`/sessions${query}`),
     ])
       .then(([ov, sess]) => {
         setOverview(ov);
@@ -373,7 +397,7 @@ export default function AnalyticsPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [isCoach, selectedShooterId]);
 
   // ── Derived data ─────────────────────────────────────────────────────────
 
@@ -555,6 +579,25 @@ export default function AnalyticsPage() {
             ))}
           </div>
         </div>
+
+        {isCoach && (
+          <div className="card p-4 animate-slide-up">
+            <label className="label block mb-2">Shooter</label>
+            <select
+              className="field w-full sm:max-w-sm"
+              value={selectedShooterId ?? ''}
+              onChange={(e) => setSelectedShooterId(e.target.value || null)}
+            >
+              {shooters.length === 0 && <option value="">No connected shooters</option>}
+              {shooters.map((shooter) => (
+                <option key={shooter.id} value={shooter.id}>
+                  {shooter.name}
+                  {shooter.shooterProfile?.isManaged ? ` (ID: ${shooter.shooterProfile.shooterCode})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* ── 2. KPI Row ───────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -1120,7 +1163,12 @@ export default function AnalyticsPage() {
                 ({overview.totalSessions} sessions)
               </span>
             </h2>
-            <Link href="/sessions" className="btn btn-ghost text-xs py-1.5">
+            <Link
+              href={isCoach && selectedShooterId
+                ? `/sessions?shooterId=${encodeURIComponent(selectedShooterId)}`
+                : '/sessions'}
+              className="btn btn-ghost text-xs py-1.5"
+            >
               View all →
             </Link>
           </div>
@@ -1144,7 +1192,7 @@ export default function AnalyticsPage() {
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .slice(0, 20)
                   .map((s) => (
-                    <SessionRow key={s.sessionId} session={s} />
+                    <SessionRow key={s.sessionId} session={s} shooterIdQuery={isCoach ? selectedShooterId ?? undefined : undefined} />
                   ))}
               </tbody>
             </table>

@@ -1,5 +1,5 @@
 // apps/web/app/layout.tsx
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Rajdhani, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/auth-context';
@@ -55,6 +55,13 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'MARKSMAN',
   },
+  themeColor: '#F5A623',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#F5A623',
 };
 

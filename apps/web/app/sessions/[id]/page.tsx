@@ -12,6 +12,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../../../lib/api';
+import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
 import { ScoreOverTimeChart, ScoreDistributionChart } from '../../../components/AnalyticsCharts';
@@ -108,7 +109,7 @@ export default function SessionDetailPage() {
   const shots = ((session?.shots ?? []) as Shot[]);
 
   const title = session
-    ? `${session.discipline} — ${new Date(session.sessionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+    ? `${session.discipline} — ${formatSessionStart(session.sessionDate)}`
     : 'Session';
 
   return (
@@ -132,7 +133,7 @@ export default function SessionDetailPage() {
                   <>
                     <span className="chip">
                       <ChipCalendarIcon />
-                      {new Date(session.sessionDate).toLocaleDateString()}
+                      {formatSessionStart(session.sessionDate, { includeYear: true })}
                     </span>
                     <span className="chip"><ChipTargetIcon /> {session.distance}m</span>
                     <span className="chip"><ChipWeaponIcon /> {session.weaponType}</span>
@@ -462,12 +463,12 @@ function PerformanceTab({
               )}
             </h3>
           </div>
-          <div className="mt-2 overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="mt-2 overflow-x-auto overscroll-x-contain">
+            <table className="w-full min-w-[420px] text-sm">
               <thead>
                 <tr className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                   {['#', 'Score', 'X', 'Y'].map((h) => (
-                    <th key={h} className="text-left px-5 py-3 text-xs font-display uppercase tracking-wide text-[#4A5568]">{h}</th>
+                    <th key={h} className="text-left px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] font-display uppercase tracking-wide text-[#4A5568]">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -483,15 +484,15 @@ function PerformanceTab({
                         background: isOutlier ? 'rgba(255,77,109,0.06)' : 'transparent',
                       }}
                     >
-                      <td className="px-5 py-2 font-data text-[#4A5568]">{s.shotNumber}</td>
-                      <td className="px-5 py-2 font-data font-bold" style={{
+                      <td className="px-3 sm:px-5 py-2 font-data text-[#4A5568]">{s.shotNumber}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data font-bold" style={{
                         color: s.score >= 10.5 ? '#F5A623' : s.score >= 10 ? '#4FC3F7' : s.score >= 9 ? '#00E5A0' : '#FF4D6D',
                       }}>
                         {s.score}
                         {isOutlier && <span className="ml-2 text-[10px] text-[#FF4D6D] font-display">OUTLIER</span>}
                       </td>
-                      <td className="px-5 py-2 font-data text-[#8892A4]">{s.x.toFixed(2)}</td>
-                      <td className="px-5 py-2 font-data text-[#8892A4]">{s.y.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4]">{s.x.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4]">{s.y.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -1099,13 +1100,13 @@ function InteractiveTab({
             </div>
           ) : (
             <div className="flex-1 overflow-auto max-h-72 pr-1">
-              <table className="w-full text-xs">
+              <table className="w-full min-w-[320px] text-xs">
                 <thead>
                   <tr className="border-b border-[#1E2433]">
-                    <th className="label py-2 text-left w-8">#</th>
-                    <th className="label py-2 text-left">Score</th>
-                    <th className="label py-2 text-left hidden sm:table-cell">X</th>
-                    <th className="label py-2 text-left hidden sm:table-cell">Y</th>
+                    <th className="py-2 text-left w-8 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1121,7 +1122,7 @@ function InteractiveTab({
                           : ''
                         }`}
                       >
-                        <td className="py-1.5 score-value text-[#4A5568]">{shot.shotNumber}</td>
+                        <td className="py-1.5 pr-2 score-value text-[#4A5568]">{shot.shotNumber}</td>
                         <td className="py-1.5">
                           <span
                             className="score-value font-bold tabular-nums"
@@ -1245,13 +1246,13 @@ function ManualTab({
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full min-w-[340px] text-xs">
           <thead>
             <tr className="border-b border-[#1E2433]">
-              <th className="label py-2 text-left w-10">#</th>
-              <th className="label py-2 text-left">Score</th>
-              <th className="label py-2 text-left hidden sm:table-cell">X</th>
-              <th className="label py-2 text-left hidden sm:table-cell">Y</th>
+              <th className="py-2 text-left w-10 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
             </tr>
           </thead>
           <tbody>

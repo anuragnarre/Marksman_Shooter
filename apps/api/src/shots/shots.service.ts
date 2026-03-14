@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../gateway/events.gateway';
 import { parseFile } from './shots.parser';
 import { ManualShotsDto } from './dto/manual-shots.dto';
-import { Shot, ShotInput } from '@shooting-platform/shared-types';
+import { Shot, ShotInput, UserRole } from '@shooting-platform/shared-types';
 
 @Injectable()
 export class ShotsService {
@@ -23,20 +23,33 @@ export class ShotsService {
 
   async createShots(
     sessionId: string,
-    shooterId: string,
+    actorId: string,
+    actorRole: UserRole,
     shots: ShotInput[],
+    shooterIdHint?: string,
   ): Promise<Shot[]> {
     if (shots.length === 0) {
       throw new BadRequestException('No shots provided');
     }
 
-    // Verify session ownership
+    // Verify session ownership / access
     const session = await this.prisma.session.findFirst({
-      where: { id: sessionId, shooterId, deletedAt: null },
+      where: { id: sessionId, deletedAt: null },
+      select: { id: true, shooterId: true },
     });
 
     if (!session) {
       throw new NotFoundException(`Session ${sessionId} not found or access denied`);
+    }
+
+    if (shooterIdHint && shooterIdHint !== session.shooterId) {
+      throw new ForbiddenException('Session does not belong to the requested shooter');
+    }
+
+    if (actorRole === 'COACH') {
+      await this.assertCoachCanAccessShooter(actorId, session.shooterId);
+    } else if (session.shooterId !== actorId) {
+      throw new ForbiddenException('You do not own this session');
     }
 
     const existingForNumbering = await this.prisma.shot.count({ where: { sessionId } });
@@ -74,28 +87,34 @@ export class ShotsService {
 
   async importFromFile(
     sessionId: string,
-    shooterId: string,
+    actorId: string,
+    actorRole: UserRole,
     file: Express.Multer.File,
+    shooterIdHint?: string,
   ): Promise<Shot[]> {
     const shots = await parseFile(file.buffer, file.mimetype, file.originalname);
-    return this.createShots(sessionId, shooterId, shots);
+    return this.createShots(sessionId, actorId, actorRole, shots, shooterIdHint);
   }
 
   // ── Method 2: Manual Entry ─────────────────────────────────────────────────
 
   async createManual(
     dto: ManualShotsDto,
-    shooterId: string,
+    actorId: string,
+    actorRole: UserRole,
+    shooterIdHint?: string,
   ): Promise<Shot[]> {
-    return this.createShots(dto.sessionId, shooterId, dto.shots);
+    return this.createShots(dto.sessionId, actorId, actorRole, dto.shots, shooterIdHint);
   }
 
   // ── Method 3: Photo Analysis via Vision Service ────────────────────────────
 
   async analyzePhoto(
     sessionId: string,
-    shooterId: string,
+    actorId: string,
+    actorRole: UserRole,
     file: Express.Multer.File,
+    shooterIdHint?: string,
   ): Promise<Shot[]> {
     const visionUrl = process.env.VISION_SERVICE_URL;
     if (!visionUrl) {
@@ -144,7 +163,7 @@ export class ShotsService {
       y: s.y,
     }));
 
-    return this.createShots(sessionId, shooterId, shots);
+    return this.createShots(sessionId, actorId, actorRole, shots, shooterIdHint);
   }
 
   async findBySession(sessionId: string): Promise<Shot[]> {
@@ -161,5 +180,22 @@ export class ShotsService {
       y: s.y,
       timestamp: s.timestamp,
     }));
+  }
+
+  private async assertCoachCanAccessShooter(coachId: string, shooterId: string): Promise<void> {
+    const [connection, managedProfile] = await Promise.all([
+      this.prisma.coachConnection.findFirst({
+        where: { coachId, shooterId, status: 'APPROVED' },
+        select: { id: true },
+      }),
+      this.prisma.shooterProfile.findFirst({
+        where: { userId: shooterId, managedByCoachId: coachId, isManaged: true },
+        select: { id: true },
+      }),
+    ]);
+
+    if (!connection && !managedProfile) {
+      throw new ForbiddenException('No approved coaching relationship with this shooter');
+    }
   }
 }

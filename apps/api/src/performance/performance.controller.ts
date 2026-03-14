@@ -5,39 +5,65 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseGuards,
-  Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PerformanceService } from './performance.service';
 import { SessionContextDto } from './dto/session-context.dto';
+import { JwtPayload } from '@shooting-platform/shared-types';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('performance')
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
   @Get('deep-analysis/:sessionId')
-  getDeepAnalysis(@Param('sessionId') sessionId: string, @Request() req: any) {
-    return this.performanceService.getDeepAnalysis(req.user.sub, sessionId);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  getDeepAnalysis(
+    @Param('sessionId') sessionId: string,
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
+  ) {
+    return this.performanceService.getDeepAnalysis(user.sub, sessionId, user.role, shooterId);
   }
 
   @Post('session-context/:sessionId')
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
   saveSessionContext(
     @Param('sessionId') sessionId: string,
     @Body() dto: SessionContextDto,
-    @Request() req: any,
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
   ) {
-    return this.performanceService.saveSessionContext(req.user.sub, sessionId, dto);
+    return this.performanceService.saveSessionContext(user.sub, sessionId, dto, user.role, shooterId);
   }
 
   @Post('training-plan')
-  generateTrainingPlan(@Request() req: any) {
-    return this.performanceService.generateTrainingPlan(req.user.sub);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  generateTrainingPlan(
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
+  ) {
+    if (user.role === 'COACH' && !shooterId) {
+      throw new BadRequestException('shooterId is required for coach training plans');
+    }
+    return this.performanceService.generateTrainingPlan(user.sub, user.role, shooterId);
   }
 
   @Get('training-plans')
-  getTrainingPlans(@Request() req: any) {
-    return this.performanceService.getTrainingPlans(req.user.sub);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  getTrainingPlans(
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
+  ) {
+    if (user.role === 'COACH' && !shooterId) {
+      throw new BadRequestException('shooterId is required for coach training plans');
+    }
+    return this.performanceService.getTrainingPlans(user.sub, user.role, shooterId);
   }
 }

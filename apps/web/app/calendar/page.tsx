@@ -6,7 +6,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin   from '@fullcalendar/daygrid';
 import timeGridPlugin  from '@fullcalendar/timegrid';
 import listPlugin      from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, { type EventResizeDoneArg } from '@fullcalendar/interaction';
 import type {
   EventClickArg,
   EventDropArg,
@@ -230,16 +230,16 @@ function CoachCalendar() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 animate-slide-up">
+      <div className="flex flex-wrap items-start sm:items-center justify-between gap-3 animate-slide-up">
         <div>
           <h1 className="font-display font-bold text-2xl" style={{ color: '#F0F4FF' }}>Training Calendar</h1>
           <p className="text-[#4A5568] text-sm mt-0.5">Plan and manage training schedules for your shooters</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-3">
           {/* Requests badge button */}
           <button
             onClick={() => setShowRequests(true)}
-            className="relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-display font-semibold transition-all hover:opacity-80"
+            className="relative flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-display font-semibold transition-all hover:opacity-80 min-h-[44px]"
             style={{ color: pendingCount > 0 ? '#F5A623' : '#4A5568', background: pendingCount > 0 ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${pendingCount > 0 ? 'rgba(245,166,35,0.3)' : 'rgba(255,255,255,0.08)'}` }}
           >
             <InboxIcon />
@@ -253,7 +253,7 @@ function CoachCalendar() {
           </button>
           <button
             onClick={() => openCreate()}
-            className="btn-primary flex items-center gap-2 px-4 py-2 text-sm font-display font-semibold rounded-xl"
+            className="btn-primary flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-display font-semibold rounded-xl min-h-[44px]"
           >
             <span className="text-lg leading-none">+</span> New Event
           </button>
@@ -261,9 +261,9 @@ function CoachCalendar() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 animate-fade-in">
+      <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 animate-fade-in overflow-x-auto pb-1">
         {(Object.entries(EVENT_TYPE_META) as [EventType, typeof EVENT_TYPE_META[EventType]][]).map(([type, meta]) => (
-          <span key={type} className="inline-flex items-center gap-1.5 text-[11px] font-display uppercase tracking-wide px-3 py-1 rounded-full"
+          <span key={type} className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-display uppercase tracking-wide px-3 py-1 rounded-full"
             style={{ color: meta.color, background: meta.bg, border: `1px solid ${meta.color}30` }}>
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: meta.color }} />
             {meta.label}
@@ -272,7 +272,7 @@ function CoachCalendar() {
       </div>
 
       {/* Calendar */}
-      <div className="card p-0 overflow-hidden animate-fade-in" style={{ minHeight: 600 }}>
+      <div className="card p-0 overflow-hidden animate-fade-in" style={{ minHeight: 'min(600px, calc(100vh - 180px))' }}>
         <style>{FULLCALENDAR_CSS}</style>
         {loading ? (
           <div className="flex items-center justify-center h-64">
@@ -290,7 +290,13 @@ function CoachCalendar() {
             eventClick={(arg: EventClickArg) => openEdit(arg.event.extendedProps as TrainingEvent)}
             eventDrop={handleDrop}
             eventResize={handleResize}
-            datesSet={(arg) => setRange({ start: arg.startStr, end: arg.endStr })}
+            datesSet={(arg) =>
+              setRange((prev) =>
+                prev.start === arg.startStr && prev.end === arg.endStr
+                  ? prev
+                  : { start: arg.startStr, end: arg.endStr }
+              )
+            }
             eventContent={(arg: EventContentArg) => <EventPill info={arg} />}
           />
         )}
@@ -314,22 +320,51 @@ function CoachCalendar() {
 
 function ShooterCalendar() {
   const { user } = useAuth();
-  const [events,   setEvents]   = useState<TrainingEvent[]>([]);
-  const [requests, setRequests] = useState<ScheduleRequest[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [detail,   setDetail]   = useState<TrainingEvent | null>(null);
-  const [reqModal, setReqModal] = useState<TrainingEvent | null>(null);
-
-  const fetchAll = useCallback(() => {
+  const canManageOwnItems = user?.role === 'SHOOTER';
+  const [events,      setEvents]      = useState<TrainingEvent[]>([]);
+  const [requests,    setRequests]    = useState<ScheduleRequest[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [detail,      setDetail]      = useState<TrainingEvent | null>(null);
+  const [reqModal,    setReqModal]    = useState<TrainingEvent | null>(null);
+  const [itemModal,   setItemModal]   = useState<'create' | 'edit' | null>(null);
+  const [itemTarget,  setItemTarget]  = useState<TrainingEvent | null>(null);
+  const [itemForm,    setItemForm]    = useState<EventFormState>(BLANK_FORM);
+  const [itemSaving,  setItemSaving]  = useState(false);
+  const [itemError,   setItemError]   = useState<string | null>(null);
+  const [range, setRange] = useState(() => {
     const s = new Date(); s.setDate(1);
     const e = new Date(s); e.setMonth(e.getMonth() + 3);
-    Promise.all([
-      apiFetch<TrainingEvent[]>(`/calendar/events?start=${encodeURIComponent(s.toISOString())}&end=${encodeURIComponent(e.toISOString())}`),
-      apiFetch<ScheduleRequest[]>('/schedule-requests'),
-    ]).then(([evs, reqs]) => { setEvents(evs); setRequests(reqs); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    return { start: s.toISOString(), end: e.toISOString() };
+  });
+
+  const isOwnItem = useCallback((ev: TrainingEvent) => {
+    return Boolean(user?.id && ev.coachId === user.id);
+  }, [user?.id]);
+
+  const fetchAll = useCallback(async () => {
+    try {
+      const [eventsResult, requestsResult] = await Promise.allSettled([
+        apiFetch<TrainingEvent[]>(
+          `/calendar/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`
+        ),
+        apiFetch<ScheduleRequest[]>('/schedule-requests'),
+      ]);
+      if (eventsResult.status === 'fulfilled') {
+        setEvents(eventsResult.value);
+      } else {
+        setEvents([]);
+      }
+      if (requestsResult.status === 'fulfilled') {
+        setRequests(requestsResult.value);
+      } else {
+        setRequests([]);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, [range]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
@@ -350,15 +385,163 @@ function ShooterCalendar() {
     .slice(0, 8);
 
   const pendingReqs = requests.filter(r => r.status === 'PENDING');
+  const ownItemsCount = events.filter(isOwnItem).length;
+
+  function openItemCreate(startStr?: string, endStr?: string) {
+    if (!canManageOwnItems) return;
+    const startDate = startStr ? new Date(startStr) : new Date();
+    const endDate = endStr ? new Date(endStr) : new Date(startDate.getTime() + 60 * 60 * 1000);
+    setItemForm({
+      ...BLANK_FORM,
+      title: '',
+      eventType: 'TASK',
+      start: toLocal(startDate.toISOString()),
+      end: toLocal(endDate.toISOString()),
+    });
+    setItemTarget(null);
+    setItemError(null);
+    setItemModal('create');
+  }
+
+  function openItemEdit(ev: TrainingEvent) {
+    if (!canManageOwnItems || !isOwnItem(ev)) return;
+    setItemForm({
+      ...BLANK_FORM,
+      title: ev.title,
+      description: ev.description ?? '',
+      eventType: ev.eventType,
+      start: toLocal(ev.start as string),
+      end: toLocal(ev.end as string),
+      allDay: ev.allDay,
+    });
+    setItemTarget(ev);
+    setItemError(null);
+    setItemModal('edit');
+  }
+
+  async function saveOwnItem() {
+    if (!itemForm.title.trim()) {
+      setItemError('Title is required');
+      return;
+    }
+    const startIso = toIso(itemForm.start);
+    let endIso = toIso(itemForm.end);
+    if (itemForm.allDay && startIso && endIso && new Date(endIso).getTime() <= new Date(startIso).getTime()) {
+      const nextDay = new Date(startIso);
+      nextDay.setDate(nextDay.getDate() + 1);
+      endIso = nextDay.toISOString();
+    }
+    if (!startIso || !endIso || new Date(endIso).getTime() <= new Date(startIso).getTime()) {
+      setItemError('End time must be after start time');
+      return;
+    }
+    setItemSaving(true);
+    setItemError(null);
+    try {
+      const body = {
+        title: itemForm.title.trim(),
+        description: itemForm.description || undefined,
+        eventType: itemForm.eventType,
+        start: startIso,
+        end: endIso,
+        allDay: itemForm.allDay,
+      };
+      if (itemModal === 'create') {
+        await apiFetch('/calendar/events', { method: 'POST', body: JSON.stringify(body) });
+      } else if (itemTarget) {
+        await apiFetch(`/calendar/events/${itemTarget.id}`, { method: 'PUT', body: JSON.stringify(body) });
+      }
+      setItemModal(null);
+      fetchAll();
+    } catch (e: unknown) {
+      setItemError(e instanceof Error ? e.message : 'Failed to save item');
+    } finally {
+      setItemSaving(false);
+    }
+  }
+
+  async function deleteOwnItem() {
+    if (!itemTarget) return;
+    setItemSaving(true);
+    setItemError(null);
+    try {
+      await apiFetch(`/calendar/events/${itemTarget.id}`, { method: 'DELETE' });
+      setItemModal(null);
+      fetchAll();
+    } catch (e: unknown) {
+      setItemError(e instanceof Error ? e.message : 'Failed to delete item');
+    } finally {
+      setItemSaving(false);
+    }
+  }
+
+  async function handleOwnDrop(arg: EventDropArg) {
+    const ev = arg.event.extendedProps as TrainingEvent;
+    if (!canManageOwnItems || !isOwnItem(ev)) {
+      arg.revert();
+      return;
+    }
+
+    const originalStart = new Date(ev.start as string).getTime();
+    const originalEnd = ev.end ? new Date(ev.end as string).getTime() : originalStart + 60 * 60 * 1000;
+    const duration = Math.max(15 * 60 * 1000, originalEnd - originalStart);
+    const newStart = arg.event.start ?? new Date();
+    const newEnd = arg.event.end ?? new Date(newStart.getTime() + duration);
+
+    try {
+      await apiFetch(`/calendar/events/${ev.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ start: newStart.toISOString(), end: newEnd.toISOString() }),
+      });
+      fetchAll();
+    } catch {
+      arg.revert();
+    }
+  }
+
+  async function handleOwnResize(arg: EventResizeDoneArg) {
+    const ev = arg.event.extendedProps as TrainingEvent;
+    if (!canManageOwnItems || !isOwnItem(ev)) {
+      arg.revert();
+      return;
+    }
+    if (!arg.event.start || !arg.event.end) {
+      arg.revert();
+      return;
+    }
+    try {
+      await apiFetch(`/calendar/events/${ev.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ start: arg.event.start.toISOString(), end: arg.event.end.toISOString() }),
+      });
+      fetchAll();
+    } catch {
+      arg.revert();
+    }
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="animate-slide-up">
-        <h1 className="font-display font-bold text-2xl" style={{ color: '#F0F4FF' }}>My Schedule</h1>
-        <p className="text-[#4A5568] text-sm mt-0.5">Upcoming training sessions and your change requests</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between animate-slide-up">
+        <div>
+          <h1 className="font-display font-bold text-2xl" style={{ color: '#F0F4FF' }}>My Schedule</h1>
+          <p className="text-[#4A5568] text-sm mt-0.5">
+            {canManageOwnItems
+              ? 'View coach sessions and manage your personal training tasks in one place'
+              : 'Track upcoming assigned sessions and schedule updates in one place'}
+          </p>
+        </div>
+        {canManageOwnItems && (
+          <button
+            onClick={() => openItemCreate()}
+            className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-display font-semibold rounded-xl min-h-[44px]"
+          >
+            <span className="text-lg leading-none">+</span> Add Training Item
+          </button>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Calendar */}
         <div className="xl:col-span-2 card p-0 overflow-hidden animate-fade-in">
           <style>{FULLCALENDAR_CSS}</style>
@@ -368,19 +551,51 @@ function ShooterCalendar() {
             </div>
           ) : (
             <FullCalendar
-              plugins={[dayGridPlugin, listPlugin]}
+              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
               initialView="dayGridMonth"
-              headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,listWeek' }}
-              events={events.map(toFCEvent)} editable={false} selectable={false}
+              headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' }}
+              events={events.map(toFCEvent)}
+              editable={canManageOwnItems}
+              selectable={canManageOwnItems}
+              selectMirror={canManageOwnItems}
               dayMaxEvents={3} height="auto"
-              eventClick={(arg: EventClickArg) => setDetail(arg.event.extendedProps as TrainingEvent)}
+              select={(arg: DateSelectArg) => openItemCreate(arg.startStr, arg.endStr)}
+              eventClick={(arg: EventClickArg) => {
+                const ev = arg.event.extendedProps as TrainingEvent;
+                if (isOwnItem(ev)) {
+                  openItemEdit(ev);
+                  return;
+                }
+                setDetail(ev);
+              }}
+              eventDrop={handleOwnDrop}
+              eventResize={handleOwnResize}
+              datesSet={(arg) =>
+                setRange((prev) =>
+                  prev.start === arg.startStr && prev.end === arg.endStr
+                    ? prev
+                    : { start: arg.startStr, end: arg.endStr }
+                )
+              }
               eventContent={(arg: EventContentArg) => <EventPill info={arg} />}
             />
           )}
         </div>
 
         {/* Right panel */}
-        <div className="space-y-4 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="space-y-3 sm:space-y-4 animate-slide-up" style={{ animationDelay: '100ms' }}>
+
+          {canManageOwnItems && (
+            <div className="rounded-xl p-3 sm:p-4" style={{ background: 'rgba(79,195,247,0.07)', border: '1px solid rgba(79,195,247,0.22)' }}>
+              <p className="text-xs uppercase tracking-widest font-display font-bold" style={{ color: '#4FC3F7' }}>My Training Items</p>
+              <p className="text-sm mt-1" style={{ color: '#B0B8CC' }}>
+                You have <span className="font-display font-bold text-[#4FC3F7]">{ownItemsCount}</span> personal item{ownItemsCount === 1 ? '' : 's'} in this view.
+              </p>
+              <p className="text-[11px] mt-1.5" style={{ color: '#4A5568' }}>
+                Tap a day on the calendar to quickly add tasks, activities, or reminders.
+              </p>
+            </div>
+          )}
 
           {/* Pending requests badge */}
           {pendingReqs.length > 0 && (
@@ -407,9 +622,12 @@ function ShooterCalendar() {
               <div className="space-y-2">
                 {upcoming.map((ev, i) => {
                   const req = requests.find(r => r.eventId === ev.id);
+                  const ownItem = isOwnItem(ev);
                   return (
                     <UpcomingCard key={ev.id} ev={ev} request={req} delay={i * 50}
-                      onClick={() => setDetail(ev)}
+                      canRequestChange={!ownItem}
+                      isSelfManaged={ownItem}
+                      onClick={() => (ownItem ? openItemEdit(ev) : setDetail(ev))}
                       onRequestChange={() => setReqModal(ev)} />
                   );
                 })}
@@ -445,19 +663,31 @@ function ShooterCalendar() {
         <RequestChangeModal ev={reqModal} onClose={() => setReqModal(null)}
           onSuccess={() => { setReqModal(null); fetchAll(); }} />
       )}
+      {itemModal && (
+        <SelfEventModal
+          mode={itemModal}
+          form={itemForm}
+          setForm={setItemForm}
+          saving={itemSaving}
+          error={itemError}
+          onSave={saveOwnItem}
+          onDelete={itemModal === 'edit' ? deleteOwnItem : undefined}
+          onClose={() => setItemModal(null)}
+        />
+      )}
     </div>
   );
 }
 
 // ── Upcoming Event Card (Shooter) ─────────────────────────────────────────────
 
-function UpcomingCard({ ev, request, delay, onClick, onRequestChange }:
-  { ev: TrainingEvent; request?: ScheduleRequest; delay: number; onClick: () => void; onRequestChange: () => void }) {
+function UpcomingCard({ ev, request, delay, canRequestChange, isSelfManaged, onClick, onRequestChange }:
+  { ev: TrainingEvent; request?: ScheduleRequest; delay: number; canRequestChange: boolean; isSelfManaged: boolean; onClick: () => void; onRequestChange: () => void }) {
   const meta  = EVENT_TYPE_META[ev.eventType] ?? EVENT_TYPE_META.SESSION;
   const start = new Date(ev.start as string);
   const dayStr  = start.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const timeStr = ev.allDay ? 'All day' : fmtTime(ev.start as string);
-  const canRequest = !request || request.status === 'REJECTED';
+  const canRequest = canRequestChange && (!request || request.status === 'REJECTED');
 
   return (
     <div className="card p-4 animate-slide-up" style={{ animationDelay: `${delay}ms`, borderLeft: `3px solid ${meta.color}` }}>
@@ -474,6 +704,12 @@ function UpcomingCard({ ev, request, delay, onClick, onRequestChange }:
 
       {/* Request status chip or button */}
       <div className="mt-2 flex items-center gap-2">
+        {isSelfManaged && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-display uppercase tracking-wide px-2 py-0.5 rounded-full"
+            style={{ color: '#4FC3F7', background: 'rgba(79,195,247,0.12)' }}>
+            My item
+          </span>
+        )}
         {request && request.status !== 'REJECTED' ? (
           <span className="inline-flex items-center gap-1 text-[10px] font-display uppercase tracking-wide px-2 py-0.5 rounded-full"
             style={{ color: STATUS_META[request.status].color, background: STATUS_META[request.status].bg }}>
@@ -970,6 +1206,169 @@ function RequestCard({ req, isExpanded, isResolving, coachNote, setCoachNote, ap
   );
 }
 
+// ── Self Event Modal (Shooter) ───────────────────────────────────────────────
+
+interface SelfEventModalProps {
+  mode: 'create' | 'edit';
+  form: EventFormState;
+  setForm: React.Dispatch<React.SetStateAction<EventFormState>>;
+  saving: boolean;
+  error: string | null;
+  onSave: () => void;
+  onDelete?: () => void;
+  onClose: () => void;
+}
+
+function SelfEventModal({ mode, form, setForm, saving, error, onSave, onDelete, onClose }: SelfEventModalProps) {
+  const f = (k: keyof EventFormState, v: unknown) => setForm((prev) => ({ ...prev, [k]: v }));
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl animate-slide-up"
+        style={{
+          background: 'rgba(10,13,22,0.98)',
+          border: '1px solid rgba(79,195,247,0.2)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-[#2A3350]" />
+        </div>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A2035]">
+          <h2 className="font-display font-bold text-base" style={{ color: '#F0F4FF' }}>
+            {mode === 'create' ? 'Add Training Item' : 'Edit Training Item'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#4A5568] hover:text-[#F0F4FF] hover:bg-[#1A2035] transition-all"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4">
+          {error && (
+            <div className="px-4 py-3 rounded-lg text-sm" style={{ background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.3)', color: '#FF4D6D' }}>
+              {error}
+            </div>
+          )}
+          <div>
+            <label className="label block mb-1.5">Title *</label>
+            <input
+              className="field w-full"
+              placeholder="e.g. Breathing drill, dry fire, stretch routine"
+              value={form.title}
+              onChange={(e) => f('title', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label block mb-1.5">Type</label>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(EVENT_TYPE_META) as EventType[]).map((type) => {
+                const meta = EVENT_TYPE_META[type];
+                const active = form.eventType === type;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => f('eventType', type)}
+                    className="px-3 py-1.5 rounded-lg text-[11px] font-display uppercase tracking-wide transition-all min-h-[36px]"
+                    style={{
+                      color: active ? meta.color : '#4A5568',
+                      background: active ? meta.bg : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${active ? `${meta.color}50` : 'rgba(255,255,255,0.06)'}`,
+                    }}
+                  >
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="label block mb-1.5">Start</label>
+              <input
+                type={form.allDay ? 'date' : 'datetime-local'}
+                className="field w-full"
+                value={form.allDay ? form.start.slice(0, 10) : form.start}
+                onChange={(e) => f('start', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="label block mb-1.5">End</label>
+              <input
+                type={form.allDay ? 'date' : 'datetime-local'}
+                className="field w-full"
+                value={form.allDay ? form.end.slice(0, 10) : form.end}
+                onChange={(e) => f('end', e.target.value)}
+              />
+            </div>
+          </div>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <div
+              onClick={() => f('allDay', !form.allDay)}
+              className="w-10 h-5 rounded-full transition-all relative"
+              style={{ background: form.allDay ? '#4FC3F7' : '#1A2035', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <div
+                className="absolute top-0.5 w-4 h-4 rounded-full transition-all"
+                style={{ left: form.allDay ? '22px' : '2px', background: form.allDay ? '#060810' : '#4A5568' }}
+              />
+            </div>
+            <span className="text-sm font-display" style={{ color: '#B0B8CC' }}>All day</span>
+          </label>
+          <div>
+            <label className="label block mb-1.5">Notes (optional)</label>
+            <textarea
+              className="field w-full resize-none"
+              rows={3}
+              placeholder="Focus points, checklists, equipment prep..."
+              value={form.description}
+              onChange={(e) => f('description', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-t border-[#1A2035]">
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              disabled={saving}
+              className="px-4 py-2.5 text-sm font-display font-semibold rounded-xl transition-all hover:opacity-80 min-h-[42px]"
+              style={{ color: '#FF4D6D', background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.25)' }}
+            >
+              Delete
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="ml-auto px-4 py-2.5 text-sm font-display font-semibold rounded-xl min-h-[42px]"
+            style={{ color: '#4A5568', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="btn-primary px-5 py-2.5 text-sm font-display font-semibold rounded-xl min-w-[120px] min-h-[42px]"
+          >
+            {saving ? (
+              <span className="flex items-center gap-2 justify-center">
+                <span className="w-3 h-3 border-2 border-t-transparent border-[#060810] rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : mode === 'create' ? 'Create Item' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Event Modal (Coach: Create / Edit) ────────────────────────────────────────
 
 interface EventModalProps {
@@ -1172,5 +1571,45 @@ const FULLCALENDAR_CSS = `
   .fc .fc-popover-close { color:#4A5568; }
   .fc .fc-now-indicator-line { border-color:#F5A623; border-width:2px; }
   .fc .fc-now-indicator-arrow { border-top-color:#F5A623; border-bottom-color:#F5A623; }
-  @media (max-width:640px) { .fc .fc-toolbar { flex-direction:column; gap:8px; } .fc .fc-toolbar-title { font-size:0.95rem; } .fc .fc-button { padding:4px 8px; font-size:10px; } }
+  @media (max-width: 640px) {
+    .fc .fc-toolbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 8px 8px 2px;
+    }
+    .fc .fc-toolbar-chunk {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .fc .fc-toolbar-title {
+      font-size: 0.9rem;
+      text-align: center;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.15;
+    }
+    .fc .fc-button {
+      min-height: 34px;
+      padding: 4px 9px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+    .fc .fc-daygrid-day-number {
+      font-size: 11px;
+      padding: 4px;
+    }
+    .fc .fc-list-table td {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+    .fc .fc-event {
+      min-height: 18px;
+    }
+  }
 `;

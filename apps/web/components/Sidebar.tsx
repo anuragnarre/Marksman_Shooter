@@ -18,12 +18,12 @@ interface NavItem {
 
 const ALL_NAV: NavItem[] = [
   { href: '/dashboard',               label: 'Dashboard',      icon: <GridIcon /> },
-  { href: '/sessions',                label: 'Sessions',       icon: <TargetIcon />,    roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/sessions/new',            label: 'New Session',    icon: <PlusIcon />,      roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/analytics',               label: 'Analytics',      icon: <AnalyticsIcon />, roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/performance',             label: 'Performance',    icon: <PulseIcon />,     roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/performance/training-plan', label: 'Training Plan', icon: <PlanIcon />,     roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/performance/pose',        label: 'Stance',         icon: <PoseIcon />,      roles: ['SHOOTER', 'SOLDIER'] },
+  { href: '/sessions',                label: 'Sessions',       icon: <TargetIcon />,    roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/sessions/new',            label: 'New Session',    icon: <PlusIcon />,      roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/analytics',               label: 'Analytics',      icon: <AnalyticsIcon />, roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/performance',             label: 'Performance',    icon: <PulseIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/performance/training-plan', label: 'Training Plan', icon: <PlanIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/performance/pose',        label: 'Stance',         icon: <PoseIcon />,      roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/connect',                 label: 'Connect',        icon: <LinkIcon />,      roles: ['SHOOTER'] },
   { href: '/ai-coach',                label: 'AI Coach',       icon: <SparkleIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/calendar',                label: 'Calendar',       icon: <CalendarIcon />,  roles: ['COACH'] },

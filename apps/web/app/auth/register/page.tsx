@@ -12,10 +12,13 @@ import { register } from '../../../lib/auth';
 import { useAuth } from '../../../contexts/auth-context';
 import type { UserRole } from '@shooting-platform/shared-types';
 import { ARMY_WEAPONS } from '@shooting-platform/shared-types';
+import { useIsMobile } from '../../../lib/use-mobile';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { setUser } = useAuth();
+  const isMobile = useIsMobile();
+  const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   const [name, setName]               = useState('');
   const [email, setEmail]             = useState('');
@@ -42,7 +45,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#080A0F]">
+    <div
+      className="min-h-screen flex bg-[#080A0F] relative overflow-hidden"
+      style={{ paddingTop: safeTopInset }}
+    >
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: safeTopInset,
+          background:
+            'linear-gradient(90deg, rgba(245,166,35,0.20) 0%, rgba(79,195,247,0.16) 45%, rgba(0,229,160,0.12) 100%)',
+        }}
+      />
 
       {/* ── Left visual panel ───────────────────────────────────────────── */}
       <div

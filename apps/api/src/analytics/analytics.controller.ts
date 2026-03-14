@@ -1,5 +1,5 @@
 // apps/api/src/analytics/analytics.controller.ts
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards, BadRequestException } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -13,19 +13,35 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('overview')
-  @Roles('SHOOTER', 'SOLDIER')
-  async getOverview(@CurrentUser() user: JwtPayload): Promise<OverviewAnalytics> {
-    return this.analyticsService.computeOverview(user.sub);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  async getOverview(
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
+  ): Promise<OverviewAnalytics> {
+    if (user.role === 'COACH' && !shooterId) {
+      throw new BadRequestException('shooterId is required for coach overview');
+    }
+    return this.analyticsService.computeOverviewForActor(user.sub, user.role, shooterId);
   }
 
   @Get('session/:id')
-  async getSessionAnalytics(@Param('id') id: string): Promise<AnalyticsResult> {
-    return this.analyticsService.computeForSession(id);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  async getSessionAnalytics(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<AnalyticsResult> {
+    return this.analyticsService.computeForSessionForActor(user.sub, user.role, id);
   }
 
   @Get('weapons/summary')
-  @Roles('SHOOTER', 'SOLDIER')
-  async getWeaponSummary(@CurrentUser() user: JwtPayload): Promise<WeaponPerformance[]> {
-    return this.analyticsService.computeWeaponSummary(user.sub);
+  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  async getWeaponSummary(
+    @CurrentUser() user: JwtPayload,
+    @Query('shooterId') shooterId: string | undefined,
+  ): Promise<WeaponPerformance[]> {
+    if (user.role === 'COACH' && !shooterId) {
+      throw new BadRequestException('shooterId is required for coach weapon summary');
+    }
+    return this.analyticsService.computeWeaponSummaryForActor(user.sub, user.role, shooterId);
   }
 }
