@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Rajdhani, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/auth-context';
+import { CursorGlow } from '../components/CursorGlow';
 
 // DESIGN NOTE: Three-font system — display (Rajdhani) for drama, DM Sans for
 // readability, JetBrains Mono for data precision. Each font carries semantic meaning.
@@ -55,7 +56,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'MARKSMAN',
   },
-  themeColor: '#F5A623',
 };
 
 export const viewport: Viewport = {
@@ -77,6 +77,7 @@ export default function RootLayout({
     >
       <body className="bg-[#080A0F] text-[#F0F4FF] antialiased font-body">
         <AuthProvider>{children}</AuthProvider>
+        <CursorGlow />
       </body>
     </html>
   );

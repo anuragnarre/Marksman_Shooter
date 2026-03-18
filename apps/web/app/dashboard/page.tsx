@@ -16,6 +16,7 @@ import { MetricCard } from '../../components/ui/MetricCard';
 import { TargetCanvas } from '../../components/TargetCanvas';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard, SkeletonRow } from '../../components/ui/SkeletonCard';
+import { StaggerGrid, StaggerItem } from '../../components/StaggerGrid';
 import type {
   CoachDashboardData,
   CreateManagedShooterProfileRequest,
@@ -392,71 +393,85 @@ function ShooterView() {
       </div>
 
       {/* ── Section 2: 6 KPI Cards ────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+      <StaggerGrid className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonCard key={i} animationDelay={i * 60} />
+            <StaggerItem key={i}>
+              <SkeletonCard animationDelay={i * 60} />
+            </StaggerItem>
           ))
         ) : (
           <>
-            <MetricCard
-              label="Season Average"
-              value={overview?.overallAverage ?? 0}
-              decimals={2}
-              color="blue"
-              delta={avgDelta}
-              sparklineData={last7Avgs}
-              icon={<ChartIcon />}
-              animationDelay={0}
-            />
-            <MetricCard
-              label="Best Session"
-              value={overview?.bestSessionAvg ?? 0}
-              decimals={2}
-              color="emerald"
-              isPB={(overview?.bestSessionAvg ?? 0) >= 9.5}
-              unit={bestTrendPoint ? fmtDateShort(bestTrendPoint.date) : undefined}
-              icon={<TrophyIcon />}
-              animationDelay={60}
-            />
-            <MetricCard
-              label="X-Ring Count"
-              value={xRingTotal}
-              decimals={0}
-              color="accent"
-              unit={`${xRingPct.toFixed(1)}% of shots`}
-              icon={<StarIcon />}
-              animationDelay={120}
-            />
-            <MetricCard
-              label="Consistency"
-              value={overview?.consistency ?? 0}
-              decimals={1}
-              color="blue"
-              unit="out of 10"
-              icon={<ZapIcon />}
-              animationDelay={180}
-            />
-            <MetricCard
-              label="Total Sessions"
-              value={overview?.totalSessions ?? 0}
-              decimals={0}
-              color="accent"
-              icon={<TargetIcon />}
-              animationDelay={240}
-            />
-            <MetricCard
-              label="Streak"
-              value={streak}
-              decimals={0}
-              color="emerald"
-              unit="sessions above avg"
-              icon={<FireIcon />}
-              animationDelay={300}
-            />
+            <StaggerItem>
+              <MetricCard
+                label="Season Average"
+                value={overview?.overallAverage ?? 0}
+                decimals={2}
+                color="blue"
+                delta={avgDelta}
+                sparklineData={last7Avgs}
+                icon={<ChartIcon />}
+                animationDelay={0}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
+                label="Best Session"
+                value={overview?.bestSessionAvg ?? 0}
+                decimals={2}
+                color="emerald"
+                isPB={(overview?.bestSessionAvg ?? 0) >= 9.5}
+                unit={bestTrendPoint ? fmtDateShort(bestTrendPoint.date) : undefined}
+                icon={<TrophyIcon />}
+                animationDelay={60}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
+                label="X-Ring Count"
+                value={xRingTotal}
+                decimals={0}
+                color="accent"
+                unit={`${xRingPct.toFixed(1)}% of shots`}
+                icon={<StarIcon />}
+                animationDelay={120}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
+                label="Consistency"
+                value={overview?.consistency ?? 0}
+                decimals={1}
+                color="blue"
+                unit="out of 10"
+                icon={<ZapIcon />}
+                animationDelay={180}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
+                label="Total Sessions"
+                value={overview?.totalSessions ?? 0}
+                decimals={0}
+                color="accent"
+                icon={<TargetIcon />}
+                animationDelay={240}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
+                label="Streak"
+                value={streak}
+                decimals={0}
+                color="emerald"
+                unit="sessions above avg"
+                icon={<FireIcon />}
+                animationDelay={300}
+              />
+            </StaggerItem>
           </>
         )}
-      </div>
+      </StaggerGrid>
 
       {/* ── Section 3: Session Trend Chart ───────────────────────────────── */}
       {!loading && trend.length > 0 && (

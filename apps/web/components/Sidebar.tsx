@@ -42,7 +42,7 @@ const ROLE_COLOR: Record<string, { color: string; bg: string; label: string }> =
   SOLDIER: { color: '#00E5A0', bg: 'rgba(0,229,160,0.12)',  label: 'Soldier' },
 };
 
-export function Sidebar() {
+export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } = {}) {
   const [expanded, setExpanded] = useState(true);
   const [mounted,  setMounted]  = useState(false);
   const pathname = usePathname();
@@ -125,6 +125,32 @@ export function Sidebar() {
 
       {/* ── Nav items ───────────────────────────────────────────────────── */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden space-y-0.5 px-2" role="menubar">
+        {/* ⌘K Command palette trigger */}
+        {onCommandPalette && (
+          <button
+            onClick={onCommandPalette}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl mb-1 transition-all duration-200"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', justifyContent: expanded ? 'flex-start' : 'center' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(245,166,35,0.06)'; e.currentTarget.style.borderColor = 'rgba(245,166,35,0.15)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)'; }}
+            aria-label="Open command palette"
+          >
+            <span className="shrink-0 w-5 h-5 flex items-center justify-center" style={{ color: '#4A5568' }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                <circle cx="5.5" cy="5.5" r="4" />
+                <line x1="8.5" y1="8.5" x2="12.5" y2="12.5" />
+              </svg>
+            </span>
+            {expanded && (
+              <>
+                <span className="flex-1 font-display font-semibold text-[12px] tracking-wide text-left" style={{ color: '#4A5568' }}>
+                  Search
+                </span>
+                <kbd className="px-1 py-0.5 rounded text-[9px] font-display" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#2A3350' }}>⌘K</kbd>
+              </>
+            )}
+          </button>
+        )}
         {nav.map((item) => {
           const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
           return (

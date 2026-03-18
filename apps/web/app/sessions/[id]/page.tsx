@@ -10,12 +10,15 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useIsMobile } from '../../../lib/use-mobile';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { isNative, getNativePhoto, requestCameraPermission, hapticSuccess, hapticError } from '../../../lib/capacitor';
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../../../lib/api';
 import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
 import { ScoreOverTimeChart, ScoreDistributionChart } from '../../../components/AnalyticsCharts';
+import { ShotHeatmap } from '../../../components/ShotHeatmap';
+import { ShotTimelineSlider } from '../../../components/ShotTimelineSlider';
 import { ShotTable } from '../../../components/ui/ShotTable';
 import { SuggestionItem } from '../../../components/ui/SuggestionItem';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
@@ -243,6 +246,14 @@ export default function SessionDetailPage() {
                   <div className="card p-4 animate-slide-up stagger-6">
                     <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Distribution</h3>
                     <ScoreDistributionChart shots={shots} />
+                  </div>
+                  <div className="card p-4 animate-slide-up stagger-7">
+                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Shot Heatmap</h3>
+                    <ShotHeatmap shots={shots} animated />
+                  </div>
+                  <div className="card p-4 animate-slide-up stagger-8">
+                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Timeline Replay</h3>
+                    <ShotTimelineSlider shots={shots} />
                   </div>
                 </>
               )}
@@ -1356,8 +1367,9 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
 
   // Start camera when mode switches to 'camera'; stop on teardown
   useEffect(() => {
-    if (mode === 'camera' && state === 'idle') {
-      void startCamera();
+    // On native, camera is launched on demand (no stream preview needed)
+    if (mode === 'camera' && state === 'idle' && !isNative()) {
+      void startWebCamera();
     }
     return () => {
       stopCamera();
@@ -1365,7 +1377,35 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  async function startCamera() {
+  /** Native Capacitor camera — opens system camera and returns a file. */
+  async function launchNativeCamera() {
+    setCameraError(null);
+    const granted = await requestCameraPermission();
+    if (!granted) {
+      setCameraError('Camera permission denied. Please allow camera access in device Settings.');
+      return;
+    }
+    try {
+      const file = await getNativePhoto('camera');
+      if (file) void handleFile(file);
+    } catch (e) {
+      setCameraError(e instanceof Error ? e.message : 'Camera failed');
+    }
+  }
+
+  /** Native gallery picker. */
+  async function launchNativeGallery() {
+    setCameraError(null);
+    try {
+      const file = await getNativePhoto('photos');
+      if (file) void handleFile(file);
+    } catch (e) {
+      setCameraError(e instanceof Error ? e.message : 'Gallery access failed');
+    }
+  }
+
+  /** Web getUserMedia camera stream — used on non-native platforms. */
+  async function startWebCamera() {
     setCameraError(null);
     setCameraReady(false);
 
@@ -1401,12 +1441,8 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         break;
       } catch (e) {
         lastErr = e;
-        // Only abort early on permission denial — for everything else (no back camera,
-        // overconstrained resolution, device busy) keep trying the next looser constraint.
         const name = (e instanceof Error ? e.name : '') as string;
-        if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-          break;
-        }
+        if (name === 'NotAllowedError' || name === 'PermissionDeniedError') break;
       }
     }
 
@@ -1422,11 +1458,13 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         await videoRef.current.play();
         setCameraReady(true);
       } catch {
-        // autoPlay likely blocked; camera will still show once user interacts
         setCameraReady(true);
       }
     }
   }
+
+  // Keep old name as alias for compatibility
+  const startCamera = startWebCamera;
 
   function stopCamera() {
     if (streamRef.current) {
@@ -1484,17 +1522,52 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
       );
       setResult({ shots: shots.length });
       setState('done');
+      void hapticSuccess();
       setTimeout(() => { setResult(null); setState('idle'); onSuccess(); }, 1500);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Photo analysis failed');
       setState('error');
+      void hapticError();
     }
   }
 
   return (
     <div className="space-y-4">
-      {/* Mode toggle */}
-      {state === 'idle' && (
+      {/* ── Native mode: show two large tap targets ──────────────────────── */}
+      {isNative() && state === 'idle' && (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => void launchNativeCamera()}
+            className="flex flex-col items-center justify-center gap-2 py-8 rounded-2xl
+                       border border-[rgba(245,166,35,0.25)] bg-[rgba(245,166,35,0.05)]
+                       active:scale-95 transition-transform touch-target"
+            style={{ minHeight: 120 }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span className="text-[#F5A623] text-xs font-display uppercase tracking-widest">Camera</span>
+          </button>
+          <button
+            onClick={() => void launchNativeGallery()}
+            className="flex flex-col items-center justify-center gap-2 py-8 rounded-2xl
+                       border border-[rgba(79,195,247,0.25)] bg-[rgba(79,195,247,0.05)]
+                       active:scale-95 transition-transform touch-target"
+            style={{ minHeight: 120 }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21,15 16,10 5,21" />
+            </svg>
+            <span className="text-[#4FC3F7] text-xs font-display uppercase tracking-widest">Gallery</span>
+          </button>
+        </div>
+      )}
+
+      {/* Web mode toggle (non-native only) */}
+      {!isNative() && state === 'idle' && (
         <div className="flex gap-1 p-1 rounded-lg bg-[#0E1118] border border-[#1E2433] w-fit">
           {(['upload', 'camera'] as PhotoMode[]).map((m) => (
             <button

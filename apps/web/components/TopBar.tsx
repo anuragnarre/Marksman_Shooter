@@ -2,7 +2,7 @@
 'use client';
 
 // DESIGN NOTE: 2026 glass topbar with animated gradient border-bottom,
-// gradient page title, live indicator and role-coloured avatar ring.
+// gradient page title, live indicator, ⌘K search trigger, and role-coloured avatar ring.
 
 import { useAuth } from '../contexts/auth-context';
 import { LiveIndicator } from './ui/LiveIndicator';
@@ -12,6 +12,7 @@ interface TopBarProps {
   isLive?: boolean;
   sidebarWidth?: number;
   safeTopInset?: string;
+  onCommandPalette?: () => void;
 }
 
 const ROLE_COLOR: Record<string, string> = {
@@ -20,11 +21,19 @@ const ROLE_COLOR: Record<string, string> = {
   SOLDIER: '#00E5A0',
 };
 
+const SEARCH_ICON = (
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+    <circle cx="5.5" cy="5.5" r="4" />
+    <line x1="8.5" y1="8.5" x2="12" y2="12" />
+  </svg>
+);
+
 export function TopBar({
   title,
   isLive = false,
   sidebarWidth = 244,
   safeTopInset = 'env(safe-area-inset-top, 0px)',
+  onCommandPalette,
 }: TopBarProps) {
   const { user } = useAuth();
   const roleColor = user?.role ? (ROLE_COLOR[user.role] ?? '#F5A623') : '#F5A623';
@@ -78,7 +87,44 @@ export function TopBar({
       </h1>
 
       {/* Right side actions */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+
+        {/* ⌘K search trigger — hidden on mobile */}
+        {onCommandPalette && (
+          <button
+            onClick={onCommandPalette}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg
+                       transition-all duration-200 group"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(245,166,35,0.06)';
+              e.currentTarget.style.borderColor = 'rgba(245,166,35,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+            }}
+            aria-label="Open command palette"
+          >
+            <span style={{ color: '#4A5568' }}>{SEARCH_ICON}</span>
+            <span className="text-[11px] font-display" style={{ color: '#3A4458' }}>
+              Search
+            </span>
+            <kbd
+              className="px-1 py-0.5 rounded text-[9px] font-display ml-1"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                color: '#2A3350',
+              }}
+            >
+              ⌘K
+            </kbd>
+          </button>
+        )}
 
         {/* Live indicator */}
         {isLive && (

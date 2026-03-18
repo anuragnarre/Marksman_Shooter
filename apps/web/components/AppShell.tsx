@@ -3,14 +3,20 @@
 
 // DESIGN NOTE: Authenticated shell — sidebar + glass topbar + bottom nav.
 // Deep grid-bg with amber/blue ambient orbs for depth and atmosphere.
+// Premium additions: CommandPalette (⌘K), AICoachPanel, PageTransition.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
+import { CommandPalette } from './CommandPalette';
+import { AICoachPanel } from './AICoachPanel';
+import { PageTransition } from './PageTransition';
+import { OfflineBanner } from './OfflineBanner';
 import { useIsMobile } from '../lib/use-mobile';
+import { initStatusBar, hideSplashScreen } from '../lib/capacitor';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -26,10 +32,17 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
   const router    = useRouter();
   const isMobile  = useIsMobile();
   const [sidebarW, setSidebarW] = useState(SIDEBAR_EXPANDED);
+  const [cmdOpen,  setCmdOpen]  = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) router.replace('/auth/login');
   }, [isLoading, isLoggedIn, router]);
+
+  // Init native status bar style + hide splash screen on mount
+  useEffect(() => {
+    void initStatusBar();
+    void hideSplashScreen();
+  }, []);
 
   // Track sidebar width dynamically via ResizeObserver
   useEffect(() => {
@@ -42,6 +55,19 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
     observer.observe(aside);
     return () => observer.disconnect();
   }, []);
+
+  // ⌘K / Ctrl+K shortcut
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      setCmdOpen((o) => !o);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onKeyDown]);
 
   if (isLoading) {
     return (
@@ -85,13 +111,13 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
   return (
     <div className="min-h-screen grid-bg relative overflow-x-hidden">
 
-      {/* ── Ambient background orbs ────────────────────────────────────── */}
+      {/* ── Ambient background orbs ─────────────────────────────────────── */}
       <div
         className="fixed pointer-events-none"
         style={{
           top: '-10%', left: '-5%',
           width: '50vw', height: '50vw',
-          background: 'radial-gradient(circle, rgba(245,166,35,0.04) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(245,166,35,0.055) 0%, transparent 65%)',
           animation: 'orbFloat 18s ease-in-out infinite',
           zIndex: 0,
         }}
@@ -101,18 +127,30 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
         style={{
           bottom: '10%', right: '-10%',
           width: '40vw', height: '40vw',
-          background: 'radial-gradient(circle, rgba(79,195,247,0.035) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(79,195,247,0.04) 0%, transparent 65%)',
           animation: 'orbFloat 22s ease-in-out infinite reverse',
           zIndex: 0,
         }}
       />
+      {/* Third deep purple orb for visual richness */}
+      <div
+        className="fixed pointer-events-none"
+        style={{
+          top: '40%', left: '30%',
+          width: '30vw', height: '30vw',
+          background: 'radial-gradient(circle, rgba(120,80,255,0.018) 0%, transparent 65%)',
+          animation: 'orbFloat 28s ease-in-out 6s infinite',
+          zIndex: 0,
+        }}
+      />
 
-      <Sidebar />
+      <Sidebar onCommandPalette={() => setCmdOpen(true)} />
       <TopBar
         title={title}
         isLive={isLive}
         sidebarWidth={isMobile ? 0 : sidebarW}
         safeTopInset={safeTopInset}
+        onCommandPalette={() => setCmdOpen(true)}
       />
 
       {/* Main content */}
@@ -125,11 +163,22 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
         }}
       >
         <div className="max-w-[1440px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </div>
       </main>
 
       <BottomNav />
+
+      {/* Command Palette */}
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
+
+      {/* AI Coach Panel — hidden on mobile bottom nav area */}
+      {!isMobile && <AICoachPanel />}
+
+      {/* Offline/network banner — slides in from top */}
+      <OfflineBanner />
     </div>
   );
 }

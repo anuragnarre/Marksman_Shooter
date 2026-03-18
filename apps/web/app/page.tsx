@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { useIsMobile } from '../lib/use-mobile';
@@ -22,16 +23,33 @@ function useScrollY(): number {
 
 function useSectionReveal(threshold = 0.15): [React.RefObject<HTMLDivElement>, boolean] {
   const ref = useRef<HTMLDivElement>(null);
+  // Bidirectional: re-triggers on both enter and re-enter from any direction
   const [vis, setVis] = useState(false);
   useEffect(() => {
     const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVis(true); },
-      { threshold }
+      ([e]) => setVis(e.isIntersecting),
+      { threshold, rootMargin: '-80px 0px' }
     );
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
   }, [threshold]);
   return [ref, vis];
+}
+
+// Detects scroll direction for directional slide animations
+function useScrollDirection(): 'down' | 'up' {
+  const [dir, setDir] = useState<'down' | 'up'>('down');
+  const lastY = useRef(0);
+  useEffect(() => {
+    const h = () => {
+      const y = window.scrollY;
+      setDir(y > lastY.current ? 'down' : 'up');
+      lastY.current = y;
+    };
+    window.addEventListener('scroll', h, { passive: true });
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+  return dir;
 }
 
 // ── Magnetic Button ────────────────────────────────────────────────────────────
@@ -64,6 +82,55 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ── Particle Field ────────────────────────────────────────────────────────────
+// Fixed seed to avoid hydration mismatch — values are deterministic.
+
+const PARTICLES = [
+  { x: 8,  y: 12, s: 1.8, d: 7.2, dl: 0,   c: '#F5A623', o: 0.25 },
+  { x: 22, y: 35, s: 1.2, d: 9.0, dl: 1.5, c: '#4FC3F7', o: 0.20 },
+  { x: 45, y: 8,  s: 2.2, d: 6.5, dl: 3.0, c: '#00E5A0', o: 0.30 },
+  { x: 65, y: 20, s: 1.5, d: 8.4, dl: 0.8, c: '#F0F4FF', o: 0.15 },
+  { x: 80, y: 45, s: 1.0, d: 7.8, dl: 2.2, c: '#F5A623', o: 0.20 },
+  { x: 15, y: 60, s: 2.0, d: 10,  dl: 4.5, c: '#4FC3F7', o: 0.25 },
+  { x: 35, y: 75, s: 1.3, d: 6.8, dl: 1.0, c: '#00E5A0', o: 0.18 },
+  { x: 55, y: 55, s: 2.5, d: 8.0, dl: 3.5, c: '#F5A623', o: 0.22 },
+  { x: 72, y: 70, s: 1.6, d: 9.5, dl: 0.3, c: '#4FC3F7', o: 0.28 },
+  { x: 90, y: 15, s: 1.1, d: 7.0, dl: 5.0, c: '#F0F4FF', o: 0.15 },
+  { x: 3,  y: 82, s: 1.9, d: 8.8, dl: 2.8, c: '#00E5A0', o: 0.22 },
+  { x: 28, y: 48, s: 1.4, d: 6.2, dl: 1.8, c: '#F5A623', o: 0.18 },
+  { x: 48, y: 30, s: 2.1, d: 9.8, dl: 4.0, c: '#4FC3F7', o: 0.28 },
+  { x: 62, y: 85, s: 1.7, d: 7.5, dl: 0.5, c: '#F0F4FF', o: 0.16 },
+  { x: 85, y: 55, s: 1.2, d: 8.2, dl: 3.2, c: '#F5A623', o: 0.24 },
+  { x: 12, y: 25, s: 2.3, d: 6.9, dl: 2.0, c: '#00E5A0', o: 0.20 },
+  { x: 40, y: 90, s: 1.5, d: 10.2,dl: 1.2, c: '#4FC3F7', o: 0.22 },
+  { x: 58, y: 42, s: 1.8, d: 7.8, dl: 4.8, c: '#F5A623', o: 0.26 },
+  { x: 75, y: 28, s: 1.0, d: 8.5, dl: 0.7, c: '#F0F4FF', o: 0.14 },
+  { x: 92, y: 72, s: 2.0, d: 6.4, dl: 3.8, c: '#00E5A0', o: 0.20 },
+];
+
+function ParticleField() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+      {PARTICLES.map((p, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top:  `${p.y}%`,
+            width:  p.s,
+            height: p.s,
+            background: p.c,
+            opacity: p.o,
+            animation: `floatY ${p.d}s ease-in-out ${p.dl}s infinite`,
+            boxShadow: `0 0 ${p.s * 4}px ${p.c}55`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ── Entry Point ──────────────────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -82,7 +149,7 @@ export default function HomePage() {
   if (!mounted || user) return null;
 
   return (
-    <div className="min-h-screen bg-[#080A0F] text-[#F0F4FF] overflow-x-hidden" style={{ fontSize: '16px' }}>
+    <div className="min-h-screen depth-bg text-[#F0F4FF] overflow-x-hidden" style={{ fontSize: '16px' }}>
       <Nav safeTopInset={safeTopInset} />
       <div style={{ paddingTop: safeTopInset }}>
         <Hero scrollY={scrollY} />
@@ -322,6 +389,9 @@ function Hero({ scrollY }: { scrollY: number }) {
           opacity: 0.35,
         }}
       />
+
+      {/* Floating particles */}
+      <ParticleField />
 
       {/* Drifting orbs */}
       <div className="absolute pointer-events-none" style={{ width: 500, height: 500, right: '0%', top: '5%', background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.07) 0%, transparent 65%)', animation: 'orbFloat 14s ease-in-out infinite' }} />
@@ -906,87 +976,491 @@ function BentoFeatures() {
 // ── AI & Health Section ───────────────────────────────────────────────────────
 
 function BiometricCardContent() {
-  const ref = useRef<SVGPolylineElement>(null);
+  const [bpm, setBpm] = useState(62);
+  const [phase, setPhase] = useState(0); // 0=resting,1=aim,2=peak
   const [drawn, setDrawn] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Animate BPM value
+  useEffect(() => {
+    const t = setInterval(() => {
+      setBpm(prev => {
+        const drift = (Math.random() - 0.5) * 3;
+        return Math.round(Math.max(55, Math.min(78, prev + drift)));
+      });
+    }, 900);
+    return () => clearInterval(t);
+  }, []);
+
+  // Cycle aim phases
+  useEffect(() => {
+    const t = setInterval(() => setPhase(p => (p + 1) % 3), 2800);
+    return () => clearInterval(t);
+  }, []);
+
+  // Trigger ECG draw on viewport enter
   useEffect(() => {
     const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setDrawn(true); },
+      ([e]) => { if (e.isIntersecting) { setDrawn(false); setTimeout(() => setDrawn(true), 50); } else { setDrawn(false); } },
       { threshold: 0.3 }
     );
-    if (ref.current) io.observe(ref.current);
+    if (containerRef.current) io.observe(containerRef.current);
     return () => io.disconnect();
   }, []);
+
+  const bpmColor = bpm > 72 ? '#FF4D6D' : bpm > 65 ? '#F5A623' : '#00E5A0';
+  const phaseLabels = ['RESTING', 'AIM PHASE', 'PEAK'];
+  const phaseColors = ['#00E5A0', '#4FC3F7', '#FF4D6D'];
+
+  // ECG path with gradient stroke points
+  const ecgPoints = "0,40 45,40 50,38 55,22 58,10 62,60 66,44 70,40 78,40 120,40 125,38 130,22 133,10 137,60 141,44 145,40 153,40 280,40";
+
   return (
-    <>
-      <div className="rounded-xl overflow-hidden" style={{ background: '#060810', border: '1px solid #1E2433' }}>
+    <div ref={containerRef} className="flex flex-col gap-3">
+      {/* Live BPM display */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <motion.div
+            className="w-2 h-2 rounded-full"
+            style={{ background: bpmColor }}
+            animate={{ scale: [1, 1.6, 1], opacity: [1, 0.5, 1] }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <span className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: '#4A5568' }}>Live BPM</span>
+        </div>
+        <motion.span
+          key={bpm}
+          className="font-data font-black text-xl tabular-nums"
+          style={{ color: bpmColor, textShadow: `0 0 16px ${bpmColor}60` }}
+          initial={{ opacity: 0.5, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          {bpm}
+        </motion.span>
+      </div>
+
+      {/* ECG Canvas */}
+      <div className="rounded-xl overflow-hidden relative"
+        style={{ background: '#060810', border: '1px solid rgba(255,77,109,0.15)', boxShadow: `0 0 20px rgba(255,77,109,0.05)` }}>
         <svg viewBox="0 0 280 80" className="w-full" style={{ display: 'block' }}>
+          <defs>
+            <linearGradient id="ecgGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#00E5A0" />
+              <stop offset="50%"  stopColor="#F5A623" />
+              <stop offset="100%" stopColor="#FF4D6D" />
+            </linearGradient>
+            <filter id="ecgGlow">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
           <rect width="280" height="80" fill="#060810" />
+
+          {/* Grid lines */}
+          {[20,40,60].map(y => (
+            <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 6" />
+          ))}
+
+          {/* ECG fill */}
+          <path
+            d={`M0,80 0,40 45,40 50,38 55,22 58,10 62,60 66,44 70,40 78,40 120,40 125,38 130,22 133,10 137,60 141,44 145,40 153,40 280,40 280,80 Z`}
+            fill="url(#ecgGrad)" fillOpacity="0.07"
+          />
+
+          {/* ECG line */}
           <polyline
-            ref={ref}
-            points="0,40 55,40 60,38 65,20 68,10 72,55 76,42 82,38 90,40 280,40"
-            fill="none" stroke="#FF4D6D" strokeWidth="1.5"
-            strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="1000"
+            points={ecgPoints}
+            fill="none"
+            stroke="url(#ecgGrad)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="800"
+            strokeDashoffset={drawn ? 0 : 800}
             style={{
-              strokeDashoffset: drawn ? 0 : 1000,
-              animation: drawn ? 'dashDraw 2s cubic-bezier(0.16,1,0.3,1) forwards' : 'none',
-              transition: drawn ? 'none' : 'stroke-dashoffset 0s',
+              transition: drawn ? 'stroke-dashoffset 1.8s cubic-bezier(0.16,1,0.3,1)' : 'none',
+              filter: 'url(#ecgGlow)',
             }}
           />
-          <circle cx="280" cy="40" r="3" fill="#FF4D6D" style={{ animation: 'pulseGlow 1.8s ease-in-out infinite' }} />
-          <text x="210" y="18" fill="#FF4D6D" fontSize="11" fontFamily="JetBrains Mono, monospace" fontWeight="700">62 BPM</text>
-          <text x="20" y="62" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.1em">AIM PHASE</text>
+
+          {/* Animated endpoint dot */}
+          <circle cx="280" cy="40" r="3.5" fill="#FF4D6D" style={{ animation: 'pulseGlow 1.4s ease-in-out infinite' }} />
+
+          {/* Phase label */}
+          <text x="10" y="72" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="700" letterSpacing="0.15em">
+            {phaseLabels[phase]}
+          </text>
         </svg>
       </div>
-      <div className="flex gap-2 mt-3">
-        {['AVG 64 BPM', 'STABLE', 'RESTING 58 BPM'].map((label, i) => (
+
+      {/* Stats pills */}
+      <div className="flex gap-2 flex-wrap">
+        {[
+          { label: `AVG ${Math.round(bpm - 2)} BPM`, color: '#FF4D6D' },
+          { label: phaseLabels[phase], color: phaseColors[phase] },
+          { label: 'REST 58 BPM', color: '#4FC3F7' },
+        ].map(({ label, color }) => (
           <span key={label} className="px-2.5 py-1 rounded-full text-[10px] font-display tracking-wide"
-            style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.2)', color: i === 1 ? '#00E5A0' : '#FF4D6D' }}>
+            style={{ background: `${color}10`, border: `1px solid ${color}30`, color }}>
             {label}
           </span>
         ))}
       </div>
-    </>
+    </div>
   );
 }
+
+// ── AI Coaching Engine card ────────────────────────────────────────────────────
+
+const AI_MESSAGES = [
+  { role: 'ai', text: 'Detected: Right drift in shots 47–52.' },
+  { role: 'ai', text: 'Trigger finger placement may need adjustment.' },
+  { role: 'ai', text: 'Follow-through consistency: 73%. Improve to 85%+.' },
+];
+
+function AICoachCardContent() {
+  const [visibleMsg, setVisibleMsg] = useState(0);
+  const [typed, setTyped] = useState('');
+  const [scanning, setScanning] = useState(true);
+
+  // Cycle through messages with typewriter
+  useEffect(() => {
+    const full = AI_MESSAGES[visibleMsg].text;
+    let i = 0;
+    setTyped('');
+    const t = setInterval(() => {
+      i++;
+      setTyped(full.slice(0, i));
+      if (i >= full.length) {
+        clearInterval(t);
+        setTimeout(() => setVisibleMsg(m => (m + 1) % AI_MESSAGES.length), 2200);
+      }
+    }, 28);
+    return () => clearInterval(t);
+  }, [visibleMsg]);
+
+  // Scanning pulse
+  useEffect(() => {
+    const t = setInterval(() => setScanning(s => !s), 1600);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Scanning header */}
+      <div className="rounded-xl overflow-hidden relative"
+        style={{ background: '#060810', border: '1px solid rgba(245,166,35,0.18)' }}>
+
+        {/* Shooter silhouette + scan lines */}
+        <div className="relative h-28 flex items-center justify-center overflow-hidden">
+          {/* Grid overlay */}
+          <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 280 112" preserveAspectRatio="none">
+            {[28,56,84].map(y => (
+              <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="#F5A623" strokeWidth="0.4" strokeDasharray="6 8" />
+            ))}
+            {[56,112,168,224].map(x => (
+              <line key={x} x1={x} y1="0" x2={x} y2="112" stroke="#F5A623" strokeWidth="0.4" strokeDasharray="6 8" />
+            ))}
+          </svg>
+
+          {/* Shooter silhouette */}
+          <svg width="56" height="90" viewBox="0 0 56 90" fill="none" className="relative z-10">
+            {/* Head */}
+            <circle cx="28" cy="10" r="8" fill="#1E2A3A" stroke="rgba(245,166,35,0.4)" strokeWidth="0.8" />
+            {/* Torso */}
+            <path d="M16 22 Q28 18 40 22 L38 60 Q28 64 18 60 Z" fill="#1E2A3A" stroke="rgba(245,166,35,0.4)" strokeWidth="0.8" />
+            {/* Arms — aiming pose */}
+            <path d="M16 28 L4 36" stroke="rgba(245,166,35,0.5)" strokeWidth="3" strokeLinecap="round" />
+            <path d="M40 28 L52 26" stroke="rgba(245,166,35,0.5)" strokeWidth="3" strokeLinecap="round" />
+            {/* Rifle */}
+            <rect x="38" y="23" width="18" height="3" rx="1.5" fill="rgba(245,166,35,0.6)" />
+            {/* Legs */}
+            <path d="M20 60 L18 82 M36 60 L38 82" stroke="rgba(245,166,35,0.4)" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+
+          {/* Animated target detection box */}
+          <motion.div
+            className="absolute"
+            style={{
+              width: 64, height: 64,
+              border: '1.5px solid #F5A623',
+              borderRadius: 4,
+              left: '50%', top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+            animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.04, 0.96] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            {/* Corner accents */}
+            {[
+              { top: -2, left: -2, borderRight: 'none', borderBottom: 'none' },
+              { top: -2, right: -2, borderLeft: 'none', borderBottom: 'none' },
+              { bottom: -2, left: -2, borderRight: 'none', borderTop: 'none' },
+              { bottom: -2, right: -2, borderLeft: 'none', borderTop: 'none' },
+            ].map((s, i) => (
+              <div key={i} className="absolute w-2.5 h-2.5" style={{ border: '2px solid #F5A623', ...s }} />
+            ))}
+          </motion.div>
+
+          {/* Scanning line sweep */}
+          <motion.div
+            className="absolute inset-x-0 h-px"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.6), transparent)' }}
+            animate={{ top: ['10%', '90%', '10%'] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+
+          {/* Status badge */}
+          <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-lg"
+            style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.25)' }}>
+            <motion.div className="w-1.5 h-1.5 rounded-full bg-[#F5A623]"
+              animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 0.9, repeat: Infinity }} />
+            <span className="text-[9px] font-display uppercase tracking-widest text-[#F5A623]">Analyzing</span>
+          </div>
+        </div>
+      </div>
+
+      {/* AI message bubble with typewriter */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={visibleMsg}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 10 }}
+          transition={{ duration: 0.3 }}
+          className="px-3.5 py-3 rounded-xl text-[13px] text-[#F0F4FF]"
+          style={{ background: 'rgba(245,166,35,0.06)', borderLeft: '2px solid #F5A623', borderRadius: '0 12px 12px 0' }}
+        >
+          {typed}
+          <span className="inline-block w-0.5 h-3.5 bg-[#F5A623] ml-0.5 animate-pulse align-middle" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Metrics row */}
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: 'DRIFT', value: 'RIGHT', color: '#FF4D6D' },
+          { label: 'FOLLOW', value: '73%', color: '#F5A623' },
+          { label: 'PATTERN', value: '6 SHOTS', color: '#4FC3F7' },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="rounded-lg px-2 py-1.5 text-center"
+            style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
+            <p className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#4A5568' }}>{label}</p>
+            <p className="font-data font-bold text-xs tabular-nums" style={{ color }}>{value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Performance Prediction card ────────────────────────────────────────────────
+
+const PERF_POINTS: [number, number][] = [[30,72],[65,65],[100,60],[135,55],[170,48],[205,42],[240,38],[265,32]];
+
+function PerfPredictionCardContent() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [drawn, setDrawn] = useState(false);
+  const [projValue, setProjValue] = useState(9.80);
+
+  // Trigger on viewport enter/exit
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) { setDrawn(false); setTimeout(() => setDrawn(true), 80); }
+        else { setDrawn(false); }
+      },
+      { threshold: 0.2 }
+    );
+    if (containerRef.current) io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  // Animate projected value counting up
+  useEffect(() => {
+    if (!drawn) { setProjValue(9.80); return; }
+    const target = 10.43;
+    const start = 9.80;
+    const duration = 1800;
+    const startTime = performance.now();
+    const raf = (ts: number) => {
+      const p = Math.min((ts - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setProjValue(+(start + (target - start) * ease).toFixed(2));
+      if (p < 1) requestAnimationFrame(raf);
+    };
+    const id = requestAnimationFrame(raf);
+    return () => cancelAnimationFrame(id);
+  }, [drawn]);
+
+  const pathD = `M${PERF_POINTS.map(([x,y]) => `${x},${y}`).join(' L')}`;
+  const fillD = `M30,82 ${PERF_POINTS.map(([x,y]) => `L${x},${y}`).join(' ')} L265,82 Z`;
+  const totalLen = 520; // approximate polyline length
+
+  return (
+    <div ref={containerRef} className="flex flex-col gap-3">
+      {/* Chart */}
+      <div className="rounded-xl overflow-hidden relative"
+        style={{ background: '#060810', border: '1px solid rgba(79,195,247,0.15)', boxShadow: '0 0 20px rgba(79,195,247,0.04)' }}>
+        <svg viewBox="0 0 290 95" className="w-full" style={{ display: 'block' }}>
+          <defs>
+            <linearGradient id="perfFill2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#4FC3F7" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0"    />
+            </linearGradient>
+            <linearGradient id="perfStroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#00E5A0" />
+              <stop offset="70%"  stopColor="#4FC3F7" />
+              <stop offset="100%" stopColor="#4FC3F7" />
+            </linearGradient>
+            <filter id="perfGlow">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          <rect width="290" height="95" fill="#060810" />
+
+          {/* Grid */}
+          {[30,47,64,81].map(y => (
+            <line key={y} x1="28" y1={y} x2="285" y2={y} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 6" />
+          ))}
+          {/* Y labels */}
+          {[['10.4',30],['10.0',47],['9.6',64],['9.2',81]].map(([v,y]) => (
+            <text key={String(v)} x="4" y={Number(y)+3} fill="#2A3350" fontSize="6.5" fontFamily="JetBrains Mono,monospace">{v}</text>
+          ))}
+
+          {/* Projection zone */}
+          <rect x="260" y="15" width="28" height="72" fill="rgba(79,195,247,0.03)" />
+          <line x1="261" y1="15" x2="261" y2="85" stroke="#4FC3F7" strokeWidth="0.7" strokeDasharray="3 4" opacity="0.4" />
+          <text x="263" y="20" fill="#4FC3F7" fontSize="6" fontFamily="Rajdhani,sans-serif" fontWeight="600" letterSpacing="0.1em" opacity="0.6">PROJ</text>
+
+          {/* Gradient fill */}
+          <path d={fillD} fill="url(#perfFill2)"
+            style={{
+              opacity: drawn ? 1 : 0,
+              transition: drawn ? 'opacity 600ms 400ms ease' : 'none',
+            }}
+          />
+
+          {/* Main trend line — animated draw */}
+          <polyline
+            points={PERF_POINTS.map(([x,y]) => `${x},${y}`).join(' ')}
+            fill="none"
+            stroke="url(#perfStroke)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray={totalLen}
+            strokeDashoffset={drawn ? 0 : totalLen}
+            style={{
+              transition: drawn ? `stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)` : 'none',
+              filter: 'url(#perfGlow)',
+            }}
+          />
+
+          {/* Projected dashed extension */}
+          <polyline
+            points="265,32 285,20"
+            fill="none" stroke="#4FC3F7" strokeWidth="1.8" strokeDasharray="4 3" opacity="0.7"
+            style={{ filter: 'url(#perfGlow)' }}
+          />
+
+          {/* Historical dots */}
+          {PERF_POINTS.map(([cx,cy],i) => (
+            <circle key={i} cx={cx} cy={cy} r="2.5" fill="#4FC3F7"
+              style={{
+                opacity: drawn ? 1 : 0,
+                transition: `opacity 200ms ${300 + i * 120}ms ease`,
+              }}
+            />
+          ))}
+
+          {/* Projected future dots */}
+          {[[275,26],[285,20]].map(([cx,cy],i) => (
+            <circle key={i} cx={cx} cy={cy} r="2.5" fill="none" stroke="#4FC3F7" strokeWidth="1.5"
+              strokeDasharray="3 2"
+              style={{
+                opacity: drawn ? 0.7 : 0,
+                transition: `opacity 300ms ${1200 + i * 150}ms ease`,
+              }}
+            />
+          ))}
+
+          {/* Glowing endpoint */}
+          <circle cx="285" cy="20" r="4" fill="#4FC3F7"
+            style={{ animation: 'pulseGlow 1.6s ease-in-out infinite', opacity: drawn ? 1 : 0 }} />
+        </svg>
+      </div>
+
+      {/* Animated stat row */}
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: 'PROJECTED', value: projValue.toFixed(2), color: '#4FC3F7' },
+          { label: 'GAIN', value: '+0.43', color: '#00E5A0' },
+          { label: 'CONFIDENCE', value: '91%', color: '#F5A623' },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="rounded-lg px-2 py-1.5 text-center"
+            style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
+            <p className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#4A5568' }}>{label}</p>
+            <p className="font-data font-bold text-xs tabular-nums" style={{ color }}>{value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── AICard wrapper ─────────────────────────────────────────────────────────────
 
 function AICard({ title, tagline, accentColor, icon, idx, children }: {
   title: string; tagline: string; accentColor: string; icon: React.ReactNode; idx: number; children: React.ReactNode;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  const scrollDir = useScrollDirection();
 
   return (
-    <div
-      ref={ref}
-      className="relative rounded-2xl overflow-hidden flex flex-col"
+    <motion.div
+      className="relative rounded-2xl flex flex-col"
       style={{
-        background: 'rgba(12,15,26,0.7)',
-        border: '1px solid rgba(255,255,255,0.055)',
-        backdropFilter: 'blur(12px)',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 600ms ${idx * 80}ms, transform 600ms ${idx * 80}ms cubic-bezier(0.16,1,0.3,1)`,
+        background: 'rgba(10,13,24,0.75)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        overflow: 'hidden',
+      }}
+      initial={{ opacity: 0, y: scrollDir === 'down' ? 36 : -36, filter: 'blur(6px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: false, margin: '-80px' }}
+      transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
+      whileHover={{
+        y: -8,
+        boxShadow: `0 28px 64px -12px ${accentColor}35, 0 0 0 1px ${accentColor}25`,
+        transition: { duration: 0.28, ease: 'easeOut' },
       }}
     >
-      {/* Top accent line — always visible */}
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
+      {/* Ambient background glow */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${accentColor}08, transparent 70%)` }} />
 
-      <div className="p-5 sm:p-6 flex flex-col gap-4 flex-1">
+      {/* Top accent line */}
+      <div className="absolute top-0 inset-x-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
+
+      {/* Subtle corner glow */}
+      <div className="absolute top-0 left-0 w-24 h-24 pointer-events-none"
+        style={{ background: `radial-gradient(circle at 0% 0%, ${accentColor}10, transparent 70%)` }} />
+
+      <div className="p-5 sm:p-6 flex flex-col gap-4 flex-1"
+        style={{ animation: `floatY ${6 + idx * 0.8}s ease-in-out infinite`, animationDelay: `${idx * 0.4}s` }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: `${accentColor}12`, color: accentColor }}>
+          <motion.div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}20` }}
+            whileHover={{ scale: 1.12, background: `${accentColor}22` }}
+            transition={{ duration: 0.2 }}
+          >
             {icon}
-          </div>
+          </motion.div>
           <div>
             <h3 className="font-display font-bold text-[#F0F4FF] text-base tracking-wide">{title}</h3>
             <p className="text-[#6B7A96] text-[13px] mt-0.5">{tagline}</p>
@@ -994,122 +1468,86 @@ function AICard({ title, tagline, accentColor, icon, idx, children }: {
         </div>
         <div className="flex-1">{children}</div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function AIHealthSection() {
-  const [headRef, headVis] = useSectionReveal();
+  const scrollDir = useScrollDirection();
   return (
     <section
       id="ai-health"
       className="py-14 sm:py-20 lg:py-32 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #080A0F 0%, #0A0D18 40%, #0C0F1A 60%, #080A0F 100%)',
+        background: 'linear-gradient(180deg, #080A0F 0%, #080D1A 35%, #0A0F1C 65%, #080A0F 100%)',
         borderTop: '1px solid #1E2433',
         borderBottom: '1px solid #1E2433',
       }}
     >
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
-        <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
+      {/* Background ambient glows */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/3 left-1/4 w-[600px] h-[400px] rounded-full opacity-[0.04]"
+          style={{ background: 'radial-gradient(ellipse, #FF4D6D, transparent)', filter: 'blur(80px)', transform: 'translate(-50%,-50%)' }} />
+        <div className="absolute top-1/2 left-1/2 w-[700px] h-[500px] rounded-full opacity-[0.035]"
+          style={{ background: 'radial-gradient(ellipse, #F5A623, transparent)', filter: 'blur(100px)', transform: 'translate(-50%,-50%)' }} />
+        <div className="absolute top-1/3 right-1/4 w-[600px] h-[400px] rounded-full opacity-[0.04]"
+          style={{ background: 'radial-gradient(ellipse, #4FC3F7, transparent)', filter: 'blur(80px)', transform: 'translate(50%,-50%)' }} />
+        {/* Subtle noise overlay */}
+        <div className="absolute inset-0 opacity-[0.015]"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px' }} />
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 relative">
+        {/* Section header — Framer Motion bidirectional */}
+        <motion.div
+          className="text-center mb-12 sm:mb-16 lg:mb-20"
+          initial={{ opacity: 0, y: scrollDir === 'down' ? 30 : -30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
+        >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
             style={{ background: 'rgba(79,195,247,0.07)', border: '1px solid rgba(79,195,247,0.22)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]" style={{ animation: 'pulseGlowBlue 2s ease-in-out infinite' }} />
+            <motion.span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]"
+              animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
+              transition={{ duration: 2, repeat: Infinity }} />
             <span className="text-[#4FC3F7] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">AI-Powered Intelligence</span>
           </div>
           <h2
             className="font-display font-black leading-[1.0]"
-            style={{
-              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
-              letterSpacing: '-0.02em',
-              animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
-              opacity: headVis ? undefined : 0,
-            }}
+            style={{ fontSize: 'clamp(2.4rem, 6.5vw, 5rem)', letterSpacing: '-0.02em' }}
           >
             <span className="text-[#F0F4FF]">Train smarter. </span>
-            <span style={{ background: 'linear-gradient(135deg, #4FC3F7, #00E5A0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Recover faster.</span>
+            <span style={{ background: 'linear-gradient(135deg, #4FC3F7 20%, #00E5A0 80%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Recover faster.
+            </span>
           </h2>
-          <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0" style={{ lineHeight: '1.75' }}>
+          <motion.p
+            className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0"
+            style={{ lineHeight: '1.75' }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: false, margin: '-80px' }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+          >
             From biometric monitoring to predictive coaching — Marksman&apos;s AI layer turns raw session data into actionable intelligence you can act on immediately.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Card 1 — Biometric Monitoring */}
-          <AICard title="Biometric Monitoring" tagline="Real-time heart rate during aim phases" accentColor="#FF4D6D" icon={<HeartIcon />} idx={0}>
+          <AICard title="Stress Monitoring" tagline="Real-time biometrics during aim phases" accentColor="#FF4D6D" icon={<HeartIcon />} idx={0}>
             <BiometricCardContent />
           </AICard>
 
           {/* Card 2 — AI Coaching Engine */}
           <AICard title="AI Coaching Engine" tagline="Pattern analysis and personalized feedback" accentColor="#F5A623" icon={<SparkleIcon />} idx={1}>
-            <div className="rounded-xl p-3 flex flex-col gap-2" style={{ background: '#060810', border: '1px solid #1E2433' }}>
-              <div className="flex justify-between items-center mb-1">
-                <span className="px-2.5 py-1 rounded-lg text-[11px] font-display tracking-wide"
-                  style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.28)', color: '#F5A623' }}>
-                  AI ANALYZING
-                </span>
-              </div>
-              <div className="self-end px-3 py-2 rounded-xl text-[13px] text-[#6B7A96] max-w-[80%]"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                Session 47–52 review
-              </div>
-              <div className="self-start px-3.5 py-2.5 rounded-xl text-[13px] text-[#F0F4FF] max-w-[90%]"
-                style={{ background: 'rgba(245,166,35,0.07)', borderLeft: '2px solid #F5A623', borderRadius: '0 12px 12px 0' }}>
-                <p>Detected: Right drift in shots 47–52.</p>
-                <p className="text-[#9CA3B4] mt-1">Check trigger finger placement and follow-through.</p>
-                <span className="inline-block w-0.5 h-3.5 bg-[#F5A623] ml-0.5 animate-pulse" />
-              </div>
-            </div>
+            <AICoachCardContent />
           </AICard>
 
           {/* Card 3 — Performance Prediction */}
           <AICard title="Performance Prediction" tagline="Score trajectory and projected improvement" accentColor="#4FC3F7" icon={<ChartLineIcon />} idx={2}>
-            <div className="rounded-xl overflow-hidden" style={{ background: '#060810', border: '1px solid #1E2433' }}>
-              <svg viewBox="0 0 280 90" className="w-full" style={{ display: 'block' }}>
-                <defs>
-                  <linearGradient id="perfFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#4FC3F7" stopOpacity="0.22" />
-                    <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <rect width="280" height="90" fill="#060810" />
-                {/* Grid lines */}
-                <line x1="30" y1="38" x2="278" y2="38" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
-                <line x1="30" y1="55" x2="278" y2="55" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
-                <line x1="30" y1="72" x2="278" y2="72" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
-                {/* Projected vertical */}
-                <line x1="265" y1="20" x2="265" y2="80" stroke="#4FC3F7" strokeWidth="0.6" strokeDasharray="3 4" opacity="0.35" />
-                {/* Y-axis labels */}
-                <text x="8" y="38" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">10.2</text>
-                <text x="8" y="55" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">9.8</text>
-                <text x="8" y="72" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">9.4</text>
-                {/* Fill area */}
-                <path
-                  d="M30,72 65,65 100,60 135,55 170,48 205,42 240,38 265,32 265,85 30,85 Z"
-                  fill="url(#perfFill)"
-                  style={{ animation: 'fadeIn 1200ms 300ms both' }}
-                />
-                {/* Actual data */}
-                <polyline
-                  points="30,72 65,65 100,60 135,55 170,48 205,42 240,38 265,32"
-                  fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                />
-                {/* Projected dashed */}
-                <polyline
-                  points="265,32 278,24"
-                  fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5"
-                />
-                {/* Data dots */}
-                {[[30,72],[65,65],[100,60],[135,55],[170,48],[205,42],[240,38],[265,32]].map(([cx,cy],i) => (
-                  <circle key={i} cx={cx} cy={cy} r="2.5" fill="#4FC3F7" />
-                ))}
-                {/* Endpoint dot with pulse */}
-                <circle cx="278" cy="24" r="3.5" fill="#4FC3F7" style={{ animation: 'pulseGlow 1.8s ease-in-out infinite' }} />
-                {/* Stats overlay */}
-                <text x="160" y="20" fill="#4FC3F7" fontSize="10" fontFamily="JetBrains Mono, monospace" fontWeight="700">+0.43 avg</text>
-                <text x="160" y="30" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.1em">PROJECTED 10.4</text>
-              </svg>
-            </div>
+            <PerfPredictionCardContent />
           </AICard>
         </div>
       </div>

@@ -54,6 +54,11 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent font inflation on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Block overscroll bounce on iOS */
+  overscroll-behavior: none;
 }
 
 body {
@@ -62,6 +67,43 @@ body {
   font-family: var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
+  /* Remove iOS tap highlight flash */
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent rubber-band scroll at root on iOS */
+  overscroll-behavior: none;
+  /* Ensure content fills safe area on notched devices */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* ── Capacitor / Hybrid WebView tweaks ───────────────────────────────────── */
+/* Disable drag-selection on interactive elements */
+button, a, [role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+  /* Fast, no-delay tap response in WebView */
+  touch-action: manipulation;
+}
+
+/* Prevent double-tap zoom on interactive elements */
+input, textarea, select {
+  touch-action: manipulation;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Remove iOS input styling */
+input, textarea, select, button {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* Momentum scrolling on scrollable containers */
+[data-scroll], .overflow-y-auto, .overflow-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* ── Scrollbar Styling ───────────────────────────────────────────────────── */
@@ -130,6 +172,16 @@ body {
   to   { stroke-dashoffset: 0; }
 }
 
+/* ── Reduced motion: strip all animations for accessibility & battery ─────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -160,6 +212,41 @@ body {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* ── NEW 2026+ Premium Keyframes ─────────────────────────────────────────── */
+
+@keyframes particleFly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25%  { transform: translate(var(--px, 20px), var(--py, -30px)) scale(1.1); opacity: 1; }
+  50%  { transform: translate(var(--px2, -10px), var(--py2, -60px)) scale(0.9); opacity: 0.8; }
+  100% { transform: translate(var(--px3, 30px), var(--py3, -100px)) scale(0); opacity: 0; }
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%       { transform: scale(1.04); opacity: 1; }
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes gradientBorderSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* ── NEW 2026 Keyframes ───────────────────────────────────────────────────── */
@@ -686,11 +773,23 @@ body {
   .grid-bg {
     background-color: var(--bg-void);
     background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(245, 166, 35, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(79, 195, 247, 0.025) 0%, transparent 50%),
-      linear-gradient(rgba(26, 32, 53, 0.35) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(26, 32, 53, 0.35) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      radial-gradient(ellipse at 20% 50%, rgba(245, 166, 35, 0.04) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(79, 195, 247, 0.03) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 90%, rgba(120, 80, 255, 0.015) 0%, transparent 50%),
+      linear-gradient(rgba(26, 32, 53, 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26, 32, 53, 0.28) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+  }
+
+  /* ── Premium depth background for landing/hero ────────────────────────── */
+  .depth-bg {
+    background-color: #080A0F;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 70% 90% at 75% 40%, rgba(245,166,35,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 15% 20%, rgba(79,195,247,0.03) 0%, transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-2l26-15V18L28 2 2 18v31L28 64z' fill='none' stroke='%231E2433' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E");
+    background-size: 200px 200px, 100% 100%, 100% 100%, 40px 72px;
   }
 
   /* ── Canvas container vignette ────────────────────────────────────────── */
@@ -882,15 +981,137 @@ body {
   .animate-border { animation: borderFlow 5s linear infinite; }
   .animate-radar  { animation: radarPing 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
 
-  /* ── Mobile touch utilities ───────────────────────────────────────────── */
+  /* ── Mobile / Capacitor touch utilities ──────────────────────────────── */
+  /* 44×44 min touch target (Apple HIG / WCAG standard) */
   .touch-target   { min-height: 44px; min-width: 44px; }
+  /* 48×48 for larger targets on smaller screens */
+  .touch-target-lg { min-height: 48px; min-width: 48px; }
+
+  /* Safe area insets */
   .pb-safe        { padding-bottom: env(safe-area-inset-bottom, 0px); }
   .pb-nav         { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
-  .scroll-smooth-ios { -webkit-overflow-scrolling: touch; overflow-y: auto; }
+  .pt-safe        { padding-top: env(safe-area-inset-top, 0px); }
+  .pl-safe        { padding-left: env(safe-area-inset-left, 0px); }
+  .pr-safe        { padding-right: env(safe-area-inset-right, 0px); }
+  .inset-safe     {
+    padding-top:    env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left:   env(safe-area-inset-left, 0px);
+    padding-right:  env(safe-area-inset-right, 0px);
+  }
+
+  /* iOS momentum scrolling */
+  .scroll-smooth-ios {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Interaction suppression */
   .no-select      { -webkit-user-select: none; user-select: none; }
+  .no-tap-flash   { -webkit-tap-highlight-color: transparent; }
+
+  /* Active press scale — gives native-feeling press feedback */
+  .press-scale    {
+    transition: transform 120ms ease, opacity 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .press-scale:active { transform: scale(0.95); opacity: 0.85; }
+
+  /* Prevents overscroll within modals / sheets */
+  .contain-scroll { overscroll-behavior: contain; }
+
+  /* Hardware-accelerated layer promotion for smooth animations */
+  .gpu-layer      { transform: translateZ(0); will-change: transform; }
 
   /* ── Perspective for 3D ───────────────────────────────────────────────── */
   .perspective-800  { perspective: 800px; }
   .perspective-1200 { perspective: 1200px; }
   .transform-style-3d { transform-style: preserve-3d; }
+
+  /* ── Scroll reveal ────────────────────────────────────────────────────── */
+  .reveal-hidden {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
+    transition: opacity 600ms cubic-bezier(0.16,1,0.3,1), transform 600ms cubic-bezier(0.16,1,0.3,1), filter 600ms ease;
+  }
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  /* ── Premium glass variants ───────────────────────────────────────────── */
+  .glass-amber {
+    background: rgba(245,166,35,0.04);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(245,166,35,0.15);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,166,35,0.08);
+  }
+
+  .glass-blue {
+    background: rgba(79,195,247,0.04);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(79,195,247,0.15);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(79,195,247,0.06);
+  }
+
+  /* ── Gradient border card (premium bento) ─────────────────────────────── */
+  .grad-border {
+    position: relative;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(245,166,35,0.3) 0%, rgba(79,195,247,0.15) 50%, rgba(0,229,160,0.15) 100%);
+  }
+  .grad-border-inner {
+    background: var(--bg-surface);
+    border-radius: 19px;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* ── Typewriter cursor ────────────────────────────────────────────────── */
+  .typewriter-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--accent-primary);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: neonFlicker 1.2s step-end infinite;
+  }
+
+  /* ── Stat highlight ───────────────────────────────────────────────────── */
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Command palette kbd shortcut hint ───────────────────────────────── */
+  .cmd-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--font-rajdhani), 'Rajdhani', sans-serif;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .cmd-hint kbd {
+    padding: 1px 5px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 9px;
+  }
 }

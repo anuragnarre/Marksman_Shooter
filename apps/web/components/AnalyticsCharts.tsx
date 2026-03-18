@@ -20,6 +20,7 @@ import {
   Cell,
   Legend,
 } from 'recharts';
+import type { DotProps } from 'recharts';
 import type { Shot } from '@shooting-platform/shared-types';
 
 // ── Shared chart theme ────────────────────────────────────────────────────────
@@ -31,6 +32,25 @@ const AXIS_STYLE = {
   axisLine: { stroke: '#1E2433' },
   tickLine: { stroke: '#1E2433' },
 };
+
+// ── Glowing active dot ────────────────────────────────────────────────────────
+
+function GlowDot(props: DotProps & { color?: string }) {
+  const { cx, cy, color = '#F5A623' } = props;
+  if (cx === undefined || cy === undefined) return null;
+  return (
+    <g>
+      {/* outer glow ring */}
+      <circle cx={cx} cy={cy} r={9} fill="none" stroke={color} strokeWidth={1} strokeOpacity={0.25} />
+      {/* mid ring */}
+      <circle cx={cx} cy={cy} r={6} fill="none" stroke={color} strokeWidth={1} strokeOpacity={0.45} />
+      {/* filled dot */}
+      <circle cx={cx} cy={cy} r={4} fill={color} />
+      {/* white core */}
+      <circle cx={cx} cy={cy} r={1.8} fill="rgba(255,255,255,0.9)" />
+    </g>
+  );
+}
 
 // ── Custom Tooltip ────────────────────────────────────────────────────────────
 
@@ -82,18 +102,33 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
   const minY = Math.max(0,   Math.min(...scores) - 0.5);
   const maxY = Math.min(10.9, Math.max(...scores) + 0.3);
 
-  const gradientId = 'scoreAreaGrad';
+  const fillGradId  = 'scoreAreaFill';
+  const strokeGradId = 'scoreLineStroke';
 
   return (
     <div aria-label="Score over time chart" role="figure">
       <ResponsiveContainer width="100%" height={220}>
         <AreaChart data={data} margin={CHART_MARGIN}>
           <defs>
-            {/* Amber gradient fill below the line */}
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#F5A623" stopOpacity={0.25} />
+            {/* Gradient fill below the line — amber fade to transparent */}
+            <linearGradient id={fillGradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#F5A623" stopOpacity={0.22} />
               <stop offset="100%" stopColor="#F5A623" stopOpacity={0}    />
             </linearGradient>
+            {/* Gradient stroke — blue → amber left-to-right */}
+            <linearGradient id={strokeGradId} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#4FC3F7" />
+              <stop offset="60%"  stopColor="#F5A623" />
+              <stop offset="100%" stopColor="#F5A623" />
+            </linearGradient>
+            {/* Glow filter for the stroke */}
+            <filter id="lineGlow" x="-20%" y="-100%" width="140%" height="300%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
 
           <CartesianGrid stroke="#1E2433" strokeDasharray="3 3" vertical={false} />
@@ -107,7 +142,7 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
 
           <Tooltip
             content={<ChartTooltip labelPrefix="Shot" valueLabel="Score" valueColor="#F5A623" />}
-            cursor={{ stroke: '#F5A623', strokeWidth: 1, strokeDasharray: '4 4' }}
+            cursor={{ stroke: 'rgba(245,166,35,0.35)', strokeWidth: 1, strokeDasharray: '4 4' }}
           />
 
           {/* Reference line at session average */}
@@ -135,18 +170,19 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
             label={{ value: 'Perfect', position: 'right', fontSize: 9, fill: '#4A5568', fontFamily: 'var(--font-rajdhani)' }}
           />
 
-          {/* Animated area + line — draws left-to-right on mount */}
+          {/* Animated area + gradient line — draws left-to-right on mount */}
           <Area
             type="monotone"
             dataKey="score"
-            stroke="#F5A623"
-            strokeWidth={2}
-            fill={`url(#${gradientId})`}
-            dot={{ r: 2.5, fill: '#F5A623', stroke: 'none' }}
-            activeDot={{ r: 5, fill: '#F5A623', stroke: '#0E1118', strokeWidth: 2 }}
+            stroke={`url(#${strokeGradId})`}
+            strokeWidth={2.5}
+            fill={`url(#${fillGradId})`}
+            dot={{ r: 2, fill: '#F5A623', fillOpacity: 0.6, stroke: 'none' }}
+            activeDot={(props: DotProps) => <GlowDot {...props} color="#F5A623" />}
             isAnimationActive
             animationDuration={1200}
             animationEasing="ease-out"
+            style={{ filter: 'url(#lineGlow)' }}
           />
         </AreaChart>
       </ResponsiveContainer>
