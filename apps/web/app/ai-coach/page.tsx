@@ -33,6 +33,35 @@ const SEVERITY_META: Record<AiCoachSeverity, { label: string; color: string; bor
   positive: { label: 'Positive', color: '#00E5A0', border: 'rgba(0,229,160,0.3)',   bg: 'rgba(0,229,160,0.06)'  },
 };
 
+// ── Analysis history (localStorage) ──────────────────────────────────────────
+
+const HISTORY_KEY = 'marksman_ai_history_v1';
+
+interface HistoryEntry {
+  sessionId:   string;
+  sessionLabel: string;
+  analysis:    AiCoachAnalysis;
+  savedAt:     string;
+}
+
+function loadHistory(): HistoryEntry[] {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]'); }
+  catch { return []; }
+}
+
+function saveToHistory(entry: HistoryEntry) {
+  const existing = loadHistory();
+  // Replace if same session already saved
+  const filtered = existing.filter(e => e.sessionId !== entry.sessionId);
+  const next = [entry, ...filtered].slice(0, 20); // keep last 20
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+}
+
+function deleteFromHistory(sessionId: string) {
+  const existing = loadHistory();
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(existing.filter(e => e.sessionId !== sessionId)));
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function AiCoachPage() {
@@ -49,6 +78,12 @@ export default function AiCoachPage() {
   const [loading,   setLoading]   = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error,     setError]     = useState<string | null>(null);
+  const [history,   setHistory]   = useState<HistoryEntry[]>([]);
+  const [historyTab, setHistoryTab] = useState(false);
+
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
   useEffect(() => {
     if (isCoach && !selectedShooterId) {
@@ -85,11 +120,24 @@ export default function AiCoachPage() {
         body: JSON.stringify({ sessionId: selected }),
       });
       setAnalysis(result);
+      // Save to history
+      const sess = sessions.find(s => s.id === selected);
+      const label = sess
+        ? `${sess.discipline} ${sess.distance}m · ${new Date(sess.sessionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+        : selected;
+      const entry: HistoryEntry = { sessionId: selected, sessionLabel: label, analysis: result, savedAt: new Date().toISOString() };
+      saveToHistory(entry);
+      setHistory(loadHistory());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed');
     } finally {
       setAnalyzing(false);
     }
+  }
+
+  function handleDeleteHistory(sessionId: string) {
+    deleteFromHistory(sessionId);
+    setHistory(loadHistory());
   }
 
   const selectedSession = sessions.find((s) => s.id === selected);
@@ -100,12 +148,27 @@ export default function AiCoachPage() {
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="animate-slide-up">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)]
-                            flex items-center justify-center">
-              <SparkleIcon />
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)]
+                              flex items-center justify-center">
+                <SparkleIcon />
+              </div>
+              <h2 className="font-display font-bold text-2xl text-[#F0F4FF]">AI Coach</h2>
             </div>
-            <h2 className="font-display font-bold text-2xl text-[#F0F4FF]">AI Coach</h2>
+            {history.length > 0 && (
+              <button
+                onClick={() => setHistoryTab(!historyTab)}
+                className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-display font-semibold transition-all duration-200"
+                style={{
+                  background: historyTab ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.04)',
+                  color: historyTab ? '#F5A623' : '#8892A4',
+                  border: historyTab ? '1px solid rgba(245,166,35,0.25)' : '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                History ({history.length})
+              </button>
+            )}
           </div>
           <p className="text-[#8892A4] text-sm">
             Powered by Claude Opus 4.6. Select a session and get expert coaching feedback based on
@@ -117,6 +180,66 @@ export default function AiCoachPage() {
             </p>
           )}
         </div>
+
+        {/* ── History panel ────────────────────────────────────────────────── */}
+        {historyTab && history.length > 0 && (
+          <div className="rounded-xl border border-[#1E2433] bg-[#0E1118] overflow-hidden animate-slide-up">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E2433]">
+              <p className="font-display font-semibold text-sm text-[#F0F4FF]">Analysis History</p>
+              <p className="text-[10px] text-[#4A5568] font-display">Stored locally · last 20</p>
+            </div>
+            <div className="divide-y divide-[#1E2433]">
+              {history.map(entry => {
+                const rColor = entry.analysis.performanceRating >= 8 ? '#00E5A0'
+                  : entry.analysis.performanceRating >= 6 ? '#F5A623' : '#FF4D6D';
+                return (
+                  <div key={entry.sessionId} className="px-5 py-4 hover:bg-white/[0.02] transition-colors group">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-semibold text-sm text-[#F0F4FF] truncate">{entry.sessionLabel}</p>
+                        <p className="text-[10px] text-[#4A5568] mt-0.5">
+                          Analysed {new Date(entry.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {entry.analysis.findings.filter(f => f.severity === 'critical').length > 0 && (
+                            <span className="text-[9px] font-display font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-[rgba(255,77,109,0.1)] border border-[rgba(255,77,109,0.25)] text-[#FF4D6D]">
+                              {entry.analysis.findings.filter(f => f.severity === 'critical').length} critical
+                            </span>
+                          )}
+                          {entry.analysis.findings.filter(f => f.severity === 'positive').length > 0 && (
+                            <span className="text-[9px] font-display font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-[rgba(0,229,160,0.08)] border border-[rgba(0,229,160,0.2)] text-[#00E5A0]">
+                              {entry.analysis.findings.filter(f => f.severity === 'positive').length} positive
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="font-data font-bold text-lg" style={{ color: rColor }}>{entry.analysis.performanceRating.toFixed(1)}</p>
+                          <p className="text-[9px] text-[#4A5568] font-display">/10</p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => { setAnalysis(entry.analysis); setHistoryTab(false); }}
+                            className="text-[10px] font-display font-semibold text-[#F5A623] hover:text-amber-300 transition-colors"
+                          >
+                            Load
+                          </button>
+                          <button
+                            onClick={() => handleDeleteHistory(entry.sessionId)}
+                            className="text-[10px] font-display text-[#4A5568] hover:text-[#FF4D6D] transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {isCoach && (
           <div className="card p-4 animate-slide-up">

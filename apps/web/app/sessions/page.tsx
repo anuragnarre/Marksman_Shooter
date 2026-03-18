@@ -4,7 +4,7 @@
 // Sessions list page — groups by month, shows discipline colour bar,
 // inline delete-confirm, and a sticky stats summary at the top.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 import { AppShell } from '../../components/AppShell';
@@ -78,6 +78,8 @@ export default function SessionsPage() {
   const [error,     setError]     = useState<string | null>(null);
   const [deleting,  setDeleting]  = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [filterDisc, setFilterDisc] = useState<string>('All');
+  const [filterMode, setFilterMode] = useState<string>('All');
 
   function load() {
     if (isCoach && !selectedShooterId) {
@@ -115,7 +117,16 @@ export default function SessionsPage() {
     }
   }
 
-  const grouped = groupByMonth(sessions);
+  const disciplines = useMemo(() => ['All', ...new Set(sessions.map(s => s.discipline))], [sessions]);
+  const modes       = useMemo(() => ['All', ...new Set(sessions.map(s => s.trainingMode).filter(Boolean) as string[])], [sessions]);
+  const filteredSessions = useMemo(() => {
+    let list = sessions;
+    if (filterDisc !== 'All') list = list.filter(s => s.discipline === filterDisc);
+    if (filterMode !== 'All') list = list.filter(s => s.trainingMode === filterMode);
+    return list;
+  }, [sessions, filterDisc, filterMode]);
+
+  const grouped = groupByMonth(filteredSessions);
   const months  = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
   const stats   = computeStats(sessions);
 
@@ -133,15 +144,23 @@ export default function SessionsPage() {
                 : 'All your recorded training sessions'}
             </p>
           </div>
-          <Link
-            href={isCoach && selectedShooterId
-              ? `/sessions/new?shooterId=${encodeURIComponent(selectedShooterId)}`
-              : '/sessions/new'}
-            className="btn btn-primary text-sm py-2.5 px-4 sm:px-5 shrink-0"
-          >
-            <span className="hidden xs:inline">+ New Session</span>
-            <span className="xs:hidden">+ New</span>
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/sessions/compare"
+              className="btn btn-ghost text-sm py-2.5 px-4"
+            >
+              Compare
+            </Link>
+            <Link
+              href={isCoach && selectedShooterId
+                ? `/sessions/new?shooterId=${encodeURIComponent(selectedShooterId)}`
+                : '/sessions/new'}
+              className="btn btn-primary text-sm py-2.5 px-4 sm:px-5"
+            >
+              <span className="hidden xs:inline">+ New Session</span>
+              <span className="xs:hidden">+ New</span>
+            </Link>
+          </div>
         </div>
 
         {isCoach && (
@@ -180,6 +199,37 @@ export default function SessionsPage() {
                 </p>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── Filters ────────────────────────────────────────────────────── */}
+        {!loading && sessions.length > 1 && (
+          <div className="flex flex-wrap gap-2 animate-slide-up">
+            <select
+              value={filterDisc}
+              onChange={e => setFilterDisc(e.target.value)}
+              className="field text-xs py-1.5 px-3 max-w-[200px]"
+            >
+              {disciplines.map(d => <option key={d} value={d}>{d === 'All' ? 'All Disciplines' : d}</option>)}
+            </select>
+            {modes.length > 2 && (
+              <select
+                value={filterMode}
+                onChange={e => setFilterMode(e.target.value)}
+                className="field text-xs py-1.5 px-3 max-w-[200px]"
+              >
+                {modes.map(m => <option key={m} value={m}>{m === 'All' ? 'All Modes' : m}</option>)}
+              </select>
+            )}
+            {(filterDisc !== 'All' || filterMode !== 'All') && (
+              <button
+                onClick={() => { setFilterDisc('All'); setFilterMode('All'); }}
+                className="text-xs font-display px-3 py-1.5 rounded-lg text-[#4A5568] hover:text-[#F0F4FF] transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+              >
+                Clear filters
+              </button>
+            )}
           </div>
         )}
 

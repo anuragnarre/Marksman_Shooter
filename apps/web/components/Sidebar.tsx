@@ -24,6 +24,8 @@ const ALL_NAV: NavItem[] = [
   { href: '/performance',             label: 'Performance',    icon: <PulseIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/performance/training-plan', label: 'Training Plan', icon: <PlanIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/performance/pose',        label: 'Stance',         icon: <PoseIcon />,      roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/goals',                   label: 'Goals',          icon: <GoalIcon />,      roles: ['SHOOTER', 'SOLDIER'] },
+  { href: '/sessions/compare',        label: 'Compare',        icon: <CompareIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/connect',                 label: 'Connect',        icon: <LinkIcon />,      roles: ['SHOOTER'] },
   { href: '/ai-coach',                label: 'AI Coach',       icon: <SparkleIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/calendar',                label: 'Calendar',       icon: <CalendarIcon />,  roles: ['COACH'] },
@@ -499,6 +501,30 @@ function PoseIcon() {
       <line x1="5" y1="7.5" x2="13" y2="7.5" />
       <line x1="9" y1="10" x2="6" y2="15" />
       <line x1="9" y1="10" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function CompareIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="9" y1="2" x2="9" y2="16" strokeDasharray="2 2" />
+      <rect x="1.5" y="4" width="6" height="10" rx="1.5" />
+      <rect x="10.5" y="4" width="6" height="10" rx="1.5" />
+    </svg>
+  );
+}
+
+function GoalIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="9" r="7" />
+      <circle cx="9" cy="9" r="4" />
+      <circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none" />
+      <line x1="9" y1="1" x2="9" y2="3" />
+      <line x1="9" y1="15" x2="9" y2="17" />
+      <line x1="1" y1="9" x2="3" y2="9" />
+      <line x1="15" y1="9" x2="17" y2="9" />
     </svg>
   );
 }

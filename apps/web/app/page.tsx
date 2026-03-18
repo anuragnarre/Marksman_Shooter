@@ -8,6 +8,62 @@ import { useAuth } from '../contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { useIsMobile } from '../lib/use-mobile';
 
+// ── Utility Hooks ─────────────────────────────────────────────────────────────
+
+function useScrollY(): number {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const h = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', h, { passive: true });
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+  return scrollY;
+}
+
+function useSectionReveal(threshold = 0.15): [React.RefObject<HTMLDivElement>, boolean] {
+  const ref = useRef<HTMLDivElement>(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVis(true); },
+      { threshold }
+    );
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [threshold]);
+  return [ref, vis];
+}
+
+// ── Magnetic Button ────────────────────────────────────────────────────────────
+
+function MagneticButton({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tf, setTf] = useState('translate(0px,0px)');
+  return (
+    <div
+      ref={ref}
+      onMouseMove={(e) => {
+        if (!ref.current) return;
+        const r = ref.current.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) * 0.3;
+        const dy = (e.clientY - (r.top + r.height / 2)) * 0.3;
+        setTf(`translate(${dx}px,${dy}px)`);
+      }}
+      onMouseLeave={() => setTf('translate(0px,0px)')}
+      style={{
+        display: 'inline-block',
+        transform: tf,
+        transition: tf === 'translate(0px,0px)'
+          ? 'transform 400ms cubic-bezier(0.16,1,0.3,1)'
+          : 'transform 80ms linear',
+        willChange: 'transform',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 // ── Entry Point ──────────────────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -16,6 +72,7 @@ export default function HomePage() {
   const isMobile  = useIsMobile();
   const [mounted, setMounted] = useState(false);
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
+  const scrollY = useScrollY();
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
@@ -25,15 +82,16 @@ export default function HomePage() {
   if (!mounted || user) return null;
 
   return (
-    <div className="min-h-screen bg-[#080A0F] text-[#F0F4FF] overflow-x-hidden">
+    <div className="min-h-screen bg-[#080A0F] text-[#F0F4FF] overflow-x-hidden" style={{ fontSize: '16px' }}>
       <Nav safeTopInset={safeTopInset} />
       <div style={{ paddingTop: safeTopInset }}>
-        <Hero />
+        <Hero scrollY={scrollY} />
         <DisciplineMarquee />
         <LiveStats />
         <BentoFeatures />
+        <AIHealthSection />
         <HowItWorks />
-        <CoachSection />
+        <RoleShowcase />
         <CtaBanner />
         <Footer />
       </div>
@@ -98,22 +156,22 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
               'linear-gradient(90deg, rgba(245,166,35,0.20) 0%, rgba(79,195,247,0.16) 45%, rgba(0,229,160,0.12) 100%)',
           }}
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[60px] sm:h-[68px] flex items-center justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 h-[64px] sm:h-[72px] flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0 touch-target">
-            <div className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9">
+          <Link href="/" className="flex items-center gap-3 group shrink-0 touch-target">
+            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10">
               <div
                 className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.2) 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.25) 0%, transparent 70%)' }}
               />
-              <CrosshairLogo size={26} />
+              <CrosshairLogo size={28} />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-display font-black text-[14px] sm:text-[15px] tracking-[0.2em] uppercase text-[#F0F4FF]">
+              <span className="font-display font-black text-[16px] sm:text-[17px] tracking-[0.18em] uppercase text-[#F0F4FF]">
                 Marksman
               </span>
-              <span className="font-display text-[7px] sm:text-[8px] tracking-[0.25em] uppercase text-[#F5A623] opacity-70 mt-0.5">
+              <span className="font-display text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-[#F5A623] opacity-80 mt-0.5">
                 Precision Analytics
               </span>
             </div>
@@ -125,13 +183,13 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
               <a
                 key={item.label}
                 href={item.href}
-                className="relative px-4 py-2 text-[#8892A4] hover:text-[#F0F4FF] text-[11px]
-                           font-display uppercase tracking-[0.18em] transition-colors duration-200
-                           group rounded-lg hover:bg-white/[0.03]"
+                className="relative px-5 py-2.5 text-[#9CA3B4] hover:text-[#F0F4FF] text-[13px]
+                           font-display uppercase tracking-[0.15em] transition-colors duration-200
+                           group rounded-lg hover:bg-white/[0.04]"
               >
                 {item.label}
                 <span
-                  className="absolute bottom-1 left-4 right-4 h-px origin-left scale-x-0
+                  className="absolute bottom-1 left-5 right-5 h-px origin-left scale-x-0
                              group-hover:scale-x-100 transition-transform duration-300"
                   style={{ background: 'linear-gradient(90deg, #F5A623 0%, rgba(245,166,35,0.2) 100%)' }}
                 />
@@ -141,29 +199,15 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
 
           {/* Desktop CTAs */}
           <div className="hidden md:flex items-center gap-3 shrink-0">
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 text-[#8892A4] hover:text-[#F0F4FF] text-[11px]
-                         font-display uppercase tracking-[0.18em] transition-colors duration-200
-                         rounded-lg hover:bg-white/[0.03]"
-            >
-              Sign In
-            </Link>
-            <Link href="/auth/register" className="btn btn-primary text-[11px] py-2.5 px-5 gap-2">
-              Get Started
-              <ArrowRightIcon size={11} />
-            </Link>
+            <MagneticButton>
+              <Link href="/auth/register" className="btn btn-primary text-[13px] py-2.5 px-6 gap-2">
+                Get Started <ArrowRightIcon size={12} />
+              </Link>
+            </MagneticButton>
           </div>
 
-          {/* Mobile: Sign in text + hamburger */}
+          {/* Mobile: hamburger */}
           <div className="flex md:hidden items-center gap-1">
-            <Link
-              href="/auth/login"
-              className="px-3 py-2 text-[#8892A4] text-[11px] font-display uppercase tracking-[0.15em]
-                         touch-target flex items-center"
-            >
-              Sign In
-            </Link>
             <button
               className="w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-xl
                          transition-colors active:bg-white/[0.06]"
@@ -229,18 +273,18 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
             transform: menuOpen ? 'translateY(0)' : 'translateY(-16px)',
           }}
         >
-          <div className="px-4 pt-3 pb-6 flex flex-col gap-1">
+          <div className="px-5 pt-3 pb-6 flex flex-col gap-1">
             {NAV_LINKS.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="px-4 py-4 text-[#8892A4] hover:text-[#F0F4FF] text-sm font-display
-                           uppercase tracking-[0.18em] transition-colors rounded-xl active:bg-white/[0.05]
+                className="px-4 py-4 text-[#9CA3B4] hover:text-[#F0F4FF] text-base font-display
+                           uppercase tracking-[0.15em] transition-colors rounded-xl active:bg-white/[0.05]
                            flex items-center justify-between touch-target"
               >
                 {item.label}
-                <span className="text-[#2A3350] text-lg">›</span>
+                <span className="text-[#4A5568] text-xl">›</span>
               </a>
             ))}
             <div
@@ -255,13 +299,6 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
               >
                 Get Started — Free
               </Link>
-              <Link
-                href="/auth/login"
-                onClick={() => setMenuOpen(false)}
-                className="btn btn-ghost text-sm py-3.5 w-full justify-center"
-              >
-                Sign In
-              </Link>
             </div>
           </div>
         </div>
@@ -272,7 +309,7 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero() {
+function Hero({ scrollY }: { scrollY: number }) {
   return (
     <section className="relative min-h-screen flex items-center pt-[60px] sm:pt-[68px] overflow-hidden">
 
@@ -299,7 +336,7 @@ function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 lg:py-24 w-full">
+      <div className="relative max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-16 lg:py-24 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 items-center">
 
           {/* Copy — always first on mobile */}
@@ -309,7 +346,7 @@ function Hero() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
               style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.22)' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623] flex-shrink-0" style={{ animation: 'pulseGlow 2.5s ease-in-out infinite' }} />
-              <span className="text-[#F5A623] font-display text-[9px] sm:text-[10px] uppercase tracking-[0.2em]">
+              <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.2em]">
                 Precision Training Analytics
               </span>
             </div>
@@ -318,18 +355,18 @@ function Hero() {
             <div>
               <h1
                 className="font-display font-black leading-[1.0] tracking-tight"
-                style={{ fontSize: 'clamp(2.6rem, 10vw, 5.5rem)' }}
+                style={{ fontSize: 'clamp(3rem, 11vw, 6.5rem)', letterSpacing: '-0.02em' }}
               >
-                <span className="block text-[#F0F4FF]" style={{ animation: 'slideUpFade 700ms 100ms both' }}>
+                <span className="block text-[#F0F4FF]" style={{ animation: 'textReveal 600ms cubic-bezier(0.16,1,0.3,1) 0ms both' }}>
                   Master
                 </span>
-                <span className="block gradient-text" style={{ animation: 'slideUpFade 700ms 180ms both' }}>
+                <span className="block gradient-text" style={{ animation: 'textReveal 600ms cubic-bezier(0.16,1,0.3,1) 120ms both' }}>
                   Every Shot.
                 </span>
               </h1>
               <p
-                className="text-[#8892A4] text-base sm:text-lg leading-relaxed mt-4 sm:mt-6"
-                style={{ animation: 'slideUpFade 700ms 260ms both', maxWidth: '34rem' }}
+                className="font-body text-[#8892A4] text-[15px] sm:text-[17px] mt-4 sm:mt-6"
+                style={{ animation: 'slideUpFade 700ms 260ms both', maxWidth: '34rem', lineHeight: '1.75' }}
               >
                 The complete analytics platform for competitive shooters and coaches.
                 Log every shot, spot patterns with computer vision, and close the gap
@@ -351,7 +388,7 @@ function Hero() {
                   <span className="font-display font-bold text-base sm:text-xl leading-none" style={{ color }}>
                     {value}
                   </span>
-                  <span className="text-[#4A5568] text-[9px] sm:text-[10px] font-display uppercase tracking-[0.15em]">
+                  <span className="text-[#6B7A96] text-[10px] sm:text-[11px] font-display uppercase tracking-[0.15em]">
                     {label}
                   </span>
                 </div>
@@ -360,21 +397,14 @@ function Hero() {
 
             {/* CTAs */}
             <div
-              className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-3 xs:gap-4 pt-1"
+              className="flex items-center pt-1"
               style={{ animation: 'slideUpFade 700ms 420ms both' }}
             >
-              <Link href="/auth/register" className="btn btn-primary text-sm px-6 sm:px-8 py-3.5 sm:py-3 gap-2 justify-center">
-                Start Free
-                <ArrowRightIcon size={14} />
-              </Link>
-              <Link
-                href="/auth/login"
-                className="inline-flex items-center justify-center gap-2 text-[#8892A4] hover:text-[#F0F4FF]
-                           font-display text-sm uppercase tracking-[0.15em] transition-all duration-200 group py-2"
-              >
-                Sign in
-                <span className="group-hover:translate-x-1 transition-transform duration-200 text-[#F5A623]">→</span>
-              </Link>
+              <MagneticButton>
+                <Link href="/auth/register" className="btn btn-primary text-sm px-6 sm:px-8 py-3.5 sm:py-3 gap-2 justify-center">
+                  Start Free →
+                </Link>
+              </MagneticButton>
             </div>
 
             {/* Social proof */}
@@ -390,8 +420,8 @@ function Hero() {
                   </div>
                 ))}
               </div>
-              <p className="text-[#4A5568] text-xs font-display">
-                Trusted by <span className="text-[#8892A4]">2,400+</span> competitive shooters
+              <p className="text-[#6B7A96] text-sm font-display">
+                Trusted by <span className="text-[#C8D0E0]">2,400+</span> competitive shooters
               </p>
             </div>
           </div>
@@ -401,7 +431,7 @@ function Hero() {
             className="flex items-center justify-center"
             style={{ animation: 'slideUpFade 700ms 250ms both' }}
           >
-            <AnimatedHeroTarget />
+            <AnimatedHeroTarget scrollY={scrollY} />
           </div>
         </div>
       </div>
@@ -414,22 +444,38 @@ function Hero() {
 
 // ── Animated Hero Target ──────────────────────────────────────────────────────
 
-function AnimatedHeroTarget() {
+function AnimatedHeroTarget({ scrollY }: { scrollY: number }) {
   const [tick, setTick]             = useState(0);
   const [sweepAngle, setSweepAngle] = useState(0);
+  const tickRef = useRef(0);
 
   const dots = [
-    { x: 180, y: 174, score: 10.4 },
-    { x: 193, y: 188, score: 9.8  },
-    { x: 172, y: 196, score: 9.5  },
-    { x: 186, y: 170, score: 10.7 },
-    { x: 199, y: 183, score: 9.2  },
-    { x: 175, y: 182, score: 10.1 },
+    { x:186, y:178, score:10.3 }, { x:191, y:184, score:10.1 },
+    { x:179, y:187, score:9.7  }, { x:184, y:172, score:10.6 },
+    { x:196, y:180, score:9.9  }, { x:177, y:179, score:10.2 },
+    { x:188, y:191, score:9.6  }, { x:183, y:176, score:10.4 },
+    { x:193, y:188, score:9.8  }, { x:175, y:183, score:10.0 },
+    { x:187, y:195, score:9.3  }, { x:194, y:175, score:10.1 },
+    { x:180, y:192, score:9.5  }, { x:190, y:181, score:10.5 },
+    { x:176, y:186, score:9.8  }, { x:185, y:170, score:10.7 },
+    { x:198, y:185, score:9.2  }, { x:178, y:175, score:10.3 },
+    { x:192, y:193, score:9.6  }, { x:183, y:188, score:10.0 },
   ];
 
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 400);
-    return () => clearInterval(id);
+    function startCycle() {
+      tickRef.current = 0;
+      setTick(0);
+      const id = setInterval(() => {
+        tickRef.current += 1;
+        setTick(tickRef.current);
+        if (tickRef.current >= 20) {
+          clearInterval(id);
+          setTimeout(startCycle, 2000);
+        }
+      }, 400);
+    }
+    startCycle();
   }, []);
 
   useEffect(() => {
@@ -462,7 +508,14 @@ function AnimatedHeroTarget() {
 
   return (
     /* Outer wrapper constrains size and positions floating cards safely */
-    <div className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[440px] mx-auto">
+    <div
+      className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[440px] mx-auto"
+      style={{
+        transform: `translateY(${-Math.min(scrollY * 0.12, 60)}px)`,
+        willChange: 'transform',
+        transition: 'transform 50ms linear',
+      }}
+    >
 
       {/* Floating cards — visible sm+ only to avoid horizontal overflow on mobile */}
       {avg !== null && (
@@ -583,10 +636,9 @@ function AnimatedHeroTarget() {
         <line x1="8" y1="294" x2="358" y2="294" stroke="rgba(245,166,35,0.25)" strokeWidth="0.7" />
 
         {[
-          { x: 38,  label: 'AVG',   value: avg  !== null ? avg.toFixed(2)  : '—', color: '#F5A623' },
-          { x: 128, label: 'SHOTS', value: String(visibleDots.length),             color: '#4FC3F7' },
-          { x: 215, label: 'BEST',  value: best !== null ? best.toFixed(1) : '—', color: '#00E5A0' },
-          { x: 298, label: 'MPI',   value: mpiX !== null ? 'LIVE' : '—',           color: '#F5A623' },
+          { x: 40,  label: 'RANGE', value: '40–59',                               color: '#8892A4' },
+          { x: 155, label: 'AVG',   value: avg  !== null ? avg.toFixed(2)  : '—', color: '#F5A623' },
+          { x: 270, label: 'BEST',  value: best !== null ? best.toFixed(1) : '—', color: '#00E5A0' },
         ].map(({ x, label, value, color }) => (
           <g key={label}>
             <text x={x} y="314" fill="#4A5568" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.12em">{label}</text>
@@ -608,24 +660,28 @@ function DisciplineMarquee() {
     'Olympic Trap', 'Skeet', 'Sporting Clays', 'ISSF Prone', 'Standing',
     'Kneeling', '50m Rifle', '300m Rifle', 'Rapid Fire Pistol',
   ];
+  const [paused, setPaused] = useState(false);
 
   return (
     <div
-      className="relative overflow-hidden py-3 sm:py-4"
-      style={{ background: 'linear-gradient(90deg, #080A0F 0%, #0C0F1A 50%, #080A0F 100%)', borderTop: '1px solid #1E2433', borderBottom: '1px solid #1E2433' }}
+      className="relative overflow-hidden py-4 sm:py-5"
+      style={{ background: 'linear-gradient(90deg, #080A0F 0%, #0D111C 50%, #080A0F 100%)', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
-      <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 z-10 pointer-events-none" style={{ background: 'linear-gradient(90deg, #080A0F, transparent)' }} />
-      <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 z-10 pointer-events-none" style={{ background: 'linear-gradient(270deg, #080A0F, transparent)' }} />
+      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(90deg, #080A0F, transparent)' }} />
+      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(270deg, #080A0F, transparent)' }} />
 
-      <div className="flex gap-8 sm:gap-10 whitespace-nowrap" style={{ animation: 'marquee 30s linear infinite' }}>
+      <div className="flex gap-10 sm:gap-14 whitespace-nowrap" style={{ animation: 'marquee 30s linear infinite', animationPlayState: paused ? 'paused' : 'running' }}>
         {[...disciplines, ...disciplines].map((d, i) => (
           <span
             key={i}
-            className="text-[#4A5568] font-display text-[9px] sm:text-[10px] uppercase
-                       tracking-[0.16em] sm:tracking-[0.18em] flex-shrink-0 flex items-center gap-2 sm:gap-3"
+            className="font-display text-[12px] sm:text-[13px] uppercase
+                       tracking-[0.18em] flex-shrink-0 flex items-center gap-2.5 sm:gap-3"
+            style={{ color: '#6B7A96' }}
           >
-            <span className="w-1 h-1 rounded-full flex-shrink-0"
-              style={{ background: i % 3 === 0 ? '#F5A623' : i % 3 === 1 ? '#4FC3F7' : '#00E5A0', opacity: 0.5 }} />
+            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ background: i % 3 === 0 ? '#F5A623' : i % 3 === 1 ? '#4FC3F7' : '#00E5A0', opacity: 0.7 }} />
             {d}
           </span>
         ))}
@@ -669,7 +725,7 @@ function StatItem({ value, suffix, label, color, active, duration }: {
       >
         {count.toLocaleString()}{suffix}
       </div>
-      <p className="text-[#4A5568] font-display text-[9px] sm:text-[10px] uppercase tracking-[0.18em] mt-2 sm:mt-3">
+      <p className="text-[#6B7A96] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.18em] mt-2 sm:mt-3">
         {label}
       </p>
       <div
@@ -702,8 +758,8 @@ function LiveStats() {
       <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.2) 50%, transparent 90%)' }} />
       <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(79,195,247,0.15) 50%, transparent 90%)' }} />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-16">
           <StatItem value={2400} suffix="+"      label="Active Shooters"      color="#F5A623" active={active} duration={1800} />
           <StatItem value={847}  suffix="K+"     label="Shots Logged"         color="#4FC3F7" active={active} duration={2000} />
           <StatItem value={12}   suffix=" types" label="Disciplines Tracked"  color="#00E5A0" active={active} duration={1400} />
@@ -745,6 +801,7 @@ function BentoCard({ feature, idx }: { feature: typeof FEATURES[0]; idx: number 
       style={{
         background: '#0C0F1A',
         borderColor: '#1E2433',
+        minHeight: '220px',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(24px)',
         transition: `opacity 600ms ${idx * 60}ms, transform 600ms ${idx * 60}ms cubic-bezier(0.16,1,0.3,1), border-color 300ms, box-shadow 300ms`,
@@ -754,21 +811,32 @@ function BentoCard({ feature, idx }: { feature: typeof FEATURES[0]; idx: number 
         el.style.borderColor = `${feature.color}40`;
         el.style.boxShadow   = `0 12px 48px -8px ${feature.color}28, 0 4px 24px rgba(0,0,0,0.5)`;
         el.style.transform   = 'translateY(-4px)';
+        const glow = el.querySelector('[data-glow]') as HTMLElement | null;
+        if (glow) glow.style.opacity = '1';
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLDivElement;
         el.style.borderColor = '#1E2433';
         el.style.boxShadow   = 'none';
         el.style.transform   = 'translateY(0)';
+        const glow = el.querySelector('[data-glow]') as HTMLElement | null;
+        if (glow) glow.style.opacity = '0.35';
       }}
     >
       {/* Top accent */}
       <div className="absolute top-0 inset-x-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{ background: `linear-gradient(90deg, transparent, ${feature.color}, transparent)` }} />
 
-      {/* Corner glow */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 15% 15%, ${feature.glow} 0%, transparent 60%)` }} />
+      {/* Corner glow — always visible at low opacity */}
+      <div
+        data-glow="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at 15% 15%, ${feature.glow} 0%, transparent 60%)`,
+          opacity: 0.35,
+          transition: 'opacity 500ms',
+        }}
+      />
 
       <div className="relative p-5 sm:p-6 lg:p-7 flex flex-col h-full">
         {/* Icon */}
@@ -777,39 +845,273 @@ function BentoCard({ feature, idx }: { feature: typeof FEATURES[0]; idx: number 
           {feature.icon}
         </div>
 
-        <h3 className="font-display font-bold text-[#F0F4FF] text-sm sm:text-base tracking-wide mb-2">
+        <h3 className="font-display font-bold text-[#F0F4FF] text-base sm:text-[17px] tracking-wide mb-2.5">
           {feature.title}
         </h3>
-        <p className="text-[#8892A4] text-sm leading-relaxed flex-1">{feature.desc}</p>
+        <p className="text-[#8892A4] text-sm sm:text-[15px] flex-1" style={{ lineHeight: '1.7' }}>{feature.desc}</p>
 
         {/* Bottom colour tick */}
         <div className="mt-4 sm:mt-5 h-px w-8 opacity-40 group-hover:w-full group-hover:opacity-60 transition-all duration-500"
           style={{ background: `linear-gradient(90deg, ${feature.color}, transparent)` }} />
+
+        {/* SVG watermark icon */}
+        <div
+          className="absolute bottom-4 right-4 pointer-events-none select-none"
+          style={{ opacity: 0.055, width: 60, height: 60, color: feature.color }}
+          aria-hidden="true"
+        >
+          <div style={{ transform: 'scale(3)', transformOrigin: 'bottom right' }}>
+            {feature.icon}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function BentoFeatures() {
+  const [headRef, headVis] = useSectionReveal();
   return (
-    <section id="features" className="py-14 sm:py-20 lg:py-32 max-w-7xl mx-auto px-4 sm:px-6">
-      <div className="text-center mb-10 sm:mb-14 lg:mb-16">
-        <p className="text-[#F5A623] font-display text-[9px] sm:text-[10px] uppercase tracking-[0.25em] mb-3 sm:mb-4">
-          Platform Features
-        </p>
+    <section id="features" className="py-14 sm:py-20 lg:py-32 max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
+      <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
+          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
+          <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Platform Features</span>
+        </div>
         <h2
-          className="font-display font-black text-[#F0F4FF] leading-[1.05]"
-          style={{ fontSize: 'clamp(1.7rem, 6vw, 3.2rem)' }}
+          className="font-display font-black leading-[1.0]"
+          style={{
+            fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
+            letterSpacing: '-0.02em',
+            animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
+            opacity: headVis ? undefined : 0,
+          }}
         >
-          Everything a competitive shooter needs
+          <span className="text-[#F0F4FF]">Everything a shooter </span>
+          <span className="gradient-text">needs.</span>
         </h2>
-        <p className="text-[#8892A4] mt-3 sm:mt-4 max-w-lg mx-auto text-sm leading-relaxed px-4 sm:px-0">
-          From first session to elite performance — Marksman covers the full training loop.
+        <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0" style={{ lineHeight: '1.75' }}>
+          From first session to elite performance — Marksman covers every step of the training loop with tools built for serious competitors.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {FEATURES.map((f, i) => <BentoCard key={f.id} feature={f} idx={i} />)}
+      </div>
+    </section>
+  );
+}
+
+// ── AI & Health Section ───────────────────────────────────────────────────────
+
+function BiometricCardContent() {
+  const ref = useRef<SVGPolylineElement>(null);
+  const [drawn, setDrawn] = useState(false);
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setDrawn(true); },
+      { threshold: 0.3 }
+    );
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <>
+      <div className="rounded-xl overflow-hidden" style={{ background: '#060810', border: '1px solid #1E2433' }}>
+        <svg viewBox="0 0 280 80" className="w-full" style={{ display: 'block' }}>
+          <rect width="280" height="80" fill="#060810" />
+          <polyline
+            ref={ref}
+            points="0,40 55,40 60,38 65,20 68,10 72,55 76,42 82,38 90,40 280,40"
+            fill="none" stroke="#FF4D6D" strokeWidth="1.5"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="1000"
+            style={{
+              strokeDashoffset: drawn ? 0 : 1000,
+              animation: drawn ? 'dashDraw 2s cubic-bezier(0.16,1,0.3,1) forwards' : 'none',
+              transition: drawn ? 'none' : 'stroke-dashoffset 0s',
+            }}
+          />
+          <circle cx="280" cy="40" r="3" fill="#FF4D6D" style={{ animation: 'pulseGlow 1.8s ease-in-out infinite' }} />
+          <text x="210" y="18" fill="#FF4D6D" fontSize="11" fontFamily="JetBrains Mono, monospace" fontWeight="700">62 BPM</text>
+          <text x="20" y="62" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.1em">AIM PHASE</text>
+        </svg>
+      </div>
+      <div className="flex gap-2 mt-3">
+        {['AVG 64 BPM', 'STABLE', 'RESTING 58 BPM'].map((label, i) => (
+          <span key={label} className="px-2.5 py-1 rounded-full text-[10px] font-display tracking-wide"
+            style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.2)', color: i === 1 ? '#00E5A0' : '#FF4D6D' }}>
+            {label}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function AICard({ title, tagline, accentColor, icon, idx, children }: {
+  title: string; tagline: string; accentColor: string; icon: React.ReactNode; idx: number; children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.1 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="relative rounded-2xl overflow-hidden flex flex-col"
+      style={{
+        background: 'rgba(12,15,26,0.7)',
+        border: '1px solid rgba(255,255,255,0.055)',
+        backdropFilter: 'blur(12px)',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
+        transition: `opacity 600ms ${idx * 80}ms, transform 600ms ${idx * 80}ms cubic-bezier(0.16,1,0.3,1)`,
+      }}
+    >
+      {/* Top accent line — always visible */}
+      <div className="absolute top-0 inset-x-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
+
+      <div className="p-5 sm:p-6 flex flex-col gap-4 flex-1">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: `${accentColor}12`, color: accentColor }}>
+            {icon}
+          </div>
+          <div>
+            <h3 className="font-display font-bold text-[#F0F4FF] text-base tracking-wide">{title}</h3>
+            <p className="text-[#6B7A96] text-[13px] mt-0.5">{tagline}</p>
+          </div>
+        </div>
+        <div className="flex-1">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function AIHealthSection() {
+  const [headRef, headVis] = useSectionReveal();
+  return (
+    <section
+      id="ai-health"
+      className="py-14 sm:py-20 lg:py-32 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #080A0F 0%, #0A0D18 40%, #0C0F1A 60%, #080A0F 100%)',
+        borderTop: '1px solid #1E2433',
+        borderBottom: '1px solid #1E2433',
+      }}
+    >
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
+        <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
+            style={{ background: 'rgba(79,195,247,0.07)', border: '1px solid rgba(79,195,247,0.22)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]" style={{ animation: 'pulseGlowBlue 2s ease-in-out infinite' }} />
+            <span className="text-[#4FC3F7] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">AI-Powered Intelligence</span>
+          </div>
+          <h2
+            className="font-display font-black leading-[1.0]"
+            style={{
+              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
+              letterSpacing: '-0.02em',
+              animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
+              opacity: headVis ? undefined : 0,
+            }}
+          >
+            <span className="text-[#F0F4FF]">Train smarter. </span>
+            <span style={{ background: 'linear-gradient(135deg, #4FC3F7, #00E5A0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Recover faster.</span>
+          </h2>
+          <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0" style={{ lineHeight: '1.75' }}>
+            From biometric monitoring to predictive coaching — Marksman&apos;s AI layer turns raw session data into actionable intelligence you can act on immediately.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Card 1 — Biometric Monitoring */}
+          <AICard title="Biometric Monitoring" tagline="Real-time heart rate during aim phases" accentColor="#FF4D6D" icon={<HeartIcon />} idx={0}>
+            <BiometricCardContent />
+          </AICard>
+
+          {/* Card 2 — AI Coaching Engine */}
+          <AICard title="AI Coaching Engine" tagline="Pattern analysis and personalized feedback" accentColor="#F5A623" icon={<SparkleIcon />} idx={1}>
+            <div className="rounded-xl p-3 flex flex-col gap-2" style={{ background: '#060810', border: '1px solid #1E2433' }}>
+              <div className="flex justify-between items-center mb-1">
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-display tracking-wide"
+                  style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.28)', color: '#F5A623' }}>
+                  AI ANALYZING
+                </span>
+              </div>
+              <div className="self-end px-3 py-2 rounded-xl text-[13px] text-[#6B7A96] max-w-[80%]"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                Session 47–52 review
+              </div>
+              <div className="self-start px-3.5 py-2.5 rounded-xl text-[13px] text-[#F0F4FF] max-w-[90%]"
+                style={{ background: 'rgba(245,166,35,0.07)', borderLeft: '2px solid #F5A623', borderRadius: '0 12px 12px 0' }}>
+                <p>Detected: Right drift in shots 47–52.</p>
+                <p className="text-[#9CA3B4] mt-1">Check trigger finger placement and follow-through.</p>
+                <span className="inline-block w-0.5 h-3.5 bg-[#F5A623] ml-0.5 animate-pulse" />
+              </div>
+            </div>
+          </AICard>
+
+          {/* Card 3 — Performance Prediction */}
+          <AICard title="Performance Prediction" tagline="Score trajectory and projected improvement" accentColor="#4FC3F7" icon={<ChartLineIcon />} idx={2}>
+            <div className="rounded-xl overflow-hidden" style={{ background: '#060810', border: '1px solid #1E2433' }}>
+              <svg viewBox="0 0 280 90" className="w-full" style={{ display: 'block' }}>
+                <defs>
+                  <linearGradient id="perfFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4FC3F7" stopOpacity="0.22" />
+                    <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <rect width="280" height="90" fill="#060810" />
+                {/* Grid lines */}
+                <line x1="30" y1="38" x2="278" y2="38" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
+                <line x1="30" y1="55" x2="278" y2="55" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
+                <line x1="30" y1="72" x2="278" y2="72" stroke="#1E2433" strokeWidth="0.6" strokeDasharray="3 4" />
+                {/* Projected vertical */}
+                <line x1="265" y1="20" x2="265" y2="80" stroke="#4FC3F7" strokeWidth="0.6" strokeDasharray="3 4" opacity="0.35" />
+                {/* Y-axis labels */}
+                <text x="8" y="38" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">10.2</text>
+                <text x="8" y="55" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">9.8</text>
+                <text x="8" y="72" fill="#2A3350" fontSize="7" fontFamily="JetBrains Mono, monospace">9.4</text>
+                {/* Fill area */}
+                <path
+                  d="M30,72 65,65 100,60 135,55 170,48 205,42 240,38 265,32 265,85 30,85 Z"
+                  fill="url(#perfFill)"
+                  style={{ animation: 'fadeIn 1200ms 300ms both' }}
+                />
+                {/* Actual data */}
+                <polyline
+                  points="30,72 65,65 100,60 135,55 170,48 205,42 240,38 265,32"
+                  fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                />
+                {/* Projected dashed */}
+                <polyline
+                  points="265,32 278,24"
+                  fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5"
+                />
+                {/* Data dots */}
+                {[[30,72],[65,65],[100,60],[135,55],[170,48],[205,42],[240,38],[265,32]].map(([cx,cy],i) => (
+                  <circle key={i} cx={cx} cy={cy} r="2.5" fill="#4FC3F7" />
+                ))}
+                {/* Endpoint dot with pulse */}
+                <circle cx="278" cy="24" r="3.5" fill="#4FC3F7" style={{ animation: 'pulseGlow 1.8s ease-in-out infinite' }} />
+                {/* Stats overlay */}
+                <text x="160" y="20" fill="#4FC3F7" fontSize="10" fontFamily="JetBrains Mono, monospace" fontWeight="700">+0.43 avg</text>
+                <text x="160" y="30" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.1em">PROJECTED 10.4</text>
+              </svg>
+            </div>
+          </AICard>
+        </div>
       </div>
     </section>
   );
@@ -826,6 +1128,7 @@ const STEPS = [
 function HowItWorks() {
   const ref    = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(-1);
+  const [headRef, headVis] = useSectionReveal();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -842,17 +1145,28 @@ function HowItWorks() {
       className="py-14 sm:py-20 lg:py-32 relative"
       style={{ background: 'linear-gradient(180deg, #080A0F 0%, #0C0F1A 30%, #0C0F1A 70%, #080A0F 100%)', borderTop: '1px solid #1E2433', borderBottom: '1px solid #1E2433' }}
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 sm:mb-14 lg:mb-20">
-          <p className="text-[#F5A623] font-display text-[9px] sm:text-[10px] uppercase tracking-[0.25em] mb-3 sm:mb-4">
-            Get started in minutes
-          </p>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-12">
+        <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
+            style={{ background: 'rgba(0,229,160,0.07)', border: '1px solid rgba(0,229,160,0.2)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2s ease-in-out infinite' }} />
+            <span className="text-[#00E5A0] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Get started in minutes</span>
+          </div>
           <h2
-            className="font-display font-black text-[#F0F4FF]"
-            style={{ fontSize: 'clamp(1.7rem, 6vw, 3.2rem)' }}
+            className="font-display font-black text-[#F0F4FF] leading-[1.0]"
+            style={{
+              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
+              letterSpacing: '-0.02em',
+              animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
+              opacity: headVis ? undefined : 0,
+            }}
           >
-            How it works
+            Three steps to<br />
+            <span className="gradient-text">peak performance.</span>
           </h2>
+          <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-xl mx-auto text-[16px] sm:text-[18px]" style={{ lineHeight: '1.75' }}>
+            Up and running in under 60 seconds. No setup fees, no credit card required.
+          </p>
         </div>
 
         <div ref={ref} className="relative grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-8">
@@ -884,46 +1198,37 @@ function HowItWorks() {
           {STEPS.map((s, i) => (
             <div
               key={s.num}
-              className="relative flex flex-col sm:items-center sm:text-center"
-              style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '1rem' }}
+              className="relative rounded-2xl p-6 sm:p-8 flex flex-row sm:flex-col gap-5 sm:gap-6 sm:items-start"
+              style={{
+                background: 'linear-gradient(135deg, rgba(14,17,24,0.95), rgba(10,13,20,0.95))',
+                border: `1px solid ${s.color}22`,
+                boxShadow: active >= i ? `0 0 0 1px ${s.color}18, 0 16px 48px -8px rgba(0,0,0,0.6)` : '0 8px 32px rgba(0,0,0,0.4)',
+                opacity: active >= i ? 1 : 0,
+                transform: active >= i ? 'translateY(0)' : 'translateY(28px)',
+                transition: `all 600ms ${i * 180}ms cubic-bezier(0.16,1,0.3,1)`,
+              }}
             >
-              {/* On mobile: horizontal layout — circle + text side by side */}
-              <div className="sm:hidden flex flex-row items-start gap-4 w-full">
-                <div
-                  className="w-[68px] h-[68px] rounded-full border-2 flex items-center justify-center z-10 shrink-0"
-                  style={{
-                    background: '#0C0F1A',
-                    borderColor: s.color,
-                    boxShadow: active >= i ? `0 0 24px ${s.glow}` : 'none',
-                    opacity: active >= i ? 1 : 0,
-                    transform: active >= i ? 'scale(1)' : 'scale(0.8)',
-                    transition: `all 500ms ${i * 150}ms`,
-                  }}
-                >
-                  <span className="font-display font-black text-xl" style={{ color: s.color }}>{s.num}</span>
-                </div>
-                <div
-                  className="flex-1 pt-2"
-                  style={{ opacity: active >= i ? 1 : 0, transform: active >= i ? 'translateX(0)' : 'translateX(12px)', transition: `all 500ms ${i * 150 + 80}ms` }}
-                >
-                  <h3 className="font-display font-bold text-[#F0F4FF] text-base mb-1.5">{s.title}</h3>
-                  <p className="text-[#8892A4] text-sm leading-relaxed">{s.desc}</p>
-                </div>
+              {/* Number badge */}
+              <div className="shrink-0 flex items-center justify-center z-10"
+                style={{
+                  width: 56, height: 56,
+                  borderRadius: 16,
+                  background: `linear-gradient(135deg, ${s.color}18, ${s.color}08)`,
+                  border: `1px solid ${s.color}40`,
+                  boxShadow: active >= i ? `0 0 20px ${s.glow}` : 'none',
+                  transition: 'box-shadow 600ms',
+                }}>
+                <span className="font-display font-black text-2xl" style={{ color: s.color }}>{s.num}</span>
               </div>
-
-              {/* On desktop: vertical stacked layout */}
-              <div
-                className="hidden sm:flex sm:flex-col sm:items-center sm:text-center w-full"
-                style={{ opacity: active >= i ? 1 : 0, transform: active >= i ? 'translateY(0)' : 'translateY(24px)', transition: `all 600ms ${i * 180}ms cubic-bezier(0.16,1,0.3,1)` }}
-              >
-                <div
-                  className="w-[72px] h-[72px] rounded-full border-2 flex items-center justify-center z-10 mb-6"
-                  style={{ background: '#0C0F1A', borderColor: s.color, boxShadow: active >= i ? `0 0 28px ${s.glow}` : 'none', transition: 'box-shadow 600ms' }}
-                >
-                  <span className="font-display font-black text-2xl" style={{ color: s.color }}>{s.num}</span>
+              <div className="flex-1 sm:flex-none">
+                {/* Color top bar on desktop */}
+                <div className="hidden sm:block h-px w-10 mb-5" style={{ background: `linear-gradient(90deg, ${s.color}, transparent)` }} />
+                <h3 className="font-display font-bold text-[#F0F4FF] text-xl sm:text-2xl mb-3" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
+                <p className="font-body text-[#8892A4] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.75' }}>{s.desc}</p>
+                <div className="mt-4 sm:mt-5 flex items-center gap-2">
+                  <span className="text-[12px] font-display uppercase tracking-[0.15em]" style={{ color: s.color }}>Step {s.num}</span>
+                  <span className="h-px flex-1 opacity-20" style={{ background: s.color }} />
                 </div>
-                <h3 className="font-display font-bold text-[#F0F4FF] text-lg mb-3">{s.title}</h3>
-                <p className="text-[#8892A4] text-sm leading-relaxed max-w-[220px]">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -933,98 +1238,38 @@ function HowItWorks() {
   );
 }
 
-// ── Coach Section ─────────────────────────────────────────────────────────────
+// ── Role Showcase ──────────────────────────────────────────────────────────────
 
-function CoachSection() {
-  return (
-    <section id="coaches" className="py-14 sm:py-20 lg:py-32 max-w-7xl mx-auto px-4 sm:px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
+type RoleTab = 'shooter' | 'coach' | 'soldier';
 
-        {/* Visual — shown second on mobile, first on desktop */}
-        <div className="order-2 lg:order-1">
-          <CoachVisual />
-        </div>
-
-        {/* Copy — shown first on mobile */}
-        <div className="order-1 lg:order-2 space-y-5 sm:space-y-6 lg:space-y-7">
-          <p className="text-[#4FC3F7] font-display text-[9px] sm:text-[10px] uppercase tracking-[0.25em]">
-            For Coaches
-          </p>
-          <h2
-            className="font-display font-black text-[#F0F4FF] leading-[1.05]"
-            style={{ fontSize: 'clamp(1.7rem, 6vw, 3rem)' }}
-          >
-            The bridge between data and improvement
-          </h2>
-          <p className="text-[#8892A4] leading-relaxed text-sm sm:text-base">
-            Coaches search for shooters by email and send connection requests.
-            Once approved, coaches gain full read access to session history and
-            can leave timestamped feedback on any individual shot.
-          </p>
-
-          <ul className="space-y-3 sm:space-y-4">
-            {[
-              { sym: '↗', color: '#4FC3F7', text: 'Browse full sessions with shot-level detail' },
-              { sym: '✦', color: '#F5A623', text: 'Post timestamped feedback on any session' },
-              { sym: '⊕', color: '#00E5A0', text: 'Manage multiple shooters from one dashboard' },
-              { sym: '◎', color: '#4FC3F7', text: 'Real-time WebSocket notifications on new sessions' },
-            ].map(({ sym, color, text }) => (
-              <li key={text} className="flex items-start gap-3">
-                <span
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold mt-0.5"
-                  style={{ background: `${color}12`, color }}
-                >{sym}</span>
-                <span className="text-[#8892A4] text-sm">{text}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="pt-1">
-            <Link href="/auth/register" className="btn btn-primary inline-flex text-sm py-3 px-6">
-              Join as Coach
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CoachVisual() {
+function CoachVisualInline() {
   return (
     <div
       className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
       style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}
     >
       <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #4FC3F7, transparent)' }} />
-
       <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <p className="font-display font-bold text-[#F0F4FF] text-sm uppercase tracking-[0.12em]">Your Shooters</p>
-        <span className="text-[9px] font-display uppercase tracking-[0.1em] px-2 py-1 rounded-md"
+        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Your Shooters</p>
+        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
           style={{ color: '#4FC3F7', background: 'rgba(79,195,247,0.08)', border: '1px solid rgba(79,195,247,0.2)' }}>
           3 Connected
         </span>
       </div>
-
       {[
         { name: 'Alex Morgan', avg: '9.84',  trend: '+0.12', pos: 'Standing', shots: 48, up: true  },
         { name: 'Sam Chen',    avg: '10.21', trend: '+0.35', pos: 'Prone',    shots: 60, up: true  },
         { name: 'Jordan Hill', avg: '9.57',  trend: '−0.08', pos: 'Kneeling', shots: 30, up: false },
       ].map((s) => (
-        <div
-          key={s.name}
-          className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl mb-2 border transition-all duration-200"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-        >
+        <div key={s.name} className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl mb-2"
+          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 font-display font-bold text-sm"
             style={{ background: 'linear-gradient(135deg, rgba(79,195,247,0.12), rgba(245,166,35,0.06))', color: '#4FC3F7', border: '1px solid rgba(79,195,247,0.15)' }}>
             {s.name[0]}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[#F0F4FF] text-sm font-medium truncate">{s.name}</p>
-            <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-wide mt-0.5">
-              {s.pos} · {s.shots} shots
-            </p>
+            <p className="text-[#F0F4FF] text-base font-medium truncate">{s.name}</p>
+            <p className="text-[#6B7A96] text-[12px] font-display uppercase tracking-wide mt-0.5">{s.pos} · {s.shots} shots</p>
           </div>
           <div className="text-right shrink-0">
             <p className="font-jetbrains text-[#F5A623] font-bold text-sm">{s.avg}</p>
@@ -1032,16 +1277,13 @@ function CoachVisual() {
           </div>
         </div>
       ))}
-
       <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl"
         style={{ background: 'rgba(79,195,247,0.04)', border: '1px solid rgba(79,195,247,0.12)' }}>
         <div className="flex items-center gap-2 mb-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7] flex-shrink-0" style={{ animation: 'pulseGlowBlue 2s ease-in-out infinite' }} />
-          <p className="text-[#4FC3F7] text-[9px] sm:text-[10px] font-display uppercase tracking-[0.16em]">
-            New feedback · Alex's session
-          </p>
+          <p className="text-[#4FC3F7] text-[11px] sm:text-[12px] font-display uppercase tracking-[0.14em]">New feedback · Alex's session</p>
         </div>
-        <p className="text-[#8892A4] text-xs leading-relaxed italic">
+        <p className="text-[#8892A4] text-sm leading-relaxed italic">
           "Good trigger discipline today. Focus on hold area — still drifting right before release."
         </p>
       </div>
@@ -1049,9 +1291,359 @@ function CoachVisual() {
   );
 }
 
+function ShooterVisual() {
+  const scores = [8.9, 9.1, 9.3, 9.4, 9.6, 9.8, 10.1, 10.3];
+  const minS = 8.7, maxS = 10.5;
+  const w = 240, h = 80;
+  const toY = (s: number) => h - ((s - minS) / (maxS - minS)) * h;
+  const pts = scores.map((s, i) => `${(i / (scores.length - 1)) * w},${toY(s)}`).join(' ');
+  const fillPts = `${pts} ${w},${h} 0,${h}`;
+  return (
+    <div className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
+      style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}>
+      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #F5A623, transparent)' }} />
+      <div className="flex items-center justify-between mb-4">
+        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Session Progress</p>
+        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
+          style={{ color: '#00E5A0', background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.2)' }}>Active</span>
+      </div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full mb-4" style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id="shooterFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#F5A623" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon points={fillPts} fill="url(#shooterFill)" />
+        <polyline points={pts} fill="none" stroke="#F5A623" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        {scores.map((s, i) => {
+          const x = (i / (scores.length - 1)) * w;
+          const y = toY(s);
+          const isLast = i === scores.length - 1;
+          return (
+            <circle key={i} cx={x} cy={y} r={isLast ? 4 : 2.5} fill="#F5A623"
+              style={isLast ? { animation: 'pulseGlow 2s ease-in-out infinite' } : {}} />
+          );
+        })}
+      </svg>
+      <div className="flex items-center gap-4 mb-3">
+        {[
+          { label: 'AVG', value: '9.71', color: '#F5A623' },
+          { label: 'BEST', value: '10.3', color: '#00E5A0' },
+          { label: 'STREAK', value: '7', color: '#4FC3F7' },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="flex flex-col gap-0.5">
+            <span className="font-jetbrains font-bold text-base leading-none" style={{ color }}>{value}</span>
+            <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">{label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="p-2.5 rounded-xl flex items-center justify-between"
+        style={{ background: 'rgba(0,229,160,0.04)', border: '1px solid rgba(0,229,160,0.12)' }}>
+        <p className="text-[#8892A4] text-sm">Session #52 · Prone · 10 shots · <span className="text-[#F5A623] font-jetbrains font-bold">9.94 avg</span></p>
+        <span className="font-bold text-sm" style={{ color: '#00E5A0' }}>↑</span>
+      </div>
+    </div>
+  );
+}
+
+function SoldierVisual() {
+  type WeaponKey = 'ak' | 'insas' | 'pistol';
+  const [weapon, setWeapon] = useState<WeaponKey>('ak');
+  const weapons: Record<WeaponKey, { label: string; score: string; total: string }> = {
+    ak:     { label: 'AK-203',  score: '38', total: '40' },
+    insas:  { label: 'INSAS',   score: '35', total: '40' },
+    pistol: { label: 'Pistol',  score: '29', total: '30' },
+  };
+  const w = weapons[weapon];
+  return (
+    <div className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
+      style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}>
+      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #00E5A0, transparent)' }} />
+      <div className="flex items-center justify-between mb-4">
+        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Qualification Record</p>
+        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
+          style={{ color: '#6B7A96', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>CLASSIFIED</span>
+      </div>
+      <div className="flex gap-1 mb-5">
+        {(['ak', 'insas', 'pistol'] as WeaponKey[]).map((k) => (
+          <button key={k} onClick={() => setWeapon(k)}
+            className="px-3 py-1.5 rounded-lg text-[10px] font-display uppercase tracking-wide transition-all duration-200"
+            style={{
+              background: weapon === k ? 'rgba(0,229,160,0.1)' : 'rgba(255,255,255,0.03)',
+              border: weapon === k ? '1px solid rgba(0,229,160,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              color: weapon === k ? '#00E5A0' : '#4A5568',
+            }}>
+            {weapons[k].label}{weapon === k ? ' ✓' : ''}
+          </button>
+        ))}
+      </div>
+      <div className="flex items-end gap-3 mb-5">
+        <span className="font-jetbrains font-black leading-none" style={{ fontSize: 'clamp(2.8rem, 10vw, 4rem)', color: '#00E5A0' }}>
+          {w.score}/{w.total}
+        </span>
+        <div className="flex flex-col pb-2">
+          <span className="text-[#4A5568] text-[9px] font-display uppercase tracking-[0.14em]">ROUNDS</span>
+          <span className="font-display font-black text-xl mt-1" style={{ color: '#00E5A0' }}>GO ✓</span>
+        </div>
+      </div>
+      {[
+        { label: 'Group Radius', value: '4.2cm',   color: '#F5A623' },
+        { label: 'Qualification', value: 'Q3-2025', color: '#4FC3F7' },
+        { label: 'Distance',     value: '100m',    color: '#00E5A0' },
+      ].map(({ label, value, color }) => (
+        <div key={label} className="flex items-center justify-between py-2 border-b"
+          style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+          <span className="text-[#6B7A96] text-sm font-display uppercase tracking-wide">{label}</span>
+          <span className="font-jetbrains font-bold text-sm" style={{ color }}>{value}</span>
+        </div>
+      ))}
+      <p className="text-[#4A5568] text-[12px] font-display uppercase tracking-wide mt-3">
+        Next qualification due: Q1-2026
+      </p>
+    </div>
+  );
+}
+
+function ShooterPanel() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
+      <div className="order-2 lg:order-1"><ShooterVisual /></div>
+      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
+          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
+          <span className="text-[#F5A623] font-display text-[11px] uppercase tracking-[0.2em]">For Shooters</span>
+        </div>
+        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
+          <span className="text-[#F0F4FF]">Every shot</span><br />
+          <span className="gradient-text">tells a story.</span>
+        </h2>
+        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
+          Log every session, analyse patterns across hundreds of shots, and let the platform surface what&apos;s holding you back — before your next competition.
+        </p>
+        <ul className="space-y-3 sm:space-y-4">
+          {[
+            { sym: '◎', color: '#F5A623', text: 'Interactive canvas for instant shot logging' },
+            { sym: '↗', color: '#4FC3F7', text: 'Fatigue index and focus score per session' },
+            { sym: '✦', color: '#00E5A0', text: 'AI training plans powered by your data' },
+            { sym: '⊕', color: '#F5A623', text: 'Export targets as PNG or share with coach' },
+          ].map(({ sym, color, text }) => (
+            <li key={text} className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
+                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
+              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="pt-2">
+          <Link href="/auth/register?role=SHOOTER" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
+            Track My Sessions →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CoachPanel() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
+      <div className="order-2 lg:order-1"><CoachVisualInline /></div>
+      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
+          style={{ background: 'rgba(79,195,247,0.08)', border: '1px solid rgba(79,195,247,0.25)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]" />
+          <span className="text-[#4FC3F7] font-display text-[11px] uppercase tracking-[0.2em]">For Coaches</span>
+        </div>
+        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
+          <span className="text-[#F0F4FF]">Data to</span><br />
+          <span style={{ background: 'linear-gradient(135deg, #4FC3F7, #F5A623)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>improvement.</span>
+        </h2>
+        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
+          Coaches search for shooters by email and send connection requests.
+          Once approved, gain full read access to session history and
+          leave timestamped feedback on any individual shot.
+        </p>
+        <ul className="space-y-3 sm:space-y-4">
+          {[
+            { sym: '↗', color: '#4FC3F7', text: 'Browse full sessions with shot-level detail' },
+            { sym: '✦', color: '#F5A623', text: 'Post timestamped feedback on any session' },
+            { sym: '⊕', color: '#00E5A0', text: 'Manage multiple shooters from one dashboard' },
+            { sym: '◎', color: '#4FC3F7', text: 'Real-time WebSocket notifications on new sessions' },
+          ].map(({ sym, color, text }) => (
+            <li key={text} className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
+                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
+              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="pt-2">
+          <Link href="/auth/register?role=COACH" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
+            Join as Coach
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SoldierPanel() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
+      <div className="order-2 lg:order-1"><SoldierVisual /></div>
+      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
+          style={{ background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.25)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" />
+          <span className="text-[#00E5A0] font-display text-[11px] uppercase tracking-[0.2em]">For Soldiers</span>
+        </div>
+        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
+          <span className="text-[#F0F4FF]">Mission-ready</span><br />
+          <span style={{ background: 'linear-gradient(135deg, #00E5A0, #4FC3F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>performance.</span>
+        </h2>
+        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
+          Track qualification scores across multiple weapon platforms, monitor group precision, and maintain a complete firing record ready for inspection or review.
+        </p>
+        <ul className="space-y-3 sm:space-y-4">
+          {[
+            { sym: '◎', color: '#00E5A0', text: 'Multi-weapon qualification record keeping' },
+            { sym: '↗', color: '#F5A623', text: 'Group radius and precision metrics per range session' },
+            { sym: '✦', color: '#4FC3F7', text: 'Qualification status and next due date tracking' },
+            { sym: '⊕', color: '#00E5A0', text: 'Export full record for review or CO submission' },
+          ].map(({ sym, color, text }) => (
+            <li key={text} className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
+                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
+              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="pt-2">
+          <Link href="/auth/register?role=SOLDIER" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
+            Start Qualification →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RoleShowcase() {
+  const [activeTab, setActiveTab] = useState<RoleTab>('shooter');
+  const [animating, setAnimating] = useState(false);
+
+  const switchTab = (tab: RoleTab) => {
+    if (tab === activeTab || animating) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setActiveTab(tab);
+      setTimeout(() => setAnimating(false), 20);
+    }, 180);
+  };
+
+  return (
+    <section id="coaches" className="py-14 sm:py-20 lg:py-32 max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
+      {/* Section header */}
+      <div className="text-center mb-10 sm:mb-14 lg:mb-16">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5"
+          style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.22)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
+          <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Built for every role</span>
+        </div>
+        <h2 className="font-display font-black leading-[1.0] mb-4"
+          style={{ fontSize: 'clamp(2.4rem, 6.5vw, 5rem)', letterSpacing: '-0.02em' }}>
+          <span className="text-[#F0F4FF]">Your role. </span>
+          <span className="gradient-text">Your platform.</span>
+        </h2>
+        <p className="font-body text-[#9CA3B4] max-w-xl mx-auto text-[16px] sm:text-[18px]" style={{ lineHeight: '1.75' }}>
+          Whether you compete, coach, or serve — Marksman gives you the tools that match your mission.
+        </p>
+      </div>
+
+      {/* Tab switcher */}
+      <div
+        className="flex items-center gap-1.5 p-1.5 rounded-2xl mb-10 sm:mb-14 lg:mb-16 mx-auto"
+        style={{ background: '#0C0F1A', border: '1px solid #1E2433', width: 'fit-content' }}
+      >
+        {([
+          { id: 'shooter' as RoleTab, label: 'Shooter', color: '#F5A623' },
+          { id: 'coach'   as RoleTab, label: 'Coach',   color: '#4FC3F7' },
+          { id: 'soldier' as RoleTab, label: 'Soldier', color: '#00E5A0' },
+        ]).map(({ id, label, color }) => {
+          const isActive = activeTab === id;
+          return (
+            <button key={id} onClick={() => switchTab(id)}
+              className="relative flex-1 sm:flex-none px-6 sm:px-10 py-3 rounded-xl font-display
+                         font-bold text-[13px] sm:text-[14px] uppercase tracking-[0.12em] transition-all duration-250"
+              style={{
+                color: isActive ? color : '#6B7A96',
+                background: isActive ? `${color}12` : 'transparent',
+                border: isActive ? `1px solid ${color}35` : '1px solid transparent',
+                boxShadow: isActive ? `0 0 20px ${color}20` : 'none',
+              }}>
+              {isActive && (
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
+                  style={{ width: '55%', background: color, boxShadow: `0 0 10px ${color}90` }} />
+              )}
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Panel crossfade */}
+      <div style={{
+        opacity: animating ? 0 : 1,
+        transform: animating ? 'translateY(6px)' : 'translateY(0)',
+        transition: 'opacity 180ms ease, transform 180ms ease',
+      }}>
+        {activeTab === 'shooter' && <ShooterPanel />}
+        {activeTab === 'coach'   && <CoachPanel />}
+        {activeTab === 'soldier' && <SoldierPanel />}
+      </div>
+    </section>
+  );
+}
+
 // ── CTA Banner ────────────────────────────────────────────────────────────────
 
+function RoleCtaCard({ href, icon, accentColor, role, tagline }: {
+  href: string; icon: React.ReactNode; accentColor: string; role: string; tagline: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-center gap-4 p-7 rounded-2xl border transition-all duration-250 relative overflow-hidden"
+      style={{ background: 'rgba(12,15,26,0.85)', borderColor: '#1E2433', backdropFilter: 'blur(12px)' }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLAnchorElement;
+        el.style.borderColor = `${accentColor}45`;
+        el.style.boxShadow = `0 12px 40px -8px ${accentColor}30, 0 0 0 1px ${accentColor}15`;
+        el.style.transform = 'translateY(-5px)';
+        el.style.background = `linear-gradient(135deg, ${accentColor}08, rgba(12,15,26,0.9))`;
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLAnchorElement;
+        el.style.borderColor = '#1E2433';
+        el.style.boxShadow = 'none';
+        el.style.transform = 'translateY(0)';
+        el.style.background = 'rgba(12,15,26,0.85)';
+      }}
+    >
+      <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+        style={{ background: `${accentColor}15`, color: accentColor, border: `1px solid ${accentColor}30` }}>
+        {icon}
+      </div>
+      <span className="font-display font-black text-[15px] tracking-[0.12em] uppercase" style={{ color: accentColor }}>{role}</span>
+      <span className="text-[#9CA3B4] text-sm text-center" style={{ lineHeight: '1.6' }}>{tagline}</span>
+    </Link>
+  );
+}
+
 function CtaBanner() {
+  const [headRef, headVis] = useSectionReveal();
   return (
     <section className="py-14 sm:py-20 lg:py-32 px-4 sm:px-6 relative overflow-hidden">
       <div className="absolute inset-0 opacity-20 pointer-events-none"
@@ -1061,7 +1653,7 @@ function CtaBanner() {
       <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.22) 50%, transparent 90%)' }} />
       <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.12) 50%, transparent 90%)' }} />
 
-      <div className="relative max-w-2xl mx-auto text-center space-y-6 sm:space-y-8">
+      <div ref={headRef} className="relative max-w-3xl mx-auto text-center space-y-6 sm:space-y-8">
         {/* Crosshair icon */}
         <div className="flex items-center justify-center">
           <div className="relative">
@@ -1074,29 +1666,51 @@ function CtaBanner() {
         </div>
 
         <h2
-          className="font-display font-black text-[#F0F4FF] leading-[1.05] px-2"
-          style={{ fontSize: 'clamp(1.7rem, 7vw, 3.5rem)' }}
+          className="font-display font-black leading-[1.0] px-2"
+          style={{
+            fontSize: 'clamp(2.6rem, 7.5vw, 5.5rem)',
+            letterSpacing: '-0.02em',
+            animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
+            opacity: headVis ? undefined : 0,
+          }}
         >
-          Ready to track your{' '}
-          <span className="gradient-text">next session?</span>
+          <span className="text-[#F0F4FF]">Choose your </span>
+          <span className="gradient-text">role.</span>
         </h2>
 
-        <p className="text-[#8892A4] text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-          Join the platform built for shooters who take training seriously.
-          Free to start. Data stays yours.
+        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[18px] max-w-lg mx-auto" style={{ lineHeight: '1.75' }}>
+          Every role, one platform. Up and running in under 60 seconds — no credit card required.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0">
-          <Link href="/auth/register" className="btn btn-primary text-sm px-8 py-3.5 justify-center">
-            Create Account — Free
-          </Link>
-          <Link href="/auth/login" className="btn btn-ghost text-sm px-8 py-3.5 justify-center">
-            Sign In
-          </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-8 sm:mt-10">
+          <RoleCtaCard
+            href="/auth/register?role=SHOOTER"
+            icon={<TargetIcon />}
+            accentColor="#F5A623"
+            role="Shooter"
+            tagline="Track every session, every shot."
+          />
+          <RoleCtaCard
+            href="/auth/register?role=COACH"
+            icon={<CoachIcon />}
+            accentColor="#4FC3F7"
+            role="Coach"
+            tagline="Guide shooters with data-driven insight."
+          />
+          <RoleCtaCard
+            href="/auth/register?role=SOLDIER"
+            icon={<SoldierIcon />}
+            accentColor="#00E5A0"
+            role="Soldier"
+            tagline="Military qualification and readiness."
+          />
         </div>
 
-        <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-[0.15em]">
-          No credit card · Setup in 60 seconds · Cancel anytime
+        <p className="mt-8 text-center text-[#4A5568] text-sm">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="text-[#F5A623] hover:text-amber-400 transition-colors font-medium">
+            Sign in →
+          </Link>
         </p>
       </div>
     </section>
@@ -1142,59 +1756,59 @@ function Footer() {
     <footer style={{ borderTop: '1px solid #1E2433', background: 'linear-gradient(180deg, #0C0F1A 0%, #080A0F 100%)' }}>
       <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.22) 30%, rgba(79,195,247,0.15) 70%, transparent 100%)' }} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 lg:py-16">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-20">
         {/* Brand row — full width on mobile */}
-        <div className="mb-8 sm:mb-10 lg:hidden">
-          <div className="flex items-center gap-3 mb-4">
-            <CrosshairLogo size={24} />
+        <div className="mb-10 sm:mb-12 lg:hidden">
+          <div className="flex items-center gap-3 mb-5">
+            <CrosshairLogo size={28} />
             <div className="flex flex-col leading-none">
-              <span className="font-display font-black text-[13px] tracking-[0.2em] uppercase text-[#F0F4FF]">Marksman</span>
-              <span className="font-display text-[7px] tracking-[0.22em] uppercase text-[#F5A623] opacity-60 mt-0.5">Precision Analytics</span>
+              <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase text-[#F0F4FF]">Marksman</span>
+              <span className="font-display text-[10px] tracking-[0.2em] uppercase text-[#F5A623] opacity-75 mt-0.5">Precision Analytics</span>
             </div>
           </div>
-          <p className="text-[#4A5568] text-xs leading-relaxed max-w-xs">
+          <p className="text-[#8892A4] text-sm leading-relaxed max-w-xs">
             The complete training analytics platform for competitive shooters and coaches.
           </p>
-          <div className="flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-2 mt-5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2.5s ease-in-out infinite' }} />
-            <span className="text-[#4A5568] text-[10px] font-display uppercase tracking-[0.12em]">All systems operational</span>
+            <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">All systems operational</span>
           </div>
         </div>
 
         {/* Main grid: 2-col on mobile, 4-col on desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 sm:gap-8 lg:gap-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
 
           {/* Brand column — desktop only */}
-          <div className="hidden lg:flex flex-col gap-5">
+          <div className="hidden lg:flex flex-col gap-6">
             <div className="flex items-center gap-3">
-              <CrosshairLogo size={26} />
+              <CrosshairLogo size={28} />
               <div className="flex flex-col leading-none">
-                <span className="font-display font-black text-[14px] tracking-[0.2em] uppercase text-[#F0F4FF]">Marksman</span>
-                <span className="font-display text-[7px] tracking-[0.22em] uppercase text-[#F5A623] opacity-60 mt-0.5">Precision Analytics</span>
+                <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase text-[#F0F4FF]">Marksman</span>
+                <span className="font-display text-[10px] tracking-[0.2em] uppercase text-[#F5A623] opacity-75 mt-0.5">Precision Analytics</span>
               </div>
             </div>
-            <p className="text-[#4A5568] text-xs leading-relaxed">
+            <p className="text-[#8892A4] text-sm leading-relaxed">
               The complete training analytics platform for competitive shooters and coaches.
             </p>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2.5s ease-in-out infinite' }} />
-              <span className="text-[#4A5568] text-[10px] font-display uppercase tracking-[0.12em]">All systems operational</span>
+              <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">All systems operational</span>
             </div>
           </div>
 
           {/* Link columns */}
           {cols.map((col) => (
-            <div key={col.heading} className="flex flex-col gap-3 sm:gap-4">
-              <p className="font-display text-[10px] sm:text-[10px] uppercase tracking-[0.2em] text-[#F0F4FF] font-bold">
+            <div key={col.heading} className="flex flex-col gap-4 sm:gap-5">
+              <p className="font-display text-[12px] sm:text-[13px] uppercase tracking-[0.18em] text-[#C8D0E0] font-bold">
                 {col.heading}
               </p>
-              <ul className="flex flex-col gap-2.5 sm:gap-3">
+              <ul className="flex flex-col gap-3 sm:gap-3.5">
                 {col.links.map(({ label, href }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-[#4A5568] hover:text-[#8892A4] text-xs font-display uppercase
-                                 tracking-[0.1em] transition-colors duration-200 inline-flex items-center gap-1.5 group
+                      className="text-[#6B7A96] hover:text-[#C8D0E0] text-sm font-display uppercase
+                                 tracking-[0.1em] transition-colors duration-200 inline-flex items-center gap-2 group
                                  active:text-[#F5A623]"
                     >
                       <span className="w-0 h-px bg-[#F5A623] transition-all duration-300 group-hover:w-3" />
@@ -1209,17 +1823,17 @@ function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t px-4 sm:px-6 py-4 sm:py-5" style={{ borderColor: '#181E2E' }}>
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[#252E42] text-[10px] font-display tracking-widest uppercase">
+      <div className="border-t px-5 sm:px-8 py-5 sm:py-6" style={{ borderColor: '#1E2433' }}>
+        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[#4A5568] text-[12px] font-display tracking-widest uppercase">
             © {year} Marksman · Built for precision
           </p>
-          <div className="flex items-center gap-5 sm:gap-6">
+          <div className="flex items-center gap-6 sm:gap-8">
             {['Privacy', 'Terms', 'Docs'].map((item) => (
               <Link
                 key={item}
                 href={item === 'Docs' ? '/docs' : '#'}
-                className="text-[#252E42] hover:text-[#4A5568] text-[10px] font-display
+                className="text-[#4A5568] hover:text-[#8892A4] text-[12px] font-display
                            uppercase tracking-[0.14em] transition-colors duration-200 touch-target flex items-center"
               >
                 {item}
@@ -1279,4 +1893,22 @@ function ImportIcon() {
 
 function SparkleIcon() {
   return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v2.5M10 15.5V18M2 10h2.5M15.5 10H18M4 4l1.8 1.8M14.2 14.2L16 16M4 16l1.8-1.8M14.2 5.8L16 4" /><circle cx="10" cy="10" r="3" fill="currentColor" stroke="none" opacity="0.8" /></svg>;
+}
+
+function HeartIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor"
+      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 19s-8-5.5-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 5.5-8 11-8 11z"/>
+    </svg>
+  );
+}
+
+function SoldierIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="10,2 12.5,7.5 18.5,7.5 13.5,11 15.5,17 10,13.5 4.5,17 6.5,11 1.5,7.5 7.5,7.5" />
+    </svg>
+  );
 }

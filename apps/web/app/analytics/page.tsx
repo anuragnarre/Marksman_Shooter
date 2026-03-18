@@ -632,6 +632,48 @@ export default function AnalyticsPage() {
           />
         </div>
 
+        {/* ── 2b. Personal Bests Banner ──────────────────────────────────── */}
+        {trend.length > 0 && (() => {
+          const bestAvg    = Math.max(...trend.map(t => t.avgScore));
+          const bestXRings = Math.max(...trend.map(t => t.xRingCount));
+          const bestRadius = trend.filter(t => t.groupRadius > 0).length > 0
+            ? Math.min(...trend.filter(t => t.groupRadius > 0).map(t => t.groupRadius))
+            : null;
+          const bestStdDev = trend.filter(t => t.stdDev > 0).length > 0
+            ? Math.min(...trend.filter(t => t.stdDev > 0).map(t => t.stdDev))
+            : null;
+          return (
+            <div className="animate-slide-up stagger-1">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="font-display font-semibold text-xs uppercase tracking-widest" style={{ color: C.muted }}>
+                  Personal Bests
+                </h2>
+                <a href="/goals" className="text-[10px] font-display uppercase tracking-wide transition-colors hover:opacity-80"
+                  style={{ color: C.amber }}>
+                  Goals & Records →
+                </a>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: 'Best Session Avg', value: bestAvg.toFixed(2),   color: C.amber, icon: '⊕' },
+                  { label: 'Most X-Rings',     value: String(bestXRings),   color: C.blue,  icon: '✦' },
+                  { label: 'Tightest Group',   value: bestRadius ? bestRadius.toFixed(2) : '—', color: C.green, icon: '◎' },
+                  { label: 'Best Consistency', value: bestStdDev ? `σ ${bestStdDev.toFixed(3)}` : '—', color: C.green, icon: '≈' },
+                ].map(pb => (
+                  <div key={pb.label} className="rounded-xl p-3 flex items-center gap-3"
+                    style={{ background: `${pb.color}08`, border: `1px solid ${pb.color}20` }}>
+                    <span className="text-lg shrink-0" style={{ color: pb.color }}>{pb.icon}</span>
+                    <div className="min-w-0">
+                      <p className="font-data font-bold text-lg leading-tight" style={{ color: pb.color }}>{pb.value}</p>
+                      <p className="text-[9px] font-display uppercase tracking-wide truncate" style={{ color: C.muted }}>{pb.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* ── 3. Score Trend + Performance Radar ─────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-slide-up stagger-2">
 

@@ -1161,6 +1161,97 @@ function SoldierView() {
         </Link>
       </div>
 
+      {/* Readiness + Qualification Row */}
+      {!loading && overview && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-slide-up stagger-1">
+          {/* Readiness Score */}
+          <div
+            className="relative rounded-xl p-4 overflow-hidden"
+            style={{
+              background: 'rgba(0,229,160,0.04)',
+              border: '1px solid rgba(0,229,160,0.18)',
+            }}
+          >
+            <div className="absolute top-0 inset-x-0 h-px"
+              style={{ background: 'linear-gradient(90deg,transparent,rgba(0,229,160,0.5),transparent)' }}
+            />
+            <div className="flex items-center gap-3">
+              <div>
+                {(() => {
+                  const trend = overview?.sessionTrend ?? [];
+                  const recentAvg = trend.slice(-5).reduce((s, t) => s + t.avgScore, 0) / Math.max(trend.slice(-5).length, 1);
+                  const avgStdDev = trend.reduce((s, t) => s + t.stdDev, 0) / Math.max(trend.length, 1);
+                  const cutoff30 = new Date(); cutoff30.setDate(cutoff30.getDate() - 30);
+                  const recentCount = sessions.filter(s => new Date(s.sessionDate) >= cutoff30).length;
+                  const score = Math.min(100,
+                    Math.round((recentAvg / 10.9) * 40) +
+                    Math.round(Math.max(0, 25 - avgStdDev * 12)) +
+                    Math.min(20, recentCount * 4) +
+                    Math.min(15, Math.round((overview.totalShots / 200) * 15))
+                  );
+                  const status = score >= 85 ? { label: 'Combat Ready', color: '#00E5A0' }
+                    : score >= 70 ? { label: 'Mission Ready', color: '#F5A623' }
+                    : score >= 50 ? { label: 'Training Ready', color: '#4FC3F7' }
+                    : { label: 'Developing', color: '#A78BFA' };
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: status.color }} />
+                        <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: status.color }}>
+                          Readiness
+                        </p>
+                      </div>
+                      <p className="font-data font-black text-4xl leading-none" style={{ color: status.color }}>{score}</p>
+                      <p className="text-[10px] font-display mt-1" style={{ color: status.color }}>{status.label}</p>
+                    </>
+                  );
+                })()}
+              </div>
+              <div className="ml-auto">
+                <Link href="/soldier/analytics" className="text-[10px] font-display text-[#4A5568] hover:text-[#00E5A0] transition-colors uppercase tracking-widest">
+                  Full Report →
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Qualification Tier */}
+          <div
+            className="relative rounded-xl p-4 overflow-hidden"
+            style={{
+              background: 'rgba(245,166,35,0.04)',
+              border: '1px solid rgba(245,166,35,0.18)',
+            }}
+          >
+            <div className="absolute top-0 inset-x-0 h-px"
+              style={{ background: 'linear-gradient(90deg,transparent,rgba(245,166,35,0.5),transparent)' }}
+            />
+            {(() => {
+              const avg = overview.overallAverage;
+              const tier = avg >= 10.5 ? { label: 'Grand Master', color: '#F5A623' }
+                : avg >= 10.0 ? { label: 'Master', color: '#4FC3F7' }
+                : avg >= 9.5  ? { label: 'Expert', color: '#00E5A0' }
+                : avg >= 9.0  ? { label: 'Sharpshooter', color: '#A78BFA' }
+                : avg >= 8.0  ? { label: 'Marksman', color: '#8892A4' }
+                : { label: 'Qualified', color: '#4A5568' };
+              return (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[#4A5568] text-[10px] font-display uppercase tracking-widest">Classification</span>
+                  </div>
+                  <p className="font-display font-black text-2xl leading-tight" style={{ color: tier.color }}>
+                    {tier.label}
+                  </p>
+                  <p className="text-[#8892A4] text-xs mt-1">
+                    {avg.toFixed(2)} overall avg
+                  </p>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
@@ -1634,28 +1725,50 @@ function CoachView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {shooterSummaries.slice(0, 12).map((summary) => (
-                    <tr key={summary.shooterId} className="border-b border-[#1E2433]/40">
-                      <td className="py-2.5 px-2">
-                        <p className="text-[#F0F4FF] font-semibold text-sm">{summary.shooterName}</p>
-                        <p className="text-[#4A5568] text-[10px]">
-                          {summary.shooterCode ? `ID ${summary.shooterCode}` : 'Connected shooter'}
-                          {summary.primaryWeapon ? ` · ${summary.primaryWeapon}` : ''}
-                          {summary.isManaged ? ' · Managed' : ''}
-                        </p>
-                      </td>
-                      <td className="py-2.5 px-2 text-right font-data font-bold text-[#00E5A0]">{summary.averageScore.toFixed(2)}</td>
-                      <td className="py-2.5 px-2 text-right font-data text-[#F5A623]">{summary.bestScore.toFixed(1)}</td>
-                      <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalSessions}</td>
-                      <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalShots}</td>
-                      <td className="py-2.5 px-2 text-right font-data text-[#4FC3F7]">{summary.consistency.toFixed(1)}</td>
-                      <td className="py-2.5 px-2 text-right text-[#8892A4] text-xs">
-                        {summary.lastSessionDate
-                          ? formatSessionStart(summary.lastSessionDate, { includeYear: true })
-                          : '—'}
-                      </td>
-                    </tr>
-                  ))}
+                  {shooterSummaries.slice(0, 12).map((summary) => {
+                    const avg = summary.averageScore;
+                    const tier = avg >= 9.5
+                      ? { label: 'Gold', color: '#F5A623' }
+                      : avg >= 9.0
+                      ? { label: 'Silver', color: '#8892A4' }
+                      : avg >= 8.0
+                      ? { label: 'Bronze', color: '#CD7F32' }
+                      : null;
+                    return (
+                      <tr key={summary.shooterId} className="border-b border-[#1E2433]/40 hover:bg-white/[0.015] transition-colors group">
+                        <td className="py-2.5 px-2">
+                          <div className="flex items-center gap-2">
+                            {tier && (
+                              <span className="text-[9px] font-display font-bold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
+                                style={{ color: tier.color, background: `${tier.color}15` }}>
+                                {tier.label}
+                              </span>
+                            )}
+                            <div>
+                              <p className="text-[#F0F4FF] font-semibold text-sm">{summary.shooterName}</p>
+                              <p className="text-[#4A5568] text-[10px]">
+                                {summary.shooterCode ? `ID ${summary.shooterCode}` : 'Connected shooter'}
+                                {summary.primaryWeapon ? ` · ${summary.primaryWeapon}` : ''}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-2 text-right font-data font-bold"
+                          style={{ color: avg >= 9.5 ? '#F5A623' : avg >= 9.0 ? '#4FC3F7' : avg >= 8.0 ? '#00E5A0' : '#FF4D6D' }}>
+                          {summary.averageScore.toFixed(2)}
+                        </td>
+                        <td className="py-2.5 px-2 text-right font-data text-[#F5A623]">{summary.bestScore.toFixed(1)}</td>
+                        <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalSessions}</td>
+                        <td className="py-2.5 px-2 text-right font-data text-[#F0F4FF]">{summary.totalShots}</td>
+                        <td className="py-2.5 px-2 text-right font-data text-[#4FC3F7]">{summary.consistency.toFixed(1)}</td>
+                        <td className="py-2.5 px-2 text-right text-[#8892A4] text-xs">
+                          {summary.lastSessionDate
+                            ? formatSessionStart(summary.lastSessionDate, { includeYear: true })
+                            : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

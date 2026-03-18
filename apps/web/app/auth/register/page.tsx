@@ -5,8 +5,8 @@
 // opposite direction. Role selector uses two large toggle cards — the
 // amber border on the selected state creates a strong selection affordance.
 
-import React, { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, FormEvent, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { register } from '../../../lib/auth';
 import { useAuth } from '../../../contexts/auth-context';
@@ -14,16 +14,21 @@ import type { UserRole } from '@shooting-platform/shared-types';
 import { ARMY_WEAPONS } from '@shooting-platform/shared-types';
 import { useIsMobile } from '../../../lib/use-mobile';
 
-export default function RegisterPage() {
+function RegisterPageInner() {
   const router = useRouter();
   const { setUser } = useAuth();
   const isMobile = useIsMobile();
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
+  const searchParams = useSearchParams();
+  const VALID_ROLES: UserRole[] = ['SHOOTER', 'COACH', 'SOLDIER'];
+  const paramRole = searchParams.get('role') as UserRole;
+  const initialRole: UserRole = VALID_ROLES.includes(paramRole) ? paramRole : 'SHOOTER';
+
   const [name, setName]               = useState('');
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
-  const [role, setRole]               = useState<UserRole>('SHOOTER');
+  const [role, setRole]               = useState<UserRole>(initialRole);
   const [primaryWeapon, setPrimary]   = useState<string>('AK-203');
   const [error, setError]             = useState<string | null>(null);
   const [loading, setLoading]         = useState(false);
@@ -214,6 +219,14 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterPageInner />
+    </Suspense>
   );
 }
 
