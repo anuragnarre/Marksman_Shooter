@@ -14,6 +14,8 @@ import {
   ConnectionNotificationEvent,
   FeedbackAddedEvent,
   SessionUpdatedEvent,
+  BiometricUpdateEvent,
+  BiometricReading,
 } from '@shooting-platform/shared-types';
 
 @WebSocketGateway({
@@ -125,5 +127,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /** Notify shooter that their request was resolved (approved/rejected) */
   emitScheduleRequestResolved(shooterId: string, requestId: string, status: string): void {
     this.server.to(`user:${shooterId}`).emit('schedule.request.resolved', { requestId, status });
+  }
+
+  // ── Biometric events ─────────────────────────────────────────────────────
+
+  emitBiometricUpdate(userId: string, sessionId: string | null, reading: any): void {
+    const event: BiometricUpdateEvent = { userId, sessionId, reading };
+    this.server.to(`user:${userId}`).emit('biometric.update', event);
+    if (sessionId) {
+      this.server.to(sessionId).emit('biometric.update', event);
+    }
   }
 }

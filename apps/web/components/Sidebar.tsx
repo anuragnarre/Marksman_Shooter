@@ -27,12 +27,15 @@ const ALL_NAV: NavItem[] = [
   { href: '/goals',                   label: 'Goals',          icon: <GoalIcon />,      roles: ['SHOOTER', 'SOLDIER'] },
   { href: '/sessions/compare',        label: 'Compare',        icon: <CompareIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/connect',                 label: 'Connect',        icon: <LinkIcon />,      roles: ['SHOOTER'] },
+  { href: '/biometrics',              label: 'Biometrics',     icon: <HeartPulseIcon />, roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/ai-coach',                label: 'AI Coach',       icon: <SparkleIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/ai-assistant',            label: 'AI Assistant',   icon: <BrainIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
   { href: '/calendar',                label: 'Calendar',       icon: <CalendarIcon />,  roles: ['COACH'] },
   { href: '/calendar',                label: 'Schedule',       icon: <CalendarIcon />,  roles: ['SHOOTER', 'SOLDIER'] },
   { href: '/soldier/weapons',         label: 'Weapons',        icon: <WeaponIcon />,    roles: ['SOLDIER'] },
   { href: '/soldier/analytics',       label: 'Field Analytics',icon: <FieldIcon />,     roles: ['SOLDIER'] },
   { href: '/coach/shooters',          label: 'Shooters',       icon: <PeopleIcon />,    roles: ['COACH'] },
+  { href: '/guidance',                 label: 'Guidance',       icon: <GuidanceIcon /> },
   { href: '/docs',                    label: 'Docs',           icon: <DocsIcon /> },
 ];
 
@@ -72,6 +75,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
 
   return (
     <aside
+      data-sidebar
       className="fixed left-0 top-0 bottom-0 z-sidebar hidden lg:flex flex-col
                  border-r border-white/[0.05]
                  transition-all duration-300 ease-spring overflow-hidden"
@@ -152,7 +156,17 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
           </button>
         )}
         {nav.map((item) => {
-          const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          const active = (() => {
+            if (item.href === '/dashboard') return pathname === '/dashboard';
+            const exactOrChild = pathname === item.href || pathname.startsWith(item.href + '/');
+            if (exactOrChild) {
+              const moreSpecific = nav.some(
+                other => other.href !== item.href && other.href.startsWith(item.href) && pathname.startsWith(other.href)
+              );
+              return !moreSpecific;
+            }
+            return false;
+          })();
           return (
             <SidebarItem
               key={item.href}
@@ -551,6 +565,36 @@ function GoalIcon() {
       <line x1="9" y1="15" x2="9" y2="17" />
       <line x1="1" y1="9" x2="3" y2="9" />
       <line x1="15" y1="9" x2="17" y2="9" />
+    </svg>
+  );
+}
+
+function BrainIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a5 5 0 0 1 5 5c0 1.5-.7 2.9-1.8 3.8A5.002 5.002 0 0 1 12 22a5.002 5.002 0 0 1-3.2-11.2A5.002 5.002 0 0 1 12 2z" />
+      <path d="M12 2v20" />
+      <path d="M8.5 6.5C7 7.5 7 9.5 8 11" />
+      <path d="M15.5 6.5c1.5 1 1.5 3 .5 4.5" />
+    </svg>
+  );
+}
+
+function HeartPulseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 15.5l-5.5-5.5C2 8.5 2 6 3.5 4.5S7.5 3 9 5c1.5-2 4-2 5.5-.5S16 8.5 14.5 10L9 15.5z" />
+      <polyline points="4,9 7,9 8,7 10,11 11,9 14,9" />
+    </svg>
+  );
+}
+
+function GuidanceIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="9" r="7.5" />
+      <path d="M6.5 7a2.5 2.5 0 015 0c0 1.5-1.5 2-2.5 3" />
+      <circle cx="9" cy="13" r="0.8" fill="currentColor" stroke="none" />
     </svg>
   );
 }

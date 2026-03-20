@@ -946,6 +946,29 @@ input, textarea, select, button {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media print {
+  /* Hide app chrome */
+  [data-sidebar], [data-topbar], [data-bottomnav],
+  .no-print { display: none !important; }
+
+  body {
+    background: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Show only the print target */
+  .print-export-img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    UTILITY LAYER
    ═══════════════════════════════════════════════════════════════════════════ */
 @layer utilities {

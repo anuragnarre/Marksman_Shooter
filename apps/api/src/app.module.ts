@@ -13,6 +13,7 @@ import { AiCoachModule } from './ai-coach/ai-coach.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { ScheduleRequestsModule } from './schedule-requests/schedule-requests.module';
 import { PerformanceModule } from './performance/performance.module';
+import { BiometricsModule } from './biometrics/biometrics.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PerformanceModule } from './performance/performance.module';
     CalendarModule,
     ScheduleRequestsModule,
     PerformanceModule,
+    BiometricsModule,
   ],
 })
 export class AppModule {}

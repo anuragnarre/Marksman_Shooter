@@ -138,6 +138,7 @@ export default function HomePage() {
   const router    = useRouter();
   const isMobile  = useIsMobile();
   const [mounted, setMounted] = useState(false);
+  const [ready, setReady]     = useState(false);
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
   const scrollY = useScrollY();
 
@@ -146,21 +147,281 @@ export default function HomePage() {
     if (mounted && user) router.replace('/dashboard');
   }, [user, mounted, router]);
 
-  if (!mounted || user) return null;
+  // Minimum loader display for polish, then reveal
+  useEffect(() => {
+    if (mounted && !user) {
+      const t = setTimeout(() => setReady(true), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [mounted, user]);
+
+  // Still waiting for hydration or redirecting authenticated user
+  if (!mounted || user) {
+    return <SplashLoader />;
+  }
 
   return (
-    <div className="min-h-screen depth-bg text-[#F0F4FF] overflow-x-hidden" style={{ fontSize: '16px' }}>
-      <Nav safeTopInset={safeTopInset} />
-      <div style={{ paddingTop: safeTopInset }}>
-        <Hero scrollY={scrollY} />
-        <DisciplineMarquee />
-        <LiveStats />
-        <BentoFeatures />
-        <AIHealthSection />
-        <HowItWorks />
-        <RoleShowcase />
-        <CtaBanner />
-        <Footer />
+    <>
+      <AnimatePresence>
+        {!ready && (
+          <motion.div
+            key="splash"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.04, filter: 'blur(8px)' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[9999]"
+          >
+            <SplashLoader />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={ready ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        className="min-h-screen depth-bg text-[#F0F4FF] overflow-x-hidden"
+        style={{ fontSize: '16px' }}
+      >
+        <Nav safeTopInset={safeTopInset} />
+        <div style={{ paddingTop: safeTopInset }}>
+          <Hero scrollY={scrollY} />
+          <DisciplineMarquee />
+          <LiveStats />
+          <BentoFeatures />
+          <AIHealthSection />
+          <HowItWorks />
+          <RoleShowcase />
+          <CtaBanner />
+          <Footer />
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+// ── Splash Loader ─────────────────────────────────────────────────────────────
+// Premium branded loading screen with animated crosshair, sweep line, and text reveal.
+
+function SplashLoader() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let raf: number;
+    const start = performance.now();
+    const duration = 1400;
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      // Ease-out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - t, 3);
+      setProgress(eased * 100);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center"
+      style={{
+        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(245,166,35,0.04) 0%, #060810 70%)',
+        zIndex: 9999,
+      }}
+    >
+      {/* Ambient orbs */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '20%', left: '30%',
+          width: '40vw', height: '40vw',
+          background: 'radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 65%)',
+          animation: 'orbFloat 8s ease-in-out infinite',
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '15%', right: '20%',
+          width: '30vw', height: '30vw',
+          background: 'radial-gradient(circle, rgba(79,195,247,0.04) 0%, transparent 65%)',
+          animation: 'orbFloat 10s ease-in-out infinite reverse',
+        }}
+      />
+
+      {/* Crosshair animation */}
+      <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-8">
+        {/* Outer ping ring */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            border: '1px solid rgba(245,166,35,0.3)',
+            animation: 'radarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+          }}
+        />
+        {/* Second ping ring offset */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            border: '1px solid rgba(245,166,35,0.2)',
+            animation: 'radarPing 2s cubic-bezier(0, 0, 0.2, 1) 0.6s infinite',
+          }}
+        />
+        {/* Rotating sweep */}
+        <div
+          className="absolute inset-0 rounded-full overflow-hidden"
+          style={{ animation: 'radarSweep 2.5s linear infinite' }}
+        >
+          <div
+            className="absolute top-0 left-1/2 w-1/2 h-1/2 origin-bottom-left"
+            style={{
+              background: 'conic-gradient(from 0deg, rgba(245,166,35,0.25) 0deg, transparent 60deg)',
+            }}
+          />
+        </div>
+        {/* Crosshair SVG with draw animation */}
+        <svg
+          viewBox="0 0 64 64"
+          fill="none"
+          className="absolute inset-0 w-full h-full"
+          style={{ filter: 'drop-shadow(0 0 12px rgba(245,166,35,0.5))' }}
+        >
+          {/* Outer ring */}
+          <circle
+            cx="32" cy="32" r="27"
+            stroke="#F5A623" strokeWidth="1"
+            opacity="0.35"
+            strokeDasharray="170"
+            style={{ animation: 'ringDraw 1.2s cubic-bezier(0.16,1,0.3,1) forwards' }}
+          />
+          {/* Middle ring */}
+          <circle
+            cx="32" cy="32" r="19"
+            stroke="#F5A623" strokeWidth="1.2"
+            opacity="0.6"
+            strokeDasharray="120"
+            style={{ animation: 'ringDraw 1s cubic-bezier(0.16,1,0.3,1) 0.15s forwards' }}
+          />
+          {/* Inner ring */}
+          <circle
+            cx="32" cy="32" r="10"
+            stroke="#F5A623" strokeWidth="1.5"
+            opacity="0.85"
+            strokeDasharray="63"
+            style={{ animation: 'ringDraw 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards' }}
+          />
+          {/* Center dot — pops in */}
+          <circle
+            cx="32" cy="32" r="3.5"
+            fill="#F5A623"
+            style={{ animation: 'dotPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.6s both' }}
+          />
+          {/* Crosshair lines */}
+          <line x1="32" y1="4" x2="32" y2="20" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
+            strokeDasharray="16"
+            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s forwards' }}
+          />
+          <line x1="32" y1="44" x2="32" y2="60" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
+            strokeDasharray="16"
+            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.45s forwards' }}
+          />
+          <line x1="4" y1="32" x2="20" y2="32" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
+            strokeDasharray="16"
+            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.5s forwards' }}
+          />
+          <line x1="44" y1="32" x2="60" y2="32" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
+            strokeDasharray="16"
+            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.55s forwards' }}
+          />
+        </svg>
+      </div>
+
+      {/* Brand text */}
+      <div className="text-center mb-8" style={{ animation: 'revealUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}>
+        <h1
+          className="font-display font-black text-2xl sm:text-3xl tracking-[0.22em] uppercase mb-1"
+          style={{
+            background: 'linear-gradient(135deg, #F5A623 0%, #FFD580 50%, #F5A623 100%)',
+            backgroundSize: '200% 100%',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: 'shimmer 3s linear infinite',
+          }}
+        >
+          MARKSMAN
+        </h1>
+        <p
+          className="font-display text-[11px] sm:text-[12px] tracking-[0.3em] uppercase"
+          style={{ color: '#4A5568', animation: 'textReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
+        >
+          Precision Analytics
+        </p>
+      </div>
+
+      {/* Progress bar */}
+      <div
+        className="w-48 sm:w-56"
+        style={{ animation: 'revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
+      >
+        <div className="progress-track" style={{ height: 2, background: 'rgba(245,166,35,0.08)' }}>
+          <div
+            className="h-full rounded-full relative overflow-hidden"
+            style={{
+              width: `${progress}%`,
+              background: 'linear-gradient(90deg, #F5A623, #FFD580)',
+              boxShadow: '0 0 12px rgba(245,166,35,0.5), 0 0 4px rgba(245,166,35,0.8)',
+              transition: 'width 60ms linear',
+            }}
+          >
+            {/* Shimmer on the bar */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1s linear infinite',
+              }}
+            />
+          </div>
+        </div>
+        {/* Loading status text */}
+        <div className="flex justify-between mt-3">
+          <span
+            className="font-display text-[10px] tracking-[0.15em] uppercase"
+            style={{ color: '#4A5568' }}
+          >
+            Initializing
+          </span>
+          <span
+            className="font-jetbrains text-[10px] font-semibold tabular-nums"
+            style={{ color: 'rgba(245,166,35,0.6)' }}
+          >
+            {Math.round(progress)}%
+          </span>
+        </div>
+      </div>
+
+      {/* Subtle grid underlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(245,166,35,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.4) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+
+      {/* Scan line effect */}
+      <div
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        style={{ animation: 'scanLine 3s linear infinite' }}
+      >
+        <div
+          className="w-full h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.15), transparent)' }}
+        />
       </div>
     </div>
   );
@@ -530,6 +791,17 @@ function AnimatedHeroTarget({ scrollY }: { scrollY: number }) {
     { x:176, y:186, score:9.8  }, { x:185, y:170, score:10.7 },
     { x:198, y:185, score:9.2  }, { x:178, y:175, score:10.3 },
     { x:192, y:193, score:9.6  }, { x:183, y:188, score:10.0 },
+    { x:189, y:177, score:10.4 }, { x:182, y:190, score:9.7  },
+    { x:195, y:183, score:9.9  }, { x:174, y:180, score:10.2 },
+    { x:186, y:194, score:9.4  }, { x:191, y:172, score:10.6 },
+    { x:177, y:185, score:10.1 }, { x:184, y:176, score:10.3 },
+    { x:197, y:189, score:9.5  }, { x:180, y:179, score:10.0 },
+    { x:188, y:196, score:9.2  }, { x:193, y:174, score:10.5 },
+    { x:176, y:182, score:9.8  }, { x:185, y:190, score:9.6  },
+    { x:199, y:177, score:9.3  }, { x:181, y:173, score:10.7 },
+    { x:190, y:186, score:9.9  }, { x:174, y:188, score:10.1 },
+    { x:187, y:180, score:10.4 }, { x:183, y:195, score:9.5  },
+    { x:192, y:178, score:10.2 },
   ];
 
   useEffect(() => {
@@ -539,7 +811,7 @@ function AnimatedHeroTarget({ scrollY }: { scrollY: number }) {
       const id = setInterval(() => {
         tickRef.current += 1;
         setTick(tickRef.current);
-        if (tickRef.current >= 20) {
+        if (tickRef.current >= 41) {
           clearInterval(id);
           setTimeout(startCycle, 2000);
         }
@@ -706,7 +978,7 @@ function AnimatedHeroTarget({ scrollY }: { scrollY: number }) {
         <line x1="8" y1="294" x2="358" y2="294" stroke="rgba(245,166,35,0.25)" strokeWidth="0.7" />
 
         {[
-          { x: 40,  label: 'RANGE', value: '40–59',                               color: '#8892A4' },
+          { x: 40,  label: 'RANGE', value: '40–60',                               color: '#8892A4' },
           { x: 155, label: 'AVG',   value: avg  !== null ? avg.toFixed(2)  : '—', color: '#F5A623' },
           { x: 270, label: 'BEST',  value: best !== null ? best.toFixed(1) : '—', color: '#00E5A0' },
         ].map(({ x, label, value, color }) => (

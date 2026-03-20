@@ -15,6 +15,12 @@ enum Role {
   SOLDIER
 }
 
+enum DeviceType {
+  CUSTOM_SENSOR
+  HEALTH_CONNECT
+  MANUAL
+}
+
 enum ConnectionStatus {
   PENDING
   APPROVED
@@ -40,6 +46,8 @@ model User {
   trainingPlans    TrainingPlan[]
   shooterProfile   ShooterProfile? @relation("UserShooterProfile")
   managedShooterProfiles ShooterProfile[] @relation("ManagedShooterProfiles")
+  devices          DeviceRegistration[]
+  biometricReadings BiometricReading[] @relation("UserBiometricReadings")
 }
 
 model Session {
@@ -54,10 +62,11 @@ model Session {
   createdAt     DateTime  @default(now())
   deletedAt     DateTime?
 
-  shooter         User             @relation("ShooterSessions", fields: [shooterId], references: [id])
-  shots           Shot[]
-  feedback        CoachFeedback[]
-  sessionContext  SessionContext?
+  shooter           User               @relation("ShooterSessions", fields: [shooterId], references: [id])
+  shots             Shot[]
+  feedback          CoachFeedback[]
+  sessionContext    SessionContext?
+  biometricReadings BiometricReading[] @relation("SessionBiometricReadings")
 
   @@index([shooterId])
 }
@@ -213,4 +222,47 @@ model ShooterProfile {
   updatedAt       DateTime @updatedAt
 
   @@index([managedByCoachId])
+}
+
+model DeviceRegistration {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  deviceName String
+  deviceType DeviceType
+  apiKey     String     @unique
+  lastSeenAt DateTime?
+  isActive   Boolean    @default(true)
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  readings BiometricReading[]
+
+  @@index([userId])
+  @@index([apiKey])
+}
+
+model BiometricReading {
+  id              String   @id @default(uuid())
+  deviceId        String
+  device          DeviceRegistration @relation(fields: [deviceId], references: [id])
+  userId          String
+  user            User     @relation("UserBiometricReadings", fields: [userId], references: [id])
+  sessionId       String?
+  session         Session? @relation("SessionBiometricReadings", fields: [sessionId], references: [id])
+  timestamp       DateTime @default(now())
+  receivedAt      DateTime @default(now())
+  heartRate       Int?
+  spo2            Int?
+  respiratoryRate Float?
+  stressLevel     Float?
+  steps           Int?
+  calories        Float?
+  activeMinutes   Float?
+  readingType     String   @default("continuous")
+  confidence      Float?
+
+  @@index([userId, timestamp])
+  @@index([sessionId, timestamp])
+  @@index([deviceId, timestamp])
 }

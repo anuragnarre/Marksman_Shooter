@@ -16,6 +16,7 @@ interface Command {
   icon: React.ReactNode;
   category: string;
   keywords?: string[];
+  roles?: string[];
 }
 
 const NAV_ICON = (
@@ -74,8 +75,10 @@ const BASE_COMMANDS: Command[] = [
   { id: 'sessions', label: 'Sessions', description: 'View all shooting sessions', href: '/sessions', icon: TARGET_ICON, category: 'Navigate' },
   { id: 'new-session', label: 'New Session', description: 'Start a new training session', href: '/sessions/new', icon: PLUS_ICON, category: 'Actions' },
   { id: 'analytics', label: 'Analytics', description: 'Performance analytics', href: '/analytics', icon: CHART_ICON, category: 'Navigate' },
+  { id: 'biometrics', label: 'Biometrics', description: 'Heart rate, SpO2, wearable data', href: '/biometrics', icon: CHART_ICON, category: 'Navigate' },
+  { id: 'device-settings', label: 'Device Settings', description: 'Manage wearable devices', href: '/settings/devices', icon: NAV_ICON, category: 'Navigate' },
   { id: 'ai-coach', label: 'AI Coach', description: 'Get AI-powered coaching insights', href: '/ai-coach', icon: AI_ICON, category: 'Navigate' },
-  { id: 'goals', label: 'Goals', description: 'Track your shooting goals', href: '/goals', icon: GOAL_ICON, category: 'Navigate' },
+  { id: 'goals', label: 'Goals', description: 'Track your shooting goals', href: '/goals', icon: GOAL_ICON, category: 'Navigate', roles: ['SHOOTER', 'SOLDIER'] },
   { id: 'compare', label: 'Compare Sessions', description: 'Side-by-side session analysis', href: '/sessions/compare', icon: COMPARE_ICON, category: 'Navigate' },
   { id: 'performance', label: 'Performance', href: '/performance', icon: CHART_ICON, category: 'Navigate' },
   { id: 'training-plan', label: 'Training Plan', description: 'AI-generated training program', href: '/performance/training-plan', icon: AI_ICON, category: 'Navigate' },
@@ -99,7 +102,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,6 +121,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   ];
 
   const filtered = commands.filter((cmd) => {
+    if (cmd.roles && (!user?.role || !cmd.roles.includes(user.role))) return false;
     const searchable = [cmd.label, cmd.description ?? '', ...(cmd.keywords ?? [])].join(' ');
     return fuzzy(query, searchable);
   });

@@ -342,6 +342,82 @@ export interface AiCoachAnalysis {
   model: string;
 }
 
+// ── AI Performance Assistant ──────────────────────────────────────────────────
+
+export interface TechniqueInsight {
+  area: 'posture' | 'breathing' | 'trigger' | 'stability' | 'followThrough';
+  status: 'strong' | 'developing' | 'needsWork';
+  title: string;
+  observation: string;
+  correction: string;
+  drill?: string;
+}
+
+export interface PerformancePattern {
+  type: 'accuracy' | 'grouping' | 'endurance' | 'consistency' | 'warmup';
+  trend: 'improving' | 'stable' | 'declining';
+  title: string;
+  detail: string;
+  dataPoint: string;
+}
+
+export interface MentalRecommendation {
+  category: 'focus' | 'calmness' | 'competition' | 'meditation' | 'visualization';
+  title: string;
+  description: string;
+  routine?: string;
+  duration?: string;
+}
+
+export interface PhysicalRecommendation {
+  category: 'core' | 'stability' | 'endurance' | 'flexibility' | 'recovery';
+  title: string;
+  description: string;
+  exercises?: string[];
+  frequency?: string;
+}
+
+export interface SmartAlert {
+  severity: 'warning' | 'info' | 'success';
+  title: string;
+  message: string;
+  actionItem: string;
+}
+
+export interface ImprovementPlan {
+  timeframe: string;
+  goal: string;
+  steps: string[];
+  milestones: string[];
+}
+
+export interface AiPerformanceAssistant {
+  shooterId: string;
+  generatedAt: string;
+  model: string;
+  sessionsAnalyzed: number;
+
+  overallRating: number;
+  summary: string;
+
+  techniqueInsights: TechniqueInsight[];
+  performancePatterns: PerformancePattern[];
+  mentalRecommendations: MentalRecommendation[];
+  physicalRecommendations: PhysicalRecommendation[];
+  smartAlerts: SmartAlert[];
+  improvementPlan: ImprovementPlan;
+
+  sessionComparison: {
+    recentAvg: number;
+    previousAvg: number;
+    trend: 'improving' | 'stable' | 'declining';
+    percentChange: number;
+  };
+
+  weaknesses: string[];
+  strengths: string[];
+}
+
 // ── WebSocket Events ──────────────────────────────────────────────────────────
 
 export interface SessionUpdatedEvent {
@@ -499,4 +575,113 @@ export interface ScheduleRequest {
   createdAt: Date | string;
   updatedAt: Date | string;
   resolvedAt?: Date | string | null;
+}
+
+// ── Biometrics / Wearable Integration ─────────────────────────────────────
+
+export type DeviceTypeEnum = 'CUSTOM_SENSOR' | 'HEALTH_CONNECT' | 'MANUAL';
+
+export interface DeviceRegistration {
+  id: string;
+  userId: string;
+  deviceName: string;
+  deviceType: DeviceTypeEnum;
+  apiKey?: string; // only returned once on creation
+  lastSeenAt?: Date | string | null;
+  isActive: boolean;
+  metadata?: Record<string, unknown> | null;
+  createdAt: Date | string;
+}
+
+export interface BiometricReading {
+  id: string;
+  deviceId: string;
+  userId: string;
+  sessionId?: string | null;
+  timestamp: Date | string;
+  receivedAt: Date | string;
+  heartRate?: number | null;
+  spo2?: number | null;
+  respiratoryRate?: number | null;
+  stressLevel?: number | null;
+  steps?: number | null;
+  calories?: number | null;
+  activeMinutes?: number | null;
+  readingType: string;
+  confidence?: number | null;
+}
+
+export interface VitalsPayload {
+  type: 'quick_estimate' | 'optimal_read';
+  heart_rate: number;
+  spo2: number;
+}
+
+export interface HealthConnectReading {
+  timestamp: string;
+  heartRate?: number;
+  spo2?: number;
+  respiratoryRate?: number;
+  steps?: number;
+  calories?: number;
+  activeMinutes?: number;
+}
+
+export interface HealthConnectSyncPayload {
+  readings: HealthConnectReading[];
+  sessionId?: string;
+}
+
+export interface BiometricSummary {
+  sessionId: string;
+  avgHeartRate: number;
+  minHeartRate: number;
+  maxHeartRate: number;
+  hrv: number;
+  avgSpo2: number;
+  avgRespiratoryRate: number | null;
+  readingCount: number;
+}
+
+export type BiometricInsightCategory =
+  | 'heart_rate'
+  | 'breathing'
+  | 'fatigue'
+  | 'optimal_window'
+  | 'correlation'
+  | 'general';
+
+export type BiometricInsightSeverity = 'critical' | 'moderate' | 'positive';
+
+export interface BiometricInsight {
+  category: BiometricInsightCategory;
+  severity: BiometricInsightSeverity;
+  title: string;
+  observation: string;
+  recommendation: string;
+}
+
+export interface AiBiometricAnalysis {
+  sessionId: string;
+  summary: string;
+  performanceCorrelation: string;
+  insights: BiometricInsight[];
+  optimalWindows: { startIndex: number; endIndex: number; avgHr: number; avgScore: number }[];
+  generatedAt: string;
+  model: string;
+}
+
+export interface BiometricUpdateEvent {
+  userId: string;
+  sessionId?: string | null;
+  reading: BiometricReading;
+}
+
+export interface BiometricTrendPoint {
+  date: string;
+  avgHeartRate: number;
+  minHeartRate: number;
+  maxHeartRate: number;
+  avgSpo2: number;
+  readingCount: number;
 }

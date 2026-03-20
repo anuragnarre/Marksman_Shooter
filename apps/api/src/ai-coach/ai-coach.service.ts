@@ -9,7 +9,7 @@ import Groq from 'groq-sdk';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsService } from '../analytics/analytics.service';
-import { AiCoachAnalysis, AiCoachFinding } from '@shooting-platform/shared-types';
+import { AiCoachAnalysis, AiCoachFinding, AiPerformanceAssistant } from '@shooting-platform/shared-types';
 
 // Free model — Llama 3.3 70B via Groq: 14,400 req/day, no billing required
 const MODEL = 'llama-3.3-70b-versatile';
@@ -91,6 +91,89 @@ Return ONLY a valid JSON object — no markdown, no explanation outside the JSON
 }
 Provide 3–6 findings. Be precise — reference exact numbers from the data (e.g. "your MPI x of −0.82 indicates…").`;
 
+const PERFORMANCE_ASSISTANT_SYSTEM = `You are an elite AI shooting performance assistant with expertise in Olympic/ISSF
+shooting, military marksmanship, and sports science. You analyse a shooter's COMPLETE training history
+and produce a comprehensive performance report covering technique, analytics, mental training,
+physical conditioning, and actionable improvement plans.
+
+You have deep knowledge of:
+- Biomechanics of shooting stances (standing, prone, kneeling)
+- Breathing patterns and heart rate management
+- Trigger control mechanics and follow-through
+- Mental performance, competition psychology, meditation for athletes
+- Physical training (core stability, endurance, flexibility) for shooters
+- Fatigue management and recovery protocols
+- Statistical pattern recognition in shooting data
+
+OUTPUT FORMAT — Return ONLY a valid JSON object:
+{
+  "overallRating": <1.0-10.0>,
+  "summary": "<3-4 sentence executive summary of the shooter's current state and trajectory>",
+
+  "techniqueInsights": [
+    {
+      "area": "<posture|breathing|trigger|stability|followThrough>",
+      "status": "<strong|developing|needsWork>",
+      "title": "<concise title>",
+      "observation": "<data-backed observation>",
+      "correction": "<specific correction technique>",
+      "drill": "<optional drill with reps/duration>"
+    }
+  ],
+
+  "performancePatterns": [
+    {
+      "type": "<accuracy|grouping|endurance|consistency|warmup>",
+      "trend": "<improving|stable|declining>",
+      "title": "<pattern name>",
+      "detail": "<detailed explanation with data references>",
+      "dataPoint": "<key metric value>"
+    }
+  ],
+
+  "mentalRecommendations": [
+    {
+      "category": "<focus|calmness|competition|meditation|visualization>",
+      "title": "<recommendation title>",
+      "description": "<detailed guidance>",
+      "routine": "<optional specific routine>",
+      "duration": "<optional time commitment>"
+    }
+  ],
+
+  "physicalRecommendations": [
+    {
+      "category": "<core|stability|endurance|flexibility|recovery>",
+      "title": "<recommendation title>",
+      "description": "<why this helps shooting performance>",
+      "exercises": ["<exercise 1>", "<exercise 2>"],
+      "frequency": "<how often>"
+    }
+  ],
+
+  "smartAlerts": [
+    {
+      "severity": "<warning|info|success>",
+      "title": "<alert title>",
+      "message": "<explanation>",
+      "actionItem": "<immediate action to take>"
+    }
+  ],
+
+  "improvementPlan": {
+    "timeframe": "<e.g. Next 4 weeks>",
+    "goal": "<specific measurable goal>",
+    "steps": ["<step 1>", "<step 2>", "<step 3>"],
+    "milestones": ["<milestone 1>", "<milestone 2>"]
+  },
+
+  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"]
+}
+
+Provide 4-5 technique insights, 3-5 performance patterns, 3-4 mental recommendations,
+3-4 physical recommendations, 2-4 smart alerts. Be precise with actual numbers.`;
+
 @Injectable()
 export class AiCoachService {
   private readonly groq: Groq;
@@ -151,6 +234,33 @@ export class AiCoachService {
     // ── 3. Compute analytics ─────────────────────────────────────────────────
     const analytics = await this.analyticsService.computeForSession(sessionId);
 
+    // ── 3b. Load biometric data (if available) ─────────────────────────────
+    const biometricReadings = await this.prisma.biometricReading.findMany({
+      where: { sessionId },
+      orderBy: { timestamp: 'asc' },
+    });
+    let biometricSection = '';
+    if (biometricReadings.length > 0) {
+      const hrs = biometricReadings.map(r => r.heartRate).filter((v): v is number => v !== null);
+      const spo2s = biometricReadings.map(r => r.spo2).filter((v): v is number => v !== null);
+      const rrs = biometricReadings.map(r => r.respiratoryRate).filter((v): v is number => v !== null);
+      const avgHr = hrs.length ? hrs.reduce((a, b) => a + b, 0) / hrs.length : 0;
+      const minHr = hrs.length ? Math.min(...hrs) : 0;
+      const maxHr = hrs.length ? Math.max(...hrs) : 0;
+      const avgSpo2 = spo2s.length ? spo2s.reduce((a, b) => a + b, 0) / spo2s.length : 0;
+      const avgRr = rrs.length ? rrs.reduce((a, b) => a + b, 0) / rrs.length : 0;
+      const hrv = hrs.length > 1
+        ? Math.sqrt(hrs.reduce((sum, v) => sum + (v - avgHr) ** 2, 0) / (hrs.length - 1))
+        : 0;
+      const firstHalf = hrs.slice(0, Math.floor(hrs.length / 2));
+      const secondHalf = hrs.slice(Math.floor(hrs.length / 2));
+      const firstAvg = firstHalf.length ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length : 0;
+      const secondAvg = secondHalf.length ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length : 0;
+      const hrTrend = secondAvg > firstAvg + 2 ? 'rising' : secondAvg < firstAvg - 2 ? 'falling' : 'stable';
+
+      biometricSection = `\nBIOMETRIC DATA\n━━━━━━━━━━━━━━\nAverage heart rate: ${avgHr.toFixed(1)} bpm (range: ${minHr}-${maxHr})\nHeart rate variability: ${hrv.toFixed(1)}\nAverage SpO2: ${avgSpo2.toFixed(1)}%\n${avgRr > 0 ? `Average respiratory rate: ${avgRr.toFixed(1)} breaths/min\n` : ''}HR trend: ${hrTrend}\nReadings during session: ${biometricReadings.length} data points\n`;
+    }
+
     // ── 4. Build prompt ──────────────────────────────────────────────────────
     const scores = session.shots.map((s) => s.score);
     const distribution = {
@@ -202,7 +312,7 @@ SHOT COORDINATES (first ${shotSample.length} shots)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${shotSample.map((s) => `#${s.n}: score=${s.score}, x=${s.x}, y=${s.y}`).join('\n')}
 ${session.shots.length > 60 ? `... and ${session.shots.length - 60} more shots` : ''}
-
+${biometricSection}
 Please analyse this session and provide coaching feedback in the required JSON format.`;
 
     // ── 5. Call Groq ─────────────────────────────────────────────────────────
@@ -243,6 +353,204 @@ Please analyse this session and provide coaching feedback in the required JSON f
       generatedAt: new Date().toISOString(),
       model: MODEL,
     };
+  }
+
+  // ── Performance Assistant (comprehensive cross-session analysis) ────────
+
+  async analyzePerformance(
+    requesterId: string,
+    requesterRole: 'SHOOTER' | 'COACH' | 'SOLDIER',
+    shooterId?: string,
+  ): Promise<AiPerformanceAssistant> {
+    // Resolve target shooter
+    const targetShooterId = requesterRole === 'COACH'
+      ? await this.resolveCoachShooter(requesterId, shooterId)
+      : requesterId;
+
+    // Fetch last 20 sessions with shots
+    const sessions = await this.prisma.session.findMany({
+      where: { shooterId: targetShooterId, deletedAt: null },
+      include: { shots: { orderBy: { shotNumber: 'asc' } } },
+      orderBy: { sessionDate: 'desc' },
+      take: 20,
+    });
+
+    if (sessions.length === 0) {
+      throw new ForbiddenException('No sessions found. Record sessions first to get AI insights.');
+    }
+
+    // Compute analytics for each session
+    const sessionAnalytics: Array<{
+      date: string; discipline: string; weapon: string; trainingMode: string | null;
+      shots: number; avgScore: number; mpiX: number; mpiY: number;
+      groupRadius: number; stdDev: number; seriesAvgs: number[];
+      xRing: number; ring10: number; ring9: number; outer: number;
+    }> = [];
+
+    for (const session of sessions) {
+      if (session.shots.length === 0) continue;
+      const analytics = await this.analyticsService.computeForSession(session.id);
+      const scores = session.shots.map(s => s.score);
+
+      sessionAnalytics.push({
+        date: new Date(session.sessionDate).toISOString().slice(0, 10),
+        discipline: session.discipline,
+        weapon: session.weaponType,
+        trainingMode: session.trainingMode ?? null,
+        shots: session.shots.length,
+        avgScore: analytics.averageScore,
+        mpiX: analytics.mpi.x,
+        mpiY: analytics.mpi.y,
+        groupRadius: analytics.groupRadius,
+        stdDev: analytics.stdDev,
+        seriesAvgs: analytics.seriesAverages,
+        xRing: scores.filter(s => s >= 10.5).length,
+        ring10: scores.filter(s => s >= 10.0 && s < 10.5).length,
+        ring9: scores.filter(s => s >= 9.0 && s < 10.0).length,
+        outer: scores.filter(s => s < 9.0).length,
+      });
+    }
+
+    if (sessionAnalytics.length === 0) {
+      throw new ForbiddenException('No sessions with shot data found.');
+    }
+
+    // Compute cross-session metrics
+    const allAvgScores = sessionAnalytics.map(s => s.avgScore);
+    const overallAvg = allAvgScores.reduce((a, b) => a + b, 0) / allAvgScores.length;
+    const recentHalf = allAvgScores.slice(0, Math.ceil(allAvgScores.length / 2));
+    const olderHalf = allAvgScores.slice(Math.ceil(allAvgScores.length / 2));
+    const recentAvg = recentHalf.reduce((a, b) => a + b, 0) / recentHalf.length;
+    const previousAvg = olderHalf.length > 0
+      ? olderHalf.reduce((a, b) => a + b, 0) / olderHalf.length
+      : recentAvg;
+
+    const avgGroupRadius = sessionAnalytics.reduce((a, b) => a + b.groupRadius, 0) / sessionAnalytics.length;
+    const avgStdDev = sessionAnalytics.reduce((a, b) => a + b.stdDev, 0) / sessionAnalytics.length;
+    const avgMpiX = sessionAnalytics.reduce((a, b) => a + b.mpiX, 0) / sessionAnalytics.length;
+    const avgMpiY = sessionAnalytics.reduce((a, b) => a + b.mpiY, 0) / sessionAnalytics.length;
+
+    // Fatigue: compare first vs last series averages across sessions
+    const fatigueScores = sessionAnalytics
+      .filter(s => s.seriesAvgs.length >= 2)
+      .map(s => s.seriesAvgs[s.seriesAvgs.length - 1] - s.seriesAvgs[0]);
+    const avgFatigue = fatigueScores.length > 0
+      ? fatigueScores.reduce((a, b) => a + b, 0) / fatigueScores.length
+      : 0;
+
+    // Total shot distribution
+    const totalXRing = sessionAnalytics.reduce((a, b) => a + b.xRing, 0);
+    const totalRing10 = sessionAnalytics.reduce((a, b) => a + b.ring10, 0);
+    const totalRing9 = sessionAnalytics.reduce((a, b) => a + b.ring9, 0);
+    const totalOuter = sessionAnalytics.reduce((a, b) => a + b.outer, 0);
+    const totalShots = sessionAnalytics.reduce((a, b) => a + b.shots, 0);
+
+    const disciplines = [...new Set(sessionAnalytics.map(s => s.discipline))];
+    const weapons = [...new Set(sessionAnalytics.map(s => s.weapon))];
+
+    const userPrompt = `SHOOTER PERFORMANCE DATA — Cross-Session Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sessions analysed: ${sessionAnalytics.length}
+Date range: ${sessionAnalytics[sessionAnalytics.length - 1].date} to ${sessionAnalytics[0].date}
+Disciplines: ${disciplines.join(', ')}
+Weapons: ${weapons.join(', ')}
+
+AGGREGATE METRICS
+━━━━━━━━━━━━━━━━
+Overall average score: ${overallAvg.toFixed(2)}
+Recent sessions avg: ${recentAvg.toFixed(2)} | Earlier sessions avg: ${previousAvg.toFixed(2)}
+Average group radius: ${avgGroupRadius.toFixed(2)}
+Average std deviation: ${avgStdDev.toFixed(2)}
+Average MPI: (${avgMpiX.toFixed(2)}, ${avgMpiY.toFixed(2)})
+Average fatigue delta (last series - first series): ${avgFatigue.toFixed(3)}
+Total shots: ${totalShots}
+
+SHOT DISTRIBUTION (all sessions)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+X-ring (>=10.5): ${totalXRing} (${pct(totalXRing, totalShots)}%)
+10-ring (>=10.0): ${totalRing10} (${pct(totalRing10, totalShots)}%)
+9-ring (>=9.0): ${totalRing9} (${pct(totalRing9, totalShots)}%)
+Outer (<9.0): ${totalOuter} (${pct(totalOuter, totalShots)}%)
+
+SESSION-BY-SESSION DATA
+━━━━━━━━━━━━━━━━━━━━━━━
+${sessionAnalytics.map((s, i) => `#${i + 1} [${s.date}] ${s.discipline} ${s.weapon}${s.trainingMode ? ' (' + s.trainingMode + ')' : ''}: avg=${s.avgScore}, GR=${s.groupRadius}, SD=${s.stdDev}, MPI=(${s.mpiX},${s.mpiY}), ${s.shots} shots, series=[${s.seriesAvgs.map(v => v.toFixed(1)).join(',')}]`).join('\n')}
+
+SCORE TREND (newest first): ${allAvgScores.map(s => s.toFixed(2)).join(' → ')}
+
+Analyse this shooter's complete history and provide the comprehensive performance assistant response in the required JSON format.`;
+
+    let raw: string;
+    try {
+      const completion = await this.groq.chat.completions.create({
+        model: MODEL,
+        max_tokens: 4096,
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: PERFORMANCE_ASSISTANT_SYSTEM },
+          { role: 'user',   content: userPrompt },
+        ],
+      });
+      raw = completion.choices[0]?.message?.content ?? '';
+    } catch (err) {
+      throw new InternalServerErrorException(
+        `AI Performance Assistant unavailable: ${(err as Error).message}`,
+      );
+    }
+
+    let parsed: any;
+    try {
+      const json = raw.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+      parsed = JSON.parse(json);
+    } catch {
+      throw new InternalServerErrorException('AI returned an invalid response — please retry');
+    }
+
+    const percentChange = previousAvg > 0
+      ? ((recentAvg - previousAvg) / previousAvg) * 100
+      : 0;
+
+    return {
+      shooterId: targetShooterId,
+      generatedAt: new Date().toISOString(),
+      model: MODEL,
+      sessionsAnalyzed: sessionAnalytics.length,
+      overallRating: parsed.overallRating ?? 5,
+      summary: parsed.summary ?? '',
+      techniqueInsights: parsed.techniqueInsights ?? [],
+      performancePatterns: parsed.performancePatterns ?? [],
+      mentalRecommendations: parsed.mentalRecommendations ?? [],
+      physicalRecommendations: parsed.physicalRecommendations ?? [],
+      smartAlerts: parsed.smartAlerts ?? [],
+      improvementPlan: parsed.improvementPlan ?? { timeframe: '4 weeks', goal: 'Improve consistency', steps: [], milestones: [] },
+      sessionComparison: {
+        recentAvg: Math.round(recentAvg * 100) / 100,
+        previousAvg: Math.round(previousAvg * 100) / 100,
+        trend: percentChange > 1 ? 'improving' : percentChange < -1 ? 'declining' : 'stable',
+        percentChange: Math.round(percentChange * 100) / 100,
+      },
+      weaknesses: parsed.weaknesses ?? [],
+      strengths: parsed.strengths ?? [],
+    };
+  }
+
+  private async resolveCoachShooter(coachId: string, shooterId?: string): Promise<string> {
+    if (!shooterId) throw new ForbiddenException('shooterId is required for coach access');
+    const [connection, managedProfile] = await Promise.all([
+      this.prisma.coachConnection.findFirst({
+        where: { coachId, shooterId, status: 'APPROVED' },
+        select: { id: true },
+      }),
+      this.prisma.shooterProfile.findFirst({
+        where: { userId: shooterId, managedByCoachId: coachId, isManaged: true },
+        select: { id: true },
+      }),
+    ]);
+    if (!connection && !managedProfile) {
+      throw new ForbiddenException('No approved coaching relationship with this shooter');
+    }
+    return shooterId;
   }
 }
 

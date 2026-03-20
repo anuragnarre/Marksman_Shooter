@@ -9,6 +9,7 @@ import {
   Cell, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import { apiFetch } from '../../lib/api';
+import { shotColor } from '../../lib/draw-target';
 import { formatSessionStart } from '../../lib/session-time';
 import { useAuth } from '../../contexts/auth-context';
 import { AppShell } from '../../components/AppShell';
@@ -17,6 +18,7 @@ import { TargetCanvas } from '../../components/TargetCanvas';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard, SkeletonRow } from '../../components/ui/SkeletonCard';
 import { StaggerGrid, StaggerItem } from '../../components/StaggerGrid';
+import { BiometricLiveCard } from '../../components/BiometricLiveCard';
 import type {
   CoachDashboardData,
   CreateManagedShooterProfileRequest,
@@ -48,13 +50,6 @@ function getGreeting(): string {
 
 function fmtDateShort(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function shotColor(score: number): string {
-  if (score >= 10.5) return '#F5A623';
-  if (score >= 10.0) return '#4FC3F7';
-  if (score >= 9.0)  return '#00E5A0';
-  return '#FF4D6D';
 }
 
 function getFormStatus(recent5Avg: number, overallAvg: number): { label: string; color: string } {
@@ -392,10 +387,15 @@ function ShooterView() {
         </div>
       </div>
 
+      {/* ── Biometric Live Card ──────────────────────────────────────────── */}
+      <div className="animate-slide-up stagger-1">
+        <BiometricLiveCard compact />
+      </div>
+
       {/* ── Section 2: 6 KPI Cards ────────────────────────────────────────── */}
-      <StaggerGrid className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+      <StaggerGrid className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-7 gap-3 sm:gap-4">
         {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
+          Array.from({ length: 7 }).map((_, i) => (
             <StaggerItem key={i}>
               <SkeletonCard animationDelay={i * 60} />
             </StaggerItem>
@@ -460,13 +460,24 @@ function ShooterView() {
             </StaggerItem>
             <StaggerItem>
               <MetricCard
+                label="Total Shots"
+                value={overview?.totalShots ?? 0}
+                decimals={0}
+                color="blue"
+                unit={overview?.totalSessions ? `${((overview.totalShots ?? 0) / overview.totalSessions).toFixed(0)} avg/session` : undefined}
+                icon={<BulletIcon />}
+                animationDelay={300}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <MetricCard
                 label="Streak"
                 value={streak}
                 decimals={0}
                 color="emerald"
                 unit="sessions above avg"
                 icon={<FireIcon />}
-                animationDelay={300}
+                animationDelay={360}
               />
             </StaggerItem>
           </>
@@ -1268,9 +1279,9 @@ function SoldierView() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} animationDelay={i * 60} />)
+          Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} animationDelay={i * 60} />)
         ) : (
           <>
             <MetricCard
@@ -1290,11 +1301,20 @@ function SoldierView() {
               icon={<ChartIcon />}
             />
             <MetricCard
+              label="Total Shots"
+              value={overview?.totalShots ?? 0}
+              decimals={0}
+              color="blue"
+              animationDelay={120}
+              unit={sessions.length ? `${((overview?.totalShots ?? 0) / sessions.length).toFixed(0)} avg/session` : undefined}
+              icon={<BulletIcon />}
+            />
+            <MetricCard
               label="Season Average"
               value={seasonAvg}
               decimals={2}
               color="emerald"
-              animationDelay={120}
+              animationDelay={180}
               icon={<TrophyIcon />}
             />
             <MetricCard
@@ -1302,7 +1322,7 @@ function SoldierView() {
               value={bestScore}
               decimals={1}
               color="accent"
-              animationDelay={180}
+              animationDelay={240}
               icon={<BulletIcon />}
               isPB={bestScore >= 10.5}
             />

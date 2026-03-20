@@ -13,6 +13,7 @@ interface TopBarProps {
   sidebarWidth?: number;
   safeTopInset?: string;
   onCommandPalette?: () => void;
+  onMenuToggle?: () => void;
 }
 
 const ROLE_COLOR: Record<string, string> = {
@@ -34,12 +35,14 @@ export function TopBar({
   sidebarWidth = 244,
   safeTopInset = 'env(safe-area-inset-top, 0px)',
   onCommandPalette,
+  onMenuToggle,
 }: TopBarProps) {
   const { user } = useAuth();
   const roleColor = user?.role ? (ROLE_COLOR[user.role] ?? '#F5A623') : '#F5A623';
 
   return (
     <header
+      data-topbar
       className="fixed top-0 right-0 z-topbar relative overflow-hidden flex items-center px-4 sm:px-5
                  transition-all duration-300 ease-spring"
       style={{
@@ -72,6 +75,26 @@ export function TopBar({
           animation: 'shimmer 6s linear infinite',
         }}
       />
+
+      {/* Hamburger menu — mobile only */}
+      {onMenuToggle && (
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl mr-2.5
+                     transition-all duration-200 active:scale-90 shrink-0"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
+          aria-label="Open navigation menu"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#8892A4" strokeWidth="1.8" strokeLinecap="round">
+            <line x1="3" y1="5" x2="15" y2="5" />
+            <line x1="3" y1="9" x2="12" y2="9" />
+            <line x1="3" y1="13" x2="15" y2="13" />
+          </svg>
+        </button>
+      )}
 
       {/* Page title */}
       <h1

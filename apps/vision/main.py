@@ -1,28 +1,20 @@
 # apps/vision/main.py
-import os
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from analyzer import analyze_target_image
 from models import AnalysisResponse
 import pose_analyzer
 
-# Roboflow publishable key — safe to use server-side.
-# Override via ROBOFLOW_API_KEY environment variable.
-ROBOFLOW_API_KEY: str = os.environ.get(
-    "ROBOFLOW_API_KEY",
-    "rf_cviORwv1VCh7A3lH95d5zF3qZGh2",
-)
-
 app = FastAPI(
     title="Shooting Target Vision Service",
     description=(
         "Analyzes target photos and returns bullet hole positions with scores. "
-        "Uses Roboflow ML model (bullet-hole-object-detection/12) as the primary "
-        "detector with OpenCV adaptive-threshold fallback."
+        "Uses a multi-stage local CV pipeline with synthetic template matching, "
+        "perspective correction, difference imaging, and fused hole detection."
     ),
-    version="2.0.0",
+    version="3.0.0",
 )
 
 app.add_middleware(
@@ -35,23 +27,27 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict:
-    """Health check — also reports which detector is active."""
+    """Health check — reports active detector pipeline."""
     return {
         "status": "ok",
-        "detector": "roboflow" if ROBOFLOW_API_KEY else "opencv-fallback",
-        "model": "bullet-hole-object-detection/12",
+        "detector": "local-cv-pipeline",
+        "version": "3.0.0",
     }
 
 
 @app.post("/analyze", response_model=AnalysisResponse)
-async def analyze(file: UploadFile = File(...)) -> AnalysisResponse:
+async def analyze(
+    file: UploadFile = File(...),
+    target_type: str = Query("air_rifle_10m", description="ISSF target type"),
+    debug: bool = Query(False, description="Include annotated debug image"),
+) -> AnalysisResponse:
     """
     Analyze a target photo and return detected bullet holes.
 
     - Accepts JPEG, PNG, TIFF, or BMP images (max 20 MB)
-    - Runs Roboflow ML inference for bullet-hole detection
-    - Falls back to OpenCV contour detection if Roboflow is unavailable
-    - Returns scored shot positions in target coordinate space (−10 to +10)
+    - Multi-stage local CV pipeline (no cloud dependencies)
+    - Returns scored shot positions in target coordinate space (-10 to +10)
+    - Optional debug=true returns annotated image as base64
     """
     allowed_types = {"image/jpeg", "image/png", "image/tiff", "image/bmp"}
     if file.content_type not in allowed_types:
@@ -69,7 +65,11 @@ async def analyze(file: UploadFile = File(...)) -> AnalysisResponse:
         raise HTTPException(status_code=413, detail="Image exceeds 20 MB size limit")
 
     try:
-        result = analyze_target_image(image_bytes, roboflow_api_key=ROBOFLOW_API_KEY)
+        result = analyze_target_image(
+            image_bytes,
+            target_type=target_type,
+            debug=debug,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:

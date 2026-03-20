@@ -10,6 +10,7 @@ import {
   ScatterChart, Scatter, ZAxis, Legend,
 } from 'recharts';
 import { apiFetch } from '../../lib/api';
+import { shotColor, RING_RADII } from '../../lib/draw-target';
 import { AppShell } from '../../components/AppShell';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { useIsMobile } from '../../lib/use-mobile';
@@ -43,16 +44,7 @@ const AXIS = {
   tickLine: { stroke: C.border },
 };
 
-const RING_RADII = [0.05, 0.10, 0.18, 0.27, 0.37, 0.48, 0.60, 0.73, 0.86, 1.00];
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function shotColor(score: number): string {
-  if (score >= 10.5) return C.amber;
-  if (score >= 10.0) return C.blue;
-  if (score >= 9.0)  return C.green;
-  return C.red;
-}
 
 function avgScoreColor(score: number): string {
   if (score >= 9.5) return C.amber;

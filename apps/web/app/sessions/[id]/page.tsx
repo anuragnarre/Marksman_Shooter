@@ -8,14 +8,16 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useIsMobile } from '../../../lib/use-mobile';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { isNative, getNativePhoto, requestCameraPermission, hapticSuccess, hapticError } from '../../../lib/capacitor';
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../../../lib/api';
+import { scoreFromCoords } from '../../../lib/draw-target';
 import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
+import { ExportSessionModal } from '../../../components/ExportSessionModal';
 import { ScoreOverTimeChart, ScoreDistributionChart } from '../../../components/AnalyticsCharts';
 import { ShotHeatmap } from '../../../components/ShotHeatmap';
 import { ShotTimelineSlider } from '../../../components/ShotTimelineSlider';
@@ -28,6 +30,8 @@ import { SkeletonCard } from '../../../components/ui/SkeletonCard';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { BiometricLiveCard } from '../../../components/BiometricLiveCard';
+import { BiometricSessionChart } from '../../../components/BiometricSessionChart';
 import type {
   AnalyticsResult,
   Session,
@@ -35,30 +39,22 @@ import type {
   SuggestionResult,
   DeepAnalysis,
   SessionContextInput,
+  BiometricSummary,
 } from '@shooting-platform/shared-types';
 import { TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 
 type AddShotsTab = 'import' | 'interactive' | 'manual' | 'photo';
 type PageTab = 'session' | 'performance';
 
-// ── Score from target coordinates — matches vision service ring thresholds ────
-const RING_RADII  = [0.05, 0.10, 0.18, 0.27, 0.37, 0.48, 0.60, 0.73, 0.86, 1.00];
-const RING_SCORES = [10.9, 10.0, 9.0,  8.0,  7.0,  6.0,  5.0,  4.0,  3.0,  2.0];
-
-function scoreFromCoords(x: number, y: number): number {
-  const dist = Math.sqrt(x * x + y * y);
-  const norm = dist / 10; // target coords ±10; normalise to 0–1
-  for (let i = 0; i < RING_RADII.length; i++) {
-    if (norm <= RING_RADII[i]) return RING_SCORES[i];
-  }
-  return 1.0;
-}
-
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shooterId = searchParams.get('shooterId');
+  const qs = shooterId ? `?shooterId=${encodeURIComponent(shooterId)}` : '';
+
   const [session,     setSession]     = useState<Session | null>(null);
   const [analytics,   setAnalytics]   = useState<AnalyticsResult | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -66,20 +62,21 @@ export default function SessionDetailPage() {
   const [isLive,      setIsLive]      = useState(false);
   const [pageTab,     setPageTab]     = useState<PageTab>('session');
   const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysis | null>(null);
+  const [exportOpen,   setExportOpen]   = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   const loadAll = useCallback(async () => {
     try {
       const [s, a, sug] = await Promise.all([
-        apiFetch<Session>(`/sessions/${id}`),
-        apiFetch<AnalyticsResult>(`/analytics/session/${id}`),
-        apiFetch<SuggestionResult>(`/suggestions/session/${id}`),
+        apiFetch<Session>(`/sessions/${id}${qs}`),
+        apiFetch<AnalyticsResult>(`/analytics/session/${id}${qs}`),
+        apiFetch<SuggestionResult>(`/suggestions/session/${id}${qs}`),
       ]);
       setSession(s);
       setAnalytics(a);
       setSuggestions(sug.suggestions);
       // Load deep analysis non-blocking
-      apiFetch<DeepAnalysis>(`/performance/deep-analysis/${id}`)
+      apiFetch<DeepAnalysis>(`/performance/deep-analysis/${id}${qs}`)
         .then(setDeepAnalysis)
         .catch(() => {});
     } catch {
@@ -87,7 +84,7 @@ export default function SessionDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, qs]);
 
   useEffect(() => {
     void loadAll();
@@ -157,7 +154,25 @@ export default function SessionDetailPage() {
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
-              <Link href="/sessions" className="btn btn-ghost text-xs py-2">← Sessions</Link>
+              <Link
+                href={shooterId ? `/coach/shooters` : '/sessions'}
+                className="btn btn-ghost text-xs py-2"
+              >
+                {shooterId ? '← Shooter' : '← Sessions'}
+              </Link>
+              {session && shots.length > 0 && (
+                <button
+                  onClick={() => setExportOpen(true)}
+                  className="btn text-xs py-2 px-3"
+                  style={{
+                    background: 'rgba(79,195,247,0.08)',
+                    borderColor: 'rgba(79,195,247,0.25)',
+                    color: '#4FC3F7',
+                  }}
+                >
+                  Export / Print
+                </button>
+              )}
               <button
                 onClick={() => router.push(`/sessions/zen?id=${id}`)}
                 className="btn text-xs py-2 px-3"
@@ -205,6 +220,7 @@ export default function SessionDetailPage() {
                   sessionId={id}
                   nextShotNumber={shots.length + 1}
                   onShotsAdded={loadAll}
+                  shooterId={shooterId ?? undefined}
                 />
               )}
 
@@ -212,13 +228,14 @@ export default function SessionDetailPage() {
           {analytics && shots.length > 0 && (
             <div className="animate-slide-up stagger-3">
               <p className="label mb-3">Performance Metrics</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <MetricCard label="Avg Score"    value={analytics.averageScore} decimals={2} color="accent"  animationDelay={0}   />
-                <MetricCard label="Best Shot"    value={analytics.maxScore}     decimals={1} color="emerald" animationDelay={60}  />
-                <MetricCard label="Std Dev"      value={analytics.stdDev}       decimals={3} color="blue"    animationDelay={120} />
-                <MetricCard label="Group Radius" value={analytics.groupRadius}  decimals={2} color="blue"    animationDelay={180} />
-                <MetricCard label="MPI X"        value={analytics.mpi.x}        decimals={2} color="accent"  animationDelay={240} />
-                <MetricCard label="MPI Y"        value={analytics.mpi.y}        decimals={2} color="accent"  animationDelay={300} />
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                <MetricCard label="Shots"        value={analytics.totalShots}   decimals={0} color="blue"    animationDelay={0}   unit="fired this session" />
+                <MetricCard label="Avg Score"    value={analytics.averageScore} decimals={2} color="accent"  animationDelay={60}  />
+                <MetricCard label="Best Shot"    value={analytics.maxScore}     decimals={1} color="emerald" animationDelay={120} />
+                <MetricCard label="Std Dev"      value={analytics.stdDev}       decimals={3} color="blue"    animationDelay={180} />
+                <MetricCard label="Group Radius" value={analytics.groupRadius}  decimals={2} color="blue"    animationDelay={240} />
+                <MetricCard label="MPI X"        value={analytics.mpi.x}        decimals={2} color="accent"  animationDelay={300} />
+                <MetricCard label="MPI Y"        value={analytics.mpi.y}        decimals={2} color="accent"  animationDelay={360} />
               </div>
             </div>
           )}
@@ -324,6 +341,17 @@ export default function SessionDetailPage() {
             </>
           )}
         </div>
+      )}
+
+      {session && (
+        <ExportSessionModal
+          open={exportOpen}
+          onClose={() => setExportOpen(false)}
+          session={session}
+          shots={shots}
+          analytics={analytics}
+          deepAnalysis={deepAnalysis}
+        />
       )}
     </AppShell>
   );
@@ -513,6 +541,9 @@ function PerformanceTab({
         </div>
       )}
 
+      {/* Biometrics Section */}
+      <BiometricsSection sessionId={sessionId} shots={shots} />
+
       {/* Session Context form */}
       <div className="card p-5 animate-slide-up stagger-2">
         <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-4">Session Context</h3>
@@ -660,16 +691,77 @@ function PerformanceTab({
   );
 }
 
+// ── Biometrics Section ────────────────────────────────────────────────────────
+
+function BiometricsSection({ sessionId, shots }: { sessionId: string; shots: Shot[] }) {
+  const [summary, setSummary] = useState<BiometricSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiFetch<BiometricSummary>(`/biometrics/session/${sessionId}/summary`)
+      .then(setSummary)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [sessionId]);
+
+  if (loading) return null;
+  if (!summary || summary.readingCount === 0) {
+    return (
+      <div className="card p-5 animate-slide-up stagger-1">
+        <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-2">Biometrics</h3>
+        <p className="text-xs" style={{ color: '#4A5568' }}>
+          No biometric readings for this session. Connect a wearable device to track heart rate and SpO2.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-5 animate-slide-up stagger-1 space-y-4">
+      <h3 className="font-display font-semibold text-sm text-[#F0F4FF]">Biometrics</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="text-center">
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>Avg HR</p>
+          <p className="font-mono text-lg font-bold" style={{ color: '#FF4D6D' }}>
+            {summary.avgHeartRate} <span className="text-xs" style={{ color: '#4A5568' }}>bpm</span>
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>HR Range</p>
+          <p className="font-mono text-lg font-bold" style={{ color: '#FF4D6D' }}>
+            {summary.minHeartRate}-{summary.maxHeartRate}
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>HRV</p>
+          <p className="font-mono text-lg font-bold" style={{ color: '#F5A623' }}>
+            {summary.hrv}
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>SpO2</p>
+          <p className="font-mono text-lg font-bold" style={{ color: '#4FC3F7' }}>
+            {summary.avgSpo2}<span className="text-xs" style={{ color: '#4A5568' }}>%</span>
+          </p>
+        </div>
+      </div>
+      <BiometricSessionChart sessionId={sessionId} shots={shots} height={200} />
+    </div>
+  );
+}
+
 // ── Add Shots Panel (4 tabs) ──────────────────────────────────────────────────
 
 function AddShotsPanel({
   sessionId,
   nextShotNumber,
   onShotsAdded,
+  shooterId,
 }: {
   sessionId: string;
   nextShotNumber: number;
   onShotsAdded: () => void;
+  shooterId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [tab,  setTab]  = useState<AddShotsTab>('interactive');

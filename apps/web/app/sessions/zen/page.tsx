@@ -5,22 +5,12 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch } from '../../../lib/api';
+import { shotColor, RING_RADII, RING_SCORES } from '../../../lib/draw-target';
 import type { Session, Shot } from '@shooting-platform/shared-types';
-
-// Ring radii (as fraction of max radius) and corresponding scores — ISSF 10m Air Rifle
-const RING_RADII  = [0.05, 0.10, 0.18, 0.27, 0.37, 0.48, 0.60, 0.73, 0.86, 1.00];
-const RING_SCORES = [10.9, 10.0, 9.0,  8.0,  7.0,  6.0,  5.0,  4.0,  3.0,  2.0];
 
 // Ring colors for canvas rendering
 const RING_COLORS = ['#F5A623', '#4FC3F7', '#00E5A0', '#00E5A0',
                      '#F0F4FF', '#F0F4FF', '#F0F4FF', '#F0F4FF', '#F0F4FF', '#F0F4FF'];
-
-function shotColor(score: number): string {
-  if (score >= 10.5) return '#F5A623';
-  if (score >= 10.0) return '#4FC3F7';
-  if (score >= 9.0)  return '#00E5A0';
-  return '#FF4D6D';
-}
 
 function speak(text: string) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;

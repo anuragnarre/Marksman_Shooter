@@ -10,6 +10,7 @@ import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
 import { SkeletonCard } from '../../../components/ui/SkeletonCard';
 import { formatSessionStart } from '../../../lib/session-time';
+import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { Session, AnalyticsResult } from '@shooting-platform/shared-types';
 
 const C = {
@@ -46,6 +47,7 @@ interface SessionMeta {
 }
 
 export default function ComparePage() {
+  const { isCoach, authLoading, selectedShooterId } = useCoachShooter();
   const [allSessions, setAllSessions] = useState<SessionMeta[]>([]);
   const [leftId,  setLeftId]  = useState('');
   const [rightId, setRightId] = useState('');
@@ -56,7 +58,12 @@ export default function ComparePage() {
   const [loadingRight, setLoadingRight] = useState(false);
 
   useEffect(() => {
-    apiFetch<SessionMeta[]>('/sessions')
+    if (authLoading) return;
+    if (isCoach && !selectedShooterId) { setLoadingList(false); return; }
+    const query = isCoach && selectedShooterId
+      ? `?shooterId=${encodeURIComponent(selectedShooterId)}`
+      : '';
+    apiFetch<SessionMeta[]>(`/sessions${query}`)
       .then(s => {
         setAllSessions(s);
         if (s.length >= 2) { setLeftId(s[0].id); setRightId(s[1].id); }
@@ -64,7 +71,7 @@ export default function ComparePage() {
       })
       .catch(() => {})
       .finally(() => setLoadingList(false));
-  }, []);
+  }, [authLoading, isCoach, selectedShooterId]);
 
   async function loadSide(id: string, side: 'left' | 'right') {
     if (!id) return;

@@ -67,6 +67,7 @@ function deleteFromHistory(sessionId: string) {
 export default function AiCoachPage() {
   const {
     isCoach,
+    authLoading,
     shooters,
     selectedShooter,
     selectedShooterId,
@@ -86,6 +87,7 @@ export default function AiCoachPage() {
   }, []);
 
   useEffect(() => {
+    if (authLoading) return;
     if (isCoach && !selectedShooterId) {
       setSessions([]);
       setSelected('');
@@ -107,7 +109,7 @@ export default function AiCoachPage() {
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [isCoach, selectedShooterId]);
+  }, [authLoading, isCoach, selectedShooterId]);
 
   async function runAnalysis() {
     if (!selected) return;

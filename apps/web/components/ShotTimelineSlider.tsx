@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Shot } from '@shooting-platform/shared-types';
+import { shotColor } from '../lib/draw-target';
 
 // ── Target canvas geometry ────────────────────────────────────────────────────
 const W    = 240;
@@ -21,13 +22,6 @@ const RINGS = [
   { r: W * 0.218, stroke: '#1E2433', opacity: 0.8  },
   { r: W * 0.265, stroke: '#1E2433', opacity: 0.5  },
 ];
-
-function shotColor(score: number) {
-  if (score >= 10.5) return '#F5A623';
-  if (score >= 10.0) return '#4FC3F7';
-  if (score >= 9.0)  return '#00E5A0';
-  return '#FF4D6D';
-}
 
 interface ShotTimelineSliderProps {
   shots: Shot[];

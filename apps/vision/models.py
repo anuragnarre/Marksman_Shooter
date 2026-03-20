@@ -1,6 +1,6 @@
 # apps/vision/models.py
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 class ShotResult(BaseModel):
@@ -21,3 +21,4 @@ class AnalysisResponse(BaseModel):
     image_width: int
     image_height: int
     processing_time_ms: float
+    debug_image: Optional[str] = Field(None, description="Base64-encoded annotated debug image (only when debug=true)")

@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Shot } from '@shooting-platform/shared-types';
+import { shotColor } from '../lib/draw-target';
 
 // ── Target geometry (matches TargetCanvas.tsx coordinate system) ──────────────
 const W   = 320;        // canvas width/height
@@ -30,13 +31,6 @@ interface ShotHeatmapProps {
   blobRadius?: number;
   /** Animate blobs appearing one-by-one on mount */
   animated?: boolean;
-}
-
-function shotColor(score: number): string {
-  if (score >= 10.5) return '#F5A623';
-  if (score >= 10.0) return '#4FC3F7';
-  if (score >= 9.0)  return '#00E5A0';
-  return '#FF4D6D';
 }
 
 export function ShotHeatmap({

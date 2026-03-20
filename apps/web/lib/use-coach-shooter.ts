@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/auth-context';
 const STORAGE_KEY = 'coach:selected-shooter-id';
 
 export function useCoachShooter() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const isCoach = user?.role === 'COACH';
 
   const [shooters, setShooters] = useState<User[]>([]);
@@ -65,6 +65,7 @@ export function useCoachShooter() {
 
   return {
     isCoach,
+    authLoading,
     shooters,
     selectedShooter,
     selectedShooterId,

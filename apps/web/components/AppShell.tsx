@@ -11,6 +11,8 @@ import { useAuth } from '../contexts/auth-context';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
+import { MobileMenu } from './MobileMenu';
+import { SwipeNavigator } from './SwipeNavigator';
 import { CommandPalette } from './CommandPalette';
 import { AICoachPanel } from './AICoachPanel';
 import { PageTransition } from './PageTransition';
@@ -33,6 +35,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
   const isMobile  = useIsMobile();
   const [sidebarW, setSidebarW] = useState(SIDEBAR_EXPANDED);
   const [cmdOpen,  setCmdOpen]  = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) router.replace('/auth/login');
@@ -113,7 +116,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
 
       {/* ── Ambient background orbs ─────────────────────────────────────── */}
       <div
-        className="fixed pointer-events-none"
+        className="fixed pointer-events-none no-print"
         style={{
           top: '-10%', left: '-5%',
           width: '50vw', height: '50vw',
@@ -123,7 +126,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
         }}
       />
       <div
-        className="fixed pointer-events-none"
+        className="fixed pointer-events-none no-print"
         style={{
           bottom: '10%', right: '-10%',
           width: '40vw', height: '40vw',
@@ -134,7 +137,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
       />
       {/* Third deep purple orb for visual richness */}
       <div
-        className="fixed pointer-events-none"
+        className="fixed pointer-events-none no-print"
         style={{
           top: '40%', left: '30%',
           width: '30vw', height: '30vw',
@@ -151,6 +154,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
         sidebarWidth={isMobile ? 0 : sidebarW}
         safeTopInset={safeTopInset}
         onCommandPalette={() => setCmdOpen(true)}
+        onMenuToggle={() => setMenuOpen(true)}
       />
 
       {/* Main content */}
@@ -163,13 +167,16 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
         }}
       >
         <div className="max-w-[1440px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
-          <PageTransition>
-            {children}
-          </PageTransition>
+          <SwipeNavigator>
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </SwipeNavigator>
         </div>
       </main>
 
-      <BottomNav />
+      <BottomNav onMorePress={() => setMenuOpen(true)} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       {/* Command Palette */}
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />

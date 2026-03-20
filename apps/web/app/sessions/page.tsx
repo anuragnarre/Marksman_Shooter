@@ -67,6 +67,7 @@ function computeStats(sessions: Session[]) {
 export default function SessionsPage() {
   const {
     isCoach,
+    authLoading,
     shooters,
     selectedShooter,
     selectedShooterId,
@@ -82,6 +83,7 @@ export default function SessionsPage() {
   const [filterMode, setFilterMode] = useState<string>('All');
 
   function load() {
+    if (authLoading) return;
     if (isCoach && !selectedShooterId) {
       setSessions([]);
       setLoading(false);
@@ -99,7 +101,7 @@ export default function SessionsPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, [isCoach, selectedShooterId]);
+  useEffect(() => { load(); }, [authLoading, isCoach, selectedShooterId]);
 
   async function handleDelete(id: string) {
     setDeleting(id);
@@ -188,7 +190,7 @@ export default function SessionsPage() {
             {[
               { label: 'Total Sessions', value: stats.total,      sub: 'all time' },
               { label: 'This Month',     value: stats.thisMonth,  sub: 'sessions logged' },
-              { label: 'Total Shots',    value: stats.totalShots, sub: 'planned across all' },
+              { label: 'Total Shots',    value: stats.totalShots, sub: 'across all sessions' },
               { label: 'Weapons',        value: stats.weapons,    sub: 'unique weapons used' },
             ].map((stat) => (
               <div key={stat.label} className="card px-4 py-3.5">
@@ -357,7 +359,7 @@ function SessionRow({
           <span className="opacity-30">·</span>
           <span>{session.distance}m</span>
           <span className="opacity-30">·</span>
-          <span>{session.numberOfShots} shots planned</span>
+          <span>{session.numberOfShots} shots</span>
         </div>
       </div>
 

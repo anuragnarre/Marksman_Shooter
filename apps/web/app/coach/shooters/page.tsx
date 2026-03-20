@@ -9,6 +9,7 @@
 // Then the connected-shooters grid and session viewer.
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { io, Socket } from 'socket.io-client';
 import { AppShell } from '../../../components/AppShell';
 import { apiFetch } from '../../../lib/api';
@@ -804,7 +805,7 @@ export default function CoachShootersPage() {
                     <th className="text-left py-3 px-5 label">Session Start</th>
                     <th className="text-left py-3 px-5 label hidden sm:table-cell">Discipline</th>
                     <th className="text-right py-3 px-5 label">Shots</th>
-                    <th className="py-3 px-5 text-right label">Feedback</th>
+                    <th className="py-3 px-5 text-right label">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -812,6 +813,7 @@ export default function CoachShootersPage() {
                     <SessionRow
                       key={s.id}
                       session={s}
+                      shooterId={selectedShooter.id}
                       delay={i * 30}
                       canDelete={Boolean(selectedShooter.shooterProfile?.isManaged)}
                       onDelete={() => void handleDeleteSession(s.id)}
@@ -886,11 +888,13 @@ function ShooterCard({
 
 function SessionRow({
   session,
+  shooterId,
   delay,
   canDelete,
   onDelete,
 }: {
   session: Session;
+  shooterId: string;
   delay: number;
   canDelete?: boolean;
   onDelete?: () => void;
@@ -955,6 +959,12 @@ function SessionRow({
                 {feedbackOpen ? 'Cancel' : 'Feedback'}
               </button>
             )}
+            <Link
+              href={`/sessions/${session.id}?shooterId=${encodeURIComponent(shooterId)}`}
+              className="text-xs text-[#4FC3F7] hover:text-[#81d4fa] font-display uppercase tracking-widest transition-colors"
+            >
+              View →
+            </Link>
           </div>
         </td>
       </tr>
