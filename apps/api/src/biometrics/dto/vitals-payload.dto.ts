@@ -1,5 +1,6 @@
 // apps/api/src/biometrics/dto/vitals-payload.dto.ts
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class VitalsPayloadDto {
   @IsOptional()
@@ -9,6 +10,7 @@ export class VitalsPayloadDto {
   @IsInt()
   @Min(30)
   @Max(250)
+  @Transform(({ obj }) => obj.heartRate ?? obj.heart_rate)
   heartRate!: number;
 
   @IsInt()
