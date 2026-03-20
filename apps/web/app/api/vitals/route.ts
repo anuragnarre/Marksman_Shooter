@@ -4,6 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
+export async function GET() {
+  return NextResponse.json(
+    { status: 'ok', method: 'POST required', hint: 'Send a POST with X-Device-Key header and JSON body { type, heart_rate, spo2 }' },
+    { status: 200 },
+  );
+}
+
 export async function POST(req: NextRequest) {
   const deviceKey =
     req.headers.get('x-device-key') ??
