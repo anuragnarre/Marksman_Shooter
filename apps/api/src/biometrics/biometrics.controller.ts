@@ -81,8 +81,8 @@ export class BiometricsController {
     return this.biometricsService.ingestVitals(
       req.device.id,
       req.deviceUserId,
-      dto.type,
-      dto.heart_rate,
+      dto.type ?? 'quick_estimate',
+      dto.heartRate,
       dto.spo2,
     );
   }
