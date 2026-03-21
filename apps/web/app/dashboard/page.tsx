@@ -41,11 +41,22 @@ export default function DashboardPage() {
 
 // ── Helper utilities ───────────────────────────────────────────────────────────
 
-function getGreeting(): string {
+function computeGreeting(): string {
   const h = new Date().getHours();
+  if (h < 5)  return 'Good night';
   if (h < 12) return 'Good morning';
   if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 21) return 'Good evening';
+  return 'Good night';
+}
+
+function useGreeting(): string {
+  const [greeting, setGreeting] = useState(computeGreeting);
+  useEffect(() => {
+    const id = setInterval(() => setGreeting(computeGreeting()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return greeting;
 }
 
 function fmtDateShort(dateStr: string): string {
@@ -240,6 +251,7 @@ function EmptyShootersState() {
 
 function ShooterView() {
   const { user } = useAuth();
+  const greeting = useGreeting();
   const [overview, setOverview] = useState<OverviewAnalytics | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -351,7 +363,7 @@ function ShooterView() {
       <div className="animate-slide-up flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-display font-bold text-3xl text-[#F0F4FF] leading-tight">
-            {getGreeting()}, {user?.name?.split(' ')[0]}.
+            {greeting}, {user?.name?.split(' ')[0]}.
           </h2>
           <div className="flex items-center gap-3 mt-1.5">
             <p className="text-[#8892A4] text-sm">
@@ -1123,6 +1135,7 @@ function WeaponBarChart({ weapons }: { weapons: WeaponPerformance[] }) {
 
 function SoldierView() {
   const { user } = useAuth();
+  const greeting = useGreeting();
   const [sessions, setSessions]   = useState<Session[]>([]);
   const [weapons, setWeapons]     = useState<WeaponPerformance[]>([]);
   const [overview, setOverview]   = useState<OverviewAnalytics | null>(null);
@@ -1174,7 +1187,7 @@ function SoldierView() {
       <div className="animate-slide-up flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-display font-bold text-3xl text-[#F0F4FF] leading-tight">
-            {getGreeting()}, {user?.name?.split(' ')[0]}.
+            {greeting}, {user?.name?.split(' ')[0]}.
           </h2>
           <p className="text-[#8892A4] text-sm mt-1">
             {sessions.length > 0
@@ -1530,6 +1543,7 @@ function SoldierView() {
 
 function CoachView() {
   const { user } = useAuth();
+  const greeting = useGreeting();
   const [dashboard, setDashboard]   = useState<CoachDashboardData | null>(null);
   const [loading, setLoading]       = useState(true);
   const [creatingManaged, setCreatingManaged] = useState(false);
@@ -1599,7 +1613,7 @@ function CoachView() {
       {/* Header */}
       <div className="animate-slide-up">
         <h2 className="font-display font-bold text-3xl text-[#F0F4FF]">
-          {getGreeting()}, Coach {user?.name?.split(' ')[0]}.
+          {greeting}, Coach {user?.name?.split(' ')[0]}.
         </h2>
         <p className="text-[#8892A4] text-sm mt-1">
           Professional overview for your entire training roster.

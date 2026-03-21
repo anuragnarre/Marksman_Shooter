@@ -3,6 +3,7 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { drawTarget } from '../lib/draw-target';
+import { exportShotsCSV, exportAnalyticsCSV, exportSessionJSON } from '../lib/export';
 import type {
   AnalyticsResult,
   Session,
@@ -670,7 +671,21 @@ export function ExportSessionModal({
             )}
 
             {/* Action buttons */}
-            <div className="flex gap-2 ml-auto">
+            <div className="flex flex-wrap gap-2 ml-auto">
+              <button
+                onClick={() => exportShotsCSV(shots, session)}
+                className="btn text-xs py-2 px-3"
+                style={{ background: 'rgba(0,229,160,0.08)', borderColor: 'rgba(0,229,160,0.25)', color: '#00E5A0' }}
+              >
+                CSV
+              </button>
+              <button
+                onClick={() => exportSessionJSON(session, analytics)}
+                className="btn text-xs py-2 px-3"
+                style={{ background: 'rgba(79,195,247,0.08)', borderColor: 'rgba(79,195,247,0.25)', color: '#4FC3F7' }}
+              >
+                JSON
+              </button>
               <button
                 onClick={handlePrint}
                 className="btn btn-ghost text-xs py-2 px-4"
@@ -691,7 +706,7 @@ export function ExportSessionModal({
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                Download {format.toUpperCase()}
+                {format.toUpperCase()}
               </button>
             </div>
           </div>

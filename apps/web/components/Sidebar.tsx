@@ -35,6 +35,8 @@ const ALL_NAV: NavItem[] = [
   { href: '/soldier/weapons',         label: 'Weapons',        icon: <WeaponIcon />,    roles: ['SOLDIER'] },
   { href: '/soldier/analytics',       label: 'Field Analytics',icon: <FieldIcon />,     roles: ['SOLDIER'] },
   { href: '/coach/shooters',          label: 'Shooters',       icon: <PeopleIcon />,    roles: ['COACH'] },
+  { href: '/events',                   label: 'Events',         icon: <EventsIcon /> },
+  { href: '/settings',                label: 'Settings',       icon: <SettingsIcon /> },
   { href: '/guidance',                 label: 'Guidance',       icon: <GuidanceIcon /> },
   { href: '/docs',                    label: 'Docs',           icon: <DocsIcon /> },
 ];
@@ -595,6 +597,23 @@ function GuidanceIcon() {
       <circle cx="9" cy="9" r="7.5" />
       <path d="M6.5 7a2.5 2.5 0 015 0c0 1.5-1.5 2-2.5 3" />
       <circle cx="9" cy="13" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function EventsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="9,2 11,7 16,7.5 12.5,11 13.5,16 9,13.5 4.5,16 5.5,11 2,7.5 7,7" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="9" r="2.5" />
+      <path d="M14.7 11.1a1.2 1.2 0 00.2 1.3l.05.04a1.45 1.45 0 11-2.05 2.05l-.04-.05a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.73 1.1v.13a1.45 1.45 0 11-2.9 0v-.07a1.2 1.2 0 00-.79-1.1 1.2 1.2 0 00-1.3.2l-.04.05a1.45 1.45 0 11-2.05-2.05l.05-.04a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.73H3.45a1.45 1.45 0 110-2.9h.07a1.2 1.2 0 001.1-.79 1.2 1.2 0 00-.2-1.3l-.05-.04A1.45 1.45 0 116.42 3.3l.04.05a1.2 1.2 0 001.3.2h.06a1.2 1.2 0 00.73-1.1V2.45a1.45 1.45 0 112.9 0v.07a1.2 1.2 0 00.73 1.1 1.2 1.2 0 001.3-.2l.04-.05a1.45 1.45 0 112.05 2.05l-.05.04a1.2 1.2 0 00-.2 1.3v.06a1.2 1.2 0 001.1.73h.13a1.45 1.45 0 110 2.9h-.07a1.2 1.2 0 00-1.1.73z" />
     </svg>
   );
 }

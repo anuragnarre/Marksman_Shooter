@@ -51,6 +51,7 @@ export default function ComparePage() {
   const [allSessions, setAllSessions] = useState<SessionMeta[]>([]);
   const [leftId,  setLeftId]  = useState('');
   const [rightId, setRightId] = useState('');
+  const [listError, setListError] = useState<string | null>(null);
   const [leftData,  setLeftData]  = useState<{ session: Session; analytics: AnalyticsResult } | null>(null);
   const [rightData, setRightData] = useState<{ session: Session; analytics: AnalyticsResult } | null>(null);
   const [loadingList,  setLoadingList]  = useState(true);
@@ -69,7 +70,7 @@ export default function ComparePage() {
         if (s.length >= 2) { setLeftId(s[0].id); setRightId(s[1].id); }
         else if (s.length === 1) setLeftId(s[0].id);
       })
-      .catch(() => {})
+      .catch((e: Error) => setListError(e.message))
       .finally(() => setLoadingList(false));
   }, [authLoading, isCoach, selectedShooterId]);
 

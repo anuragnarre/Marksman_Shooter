@@ -31,7 +31,8 @@ model User {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
-  passwordHash String
+  passwordHash String?
+  googleId     String?  @unique
   role         Role
   createdAt    DateTime @default(now())
 
@@ -48,6 +49,8 @@ model User {
   managedShooterProfiles ShooterProfile[] @relation("ManagedShooterProfiles")
   devices          DeviceRegistration[]
   biometricReadings BiometricReading[] @relation("UserBiometricReadings")
+  competitionRegistrations CompetitionEventRegistration[]
+  createdCompetitionEvents CompetitionEvent[] @relation("EventCreator")
 }
 
 model Session {
@@ -265,4 +268,69 @@ model BiometricReading {
   @@index([userId, timestamp])
   @@index([sessionId, timestamp])
   @@index([deviceId, timestamp])
+}
+
+// ── Competition Events ──────────────────────────────────────────────────────
+
+enum CompetitionEventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMING_SOON
+}
+
+model CompetitionEvent {
+  id               String                 @id @default(uuid())
+  name             String
+  description      String?
+  date             DateTime
+  time             String
+  location         String
+  registrationFee  Float?
+  rules            String?
+  guidelines       String?
+  images           String[]
+  videos           String[]
+  status           CompetitionEventStatus @default(DRAFT)
+  maxParticipants  Int?
+  createdById      String
+  createdBy        User                   @relation("EventCreator", fields: [createdById], references: [id])
+  categories       CompetitionEventCategory[]
+  registrations    CompetitionEventRegistration[]
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@index([status])
+  @@index([date])
+}
+
+model CompetitionEventCategory {
+  id              String           @id @default(uuid())
+  eventId         String
+  event           CompetitionEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name            String
+  fee             Float?
+  maxParticipants Int?
+  registrations   CompetitionEventRegistration[]
+}
+
+model CompetitionEventRegistration {
+  id            String                    @id @default(uuid())
+  eventId       String
+  event         CompetitionEvent          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation(fields: [userId], references: [id])
+  categoryId    String?
+  category      CompetitionEventCategory? @relation(fields: [categoryId], references: [id])
+  paymentStatus PaymentStatus             @default(COMING_SOON)
+  registeredAt  DateTime                  @default(now())
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
 }

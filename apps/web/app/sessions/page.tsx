@@ -81,6 +81,7 @@ export default function SessionsPage() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [filterDisc, setFilterDisc] = useState<string>('All');
   const [filterMode, setFilterMode] = useState<string>('All');
+  const [search,     setSearch]     = useState('');
 
   function load() {
     if (authLoading) return;

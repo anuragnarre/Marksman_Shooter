@@ -2,92 +2,92 @@
 
 from fastapi import FastAPI, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
 
 from analyzer import analyze_target_image
 from models import AnalysisResponse
+from pipeline.target_specs import TargetType, TARGET_SPECS
 import pose_analyzer
 
 app = FastAPI(
     title="Shooting Target Vision Service",
     description=(
         "Analyzes target photos and returns bullet hole positions with scores. "
-        "Uses a multi-stage local CV pipeline with synthetic template matching, "
-        "perspective correction, difference imaging, and fused hole detection."
+        "Zone-aware detection pipeline: finds bright holes in black zone, "
+        "dark holes in cream zone. ISSF decimal scoring."
     ),
-    version="3.0.0",
+    version="4.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict to API server origin in production
+    allow_origins=["*"],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
+SUPPORTED_TARGETS = {t.value: TARGET_SPECS[t].name for t in TargetType}
+
 
 @app.get("/health")
 def health() -> dict:
-    """Health check — reports active detector pipeline."""
     return {
         "status": "ok",
-        "detector": "local-cv-pipeline",
-        "version": "3.0.0",
+        "detector": "zone-aware-cv-v4",
+        "version": "4.0.0",
+        "supported_targets": SUPPORTED_TARGETS,
     }
+
+
+@app.get("/targets")
+def list_targets() -> List[dict]:
+    result = []
+    for tt, spec in TARGET_SPECS.items():
+        result.append({
+            "type": tt.value,
+            "name": spec.name,
+            "outer_diameter_mm": spec.outer_ring1_diameter_mm,
+            "ring_width_mm": spec.ring_width_mm,
+            "pellet_diameter_mm": spec.pellet_diameter_mm,
+            "num_rings": spec.num_rings,
+        })
+    return result
 
 
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze(
     file: UploadFile = File(...),
-    target_type: str = Query("air_rifle_10m", description="ISSF target type"),
+    target_type: str = Query(
+        "air_rifle_10m",
+        description="Target type",
+    ),
     debug: bool = Query(False, description="Include annotated debug image"),
 ) -> AnalysisResponse:
-    """
-    Analyze a target photo and return detected bullet holes.
-
-    - Accepts JPEG, PNG, TIFF, or BMP images (max 20 MB)
-    - Multi-stage local CV pipeline (no cloud dependencies)
-    - Returns scored shot positions in target coordinate space (-10 to +10)
-    - Optional debug=true returns annotated image as base64
-    """
+    """Analyze a target photo and return detected bullet holes with scores."""
     allowed_types = {"image/jpeg", "image/png", "image/tiff", "image/bmp"}
     if file.content_type not in allowed_types:
         raise HTTPException(
             status_code=415,
-            detail=(
-                f"Unsupported media type '{file.content_type}'. "
-                "Accepted: JPEG, PNG, TIFF, BMP"
-            ),
+            detail=f"Unsupported media type '{file.content_type}'. Accepted: JPEG, PNG, TIFF, BMP",
         )
 
     image_bytes = await file.read()
-
     if len(image_bytes) > 20 * 1024 * 1024:
         raise HTTPException(status_code=413, detail="Image exceeds 20 MB size limit")
 
     try:
-        result = analyze_target_image(
-            image_bytes,
-            target_type=target_type,
-            debug=debug,
-        )
+        result = analyze_target_image(image_bytes, target_type=target_type, debug=debug)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(
-            status_code=500, detail=f"Analysis failed: {str(exc)}"
-        ) from exc
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(exc)}") from exc
 
     return result
 
 
 @app.post("/pose")
 async def analyze_pose_endpoint(file: UploadFile = File(...)) -> dict:
-    """
-    Analyze shooting stance from an uploaded photo using MediaPipe Pose.
-
-    Returns posture score, key joint angles, detected issues, and 33 landmark
-    keypoints for skeleton overlay rendering.
-    """
+    """Analyze shooting stance from an uploaded photo using MediaPipe Pose."""
     allowed_types = {"image/jpeg", "image/png", "image/bmp"}
     if file.content_type not in allowed_types:
         raise HTTPException(

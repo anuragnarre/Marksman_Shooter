@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Rajdhani, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/auth-context';
+import { ToastProvider } from '../contexts/toast-context';
 import { CursorGlow } from '../components/CursorGlow';
 
 // DESIGN NOTE: Three-font system — display (Rajdhani) for drama, DM Sans for
@@ -76,7 +77,9 @@ export default function RootLayout({
       className={`${rajdhani.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="bg-[#080A0F] text-[#F0F4FF] antialiased font-body">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
         <CursorGlow />
       </body>
     </html>

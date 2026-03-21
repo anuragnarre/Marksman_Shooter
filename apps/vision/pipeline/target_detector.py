@@ -1,12 +1,8 @@
 """
-Target detection via synthetic template matching + radial profile refinement.
+Robust target detection via multi-method concentric circle detection.
 
-Stages:
-  A. Multi-scale template matching (synthetic ISSF target)
-  B. Radial profile refinement (sub-pixel center + precise mm_per_pixel)
-  C. Perspective estimation (single outer-ring ellipse)
-
-Fallback chain: template match -> Hough circles -> frame center.
+Optimized for speed: vectorized operations, reduced parameter sweeps,
+early exit on confident detection.
 """
 
 import cv2
@@ -21,26 +17,38 @@ def detect_target(
     gray: np.ndarray,
     target_type: str = "air_rifle_10m",
 ) -> TargetCalibration:
-    """
-    Detect the target in a grayscale image using synthetic template matching.
-
-    Returns TargetCalibration with center, radii, perspective, and mm_per_pixel.
-    """
+    """Detect the target using a cascade of robust methods."""
     h, w = gray.shape[:2]
     min_dim = min(h, w)
     spec = get_spec(target_type)
 
-    # Stage A: Multi-scale template matching
-    result = _template_match(gray, spec, min_dim)
+    # Downscale large images for faster detection
+    scale = 1.0
+    work_gray = gray
+    if min_dim > 800:
+        scale = 600.0 / min_dim
+        work_gray = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+
+    wh, ww = work_gray.shape[:2]
+
+    # Preprocess: CLAHE for robust contrast
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    enhanced = clahe.apply(work_gray)
+
+    # Method A: Hough circle sweep (reduced params)
+    result = _robust_hough_detect(enhanced, wh, ww)
+
+    # Method B: Gradient voting (vectorized)
+    if result is None:
+        result = _gradient_voting_detect(enhanced, wh, ww)
+
+    # Method C: Contour-based
+    if result is None:
+        result = _contour_based_detect(enhanced, wh, ww)
 
     if result is None:
-        # Fallback: Hough circles
-        result = _hough_fallback(gray, h, w)
-
-    if result is None:
-        # Last resort: assume target fills frame
         cx, cy = w / 2.0, h / 2.0
-        r = min_dim / 2.0
+        r = min_dim * 0.3
         return TargetCalibration(
             center=(cx, cy),
             major_radius=r,
@@ -53,12 +61,26 @@ def detect_target(
 
     cx, cy, radius, confidence = result
 
-    # Stage B: Radial profile refinement
-    cx, cy, mm_per_pixel, ring_radii = _radial_profile_refine(
-        gray, cx, cy, radius, spec
-    )
+    # Scale back to original resolution
+    if scale != 1.0:
+        cx /= scale
+        cy /= scale
+        radius /= scale
 
-    # Stage C: Perspective estimation via outer-ring ellipse
+    # Sanity check: target radius should be 10-50% of image min dimension
+    # (targets don't fill the entire frame in real photos)
+    max_reasonable_radius = min_dim * 0.48
+    if radius > max_reasonable_radius:
+        radius = max_reasonable_radius
+        confidence *= 0.7
+
+    # Refine center (on original image, limited iterations)
+    cx, cy = _refine_center_symmetry(gray, cx, cy, radius)
+
+    # Calibrate rings (vectorized)
+    mm_per_pixel, ring_radii = _calibrate_rings(gray, cx, cy, radius, spec)
+
+    # Perspective estimation
     major_r, minor_r, rotation, eccentricity = _estimate_perspective(
         gray, cx, cy, radius
     )
@@ -75,259 +97,386 @@ def detect_target(
     )
 
 
-def _template_match(
-    gray: np.ndarray,
-    spec: TargetSpec,
-    min_dim: int,
+def _robust_hough_detect(
+    gray: np.ndarray, img_h: int, img_w: int
 ) -> Optional[Tuple[float, float, float, float]]:
-    """
-    Multi-scale template matching against synthetic ISSF target.
+    """Hough circle detection with reduced parameter sweep."""
+    min_dim = min(img_h, img_w)
+    best = None
+    best_score = -1.0
 
-    Returns (cx, cy, radius, confidence) or None.
-    """
-    h, w = gray.shape[:2]
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Generate templates at 5-7 scales (10% to 70% of min dimension)
-    scales = np.linspace(0.10, 0.70, 7)
-    best_val = -1.0
-    best_cx, best_cy, best_radius = 0.0, 0.0, 0.0
+    # Reduced sweep: 2 dp × 3 param2 × 2 radius ranges = 12 calls
+    for dp in [1.0, 1.5]:
+        for param2 in [30, 50, 80]:
+            for min_r_frac, max_r_frac in [(0.08, 0.45), (0.15, 0.55)]:
+                min_r = max(20, int(min_dim * min_r_frac))
+                max_r = int(min_dim * max_r_frac)
+                if min_r >= max_r:
+                    continue
 
-    # Downsample large images for speed during template matching
-    max_search_dim = 800
-    scale_factor = 1.0
-    search_gray = gray
-    if min_dim > max_search_dim:
-        scale_factor = max_search_dim / min_dim
-        search_gray = cv2.resize(
-            gray, None, fx=scale_factor, fy=scale_factor,
-            interpolation=cv2.INTER_AREA,
-        )
+                circles = cv2.HoughCircles(
+                    blurred,
+                    cv2.HOUGH_GRADIENT,
+                    dp=dp,
+                    minDist=min_dim // 3,
+                    param1=100,
+                    param2=param2,
+                    minRadius=min_r,
+                    maxRadius=max_r,
+                )
 
-    sh, sw = search_gray.shape[:2]
-    search_min = min(sh, sw)
+                if circles is None:
+                    continue
 
-    for s in scales:
-        radius_px = int(search_min * s / 2)
-        if radius_px < 20:
-            continue
+                for c in circles[0][:5]:  # Only check top 5
+                    cx, cy, r = float(c[0]), float(c[1]), float(c[2])
+                    dist_from_center = np.sqrt(
+                        (cx - img_w / 2) ** 2 + (cy - img_h / 2) ** 2
+                    )
+                    center_score = 1.0 - min(1.0, dist_from_center / (min_dim * 0.4))
+                    size_score = max(0.0, min(1.0, 1.0 - abs(r / (min_dim * 0.25) - 1.0) * 0.5))
+                    edge_score = _verify_circle_edge(gray, cx, cy, r)
+                    score = center_score * 0.25 + size_score * 0.25 + edge_score * 0.5
 
-        template = spec.render_template(radius_px)
-        th, tw = template.shape[:2]
+                    if score > best_score:
+                        best_score = score
+                        best = (cx, cy, r, min(1.0, score * 1.2))
 
-        if th >= sh or tw >= sw:
-            continue
+                # Early exit if confident
+                if best_score > 0.6:
+                    return best
 
-        result = cv2.matchTemplate(search_gray, template, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+    if best is not None and best_score > 0.2:
+        return best
+    return None
 
-        if max_val > best_val:
-            best_val = max_val
-            # max_loc is top-left corner of match; center is offset by radius
-            best_cx = (max_loc[0] + radius_px) / scale_factor
-            best_cy = (max_loc[1] + radius_px) / scale_factor
-            best_radius = radius_px / scale_factor
 
-    if best_val < 0.15:
+def _gradient_voting_detect(
+    gray: np.ndarray, img_h: int, img_w: int
+) -> Optional[Tuple[float, float, float, float]]:
+    """Vectorized gradient direction voting for center detection."""
+    blurred = cv2.GaussianBlur(gray, (5, 5), 1.5)
+    gx = cv2.Sobel(blurred, cv2.CV_32F, 1, 0, ksize=3)
+    gy = cv2.Sobel(blurred, cv2.CV_32F, 0, 1, ksize=3)
+    mag = np.sqrt(gx ** 2 + gy ** 2)
+
+    mag_thresh = np.percentile(mag, 90)
+    ys, xs = np.where(mag > mag_thresh)
+    if len(ys) < 100:
         return None
 
-    confidence = min(1.0, max(0.3, (best_val - 0.15) / 0.5 + 0.3))
-    return (best_cx, best_cy, best_radius, confidence)
+    # Subsample
+    if len(ys) > 3000:
+        idx = np.random.RandomState(42).choice(len(ys), 3000, replace=False)
+        ys, xs = ys[idx], xs[idx]
+
+    # Normalize gradients
+    m = mag[ys, xs]
+    dx = (gx[ys, xs] / m).astype(np.float32)
+    dy = (gy[ys, xs] / m).astype(np.float32)
+
+    # Vectorized: cast votes at multiple distances at once
+    scale = 4
+    acc_h, acc_w = img_h // scale, img_w // scale
+    accumulator = np.zeros((acc_h, acc_w), dtype=np.float32)
+
+    dists = np.arange(20, min(img_h, img_w) // 2, 5, dtype=np.float32)  # Coarser steps
+    for sign in [-1.0, 1.0]:
+        for d in dists:
+            vx = ((xs + sign * dx * d) / scale).astype(np.int32)
+            vy = ((ys + sign * dy * d) / scale).astype(np.int32)
+            valid = (vx >= 0) & (vx < acc_w) & (vy >= 0) & (vy < acc_h)
+            np.add.at(accumulator, (vy[valid], vx[valid]), 1.0)
+
+    if accumulator.max() < 10:
+        return None
+
+    accumulator = cv2.GaussianBlur(accumulator, (11, 11), 3)
+    _, max_val, _, max_loc = cv2.minMaxLoc(accumulator)
+
+    cx = (max_loc[0] + 0.5) * scale
+    cy = (max_loc[1] + 0.5) * scale
+
+    radius = _estimate_radius_from_center(gray, cx, cy)
+    if radius is None:
+        return None
+
+    confidence = min(1.0, max_val / (accumulator.mean() + 1) * 0.1)
+    return (cx, cy, radius, max(0.3, confidence))
 
 
-def _radial_profile_refine(
-    gray: np.ndarray,
-    cx: float,
-    cy: float,
-    radius: float,
-    spec: TargetSpec,
-) -> Tuple[float, float, float, List[float]]:
-    """
-    Refine center and scale using the radial intensity profile.
+def _contour_based_detect(
+    gray: np.ndarray, img_h: int, img_w: int
+) -> Optional[Tuple[float, float, float, float]]:
+    """Detect target via concentric circular contours."""
+    blurred = cv2.GaussianBlur(gray, (5, 5), 1.5)
+    binary = cv2.adaptiveThreshold(
+        blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY, 31, 5
+    )
 
-    The ISSF target has a characteristic staircase pattern (alternating
-    black/white rings). We extract the radial profile and fit against
-    the known ring positions.
+    contours, _ = cv2.findContours(binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    Returns (refined_cx, refined_cy, mm_per_pixel, ring_radii_pixels).
-    """
+    circles = []
+    for cnt in contours:
+        if len(cnt) < 30:
+            continue
+        area = cv2.contourArea(cnt)
+        perimeter = cv2.arcLength(cnt, True)
+        if perimeter < 1:
+            continue
+        circularity = 4 * np.pi * area / (perimeter ** 2)
+        if circularity < 0.5:
+            continue
+        if len(cnt) < 5:
+            continue
+
+        (ex, ey), (ma, MA), angle = cv2.fitEllipse(cnt)
+        if ma < 1 or MA < 1:
+            continue
+        if min(ma, MA) / max(ma, MA) < 0.6:
+            continue
+        r = (ma + MA) / 4.0
+        circles.append((ex, ey, r, circularity))
+
+    if not circles:
+        return None
+
+    # Find concentric cluster
+    best_cx, best_cy, best_r = 0.0, 0.0, 0.0
+    best_count = 0
+
+    for i, (cx1, cy1, r1, _) in enumerate(circles):
+        count = 0
+        max_r = r1
+        for j, (cx2, cy2, r2, _) in enumerate(circles):
+            if i == j:
+                continue
+            dist = np.sqrt((cx1 - cx2) ** 2 + (cy1 - cy2) ** 2)
+            if dist < min(r1, r2) * 0.3:
+                count += 1
+                max_r = max(max_r, r2)
+        if count > best_count:
+            best_count = count
+            best_cx, best_cy, best_r = cx1, cy1, max_r
+
+    if best_count < 2:
+        return None
+
+    confidence = min(1.0, best_count / 5.0 * 0.6 + 0.3)
+    return (best_cx, best_cy, best_r, confidence)
+
+
+def _verify_circle_edge(
+    gray: np.ndarray, cx: float, cy: float, r: float
+) -> float:
+    """Vectorized edge verification along expected circle."""
+    h, w = gray.shape[:2]
+    angles = np.linspace(0, 2 * np.pi, 36, endpoint=False)  # 36 samples (was 72)
+    offsets = np.array([-2, -1, 0, 1, 2], dtype=np.float32)
+
+    # Precompute edge map once
+    blurred = cv2.GaussianBlur(gray, (3, 3), 1)
+    edges = cv2.Canny(blurred, 50, 150)
+
+    cos_a = np.cos(angles)
+    sin_a = np.sin(angles)
+    on_edge = 0
+    total = 0
+
+    for dr in offsets:
+        px = np.clip((cx + (r + dr) * cos_a).astype(int), 0, w - 1)
+        py = np.clip((cy + (r + dr) * sin_a).astype(int), 0, h - 1)
+        total += len(px)
+        on_edge += np.count_nonzero(edges[py, px])
+
+    return on_edge / max(1, total)
+
+
+def _estimate_radius_from_center(
+    gray: np.ndarray, cx: float, cy: float
+) -> Optional[float]:
+    """Vectorized radial profile for radius estimation."""
+    h, w = gray.shape[:2]
+    max_r = int(min(cx, cy, w - cx, h - cy) * 0.9)
+    if max_r < 30:
+        return None
+
+    profile = _compute_radial_profile(gray, cx, cy, max_r, num_angles=36)
+
+    grad = np.abs(np.diff(profile))
+    smoothed_grad = cv2.GaussianBlur(
+        grad.reshape(1, -1).astype(np.float32), (1, 15), 0
+    ).flatten()
+
+    thresh = np.percentile(smoothed_grad, 80)
+    peaks = np.where(smoothed_grad > thresh)[0]
+    if len(peaks) == 0:
+        return None
+
+    last_peak = float(peaks[-1])
+    return last_peak if last_peak >= 20 else None
+
+
+def _compute_radial_profile(
+    gray: np.ndarray, cx: float, cy: float, max_r: int, num_angles: int = 36
+) -> np.ndarray:
+    """Vectorized radial intensity profile computation."""
+    h, w = gray.shape[:2]
+    angles = np.linspace(0, 2 * np.pi, num_angles, endpoint=False)
+    radii = np.arange(max_r, dtype=np.float32)
+
+    # Create coordinate grids: (num_angles, max_r)
+    cos_a = np.cos(angles)[:, None]  # (A, 1)
+    sin_a = np.sin(angles)[:, None]  # (A, 1)
+    r = radii[None, :]              # (1, R)
+
+    px = (cx + r * cos_a).astype(np.int32)  # (A, R)
+    py = (cy + r * sin_a).astype(np.int32)  # (A, R)
+
+    # Clip and sample
+    valid = (px >= 0) & (px < w) & (py >= 0) & (py < h)
+    px = np.clip(px, 0, w - 1)
+    py = np.clip(py, 0, h - 1)
+
+    values = gray[py, px].astype(np.float64)
+    values[~valid] = 0
+
+    counts = valid.astype(np.float64).sum(axis=0)
+    counts[counts == 0] = 1
+    profile = values.sum(axis=0) / counts
+
+    return profile
+
+
+def _refine_center_symmetry(
+    gray: np.ndarray, cx: float, cy: float, radius: float
+) -> Tuple[float, float]:
+    """Refine center using radial profile symmetry (3 iterations max)."""
     h, w = gray.shape[:2]
 
-    # Iterative refinement: adjust center based on profile symmetry
-    best_cx, best_cy = cx, cy
-
-    for iteration in range(3):
-        # Extract radial intensity profile
-        max_r = int(min(radius * 1.3, min(best_cx, best_cy, w - best_cx, h - best_cy) - 1))
-        if max_r < 20:
+    for _ in range(3):
+        sample_r = int(min(radius * 0.8, min(cx, cy, w - cx, h - cy) - 1))
+        if sample_r < 20:
             break
 
-        num_samples = max_r
-        profile = np.zeros(num_samples, dtype=np.float64)
-        counts = np.zeros(num_samples, dtype=np.float64)
+        # Horizontal symmetry
+        y_int = int(round(cy))
+        x_lo = max(0, int(cx - sample_r))
+        x_hi = min(w, int(cx + sample_r))
+        if 0 <= y_int < h and x_hi > x_lo:
+            strip = gray[y_int, x_lo:x_hi].astype(np.float64)
+            mid = int(cx - x_lo)
+            if 5 <= mid < len(strip) - 5:
+                left = strip[:mid][::-1]
+                right = strip[mid:]
+                ml = min(len(left), len(right))
+                if ml > 5:
+                    best_shift, best_corr = 0, -1.0
+                    for shift in range(-3, 4):
+                        nmid = mid + shift
+                        if nmid < 5 or nmid >= len(strip) - 5:
+                            continue
+                        l = strip[:nmid][::-1][:ml]
+                        r = strip[nmid:][:ml]
+                        corr = float(np.corrcoef(l, r)[0, 1]) if len(l) == len(r) else 0
+                        if corr > best_corr:
+                            best_corr = corr
+                            best_shift = shift
+                    cx += best_shift * 0.5
 
-        # Sample in a grid around center
-        y_lo = max(0, int(best_cy - max_r))
-        y_hi = min(h, int(best_cy + max_r + 1))
-        x_lo = max(0, int(best_cx - max_r))
-        x_hi = min(w, int(best_cx + max_r + 1))
+        # Vertical symmetry
+        x_int = int(round(cx))
+        y_lo = max(0, int(cy - sample_r))
+        y_hi = min(h, int(cy + sample_r))
+        if 0 <= x_int < w and y_hi > y_lo:
+            strip = gray[y_lo:y_hi, x_int].astype(np.float64)
+            mid = int(cy - y_lo)
+            if 5 <= mid < len(strip) - 5:
+                top = strip[:mid][::-1]
+                bottom = strip[mid:]
+                ml = min(len(top), len(bottom))
+                if ml > 5:
+                    best_shift, best_corr = 0, -1.0
+                    for shift in range(-3, 4):
+                        nmid = mid + shift
+                        if nmid < 5 or nmid >= len(strip) - 5:
+                            continue
+                        t = strip[:nmid][::-1][:ml]
+                        b = strip[nmid:][:ml]
+                        corr = float(np.corrcoef(t, b)[0, 1]) if len(t) == len(b) else 0
+                        if corr > best_corr:
+                            best_corr = corr
+                            best_shift = shift
+                    cy += best_shift * 0.5
 
-        # Vectorized radial profile extraction
-        ys = np.arange(y_lo, y_hi)
-        xs = np.arange(x_lo, x_hi)
-        yy, xx = np.meshgrid(ys, xs, indexing='ij')
-        dists = np.sqrt((xx - best_cx) ** 2 + (yy - best_cy) ** 2)
-        dist_idx = dists.astype(np.int32)
+    return (cx, cy)
 
-        mask = dist_idx < num_samples
-        vals = gray[y_lo:y_hi, x_lo:x_hi].astype(np.float64)
 
-        np.add.at(profile, dist_idx[mask], vals[mask])
-        np.add.at(counts, dist_idx[mask], 1.0)
+def _calibrate_rings(
+    gray: np.ndarray, cx: float, cy: float, radius: float, spec: TargetSpec
+) -> Tuple[float, List[float]]:
+    """Vectorized ring calibration using radial profile."""
+    h, w = gray.shape[:2]
+    max_r = int(min(radius * 1.3, min(cx, cy, w - cx, h - cy) - 1))
+    if max_r < 20:
+        mm_per_pixel = spec.outer_radius_mm / max(radius, 1)
+        return mm_per_pixel, []
 
-        counts[counts == 0] = 1
-        profile /= counts
+    profile = _compute_radial_profile(gray, cx, cy, max_r, num_angles=48)
 
-        # Find ring transitions (large intensity changes)
-        if len(profile) < 10:
-            break
+    # Smooth and find gradient peaks
+    kernel_size = max(3, int(radius * 0.015))
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+    smoothed = cv2.GaussianBlur(
+        profile.reshape(1, -1).astype(np.float32), (kernel_size, 1), 0
+    ).flatten()
 
-        # Smooth profile for gradient computation
-        kernel_size = max(3, int(radius * 0.02))
-        if kernel_size % 2 == 0:
-            kernel_size += 1
-        smoothed = cv2.GaussianBlur(
-            profile.reshape(1, -1).astype(np.float32),
-            (kernel_size, 1), 0
-        ).flatten()
+    gradient = np.abs(np.diff(smoothed))
 
-        gradient = np.abs(np.diff(smoothed))
+    # Find peaks
+    ring_positions_px = []
+    min_ring_gap = max(3, int(radius / spec.num_rings * 0.4))
+    threshold = np.percentile(gradient, 80)
 
-        # Find peaks in gradient (ring transitions)
-        ring_positions_px = []
-        min_ring_gap = int(radius / spec.num_rings * 0.5)
-        threshold = np.percentile(gradient, 85)
+    i = 0
+    while i < len(gradient):
+        if gradient[i] > threshold:
+            j = i
+            while j < len(gradient) - 1 and gradient[j + 1] >= gradient[j]:
+                j += 1
+            ring_positions_px.append(float(j))
+            i = j + max(min_ring_gap, 1)
+        else:
+            i += 1
 
-        i = 0
-        while i < len(gradient):
-            if gradient[i] > threshold:
-                # Find local max
-                j = i
-                while j < len(gradient) - 1 and gradient[j + 1] >= gradient[j]:
-                    j += 1
-                ring_positions_px.append(float(j))
-                i = j + max(min_ring_gap, 1)
-            else:
-                i += 1
-
-        # Try to center-refine using profile symmetry
-        # Compare left vs right half-profiles
-        if iteration < 2:
-            shift_x, shift_y = _symmetry_shift(gray, best_cx, best_cy, max_r)
-            best_cx += shift_x * 0.5
-            best_cy += shift_y * 0.5
-
-    # Compute mm_per_pixel from ring positions
-    mm_per_pixel = spec.outer_radius_mm / radius  # Default
+    mm_per_pixel = spec.outer_radius_mm / max(radius, 1)
 
     if len(ring_positions_px) >= 3:
-        # Match detected transitions to known ring positions
-        known_radii_mm = []
-        for ring_num in range(1, spec.num_rings + 1):
-            known_radii_mm.append(spec.ring_radius_mm(ring_num))
+        known_radii_mm = [spec.ring_radius_mm(n) for n in range(1, spec.num_rings + 1)]
+        detected = np.array(ring_positions_px[:min(len(ring_positions_px), len(known_radii_mm))])
+        known = np.array(known_radii_mm[:len(detected)])
+        if np.sum(detected ** 2) > 0:
+            fit = float(np.dot(known, detected) / np.dot(detected, detected))
+            if 0.005 < fit < 20.0:
+                mm_per_pixel = fit
 
-        # Least-squares fit: detected_px = known_mm / mm_per_pixel
-        # Try to match the detected transitions to known ones
-        if len(ring_positions_px) >= 2:
-            detected = np.array(ring_positions_px[:min(len(ring_positions_px), len(known_radii_mm))])
-            known = np.array(known_radii_mm[:len(detected)])
-            # mm_per_pixel = sum(known_mm) / sum(detected_px) via least squares
-            if np.sum(detected ** 2) > 0:
-                mm_per_pixel_fit = float(np.dot(known, detected) / np.dot(detected, detected))
-                if 0.01 < mm_per_pixel_fit < 10.0:
-                    mm_per_pixel = mm_per_pixel_fit
+    ring_radii = [spec.ring_radius_mm(n) / mm_per_pixel for n in range(1, spec.num_rings + 1)]
 
-    # Generate ring radii in pixels from spec
-    ring_radii = []
-    for ring_num in range(1, spec.num_rings + 1):
-        r_mm = spec.ring_radius_mm(ring_num)
-        r_px = r_mm / mm_per_pixel
-        ring_radii.append(r_px)
-
-    return (best_cx, best_cy, mm_per_pixel, ring_radii)
-
-
-def _symmetry_shift(
-    gray: np.ndarray,
-    cx: float,
-    cy: float,
-    max_r: int,
-) -> Tuple[float, float]:
-    """Estimate center offset by comparing radial profile in 4 quadrants."""
-    h, w = gray.shape[:2]
-    sample_r = min(max_r, 100)
-
-    # Sample horizontal profile
-    x_lo = max(0, int(cx - sample_r))
-    x_hi = min(w, int(cx + sample_r))
-    y_int = int(cy)
-    if y_int < 0 or y_int >= h or x_hi <= x_lo:
-        return (0.0, 0.0)
-
-    h_strip = gray[y_int, x_lo:x_hi].astype(np.float64)
-    mid = int(cx - x_lo)
-    if mid < 5 or mid >= len(h_strip) - 5:
-        return (0.0, 0.0)
-
-    left = h_strip[:mid][::-1]
-    right = h_strip[mid:]
-    min_len = min(len(left), len(right))
-    if min_len < 5:
-        return (0.0, 0.0)
-
-    diff_h = np.mean(right[:min_len]) - np.mean(left[:min_len])
-    shift_x = diff_h * 0.1  # Small correction
-
-    # Sample vertical profile
-    y_lo = max(0, int(cy - sample_r))
-    y_hi = min(h, int(cy + sample_r))
-    x_int = int(cx)
-    if x_int < 0 or x_int >= w or y_hi <= y_lo:
-        return (shift_x, 0.0)
-
-    v_strip = gray[y_lo:y_hi, x_int].astype(np.float64)
-    mid = int(cy - y_lo)
-    if mid < 5 or mid >= len(v_strip) - 5:
-        return (shift_x, 0.0)
-
-    top = v_strip[:mid][::-1]
-    bottom = v_strip[mid:]
-    min_len = min(len(top), len(bottom))
-    if min_len < 5:
-        return (shift_x, 0.0)
-
-    diff_v = np.mean(bottom[:min_len]) - np.mean(top[:min_len])
-    shift_y = diff_v * 0.1
-
-    return (shift_x, shift_y)
+    return mm_per_pixel, ring_radii
 
 
 def _estimate_perspective(
-    gray: np.ndarray,
-    cx: float,
-    cy: float,
-    radius: float,
+    gray: np.ndarray, cx: float, cy: float, radius: float
 ) -> Tuple[float, float, float, float]:
-    """
-    Estimate perspective distortion from a single outer-ring ellipse fit.
-
-    Uses Canny edges only in the 85-115% radius band.
-    Returns (major_radius, minor_radius, rotation_deg, eccentricity).
-    """
+    """Estimate perspective from outer-ring ellipse."""
     h, w = gray.shape[:2]
 
-    # Create annular mask at 85-115% of detected radius
-    inner_r = int(radius * 0.85)
-    outer_r = int(radius * 1.15)
+    inner_r = int(radius * 0.80)
+    outer_r = int(radius * 1.20)
 
     y_lo = max(0, int(cy - outer_r))
     y_hi = min(h, int(cy + outer_r + 1))
@@ -338,28 +487,18 @@ def _estimate_perspective(
     if roi.size == 0:
         return (radius, radius, 0.0, 0.0)
 
-    # Create annular mask
     roi_h, roi_w = roi.shape[:2]
-    ys = np.arange(roi_h)
-    xs = np.arange(roi_w)
-    yy, xx = np.meshgrid(ys, xs, indexing='ij')
-    dists = np.sqrt((xx - (cx - x_lo)) ** 2 + (yy - (cy - y_lo)) ** 2)
+    ys, xs = np.ogrid[:roi_h, :roi_w]
+    dists = np.sqrt((xs - (cx - x_lo)) ** 2 + (ys - (cy - y_lo)) ** 2)
     annular_mask = ((dists >= inner_r) & (dists <= outer_r)).astype(np.uint8) * 255
 
-    # Edge detection within annular region
     blurred = cv2.GaussianBlur(roi, (5, 5), 1.5)
-    edges = cv2.Canny(blurred, 50, 150)
+    edges = cv2.Canny(blurred, 40, 120)
     edges = cv2.bitwise_and(edges, annular_mask)
 
-    # Find contours and fit ellipse
     contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 
-    # Collect all edge points
-    all_points = []
-    for cnt in contours:
-        if len(cnt) >= 3:
-            all_points.append(cnt)
-
+    all_points = [cnt for cnt in contours if len(cnt) >= 3]
     if not all_points:
         return (radius, radius, 0.0, 0.0)
 
@@ -381,28 +520,3 @@ def _estimate_perspective(
 
     ecc = 1.0 - semi_minor / semi_major
     return (semi_major, semi_minor, angle, ecc)
-
-
-def _hough_fallback(
-    gray: np.ndarray, img_h: int, img_w: int
-) -> Optional[Tuple[float, float, float, float]]:
-    """Fall back to Hough Circle Transform for target detection."""
-    blurred = cv2.GaussianBlur(gray, (5, 5), 1.5)
-    min_dim = min(img_h, img_w)
-
-    circles = cv2.HoughCircles(
-        blurred,
-        cv2.HOUGH_GRADIENT,
-        dp=1.5,
-        minDist=img_w // 2,
-        param1=100,
-        param2=50,
-        minRadius=min_dim // 6,
-        maxRadius=min_dim // 2,
-    )
-
-    if circles is None:
-        return None
-
-    c = circles[0, 0]
-    return (float(c[0]), float(c[1]), float(c[2]), 0.4)

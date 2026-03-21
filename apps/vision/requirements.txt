@@ -7,4 +7,4 @@ python-multipart==0.0.20
 anyio>=4.0.0,<4.4.0
 scipy>=1.11.0
 charset-normalizer==3.4.1
-mediapipe>=0.10.30
+mediapipe>=0.10.9,<0.10.22

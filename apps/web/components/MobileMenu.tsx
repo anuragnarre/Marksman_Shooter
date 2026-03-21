@@ -63,8 +63,10 @@ const NAV_SECTIONS: { title: string; items: NavEntry[] }[] = [
     ],
   },
   {
-    title: 'Resources',
+    title: 'Events & More',
     items: [
+      { href: '/events',   label: 'Events',   icon: <EventsIcon /> },
+      { href: '/settings', label: 'Settings', icon: <SettingsGearIcon /> },
       { href: '/guidance', label: 'Guidance', icon: <GuidanceIcon /> },
       { href: '/docs',     label: 'Documentation', icon: <DocsIcon /> },
     ],
@@ -452,5 +454,16 @@ function GuidanceIcon() {
 function DocsIcon() {
   return (<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
     <rect x="3" y="2" width="12" height="14" rx="2" /><line x1="6" y1="6" x2="12" y2="6" /><line x1="6" y1="9" x2="12" y2="9" /><line x1="6" y1="12" x2="9" y2="12" />
+  </svg>);
+}
+function EventsIcon() {
+  return (<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="9,2 11,7 16,7.5 12.5,11 13.5,16 9,13.5 4.5,16 5.5,11 2,7.5 7,7" />
+  </svg>);
+}
+function SettingsGearIcon() {
+  return (<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="9" r="2.5" />
+    <path d="M14.7 11.1a1.2 1.2 0 00.2 1.3l.05.04a1.45 1.45 0 11-2.05 2.05l-.04-.05a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.73 1.1v.13a1.45 1.45 0 11-2.9 0v-.07a1.2 1.2 0 00-.79-1.1 1.2 1.2 0 00-1.3.2l-.04.05a1.45 1.45 0 11-2.05-2.05l.05-.04a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.73H3.45a1.45 1.45 0 110-2.9h.07a1.2 1.2 0 001.1-.79 1.2 1.2 0 00-.2-1.3l-.05-.04A1.45 1.45 0 116.42 3.3l.04.05a1.2 1.2 0 001.3.2h.06a1.2 1.2 0 00.73-1.1V2.45a1.45 1.45 0 112.9 0v.07a1.2 1.2 0 00.73 1.1 1.2 1.2 0 001.3-.2l.04-.05a1.45 1.45 0 112.05 2.05l-.05.04a1.2 1.2 0 00-.2 1.3v.06a1.2 1.2 0 001.1.73h.13a1.45 1.45 0 110 2.9h-.07a1.2 1.2 0 00-1.1.73z" />
   </svg>);
 }

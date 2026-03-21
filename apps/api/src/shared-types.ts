@@ -685,3 +685,67 @@ export interface BiometricTrendPoint {
   avgSpo2: number;
   readingCount: number;
 }
+
+// ── Advanced Biometric Insights ──────────────────────────────────────────────
+
+export type AdvancedInsightDomain =
+  | 'breathing'
+  | 'heart_rate_stability'
+  | 'focus_stress'
+  | 'performance_optimization'
+  | 'recovery'
+  | 'health_connect';
+
+export interface AdvancedInsightItem {
+  domain: AdvancedInsightDomain;
+  severity: BiometricInsightSeverity;
+  title: string;
+  observation: string;
+  recommendation: string;
+  metric?: string;
+  metricValue?: string;
+  trend?: 'improving' | 'declining' | 'stable';
+}
+
+export interface BreathingAnalysis {
+  estimatedRate: number | null;
+  pattern: string;
+  consistencyScore: number;
+  recommendations: string[];
+}
+
+export interface HrStabilityAnalysis {
+  restingHr: number;
+  activeHr: number;
+  recoveryRate: string;
+  calmnessScore: number;
+  zoneBreakdown: { optimal: number; elevated: number; high: number };
+  recommendations: string[];
+}
+
+export interface FocusStressAnalysis {
+  stressLevel: 'low' | 'moderate' | 'high';
+  hrvTrend: string;
+  mentalReadiness: number;
+  recommendations: string[];
+}
+
+export interface PerformanceOptimization {
+  optimalHrZone: string;
+  bestPerformanceWindow: string;
+  shotTimingCorrelation: string;
+  recommendations: string[];
+}
+
+export interface AdvancedBiometricInsights {
+  breathing: BreathingAnalysis;
+  hrStability: HrStabilityAnalysis;
+  focusStress: FocusStressAnalysis;
+  performanceOptimization: PerformanceOptimization;
+  insights: AdvancedInsightItem[];
+  overallReadiness: number;
+  overallReadinessLabel: string;
+  dataSource: 'sensor' | 'health_connect' | 'combined';
+  generatedAt: string;
+  model: string;
+}

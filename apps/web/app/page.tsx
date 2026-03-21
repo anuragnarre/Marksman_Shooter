@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { useIsMobile } from '../lib/use-mobile';
+import EventPopup from '../components/EventPopup';
 
 // ── Utility Hooks ─────────────────────────────────────────────────────────────
 
@@ -631,6 +632,7 @@ function Nav({ safeTopInset }: { safeTopInset: string }) {
           </div>
         </div>
       </div>
+      <EventPopup />
     </>
   );
 }

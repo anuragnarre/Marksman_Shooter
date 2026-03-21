@@ -1,16 +1,16 @@
 """
-Difference imaging: subtract synthetic template from real image to isolate bullet holes.
+Difference imaging: optional confirmation signal for hole detection.
 
-Replaces inpainter.py. Instead of trying to mask/inpaint ring features (lossy),
-we render a synthetic target at the exact detected parameters and subtract it.
-Ring lines, numbers, and background cancel out — only anomalies (holes) remain.
+Renders a synthetic target at detected parameters and subtracts from the real
+image. The resulting diff highlights anomalies (holes). This is used as a
+secondary confirmation method, not the primary detection path.
 """
 
 import cv2
 import numpy as np
 
 from .types import TargetCalibration
-from .target_specs import get_spec, TargetSpec
+from .target_specs import get_spec
 
 
 def compute_difference_image(
@@ -20,23 +20,18 @@ def compute_difference_image(
     blur_score: float = 0.0,
 ) -> np.ndarray:
     """
-    Compute a difference image that isolates bullet holes.
-
-    1. Render synthetic template at exact detected parameters
-    2. Match blur level to the real image
-    3. Normalize and subtract
-    4. Return difference image where holes are bright on dark background
+    Compute a difference image that highlights anomalies (bullet holes).
 
     Parameters
     ----------
     gray : Grayscale image (perspective-corrected).
     calibration : Target geometry with center and radius.
     target_type : ISSF target type key.
-    blur_score : Laplacian variance from quality check (for blur matching).
+    blur_score : Laplacian variance from quality check.
 
     Returns
     -------
-    Difference image (uint8, 0-255) where bright = anomaly (holes).
+    Difference image (uint8, 0-255) where bright = anomaly.
     """
     h, w = gray.shape[:2]
     cx, cy = calibration.center
@@ -46,15 +41,13 @@ def compute_difference_image(
     if radius < 10:
         return np.zeros_like(gray)
 
-    # Step 1: Render synthetic template at detected scale
+    # Render synthetic template at detected scale
     radius_px = int(round(radius))
     template_square = spec.render_template(radius_px)
-    ts = template_square.shape[0]  # 2*radius_px + 1
+    ts = template_square.shape[0]
 
-    # Step 2: Place template on a full-size canvas at detected center
-    synthetic = np.full((h, w), 200, dtype=np.uint8)  # neutral gray background
-
-    # Compute paste region (handle edges)
+    # Place template on full-size canvas
+    synthetic = np.full((h, w), 200, dtype=np.uint8)
     half = ts // 2
     src_y_start = max(0, -int(cy - half))
     src_x_start = max(0, -int(cx - half))
@@ -69,28 +62,22 @@ def compute_difference_image(
         synthetic[dst_y_start:dst_y_end, dst_x_start:dst_x_end] = \
             template_square[src_y_start:src_y_end, src_x_start:src_x_end]
 
-    # Step 3: Match blur — estimate PSF sigma from blur_score
-    # blur_score is Laplacian variance: higher = sharper
-    # A sharp image (blur_score ~500+) needs minimal blur on template
-    # A blurry image (blur_score ~50) needs more blur
+    # Match blur level
     if blur_score > 0:
         sigma = max(0.5, 3.0 / (1.0 + blur_score / 100.0))
     else:
-        sigma = 1.5  # Default moderate blur
-
-    ksize = int(sigma * 6) | 1  # Ensure odd
-    ksize = max(3, ksize)
+        sigma = 1.5
+    ksize = max(3, int(sigma * 6) | 1)
     synthetic = cv2.GaussianBlur(synthetic, (ksize, ksize), sigma)
 
-    # Step 4: Apply bilateral filter to real image to suppress JPEG artifacts
+    # Smooth real image to suppress JPEG artifacts
     real_smooth = cv2.bilateralFilter(gray, d=5, sigmaColor=30, sigmaSpace=30)
 
-    # Step 5: Normalize both to [0, 1] and compute difference
+    # Normalize both to [0, 1]
     real_f = real_smooth.astype(np.float32) / 255.0
     synth_f = synthetic.astype(np.float32) / 255.0
 
-    # Local histogram matching: adjust synthetic brightness/contrast to match real
-    # within the target region
+    # Local histogram matching within target region
     mask = _target_mask(h, w, cx, cy, radius)
     if np.any(mask):
         real_mean = float(np.mean(real_f[mask]))
@@ -104,26 +91,16 @@ def compute_difference_image(
 
     # Absolute difference
     diff = np.abs(real_f - synth_f)
+    diff[~mask] = 0.0
 
-    # Mask outside target region (no holes expected there)
-    outside_mask = ~mask
-    diff[outside_mask] = 0.0
-
-    # Convert back to uint8
     diff_uint8 = (diff * 255.0).astype(np.uint8)
-
-    # Enhance contrast of difference image
     diff_uint8 = cv2.normalize(diff_uint8, None, 0, 255, cv2.NORM_MINMAX)
 
     return diff_uint8
 
 
-def _target_mask(
-    h: int, w: int, cx: float, cy: float, radius: float
-) -> np.ndarray:
-    """Create a boolean mask for pixels within the target boundary."""
-    ys = np.arange(h)
-    xs = np.arange(w)
-    yy, xx = np.meshgrid(ys, xs, indexing='ij')
+def _target_mask(h: int, w: int, cx: float, cy: float, radius: float) -> np.ndarray:
+    """Boolean mask for pixels within the target boundary."""
+    yy, xx = np.ogrid[:h, :w]
     dist_sq = (xx - cx) ** 2 + (yy - cy) ** 2
     return dist_sq <= (radius * 1.05) ** 2

@@ -18,6 +18,7 @@ import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
 import { ExportSessionModal } from '../../../components/ExportSessionModal';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 import { ScoreOverTimeChart, ScoreDistributionChart } from '../../../components/AnalyticsCharts';
 import { ShotHeatmap } from '../../../components/ShotHeatmap';
 import { ShotTimelineSlider } from '../../../components/ShotTimelineSlider';
@@ -62,7 +63,11 @@ export default function SessionDetailPage() {
   const [isLive,      setIsLive]      = useState(false);
   const [pageTab,     setPageTab]     = useState<PageTab>('session');
   const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysis | null>(null);
+  const [deepAnalysisError, setDeepAnalysisError] = useState(false);
   const [exportOpen,   setExportOpen]   = useState(false);
+  const [deleteOpen,   setDeleteOpen]   = useState(false);
+  const [deleting,     setDeleting]     = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   const loadAll = useCallback(async () => {
@@ -76,9 +81,10 @@ export default function SessionDetailPage() {
       setAnalytics(a);
       setSuggestions(sug.suggestions);
       // Load deep analysis non-blocking
+      setDeepAnalysisError(false);
       apiFetch<DeepAnalysis>(`/performance/deep-analysis/${id}${qs}`)
         .then(setDeepAnalysis)
-        .catch(() => {});
+        .catch(() => setDeepAnalysisError(true));
     } catch {
       // session 404 handled via empty state
     } finally {
@@ -89,9 +95,20 @@ export default function SessionDetailPage() {
   useEffect(() => {
     void loadAll();
 
-    const socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001');
+    const socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001', {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      timeout: 10000,
+    });
     socketRef.current = socket;
-    socket.emit('joinSession', id);
+
+    socket.on('connect', () => {
+      setSocketConnected(true);
+      socket.emit('joinSession', id);
+    });
+
+    socket.on('disconnect', () => setSocketConnected(false));
+    socket.on('connect_error', () => setSocketConnected(false));
 
     socket.on('session.updated', () => {
       setIsLive(true);
@@ -153,7 +170,7 @@ export default function SessionDetailPage() {
                 )}
               </div>
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
               <Link
                 href={shooterId ? `/coach/shooters` : '/sessions'}
                 className="btn btn-ghost text-xs py-2"
@@ -170,7 +187,7 @@ export default function SessionDetailPage() {
                     color: '#4FC3F7',
                   }}
                 >
-                  Export / Print
+                  Export
                 </button>
               )}
               <button
@@ -184,6 +201,19 @@ export default function SessionDetailPage() {
               >
                 Zen Mode
               </button>
+              {!shooterId && (
+                <button
+                  onClick={() => setDeleteOpen(true)}
+                  className="btn text-xs py-2 px-3"
+                  style={{
+                    background: 'rgba(255,77,109,0.08)',
+                    borderColor: 'rgba(255,77,109,0.25)',
+                    color: '#FF4D6D',
+                  }}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
 
@@ -353,6 +383,26 @@ export default function SessionDetailPage() {
           deepAnalysis={deepAnalysis}
         />
       )}
+
+      <ConfirmModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={async () => {
+          setDeleting(true);
+          try {
+            await apiFetch(`/sessions/${id}`, { method: 'DELETE' });
+            router.push('/sessions');
+          } catch {
+            setDeleting(false);
+            setDeleteOpen(false);
+          }
+        }}
+        title="Delete Session"
+        message="This session and all its shots will be permanently deleted. This action cannot be undone."
+        confirmLabel="Delete Session"
+        variant="danger"
+        loading={deleting}
+      />
     </AppShell>
   );
 }
@@ -503,17 +553,18 @@ function PerformanceTab({
             </h3>
           </div>
           <div className="mt-2 overflow-x-auto overscroll-x-contain">
-            <table className="w-full min-w-[420px] text-sm">
+            <table className="w-full min-w-[380px] text-sm">
               <thead>
                 <tr className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                  {['#', 'Score', 'X', 'Y'].map((h) => (
-                    <th key={h} className="text-left px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] font-display uppercase tracking-wide text-[#4A5568]">{h}</th>
+                  {['#', 'Score', 'Direction', 'X', 'Y'].map((h) => (
+                    <th key={h} className={`text-left px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] font-display uppercase tracking-wide text-[#4A5568]${h === 'X' || h === 'Y' ? ' hidden lg:table-cell' : ''}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {shots.map((s) => {
                   const isOutlier = outlierSet.has(s.shotNumber);
+                  const dir = shotDirection(s.x, s.y);
                   return (
                     <tr
                       key={s.id}
@@ -530,8 +581,9 @@ function PerformanceTab({
                         {s.score}
                         {isOutlier && <span className="ml-2 text-[10px] text-[#FF4D6D] font-display">OUTLIER</span>}
                       </td>
-                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4]">{s.x.toFixed(2)}</td>
-                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4]">{s.y.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-xs" style={{ color: directionColor(dir) }}>{dir}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4] hidden lg:table-cell">{s.x.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4] hidden lg:table-cell">{s.y.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -700,7 +752,7 @@ function BiometricsSection({ sessionId, shots }: { sessionId: string; shots: Sho
   useEffect(() => {
     apiFetch<BiometricSummary>(`/biometrics/session/${sessionId}/summary`)
       .then(setSummary)
-      .catch(() => {})
+      .catch(() => setSummary(null))
       .finally(() => setLoading(false));
   }, [sessionId]);
 
@@ -851,6 +903,23 @@ function shotDotColor(score: number): string {
   if (score >= 10.0) return '#4FC3F7';
   if (score >= 9.0)  return '#00E5A0';
   return '#FF4D6D';
+}
+
+function shotDirection(x: number, y: number): string {
+  const dist = Math.sqrt(x * x + y * y);
+  if (dist < 0.5) return 'Center';
+  // Y axis: negative = up (top of target), positive = down
+  const vertical = y < 0 ? 'Top' : 'Bottom';
+  const horizontal = x < 0 ? 'Left' : 'Right';
+  // If shot is nearly on an axis, show single direction
+  if (Math.abs(x) < 0.3) return vertical;
+  if (Math.abs(y) < 0.3) return horizontal;
+  return `${vertical}-${horizontal}`;
+}
+
+function directionColor(dir: string): string {
+  if (dir === 'Center') return '#00E5A0';
+  return '#8892A4';
 }
 
 function ringFill(n: number): string {
@@ -1203,19 +1272,19 @@ function InteractiveTab({
             </div>
           ) : (
             <div className="flex-1 overflow-auto max-h-72 pr-1">
-              <table className="w-full min-w-[320px] text-xs">
+              <table className="w-full min-w-[280px] text-xs">
                 <thead>
                   <tr className="border-b border-[#1E2433]">
                     <th className="py-2 text-left w-8 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
                     <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
-                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
-                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
                   </tr>
                 </thead>
                 <tbody>
                   {shots.map((shot, i) => {
                     const isDrag  = draggingIndex === i;
                     const isHover = hoverIndex === i && !isDrag;
+                    const dir = shotDirection(shot.x, shot.y);
                     return (
                       <tr
                         key={shot.shotNumber}
@@ -1239,11 +1308,8 @@ function InteractiveTab({
                             </span>
                           )}
                         </td>
-                        <td className={`py-1.5 score-value hidden sm:table-cell tabular-nums ${isDrag ? 'text-accent' : 'text-[#8892A4]'}`}>
-                          {shot.x.toFixed(2)}
-                        </td>
-                        <td className={`py-1.5 score-value hidden sm:table-cell tabular-nums ${isDrag ? 'text-accent' : 'text-[#8892A4]'}`}>
-                          {shot.y.toFixed(2)}
+                        <td className={`py-1.5 score-value text-xs ${isDrag ? 'text-accent' : ''}`} style={{ color: isDrag ? undefined : directionColor(dir) }}>
+                          {dir}
                         </td>
                       </tr>
                     );
@@ -1356,10 +1422,13 @@ function ManualTab({
               <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
               <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
               <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => (
+            {rows.map((row, i) => {
+              const dir = shotDirection(Number(row.x) || 0, Number(row.y) || 0);
+              return (
               <tr key={i} className="border-b border-[#1E2433]/40">
                 <td className="py-1 pr-3 score-value text-[#4A5568]">{row.shotNumber}</td>
                 <td className="py-1 pr-2">
@@ -1382,8 +1451,10 @@ function ManualTab({
                     onChange={(e) => updateRow(i, 'y', e.target.value)}
                     className="field py-1 px-2 text-xs w-20" aria-label={`Shot ${row.shotNumber} Y`} />
                 </td>
+                <td className="py-1 score-value text-xs" style={{ color: directionColor(dir) }}>{dir}</td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -1,7 +1,7 @@
 // apps/api/src/biometrics/biometrics.controller.ts
 import {
   Controller, Post, Get, Patch, Delete, Body, Param, Query,
-  UseGuards, Req, HttpCode,
+  UseGuards, Req, HttpCode, ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -142,6 +142,21 @@ export class BiometricsController {
     return this.biometricsAiService.analyzeSessionBiometrics(sessionId, user.sub);
   }
 
+  // ── Advanced Insights ────────────────────────────────────────────────────
+
+  @Get('advanced-insights')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  async getAdvancedInsights(
+    @CurrentUser() user: JwtPayload,
+    @Query('days') days?: string,
+  ) {
+    return this.biometricsAiService.generateAdvancedInsights(
+      user.sub,
+      days ? parseInt(days, 10) : 30,
+    );
+  }
+
   // ── Trends ────────────────────────────────────────────────────────────────
 
   @Get('trends')
@@ -163,6 +178,10 @@ export class BiometricsController {
     @CurrentUser() user: JwtPayload,
     @Param('userId') userId: string,
   ) {
+    // Only allow users to read their own biometrics (or coaches with a relationship)
+    if (user.sub !== userId && user.role !== 'COACH') {
+      throw new ForbiddenException('Cannot access another user\'s biometric data');
+    }
     return this.biometricsService.getLatestReading(userId);
   }
 }

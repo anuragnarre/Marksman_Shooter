@@ -1137,4 +1137,66 @@ input, textarea, select, button {
     font-family: inherit;
     font-size: 9px;
   }
+
+  /* ── Toast Notification ──────────────────────────────────────────────── */
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    animation: slideUpFade 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .toast-success {
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: #00E5A0;
+  }
+  .toast-error {
+    background: rgba(255,77,109,0.1);
+    border: 1px solid rgba(255,77,109,0.3);
+    color: #FF4D6D;
+  }
+  .toast-info {
+    background: rgba(79,195,247,0.1);
+    border: 1px solid rgba(79,195,247,0.3);
+    color: #4FC3F7;
+  }
+  .toast-warning {
+    background: rgba(245,166,35,0.1);
+    border: 1px solid rgba(245,166,35,0.3);
+    color: #F5A623;
+  }
+
+  /* ── Empty State ─────────────────────────────────────────────────────── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  /* ── Status Dot ──────────────────────────────────────────────────────── */
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .status-dot-online {
+    background: #00E5A0;
+    box-shadow: 0 0 8px rgba(0,229,160,0.6);
+  }
+  .status-dot-offline {
+    background: #4A5568;
+  }
+  .status-dot-busy {
+    background: #FF4D6D;
+    box-shadow: 0 0 8px rgba(255,77,109,0.4);
+  }
 }

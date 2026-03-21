@@ -14,6 +14,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { ScheduleRequestsModule } from './schedule-requests/schedule-requests.module';
 import { PerformanceModule } from './performance/performance.module';
 import { BiometricsModule } from './biometrics/biometrics.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { BiometricsModule } from './biometrics/biometrics.module';
     ScheduleRequestsModule,
     PerformanceModule,
     BiometricsModule,
+    EventsModule,
   ],
 })
 export class AppModule {}

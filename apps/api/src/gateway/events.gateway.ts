@@ -45,6 +45,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() sessionId: string,
     @ConnectedSocket() client: Socket,
   ): void {
+    if (!sessionId || typeof sessionId !== 'string') return;
     void client.join(sessionId);
     client.emit('joinedSession', { sessionId });
   }
@@ -66,6 +67,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
   ): void {
+    if (!userId || typeof userId !== 'string') return;
     void client.join(`user:${userId}`);
     client.emit('joinedUserRoom', { userId });
   }

@@ -36,6 +36,7 @@ function ZenModeInner() {
   const [elapsed,    setElapsed]    = useState(0);
   const [lastScore,  setLastScore]  = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loadError,  setLoadError]  = useState<string | null>(null);
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const startTime  = useRef(Date.now());
   const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -49,7 +50,7 @@ function ZenModeInner() {
         setSession(s);
         setShots((s.shots ?? []) as Shot[]);
       })
-      .catch(() => {});
+      .catch((e: Error) => setLoadError(e.message));
   }, [sessionId]);
 
   // ── Elapsed timer ───────────────────────────────────────────────────────────

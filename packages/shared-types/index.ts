@@ -10,6 +10,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  googleId?: string | null;
   createdAt: Date;
   shooterProfile?: ShooterProfile | null;
 }
@@ -677,6 +678,59 @@ export interface BiometricUpdateEvent {
   reading: BiometricReading;
 }
 
+// ── Competition Events ───────────────────────────────────────────────────────
+
+export type CompetitionEventStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
+export type PaymentStatus = 'PENDING' | 'COMING_SOON';
+
+export interface CompetitionEvent {
+  id: string;
+  name: string;
+  description?: string | null;
+  date: Date | string;
+  time: string;
+  location: string;
+  registrationFee?: number | null;
+  rules?: string | null;
+  guidelines?: string | null;
+  images: string[];
+  videos: string[];
+  status: CompetitionEventStatus;
+  maxParticipants?: number | null;
+  createdById: string;
+  createdBy?: User;
+  categories?: CompetitionEventCategory[];
+  registrations?: CompetitionEventRegistration[];
+  _count?: { registrations: number };
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface CompetitionEventCategory {
+  id: string;
+  eventId: string;
+  name: string;
+  fee?: number | null;
+  maxParticipants?: number | null;
+}
+
+export interface CompetitionEventRegistration {
+  id: string;
+  eventId: string;
+  userId: string;
+  categoryId?: string | null;
+  paymentStatus: PaymentStatus;
+  registeredAt: Date | string;
+  user?: User;
+  category?: CompetitionEventCategory;
+}
+
+export interface GoogleAuthRequest {
+  email: string;
+  name?: string;
+  googleId: string;
+}
+
 export interface BiometricTrendPoint {
   date: string;
   avgHeartRate: number;
@@ -684,4 +738,68 @@ export interface BiometricTrendPoint {
   maxHeartRate: number;
   avgSpo2: number;
   readingCount: number;
+}
+
+// ── Advanced Biometric Insights ──────────────────────────────────────────────
+
+export type AdvancedInsightDomain =
+  | 'breathing'
+  | 'heart_rate_stability'
+  | 'focus_stress'
+  | 'performance_optimization'
+  | 'recovery'
+  | 'health_connect';
+
+export interface AdvancedInsightItem {
+  domain: AdvancedInsightDomain;
+  severity: BiometricInsightSeverity;
+  title: string;
+  observation: string;
+  recommendation: string;
+  metric?: string;
+  metricValue?: string;
+  trend?: 'improving' | 'declining' | 'stable';
+}
+
+export interface BreathingAnalysis {
+  estimatedRate: number | null;
+  pattern: string;
+  consistencyScore: number;
+  recommendations: string[];
+}
+
+export interface HrStabilityAnalysis {
+  restingHr: number;
+  activeHr: number;
+  recoveryRate: string;
+  calmnessScore: number;
+  zoneBreakdown: { optimal: number; elevated: number; high: number };
+  recommendations: string[];
+}
+
+export interface FocusStressAnalysis {
+  stressLevel: 'low' | 'moderate' | 'high';
+  hrvTrend: string;
+  mentalReadiness: number;
+  recommendations: string[];
+}
+
+export interface PerformanceOptimization {
+  optimalHrZone: string;
+  bestPerformanceWindow: string;
+  shotTimingCorrelation: string;
+  recommendations: string[];
+}
+
+export interface AdvancedBiometricInsights {
+  breathing: BreathingAnalysis;
+  hrStability: HrStabilityAnalysis;
+  focusStress: FocusStressAnalysis;
+  performanceOptimization: PerformanceOptimization;
+  insights: AdvancedInsightItem[];
+  overallReadiness: number;
+  overallReadinessLabel: string;
+  dataSource: 'sensor' | 'health_connect' | 'combined';
+  generatedAt: string;
+  model: string;
 }
