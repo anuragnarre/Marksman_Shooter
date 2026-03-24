@@ -1,20 +1,30 @@
 // apps/web/lib/health-connect.ts
 // Health Connect integration wrapper with graceful web fallback.
 // Health Connect is Android-only (Android 14+ native, or Health Connect app on Android 9+).
-// On non-Android platforms, all functions return empty/false gracefully.
+// On non-Android platforms (including web/Vercel), all functions return empty/false gracefully.
 
 import { apiFetch } from './api';
 
+const PLUGIN_ID = '@anthropic-ai/capacitor-health-connect';
+
 let _available: boolean | null = null;
+
+async function loadPlugin(): Promise<{ HealthConnect: any } | null> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    return await (new Function('id', 'return import(id)')(PLUGIN_ID));
+  } catch {
+    return null;
+  }
+}
 
 export async function isAvailable(): Promise<boolean> {
   if (_available !== null) return _available;
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') return (_available = false);
 
-  // Check for Capacitor Health Connect plugin
   try {
-    const { HealthConnect } = await import('@anthropic-ai/capacitor-health-connect' as any);
-    const result = await HealthConnect.isAvailable();
+    const mod = await loadPlugin();
+    const result = await mod?.HealthConnect.isAvailable();
     _available = result?.available ?? false;
   } catch {
     _available = false;
@@ -24,8 +34,8 @@ export async function isAvailable(): Promise<boolean> {
 
 export async function requestPermissions(): Promise<boolean> {
   try {
-    const { HealthConnect } = await import('@anthropic-ai/capacitor-health-connect' as any);
-    const result = await HealthConnect.requestPermissions({
+    const mod = await loadPlugin();
+    const result = await mod?.HealthConnect.requestPermissions({
       permissions: ['HEART_RATE', 'BLOOD_OXYGEN', 'RESPIRATORY_RATE'],
     });
     return result?.granted ?? false;
@@ -39,8 +49,8 @@ export async function readHeartRate(
   end: Date,
 ): Promise<Array<{ timestamp: string; heartRate: number }>> {
   try {
-    const { HealthConnect } = await import('@anthropic-ai/capacitor-health-connect' as any);
-    const result = await HealthConnect.readHeartRate({
+    const mod = await loadPlugin();
+    const result = await mod?.HealthConnect.readHeartRate({
       startTime: start.toISOString(),
       endTime: end.toISOString(),
     });
@@ -55,8 +65,8 @@ export async function readBloodOxygen(
   end: Date,
 ): Promise<Array<{ timestamp: string; spo2: number }>> {
   try {
-    const { HealthConnect } = await import('@anthropic-ai/capacitor-health-connect' as any);
-    const result = await HealthConnect.readBloodOxygen({
+    const mod = await loadPlugin();
+    const result = await mod?.HealthConnect.readBloodOxygen({
       startTime: start.toISOString(),
       endTime: end.toISOString(),
     });
@@ -71,8 +81,8 @@ export async function readRespiratoryRate(
   end: Date,
 ): Promise<Array<{ timestamp: string; respiratoryRate: number }>> {
   try {
-    const { HealthConnect } = await import('@anthropic-ai/capacitor-health-connect' as any);
-    const result = await HealthConnect.readRespiratoryRate({
+    const mod = await loadPlugin();
+    const result = await mod?.HealthConnect.readRespiratoryRate({
       startTime: start.toISOString(),
       endTime: end.toISOString(),
     });
@@ -97,7 +107,6 @@ export async function syncToBackend(
     readRespiratoryRate(start, end),
   ]);
 
-  // Merge by timestamp (closest match)
   const readings: Array<{
     timestamp: string;
     heartRate?: number;

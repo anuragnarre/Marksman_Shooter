@@ -186,7 +186,7 @@ function RegisterPageInner() {
           {/* Google Sign Up — passes the role the user selected above */}
           <GoogleSignInButton
             text="signup_with"
-            role={role}
+            role={role === 'COACH' ? 'COACH' : 'SHOOTER'}
             onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
             onError={(msg) => setError(msg)}
           />
