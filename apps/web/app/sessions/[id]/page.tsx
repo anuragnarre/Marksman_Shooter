@@ -6,7 +6,7 @@
 // Interactive tab lets the shooter click the live target to place shots.
 // Photo tab supports both file upload and live camera capture.
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useIsMobile } from '../../../lib/use-mobile';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -49,7 +49,7 @@ type PageTab = 'session' | 'performance';
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function SessionDetailPage() {
+function SessionDetailInner() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -2164,5 +2164,13 @@ function LargeImportIcon() {
       <line x1="10" y1="22" x2="18" y2="22" />
       <line x1="10" y1="26" x2="16" y2="26" />
     </svg>
+  );
+}
+
+export default function SessionDetailPage() {
+  return (
+    <Suspense>
+      <SessionDetailInner />
+    </Suspense>
   );
 }

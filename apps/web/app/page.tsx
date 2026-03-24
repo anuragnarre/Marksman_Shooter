@@ -1654,7 +1654,7 @@ function HowItWorksSection() {
             transitionDelay: '200ms',
           }} />
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { n: '01', title: 'Create your profile', desc: 'Select discipline, weapon, and competition goals. Connect a coach for team-based training.', c: '#F5A623',
                 icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5"><circle cx="9" cy="6" r="3.5"/><circle cx="9" cy="9" r="7.5" strokeDasharray="3 2"/></svg> },

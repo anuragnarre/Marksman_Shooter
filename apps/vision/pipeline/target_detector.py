@@ -449,10 +449,15 @@ def _calibrate_rings(
 
     profile = _compute_radial_profile(gray, cx, cy, max_r, num_angles=60)
 
-    # Smooth then compute gradient magnitude
-    ks = max(5, int(radius * 0.02) | 1)
+    # Smooth then compute gradient magnitude.
+    # Kernel must suppress sub-ring features (shot holes ~5-10px) while preserving
+    # ring-boundary peaks (~ring_width_px wide). Scale by estimated ring width.
+    estimated_ring_px = spec.ring_width_mm / simple_ratio
+    # (ks, 1) blurs along columns of a (1, N) row-vector; (1, ks) would blur
+    # vertically and have zero effect on a single-row image.
+    ks = max(9, int(estimated_ring_px * 1.0) | 1)
     smoothed = cv2.GaussianBlur(
-        profile.reshape(1, -1).astype(np.float32), (1, ks), 0
+        profile.reshape(1, -1).astype(np.float32), (ks, 1), 0
     ).flatten()
     gradient = np.abs(np.diff(smoothed))
 

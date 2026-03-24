@@ -1,7 +1,8 @@
 // apps/web/components/planning/CalendarSection.tsx
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useIsMobile } from '../../lib/use-mobile';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin   from '@fullcalendar/daygrid';
 import timeGridPlugin  from '@fullcalendar/timegrid';
@@ -99,7 +100,14 @@ export default function CalendarSection() {
 
 function CoachCalendar() {
   const { user } = useAuth();
+  const isMobile = useIsMobile(768);
   const calRef = useRef<FullCalendar>(null);
+  const calendarConfig = useMemo(() => ({
+    initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+    headerToolbar: isMobile
+      ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
+      : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
+  }), [isMobile]);
   const [events,        setEvents]        = useState<TrainingEvent[]>([]);
   const [shooters,      setShooters]      = useState<User[]>([]);
   const [requests,      setRequests]      = useState<ScheduleRequest[]>([]);
@@ -279,10 +287,11 @@ function CoachCalendar() {
           </div>
         ) : (
           <FullCalendar
+            key={calendarConfig.initialView}
             ref={calRef}
             plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' }}
+            initialView={calendarConfig.initialView}
+            headerToolbar={calendarConfig.headerToolbar}
             events={events.map(toFCEvent)}
             editable selectable selectMirror dayMaxEvents={3} nowIndicator height="auto"
             select={(arg: DateSelectArg) => openCreate(arg.startStr, arg.endStr)}
@@ -319,7 +328,14 @@ function CoachCalendar() {
 
 function ShooterCalendar() {
   const { user } = useAuth();
+  const isMobile = useIsMobile(768);
   const canManageOwnItems = user?.role === 'SHOOTER';
+  const calendarConfig = useMemo(() => ({
+    initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+    headerToolbar: isMobile
+      ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
+      : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
+  }), [isMobile]);
   const [events,      setEvents]      = useState<TrainingEvent[]>([]);
   const [requests,    setRequests]    = useState<ScheduleRequest[]>([]);
   const [loading,     setLoading]     = useState(true);
@@ -550,9 +566,10 @@ function ShooterCalendar() {
             </div>
           ) : (
             <FullCalendar
+              key={calendarConfig.initialView}
               plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' }}
+              initialView={calendarConfig.initialView}
+              headerToolbar={calendarConfig.headerToolbar}
               events={events.map(toFCEvent)}
               editable={canManageOwnItems}
               selectable={canManageOwnItems}

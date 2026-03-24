@@ -174,7 +174,7 @@ export default function ComparePage() {
 
             {/* Comparison content */}
             {(loadingLeft || loadingRight) && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <SkeletonCard height={200} animationDelay={0} />
                 <SkeletonCard height={200} animationDelay={60} />
               </div>
@@ -184,7 +184,7 @@ export default function ComparePage() {
               <div className="space-y-6 animate-slide-up">
 
                 {/* Session info headers */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <SessionInfoCard session={leftData.session} color={C.amber} label="A" />
                   <SessionInfoCard session={rightData.session} color={C.blue} label="B" />
                 </div>

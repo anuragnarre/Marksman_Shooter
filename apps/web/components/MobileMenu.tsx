@@ -24,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/performance/ai-coach',     label: 'AI Coach',      icon: <IconSparkle /> },
   { href: '/performance/ai-assistant', label: 'AI Assistant',  icon: <IconBrain /> },
   { href: '/performance/health',       label: 'Health',        icon: <IconHeart /> },
+  { href: '/planning',                  label: 'Schedule',      icon: <IconCalendar /> },
   { href: '/planning/training-plan',   label: 'Training Plan', icon: <IconPlan /> },
   { href: '/sessions/compare',         label: 'Compare',       icon: <IconCompare /> },
   { href: '/docs',                     label: 'Docs & Guides', icon: <IconDocs /> },
@@ -318,6 +319,13 @@ function IconHeart() {
   return (<svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M7.5 13L2 7.5C1 6 1 4 2.5 3S5.5 2.5 7.5 4.5c2-2 4-1.5 5-0.5S14 6 13 7.5z"/>
     <polyline points="3,7.5 5.5,7.5 6.5,5.5 8.5,9.5 9.5,7.5 12,7.5"/>
+  </svg>);
+}
+function IconCalendar() {
+  return (<svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1.5" y="2.5" width="12" height="11" rx="1.5"/>
+    <line x1="1.5" y1="6" x2="13.5" y2="6"/>
+    <line x1="4.5" y1="1" x2="4.5" y2="4"/><line x1="10.5" y1="1" x2="10.5" y2="4"/>
   </svg>);
 }
 function IconPlan() {
