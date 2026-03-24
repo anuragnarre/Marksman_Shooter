@@ -3,8 +3,19 @@ import type { Metadata, Viewport } from 'next';
 import { Rajdhani, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/auth-context';
+import { ThemeProvider } from '../contexts/theme-context';
 import { ToastProvider } from '../contexts/toast-context';
 import { CursorGlow } from '../components/CursorGlow';
+
+const THEME_INIT_SCRIPT = `
+(function(){
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || (!t && matchMedia('(prefers-color-scheme:light)').matches) || (t === 'system' && matchMedia('(prefers-color-scheme:light)').matches))
+      document.documentElement.classList.add('light');
+  } catch(e){}
+})()
+`;
 
 // DESIGN NOTE: Three-font system — display (Rajdhani) for drama, DM Sans for
 // readability, JetBrains Mono for data precision. Each font carries semantic meaning.
@@ -74,11 +85,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${rajdhani.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="bg-[#080A0F] text-[#F0F4FF] antialiased font-body">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="bg-void text-text-primary antialiased font-body">
         <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ThemeProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </ThemeProvider>
         </AuthProvider>
         <CursorGlow />
       </body>

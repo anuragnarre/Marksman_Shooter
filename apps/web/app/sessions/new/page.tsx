@@ -14,7 +14,6 @@ import { useAuth } from '../../../contexts/auth-context';
 import { toLocalDateTimeInput } from '../../../lib/session-time';
 import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { Session } from '@shooting-platform/shared-types';
-import { ARMY_WEAPONS, TRAINING_MODES, TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 
 const DISCIPLINES = [
   '10m Air Rifle', '10m Air Pistol', '25m Rapid Fire Pistol',
@@ -49,17 +48,14 @@ export default function NewSessionPage() {
       : selectedShooterId)
     : null;
 
-  const isSoldier = user?.role === 'SOLDIER';
-
-  const weaponList = isSoldier ? [...ARMY_WEAPONS] : WEAPON_TYPES;
+  const weaponList = WEAPON_TYPES;
 
   const [discipline, setDiscipline]       = useState(DISCIPLINES[0]);
   const [weaponType, setWeaponType]       = useState(weaponList[0]);
   const [customWeapon, setCustomWeapon]   = useState('');
-  const [distance, setDistance]           = useState(isSoldier ? 25 : 10);
+  const [distance, setDistance]           = useState(10);
   const [numberOfShots, setShots]         = useState(60);
   const [sessionDate, setSessionDate]     = useState(toLocalDateTimeInput(new Date()));
-  const [trainingMode, setTrainingMode]   = useState<string>(TRAINING_MODES[0]);
   const [error, setError]                 = useState<string | null>(null);
   const [loading, setLoading]             = useState(false);
 
@@ -78,7 +74,6 @@ export default function NewSessionPage() {
       numberOfShots,
       sessionDate: new Date(sessionDate).toISOString(),
     };
-    if (isSoldier) body.trainingMode = trainingMode;
 
     try {
       const path = isCoach
@@ -106,7 +101,7 @@ export default function NewSessionPage() {
 
         {/* Breadcrumb */}
         <Link href="/sessions"
-          className="inline-flex items-center gap-1 text-[#4A5568] hover:text-accent text-xs font-display uppercase tracking-widest transition-colors mb-6">
+          className="inline-flex items-center gap-1 text-text-muted hover:text-accent text-xs font-display uppercase tracking-widest transition-colors mb-6">
           ← Sessions
         </Link>
 
@@ -116,21 +111,21 @@ export default function NewSessionPage() {
             <span className="w-6 h-6 rounded-full bg-accent text-[#080A0F] font-display font-bold text-xs flex items-center justify-center">
               1
             </span>
-            <span className="text-[#F0F4FF] text-xs font-display font-semibold uppercase tracking-wide">Session Details</span>
+            <span className="text-text-primary text-xs font-display font-semibold uppercase tracking-wide">Session Details</span>
           </div>
-          <div className="flex-1 h-px bg-[#1E2433]" />
+          <div className="flex-1 h-px bg-subtle" />
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full border border-[#1E2433] text-[#4A5568] font-display font-bold text-xs flex items-center justify-center">
+            <span className="w-6 h-6 rounded-full border border-border-subtle text-text-muted font-display font-bold text-xs flex items-center justify-center">
               2
             </span>
-            <span className="text-[#4A5568] text-xs font-display uppercase tracking-wide">Add Shots</span>
+            <span className="text-text-muted text-xs font-display uppercase tracking-wide">Add Shots</span>
           </div>
         </div>
 
         <div className="card p-6 animate-slide-up stagger-1">
           <div className="mb-6">
-            <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">New Training Session</h1>
-            <p className="text-[#8892A4] text-sm mt-1">
+            <h1 className="font-display font-bold text-2xl text-text-primary">New Training Session</h1>
+            <p className="text-text-secondary text-sm mt-1">
               Define the session parameters. You'll add shots on the next screen.
             </p>
           </div>
@@ -140,7 +135,7 @@ export default function NewSessionPage() {
               <div>
                 <label className="label">Shooter</label>
                 <select
-                  className="field bg-[#161B26]"
+                  className="field bg-elevated"
                   value={targetShooterId ?? ''}
                   onChange={(e) => setSelectedShooterId(e.target.value || null)}
                   required
@@ -162,7 +157,7 @@ export default function NewSessionPage() {
                 id="discipline"
                 value={discipline}
                 onChange={(e) => setDiscipline(e.target.value)}
-                className="field bg-[#161B26]"
+                className="field bg-elevated"
               >
                 {DISCIPLINES.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -175,7 +170,7 @@ export default function NewSessionPage() {
                 id="weaponType"
                 value={weaponType}
                 onChange={(e) => setWeaponType(e.target.value)}
-                className="field bg-[#161B26]"
+                className="field bg-elevated"
               >
                 {weaponList.map((w) => <option key={w} value={w}>{w}</option>)}
               </select>
@@ -190,37 +185,6 @@ export default function NewSessionPage() {
                 />
               )}
             </div>
-
-            {/* Training mode — SOLDIER only */}
-            {isSoldier && (
-              <div>
-                <label htmlFor="trainingMode" className="label">Training Mode</label>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {TRAINING_MODES.map((m) => {
-                    const color = TRAINING_MODE_COLORS[m] ?? '#8892A4';
-                    const selected = trainingMode === m;
-                    return (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => setTrainingMode(m)}
-                        className={`
-                          px-3 py-2 rounded-lg border text-xs font-display tracking-wide text-left
-                          transition-all duration-150
-                          ${selected
-                            ? 'border-current text-current bg-current/10'
-                            : 'border-[#1E2433] text-[#8892A4] hover:border-[#2A3040]'
-                          }
-                        `}
-                        style={selected ? { color, borderColor: color } : {}}
-                      >
-                        {m}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             {/* Distance + shots row */}
             <div className="grid grid-cols-2 gap-4">
@@ -280,15 +244,11 @@ export default function NewSessionPage() {
         <div className="mt-4 animate-slide-up stagger-3">
           <p className="label mb-3 px-1">Quick presets</p>
           <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
-            {(isSoldier ? [
-              { label: 'AK-203 25m', disc: 'Other', weapon: 'AK-203', dist: 25, shots: 30, mode: 'Marksmanship' },
-              { label: 'Glock 17 15m', disc: 'Other', weapon: 'Glock 17', dist: 15, shots: 20, mode: 'Rapid Fire' },
-              { label: 'Sig716 100m', disc: 'Other', weapon: 'Sig Sauer SIG716', dist: 100, shots: 20, mode: 'Field Exercise' },
-            ] : [
-              { label: '60-Shot Air Rifle', disc: '10m Air Rifle', weapon: 'Air Rifle', dist: 10, shots: 60, mode: '' },
-              { label: '40-Shot Air Pistol', disc: '10m Air Pistol', weapon: 'Air Pistol', dist: 10, shots: 40, mode: '' },
-              { label: '3P Rifle', disc: '50m Rifle 3 Positions', weapon: 'Air Rifle', dist: 50, shots: 120, mode: '' },
-            ]).map((p) => (
+            {[
+              { label: '60-Shot Air Rifle', disc: '10m Air Rifle', weapon: 'Air Rifle', dist: 10, shots: 60 },
+              { label: '40-Shot Air Pistol', disc: '10m Air Pistol', weapon: 'Air Pistol', dist: 10, shots: 40 },
+              { label: '3P Rifle', disc: '50m Rifle 3 Positions', weapon: 'Air Rifle', dist: 50, shots: 120 },
+            ].map((p) => (
               <button
                 key={p.label}
                 type="button"
@@ -297,7 +257,6 @@ export default function NewSessionPage() {
                   setWeaponType(p.weapon);
                   setDistance(p.dist);
                   setShots(p.shots);
-                  if (p.mode) setTrainingMode(p.mode);
                 }}
                 className="btn btn-ghost text-xs py-2 px-3 leading-tight"
               >
@@ -312,7 +271,7 @@ export default function NewSessionPage() {
 }
 
 function Spinner() {
-  return <span className="w-4 h-4 border-2 border-[#080A0F] border-t-transparent rounded-full animate-spin" aria-hidden="true" />;
+  return <span className="w-4 h-4 border-2 border-[#F5A623]/30 border-t-[#F5A623] rounded-full animate-spin" aria-hidden="true" />;
 }
 
 function AlertIcon() {

@@ -132,7 +132,7 @@ export function TargetCanvas({ shots, mpi, size = 460 }: TargetCanvasProps) {
   return (
     <div className="flex flex-col gap-3">
       {/* Canvas */}
-      <div className="relative canvas-vignette rounded-xl overflow-hidden border border-[#1E2433]">
+      <div className="relative canvas-vignette rounded-xl overflow-hidden border border-border-subtle">
         <canvas
           ref={canvasRef}
           width={size}
@@ -160,26 +160,26 @@ export function TargetCanvas({ shots, mpi, size = 460 }: TargetCanvasProps) {
       <div className="flex items-center gap-2 px-1">
         <button
           onClick={() => setZoom((z) => Math.max(1, z - 0.25))}
-          className="w-7 h-7 rounded bg-[#161B26] border border-[#1E2433] text-[#8892A4]
-                     hover:text-[#F0F4FF] hover:border-[#2A3040] transition-all text-sm flex items-center justify-center"
+          className="w-7 h-7 rounded bg-elevated border border-border-subtle text-text-secondary
+                     hover:text-text-primary hover:border-[#2A3040] transition-all text-sm flex items-center justify-center"
           aria-label="Zoom out"
         >−</button>
 
-        <span className="score-value text-xs text-[#4A5568] w-10 text-center">
+        <span className="score-value text-xs text-text-muted w-10 text-center">
           {zoom.toFixed(1)}×
         </span>
 
         <button
           onClick={() => setZoom((z) => Math.min(5, z + 0.25))}
-          className="w-7 h-7 rounded bg-[#161B26] border border-[#1E2433] text-[#8892A4]
-                     hover:text-[#F0F4FF] hover:border-[#2A3040] transition-all text-sm flex items-center justify-center"
+          className="w-7 h-7 rounded bg-elevated border border-border-subtle text-text-secondary
+                     hover:text-text-primary hover:border-[#2A3040] transition-all text-sm flex items-center justify-center"
           aria-label="Zoom in"
         >+</button>
 
         <button
           onClick={() => setZoom(1)}
-          className="px-3 h-7 rounded bg-[#161B26] border border-[#1E2433] text-[#8892A4] text-xs
-                     hover:text-[#F0F4FF] hover:border-[#2A3040] transition-all font-display uppercase tracking-wide"
+          className="px-3 h-7 rounded bg-elevated border border-border-subtle text-text-secondary text-xs
+                     hover:text-text-primary hover:border-[#2A3040] transition-all font-display uppercase tracking-wide"
           aria-label="Reset zoom"
         >
           Reset
@@ -196,7 +196,7 @@ export function TargetCanvas({ shots, mpi, size = 460 }: TargetCanvasProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 px-1 text-[10px] font-display uppercase tracking-widest text-[#4A5568]">
+      <div className="flex flex-wrap items-center gap-4 px-1 text-[10px] font-display uppercase tracking-widest text-text-muted">
         {[
           { color: '#F5A623', label: '10.X+' },
           { color: '#4FC3F7', label: '10' },

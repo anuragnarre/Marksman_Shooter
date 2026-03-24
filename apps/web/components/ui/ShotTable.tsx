@@ -10,7 +10,7 @@ function getRingLabel(score: number): { label: string; color: string; bg: string
   if (score >= 10.5) return { label: 'X',  color: '#F5A623', bg: 'rgba(245,166,35,0.15)' };
   if (score >= 10.0) return { label: '10', color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)' };
   if (score >= 9.0)  return { label: '9',  color: '#00E5A0', bg: 'rgba(0,229,160,0.10)' };
-  if (score >= 8.0)  return { label: '8',  color: '#F0F4FF', bg: 'rgba(240,244,255,0.06)' };
+  if (score >= 8.0)  return { label: '8',  color: 'var(--text-primary)', bg: 'rgba(240,244,255,0.06)' };
   if (score >= 7.0)  return { label: '7',  color: '#FF4D6D', bg: 'rgba(255,77,109,0.08)' };
   return              { label: '<7', color: '#FF4D6D', bg: 'rgba(255,77,109,0.12)' };
 }
@@ -19,7 +19,7 @@ function getScoreColor(score: number): string {
   if (score >= 10.5) return '#F5A623';
   if (score >= 10.0) return '#4FC3F7';
   if (score >= 9.0)  return '#00E5A0';
-  if (score >= 8.0)  return '#F0F4FF';
+  if (score >= 8.0)  return 'var(--text-primary)';
   return '#FF4D6D';
 }
 
@@ -46,15 +46,15 @@ function getDirection(x: number, y: number): Direction {
   if (!nearX && !nearY) {
     if (x > 0 && y > 0) return { symbol: '⬈', label: 'Top-Right',    color: '#4FC3F7' };
     if (x < 0 && y > 0) return { symbol: '⬉', label: 'Top-Left',     color: '#4FC3F7' };
-    if (x > 0 && y < 0) return { symbol: '⬊', label: 'Bottom-Right', color: '#8892A4' };
-    /* x < 0 && y < 0 */return { symbol: '⬋', label: 'Bottom-Left',  color: '#8892A4' };
+    if (x > 0 && y < 0) return { symbol: '⬊', label: 'Bottom-Right', color: 'var(--text-secondary)' };
+    /* x < 0 && y < 0 */return { symbol: '⬋', label: 'Bottom-Left',  color: 'var(--text-secondary)' };
   }
 
   // Cardinal (one axis near zero)
   if (nearX && y > 0) return { symbol: '↑', label: 'Top',    color: '#4FC3F7' };
-  if (nearX && y < 0) return { symbol: '↓', label: 'Bottom', color: '#8892A4' };
+  if (nearX && y < 0) return { symbol: '↓', label: 'Bottom', color: 'var(--text-secondary)' };
   if (x > 0)          return { symbol: '→', label: 'Right',  color: '#4FC3F7' };
-  /* x < 0 */         return { symbol: '←', label: 'Left',   color: '#8892A4' };
+  /* x < 0 */         return { symbol: '←', label: 'Left',   color: 'var(--text-secondary)' };
 }
 
 // ── Timestamp formatter ───────────────────────────────────────────────────────
@@ -92,8 +92,8 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <BlinkingCrosshair />
-        <p className="text-[#F0F4FF] font-display font-semibold text-lg mt-4">No shots recorded</p>
-        <p className="text-[#4A5568] text-sm mt-1">Choose an input method above to begin logging shots.</p>
+        <p className="text-text-primary font-display font-semibold text-lg mt-4">No shots recorded</p>
+        <p className="text-text-muted text-sm mt-1">Choose an input method above to begin logging shots.</p>
       </div>
     );
   }
@@ -111,7 +111,8 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
   return (
     <div>
       {/* ── Header stats bar ─────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3.5 border-b border-[#1E2433] bg-[#0A0D12]">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3.5 border-b border-border-subtle"
+           style={{ background: 'var(--bg-surface)' }}>
         <StatPill label="Shots"   value={String(shots.length)} />
         <Divider />
         <StatPill label="Average" value={avgScore.toFixed(2)}  color={getScoreColor(avgScore)} />
@@ -124,7 +125,7 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
 
         <button
           className="ml-auto flex items-center gap-1 text-[10px] font-display uppercase tracking-widest
-                     text-[#4A5568] hover:text-[#8892A4] transition-colors"
+                     text-text-muted hover:text-text-secondary transition-colors"
           onClick={() => setSortDir((d) => d === 'asc' ? 'desc' : 'asc')}
           aria-label="Toggle sort direction"
         >
@@ -137,15 +138,15 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
       <div className="overflow-x-auto overscroll-x-contain">
         <table className="w-full min-w-[520px] sm:min-w-full" role="table" aria-label="Shot data">
           <thead>
-            <tr className="border-b border-[#1E2433] bg-[rgba(10,13,18,0.95)]">
-              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] w-10 font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
-              <th className="text-left py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Ring</th>
-              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
-              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
-              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
-              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
-              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden md:table-cell">Time</th>
-              <th className="text-center py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden lg:table-cell w-8">Δ</th>
+            <tr className="border-b border-border-subtle" style={{ background: 'var(--bg-surface)' }}>
+              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] w-10 font-display font-semibold uppercase tracking-[0.1em] text-text-muted">#</th>
+              <th className="text-left py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Ring</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Score</th>
+              <th className="text-left py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Direction</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden sm:table-cell">X</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden sm:table-cell">Y</th>
+              <th className="text-right py-2.5 px-2.5 sm:px-4 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden md:table-cell">Time</th>
+              <th className="text-center py-2.5 px-2.5 sm:px-3 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden lg:table-cell w-8">Δ</th>
             </tr>
           </thead>
 
@@ -168,10 +169,10 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                     return (
                       <tr
                         key={shot.id}
-                        className="group border-b border-[#1E2433]/40 hover:bg-[#161B26] transition-colors duration-100"
+                        className="group border-b border-border-subtle/40 hover:bg-elevated transition-colors duration-100"
                       >
                         {/* Shot # */}
-                        <td className="py-2.5 px-2.5 sm:px-4 text-[#4A5568] font-data text-xs tabular-nums">
+                        <td className="py-2.5 px-2.5 sm:px-4 text-text-muted font-data text-xs tabular-nums">
                           {shot.shotNumber}
                         </td>
 
@@ -229,14 +230,14 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         </td>
 
                         {/* Timestamp */}
-                        <td className="py-2.5 px-2.5 sm:px-4 text-right font-data text-[11px] text-[#4A5568] tabular-nums hidden md:table-cell">
+                        <td className="py-2.5 px-2.5 sm:px-4 text-right font-data text-[11px] text-text-muted tabular-nums hidden md:table-cell">
                           {fmtTime(shot.timestamp)}
                         </td>
 
                         {/* Trend Δ */}
                         <td className="py-2.5 px-2.5 sm:px-3 text-center hidden lg:table-cell">
                           {trend === null ? (
-                            <span className="text-[#4A5568] text-xs">—</span>
+                            <span className="text-text-muted text-xs">—</span>
                           ) : trend > 0.05 ? (
                             <span
                               className="text-[#00E5A0] text-xs font-bold"
@@ -248,7 +249,7 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                               title={trend.toFixed(1)}
                             >↓</span>
                           ) : (
-                            <span className="text-[#4A5568] text-xs" title="Stable">→</span>
+                            <span className="text-text-muted text-xs" title="Stable">→</span>
                           )}
                         </td>
                       </tr>
@@ -257,14 +258,14 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
 
                   {/* ── Series summary row ──────────────────────────────── */}
                   {highlightSeries && (
-                    <tr className="border-y border-[#1E2433] bg-[rgba(245,166,35,0.04)]">
+                    <tr className="border-y border-border-subtle" style={{ background: 'rgba(245,166,35,0.05)' }}>
                       <td className="py-2 px-2.5 sm:px-4">
                         <span className="text-[10px] font-display font-bold uppercase tracking-widest text-accent">
                           S{si + 1}
                         </span>
                       </td>
                       <td className="py-2 px-2.5 sm:px-3">
-                        <span className="text-[10px] font-display text-[#4A5568] uppercase tracking-wide">
+                        <span className="text-[10px] font-display text-text-muted uppercase tracking-wide">
                           {group.length} shots
                         </span>
                       </td>
@@ -272,19 +273,19 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
                         <span className="font-data font-bold text-accent text-sm tabular-nums">
                           {seriesAvg.toFixed(2)}
                         </span>
-                        <span className="text-[10px] text-[#4A5568] ml-1">avg</span>
+                        <span className="text-[10px] text-text-muted ml-1">avg</span>
                       </td>
                       {/* Direction col — series direction distribution hint */}
                       <td className="py-2 px-2.5 sm:px-4">
                         <SeriesDirectionHint shots={group} />
                       </td>
                       <td className="py-2 px-2.5 sm:px-3 hidden sm:table-cell">
-                        <span className="text-[10px] text-[#4A5568] font-data tabular-nums">
+                        <span className="text-[10px] text-text-muted font-data tabular-nums">
                           Σ {seriesTotal.toFixed(1)}
                         </span>
                       </td>
                       <td className="py-2 px-2.5 sm:px-3 hidden sm:table-cell">
-                        <span className="text-[10px] text-[#4A5568] font-data tabular-nums">
+                        <span className="text-[10px] text-text-muted font-data tabular-nums">
                           {seriesMin.toFixed(1)}–{seriesMax.toFixed(1)}
                         </span>
                       </td>
@@ -300,21 +301,22 @@ export function ShotTable({ shots, highlightSeries = true }: ShotTableProps) {
       </div>
 
       {/* ── Direction legend ──────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-3 border-t border-[#1E2433] bg-[#0A0D12]">
-        <span className="text-[9px] font-display uppercase tracking-widest text-[#2A3040]">Direction</span>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-3 border-t border-border-subtle"
+           style={{ background: 'var(--bg-surface)' }}>
+        <span className="text-[9px] font-display uppercase tracking-widest text-text-muted">Direction</span>
         {([
           { symbol: '⬉', label: 'Top-Left',     color: '#4FC3F7' },
           { symbol: '⬈', label: 'Top-Right',    color: '#4FC3F7' },
-          { symbol: '⬋', label: 'Bottom-Left',  color: '#8892A4' },
-          { symbol: '⬊', label: 'Bottom-Right', color: '#8892A4' },
+          { symbol: '⬋', label: 'Bottom-Left',  color: 'var(--text-secondary)' },
+          { symbol: '⬊', label: 'Bottom-Right', color: 'var(--text-secondary)' },
           { symbol: '●', label: 'Center',        color: '#F5A623' },
         ] as const).map(({ symbol, label, color }) => (
-          <span key={label} className="flex items-center gap-1 text-[10px] font-display text-[#4A5568]">
+          <span key={label} className="flex items-center gap-1 text-[10px] font-display text-text-muted">
             <span style={{ color }} aria-hidden="true">{symbol}</span>
             {label}
           </span>
         ))}
-        <span className="ml-auto text-[9px] font-display uppercase tracking-widest text-[#2A3040]">
+        <span className="ml-auto text-[9px] font-display uppercase tracking-widest text-text-muted">
           X+ right · X− left · Y+ up · Y− down
         </span>
       </div>
@@ -354,7 +356,7 @@ function StatPill({ label, value, color, dot }: { label: string; value: string; 
   return (
     <div className="flex items-center gap-2">
       {dot && <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />}
-      <span className="text-[10px] font-display uppercase tracking-widest text-[#4A5568]">{label}</span>
+      <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">{label}</span>
       <span className="font-data font-bold text-sm tabular-nums" style={{ color: color ?? '#F0F4FF' }}>
         {value}
       </span>
@@ -363,7 +365,7 @@ function StatPill({ label, value, color, dot }: { label: string; value: string; 
 }
 
 function Divider() {
-  return <div className="w-px h-4 bg-[#1E2433] shrink-0" />;
+  return <div className="w-px h-4 bg-subtle shrink-0" />;
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────

@@ -24,12 +24,21 @@ interface ExportSessionModalProps {
 
 const W = 1200;
 const H = 1600;
-const BG         = '#080A0F';
-const SURFACE    = '#0E1118';
-const BORDER     = '#1E2433';
-const TEXT_PRI   = '#F0F4FF';
-const TEXT_SEC   = '#8892A4';
-const TEXT_MUT   = '#4A5568';
+function getThemeColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    BG:       s.getPropertyValue('--bg-void').trim()      || '#080A0F',
+    SURFACE:  s.getPropertyValue('--bg-surface').trim()   || '#0E1118',
+    BORDER:   s.getPropertyValue('--border-subtle').trim() || '#1E2433',
+    TEXT_PRI: s.getPropertyValue('--text-primary').trim()  || '#F0F4FF',
+    TEXT_SEC: s.getPropertyValue('--text-secondary').trim()|| '#8892A4',
+    TEXT_MUT: s.getPropertyValue('--text-muted').trim()    || '#4A5568',
+    ACCENT:   '#F5A623',
+    BLUE:     '#4FC3F7',
+    GREEN:    '#00E5A0',
+    RED:      '#FF4D6D',
+  };
+}
 const ACCENT     = '#F5A623';
 const BLUE       = '#4FC3F7';
 const GREEN      = '#00E5A0';
@@ -67,7 +76,7 @@ function getDistribution(shots: Shot[]) {
     { label: '10.X', min: 10.5, max: Infinity, count: 0, color: ACCENT },
     { label: '10',   min: 10.0, max: 10.5,     count: 0, color: BLUE },
     { label: '9',    min: 9.0,  max: 10.0,     count: 0, color: GREEN },
-    { label: '8',    min: 8.0,  max: 9.0,      count: 0, color: '#8892A4' },
+    { label: '8',    min: 8.0,  max: 9.0,      count: 0, color: 'var(--text-secondary)' },
     { label: '7',    min: 7.0,  max: 8.0,      count: 0, color: '#6B7280' },
     { label: '<7',   min: -Infinity, max: 7.0,  count: 0, color: RED },
   ];
@@ -88,6 +97,7 @@ function renderExport(
   analytics: AnalyticsResult | null,
   deepAnalysis: DeepAnalysis | null,
 ) {
+  const { BG, SURFACE, BORDER, TEXT_PRI, TEXT_SEC, TEXT_MUT } = getThemeColors();
   // Background
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, W, H);
@@ -508,6 +518,15 @@ export function ExportSessionModal({
   const [format, setFormat] = useState<'png' | 'jpeg'>('png');
   const [quality, setQuality] = useState(0.92);
   const [rendered, setRendered] = useState(false);
+  const BORDER = typeof window !== 'undefined'
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--border-subtle').trim() || '#1E2433')
+    : '#1E2433';
+  const BG = typeof window !== 'undefined'
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--bg-void').trim() || '#080A0F')
+    : '#080A0F';
+  const TEXT_MUT = typeof window !== 'undefined'
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#4A5568')
+    : '#4A5568';
 
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -594,12 +613,12 @@ export function ExportSessionModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: BORDER }}>
           <div>
-            <h2 className="font-display font-bold text-lg text-[#F0F4FF]">Export / Print</h2>
-            <p className="text-xs text-[#4A5568] mt-0.5">Session report with analytics and target view</p>
+            <h2 className="font-display font-bold text-lg text-text-primary">Export / Print</h2>
+            <p className="text-xs text-text-muted mt-0.5">Session report with analytics and target view</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A5568] hover:text-[#F0F4FF] hover:bg-[#161B26] transition-all"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-elevated transition-all"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -626,7 +645,7 @@ export function ExportSessionModal({
               style={{ imageRendering: 'auto' }}
             />
             {!rendered && (
-              <div className="flex items-center justify-center py-20 text-[#4A5568] text-sm">
+              <div className="flex items-center justify-center py-20 text-text-muted text-sm">
                 Rendering preview...
               </div>
             )}
@@ -637,7 +656,7 @@ export function ExportSessionModal({
         <div className="px-5 pb-5">
           <div className="flex flex-wrap items-center gap-4">
             {/* Format toggle */}
-            <div className="flex items-center gap-1 bg-[#0E1118] rounded-lg p-1 border" style={{ borderColor: BORDER }}>
+            <div className="flex items-center gap-1 bg-surface rounded-lg p-1 border" style={{ borderColor: BORDER }}>
               {(['png', 'jpeg'] as const).map((f) => (
                 <button
                   key={f}
@@ -657,7 +676,7 @@ export function ExportSessionModal({
             {/* JPEG quality slider */}
             {format === 'jpeg' && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#4A5568] font-display uppercase tracking-wide">Quality</span>
+                <span className="text-xs text-text-muted font-display uppercase tracking-wide">Quality</span>
                 <input
                   type="range"
                   min={70}
@@ -666,7 +685,7 @@ export function ExportSessionModal({
                   onChange={(e) => setQuality(parseInt(e.target.value) / 100)}
                   className="w-24 accent-[#F5A623]"
                 />
-                <span className="text-xs font-mono text-[#8892A4] w-8">{Math.round(quality * 100)}%</span>
+                <span className="text-xs font-mono text-text-secondary w-8">{Math.round(quality * 100)}%</span>
               </div>
             )}
 

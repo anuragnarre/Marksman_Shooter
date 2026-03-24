@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex bg-[#080A0F] relative overflow-hidden"
+      className="min-h-screen flex bg-void relative overflow-hidden"
       style={{ paddingTop: safeTopInset }}
     >
       <div
@@ -63,7 +63,7 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex lg:w-[55%] relative overflow-hidden flex-col justify-between p-12 noise-overlay"
         style={{
-          background: 'radial-gradient(ellipse at 40% 50%, #0f1f3d 0%, #080A0F 70%)',
+          background: 'radial-gradient(ellipse at 40% 50%, rgba(15,31,61,0.5) 0%, var(--bg-void) 70%)',
           animation: 'radialShift 8s ease infinite',
           backgroundSize: '200% 200%',
         }}
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
         {/* Quote */}
         <p
-          className="relative z-10 text-[#4A5568] italic text-sm font-body animate-fade-in"
+          className="relative z-10 text-text-muted italic text-sm font-body animate-fade-in"
           style={{ animationDelay: '1400ms' }}
         >
           "Precision is not an accident."
@@ -109,17 +109,17 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-10">
             <CrosshairMark />
-            <span className="font-display font-bold text-2xl tracking-widest text-[#F0F4FF]">
+            <span className="font-display font-bold text-2xl tracking-widest text-text-primary">
               MARKSMAN
             </span>
           </div>
 
           {/* Heading */}
           <div className="mb-8">
-            <h1 className="font-display font-bold text-3xl text-[#F0F4FF] mb-1">
+            <h1 className="font-display font-bold text-3xl text-text-primary mb-1">
               Welcome back
             </h1>
-            <p className="text-[#8892A4] text-sm">
+            <p className="text-text-secondary text-sm">
               Sign in to your training dashboard.
             </p>
           </div>
@@ -185,9 +185,9 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-[#1E2433]" />
-            <span className="text-[10px] font-display uppercase tracking-widest text-[#4A5568]">or</span>
-            <div className="flex-1 h-px bg-[#1E2433]" />
+            <div className="flex-1 h-px bg-subtle" />
+            <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
+            <div className="flex-1 h-px bg-subtle" />
           </div>
 
           {/* Google Sign In */}
@@ -195,8 +195,8 @@ export default function LoginPage() {
             type="button"
             onClick={() => googleSignIn()}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-                       border border-[#1E2433] bg-[#161B26] text-[#F0F4FF] text-sm font-medium
-                       hover:border-[#2A3040] hover:bg-[#1A2030] transition-all duration-200"
+                       border border-border-subtle bg-elevated text-text-primary text-sm font-medium
+                       hover:border-border-active hover:bg-subtle transition-all duration-200"
           >
             <GoogleIcon />
             Continue with Google
@@ -204,13 +204,13 @@ export default function LoginPage() {
 
           {/* Footer links */}
           <div className="mt-6 text-center space-y-2">
-            <p className="text-[#4A5568] text-sm">
+            <p className="text-text-muted text-sm">
               No account yet?{' '}
               <Link href="/auth/register" className="text-accent hover:text-amber-400 transition-colors font-medium">
                 Create one
               </Link>
             </p>
-            <p className="text-[#4A5568] text-xs mt-4">
+            <p className="text-text-muted text-xs mt-4">
               Trusted by 12 national teams worldwide
             </p>
           </div>
@@ -268,8 +268,8 @@ function StatCard({
 }: { value: string; label: string; color: string; delay: number }) {
   return (
     <div
-      className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[#1E2433]/50
-                 bg-[rgba(14,17,24,0.8)] backdrop-blur-sm max-w-xs animate-slide-in-right"
+      className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle/50
+                 glass max-w-xs animate-slide-in-right"
       style={{ animationDelay: `${delay}ms` }}
     >
       <span
@@ -278,7 +278,7 @@ function StatCard({
       >
         {value}
       </span>
-      <span className="text-[#8892A4] text-xs font-body">{label}</span>
+      <span className="text-text-secondary text-xs font-body">{label}</span>
     </div>
   );
 }

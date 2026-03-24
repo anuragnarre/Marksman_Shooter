@@ -44,11 +44,11 @@ export function MetricCard({
                   animate-slide-up transition-all duration-300 group ${className}`}
       style={{
         animationDelay: `${animationDelay}ms`,
-        background: `linear-gradient(145deg, rgba(12,15,26,0.95) 0%, rgba(19,24,38,0.9) 100%)`,
-        border: `1px solid rgba(255,255,255,0.055)`,
+        background: `linear-gradient(145deg, var(--bg-surface) 0%, var(--bg-elevated) 100%)`,
+        border: `1px solid var(--glass-border)`,
         boxShadow: isPB
-          ? `0 0 0 1px ${c.hex}30, 0 8px 32px -8px ${c.glow}, 0 2px 8px rgba(0,0,0,0.4)`
-          : `0 2px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)`,
+          ? `0 0 0 1px ${c.hex}30, 0 8px 32px -8px ${c.glow}, var(--shadow-card)`
+          : `var(--shadow-card)`,
       }}
     >
       {/* Top gradient accent line */}
@@ -92,12 +92,12 @@ export function MetricCard({
         <div>
           <p
             className="text-[10px] font-display font-bold uppercase tracking-[0.12em]"
-            style={{ color: '#4A5568' }}
+            style={{ color: 'var(--text-muted)' }}
           >
             {label}
           </p>
           {unit && (
-            <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: '#2A3350' }}>
+            <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--text-muted)' }}>
               {unit}
             </p>
           )}
@@ -135,7 +135,7 @@ export function MetricCard({
           {animatedValue.toFixed(decimals)}
         </span>
         {suffix && (
-          <span className="text-sm mb-1 font-display font-semibold" style={{ color: '#4A5568' }}>
+          <span className="text-sm mb-1 font-display font-semibold" style={{ color: 'var(--text-muted)' }}>
             {suffix}
           </span>
         )}

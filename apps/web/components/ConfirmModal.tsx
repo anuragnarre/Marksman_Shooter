@@ -83,14 +83,14 @@ export function ConfirmModal({
 
       {/* Dialog */}
       <div
-        className="relative w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#0E1118] p-6 shadow-2xl animate-fade-in"
+        className="relative w-full max-w-sm rounded-xl border border-white/[0.06] bg-surface p-6 shadow-2xl animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col items-center text-center gap-4">
           {style.icon}
           <div>
-            <h3 className="font-display text-lg font-semibold text-[#F0F4FF]">{title}</h3>
-            <p className="mt-1 text-sm text-[#8892A4] leading-relaxed">{message}</p>
+            <h3 className="font-display text-lg font-semibold text-text-primary">{title}</h3>
+            <p className="mt-1 text-sm text-text-secondary leading-relaxed">{message}</p>
           </div>
           <div className="flex gap-3 w-full mt-2">
             <button

@@ -12,11 +12,9 @@ import { useAuth } from '../contexts/auth-context';
 // Ordered page routes for swipe navigation (role-filtered at runtime)
 const SWIPE_PAGES: { href: string; roles?: string[] }[] = [
   { href: '/dashboard' },
-  { href: '/sessions',   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/analytics',  roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/performance', roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/ai-coach',   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/ai-assistant', roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
+  { href: '/sessions' },
+  { href: '/planning' },
+  { href: '/performance' },
 ];
 
 const SWIPE_THRESHOLD = 80;   // px to trigger navigation

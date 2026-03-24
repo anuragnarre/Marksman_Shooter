@@ -36,7 +36,7 @@ export function BiometricSessionChart({ sessionId, shots = [], height = 280 }: P
 
   if (loading) {
     return (
-      <div className="h-[280px] flex items-center justify-center" style={{ color: '#4A5568' }}>
+      <div className="h-[280px] flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
         <span className="text-sm font-display">Loading biometric data...</span>
       </div>
     );
@@ -44,7 +44,7 @@ export function BiometricSessionChart({ sessionId, shots = [], height = 280 }: P
 
   if (readings.length === 0) {
     return (
-      <div className="h-[200px] flex items-center justify-center" style={{ color: '#4A5568' }}>
+      <div className="h-[200px] flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
         <span className="text-sm font-display">No biometric readings for this session</span>
       </div>
     );
@@ -115,7 +115,7 @@ export function BiometricSessionChart({ sessionId, shots = [], height = 280 }: P
             borderRadius: 8,
             fontSize: 12,
           }}
-          labelStyle={{ color: '#8892A4' }}
+          labelStyle={{ color: 'var(--text-secondary)' }}
         />
 
         {/* Optimal zone */}

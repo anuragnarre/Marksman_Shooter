@@ -171,7 +171,7 @@ function ZenModeInner() {
   if (!sessionId) {
     return (
       <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'rgba(8,10,15,0.98)' }}>
-        <p className="text-[#4A5568] font-display">No session specified. <a href="/sessions" className="text-[#F5A623]">Back to sessions</a></p>
+        <p className="text-text-muted font-display">No session specified. <a href="/sessions" className="text-[#F5A623]">Back to sessions</a></p>
       </div>
     );
   }
@@ -184,7 +184,7 @@ function ZenModeInner() {
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div
         className="flex items-center justify-between px-6 py-3 shrink-0"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+        style={{ borderBottom: '1px solid var(--glass-border)' }}
       >
         <div className="flex items-center gap-4">
           <span
@@ -194,24 +194,24 @@ function ZenModeInner() {
             ZEN MODE
           </span>
           {session && (
-            <span className="text-[#4A5568] text-xs font-display">{session.discipline}</span>
+            <span className="text-text-muted text-xs font-display">{session.discipline}</span>
           )}
         </div>
 
         <div className="flex items-center gap-6">
           <div className="text-center">
             <p className="font-data font-bold text-xl" style={{ color: '#F5A623' }}>{shots.length}</p>
-            <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-wide">Shots</p>
+            <p className="text-text-muted text-[10px] font-display uppercase tracking-wide">Shots</p>
           </div>
           <div className="text-center">
             <p className="font-data font-bold text-xl" style={{ color: '#4FC3F7' }}>{formatTime(elapsed)}</p>
-            <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-wide">Elapsed</p>
+            <p className="text-text-muted text-[10px] font-display uppercase tracking-wide">Elapsed</p>
           </div>
           <button
             onClick={() => router.push(`/sessions/${sessionId}`)}
-            className="flex items-center gap-1.5 text-[#4A5568] hover:text-[#F0F4FF] text-xs font-display
+            className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-xs font-display
                        uppercase tracking-wide transition-colors px-3 py-1.5 rounded-lg"
-            style={{ background: 'rgba(255,255,255,0.04)' }}
+            style={{ background: 'var(--chip-bg)' }}
           >
             <CloseIcon />
             Exit
@@ -248,7 +248,7 @@ function ZenModeInner() {
                 border: `1px solid ${lastColor}30`,
               }}
             >
-              <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-widest mb-1">Last</p>
+              <p className="text-text-muted text-[10px] font-display uppercase tracking-widest mb-1">Last</p>
               <p className="font-data font-black text-5xl leading-none" style={{ color: lastColor }}>
                 {lastScore}
               </p>
@@ -314,9 +314,9 @@ function ZenModeInner() {
                 <div
                   key={s.id}
                   className="flex items-center justify-between rounded-lg px-3 py-1.5"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}
+                  style={{ background: 'var(--chip-bg)' }}
                 >
-                  <span className="text-[#4A5568] text-xs font-data">#{s.shotNumber}</span>
+                  <span className="text-text-muted text-xs font-data">#{s.shotNumber}</span>
                   <span
                     className="font-data font-bold text-sm"
                     style={{ color: shotColor(s.score) }}

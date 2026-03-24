@@ -1,2555 +1,1843 @@
 'use client';
 
-// apps/web/app/page.tsx — Marksman Landing Page (mobile-first)
+// apps/web/app/page.tsx — Marksman Landing Page
+// Design base: GitHub 2026 aurora aesthetic — deep void, shifting colour orbs,
+// bold display type, glass product windows, premium spacing.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, createContext, useContext } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/auth-context';
+import { useTheme } from '../contexts/theme-context';
 import { useRouter } from 'next/navigation';
-import { useIsMobile } from '../lib/use-mobile';
-import EventPopup from '../components/EventPopup';
 
-// ── Utility Hooks ─────────────────────────────────────────────────────────────
+// Theme context shared by all sections on this page
+const PageTheme = createContext<boolean>(true); // true = dark
+function usePageTheme() { return useContext(PageTheme); }
 
-function useScrollY(): number {
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const h = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', h, { passive: true });
-    return () => window.removeEventListener('scroll', h);
-  }, []);
-  return scrollY;
-}
+// ── Hooks ─────────────────────────────────────────────────────────────────────
 
-function useSectionReveal(threshold = 0.15): [React.RefObject<HTMLDivElement>, boolean] {
-  const ref = useRef<HTMLDivElement>(null);
-  // Bidirectional: re-triggers on both enter and re-enter from any direction
+function useSectionReveal(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null!);
   const [vis, setVis] = useState(false);
   useEffect(() => {
     const io = new IntersectionObserver(
-      ([e]) => setVis(e.isIntersecting),
-      { threshold, rootMargin: '-80px 0px' }
+      ([e]) => { if (e.isIntersecting) setVis(true); },
+      { threshold }
     );
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
   }, [threshold]);
-  return [ref, vis];
+  return [ref, vis] as const;
 }
 
-// Detects scroll direction for directional slide animations
-function useScrollDirection(): 'down' | 'up' {
-  const [dir, setDir] = useState<'down' | 'up'>('down');
-  const lastY = useRef(0);
+function useCounter(target: number, active: boolean, duration = 1400) {
+  const [val, setVal] = useState(0);
   useEffect(() => {
-    const h = () => {
-      const y = window.scrollY;
-      setDir(y > lastY.current ? 'down' : 'up');
-      lastY.current = y;
-    };
-    window.addEventListener('scroll', h, { passive: true });
-    return () => window.removeEventListener('scroll', h);
-  }, []);
-  return dir;
+    if (!active) return;
+    let v = 0;
+    const step = target / (duration / 16);
+    const t = setInterval(() => {
+      v = Math.min(v + step, target);
+      setVal(Math.round(v));
+      if (v >= target) clearInterval(t);
+    }, 16);
+    return () => clearInterval(t);
+  }, [active, target, duration]);
+  return val;
 }
 
-// ── Magnetic Button ────────────────────────────────────────────────────────────
+// ── Deterministic shot data (SSR-safe — no Math.random) ──────────────────────
 
-function MagneticButton({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tf, setTf] = useState('translate(0px,0px)');
-  return (
-    <div
-      ref={ref}
-      onMouseMove={(e) => {
-        if (!ref.current) return;
-        const r = ref.current.getBoundingClientRect();
-        const dx = (e.clientX - (r.left + r.width / 2)) * 0.3;
-        const dy = (e.clientY - (r.top + r.height / 2)) * 0.3;
-        setTf(`translate(${dx}px,${dy}px)`);
-      }}
-      onMouseLeave={() => setTf('translate(0px,0px)')}
-      style={{
-        display: 'inline-block',
-        transform: tf,
-        transition: tf === 'translate(0px,0px)'
-          ? 'transform 400ms cubic-bezier(0.16,1,0.3,1)'
-          : 'transform 80ms linear',
-        willChange: 'transform',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ── Particle Field ────────────────────────────────────────────────────────────
-// Fixed seed to avoid hydration mismatch — values are deterministic.
-
-const PARTICLES = [
-  { x: 8,  y: 12, s: 1.8, d: 7.2, dl: 0,   c: '#F5A623', o: 0.25 },
-  { x: 22, y: 35, s: 1.2, d: 9.0, dl: 1.5, c: '#4FC3F7', o: 0.20 },
-  { x: 45, y: 8,  s: 2.2, d: 6.5, dl: 3.0, c: '#00E5A0', o: 0.30 },
-  { x: 65, y: 20, s: 1.5, d: 8.4, dl: 0.8, c: '#F0F4FF', o: 0.15 },
-  { x: 80, y: 45, s: 1.0, d: 7.8, dl: 2.2, c: '#F5A623', o: 0.20 },
-  { x: 15, y: 60, s: 2.0, d: 10,  dl: 4.5, c: '#4FC3F7', o: 0.25 },
-  { x: 35, y: 75, s: 1.3, d: 6.8, dl: 1.0, c: '#00E5A0', o: 0.18 },
-  { x: 55, y: 55, s: 2.5, d: 8.0, dl: 3.5, c: '#F5A623', o: 0.22 },
-  { x: 72, y: 70, s: 1.6, d: 9.5, dl: 0.3, c: '#4FC3F7', o: 0.28 },
-  { x: 90, y: 15, s: 1.1, d: 7.0, dl: 5.0, c: '#F0F4FF', o: 0.15 },
-  { x: 3,  y: 82, s: 1.9, d: 8.8, dl: 2.8, c: '#00E5A0', o: 0.22 },
-  { x: 28, y: 48, s: 1.4, d: 6.2, dl: 1.8, c: '#F5A623', o: 0.18 },
-  { x: 48, y: 30, s: 2.1, d: 9.8, dl: 4.0, c: '#4FC3F7', o: 0.28 },
-  { x: 62, y: 85, s: 1.7, d: 7.5, dl: 0.5, c: '#F0F4FF', o: 0.16 },
-  { x: 85, y: 55, s: 1.2, d: 8.2, dl: 3.2, c: '#F5A623', o: 0.24 },
-  { x: 12, y: 25, s: 2.3, d: 6.9, dl: 2.0, c: '#00E5A0', o: 0.20 },
-  { x: 40, y: 90, s: 1.5, d: 10.2,dl: 1.2, c: '#4FC3F7', o: 0.22 },
-  { x: 58, y: 42, s: 1.8, d: 7.8, dl: 4.8, c: '#F5A623', o: 0.26 },
-  { x: 75, y: 28, s: 1.0, d: 8.5, dl: 0.7, c: '#F0F4FF', o: 0.14 },
-  { x: 92, y: 72, s: 2.0, d: 6.4, dl: 3.8, c: '#00E5A0', o: 0.20 },
+const HERO_SHOTS = [
+  { cx: 50.4, cy: 49.2, score: 10.9, r: '#F5A623' },
+  { cx: 49.1, cy: 50.8, score: 10.7, r: '#F5A623' },
+  { cx: 51.2, cy: 48.6, score: 10.6, r: '#F5A623' },
+  { cx: 48.8, cy: 51.4, score: 10.4, r: '#4FC3F7' },
+  { cx: 50.9, cy: 50.5, score: 10.8, r: '#F5A623' },
+  { cx: 49.6, cy: 49.0, score: 10.2, r: '#4FC3F7' },
+  { cx: 51.8, cy: 51.1, score: 10.1, r: '#4FC3F7' },
+  { cx: 47.9, cy: 48.7, score:  9.9, r: '#00E5A0' },
 ];
 
-function ParticleField() {
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      {PARTICLES.map((p, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            left: `${p.x}%`,
-            top:  `${p.y}%`,
-            width:  p.s,
-            height: p.s,
-            background: p.c,
-            opacity: p.o,
-            animation: `floatY ${p.d}s ease-in-out ${p.dl}s infinite`,
-            boxShadow: `0 0 ${p.s * 4}px ${p.c}55`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+const TABLE_SHOTS = [
+  { n:  1, score: 10.3, x: -1.2, y:  0.8 },
+  { n:  2, score: 10.6, x:  0.3, y: -0.4 },
+  { n:  3, score: 10.8, x: -0.6, y:  0.2 },
+  { n:  4, score: 10.1, x:  1.8, y: -1.1 },
+  { n:  5, score: 10.7, x: -0.1, y:  0.6 },
+  { n:  6, score: 10.9, x:  0.4, y: -0.3 },
+  { n:  7, score: 10.4, x: -0.8, y:  0.9 },
+  { n:  8, score: 10.2, x:  1.1, y: -0.7 },
+];
 
-// ── Entry Point ──────────────────────────────────────────────────────────────
+// ── Entry Point ───────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const { user }  = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
   const router    = useRouter();
-  const isMobile  = useIsMobile();
-  const [mounted, setMounted] = useState(false);
-  const [ready, setReady]     = useState(false);
-  const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
-  const scrollY = useScrollY();
+  const [mounted, setMounted]     = useState(false);
+  const [navSolid, setNavSolid]   = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { if (mounted && user) router.replace('/dashboard'); }, [user, mounted, router]);
   useEffect(() => {
-    if (mounted && user) router.replace('/dashboard');
-  }, [user, mounted, router]);
-
-  // Minimum loader display for polish, then reveal
-  useEffect(() => {
-    if (mounted && !user) {
-      const t = setTimeout(() => setReady(true), 1600);
-      return () => clearTimeout(t);
-    }
-  }, [mounted, user]);
-
-  // Still waiting for hydration or redirecting authenticated user
-  if (!mounted || user) {
-    return <SplashLoader />;
-  }
-
-  return (
-    <>
-      <AnimatePresence>
-        {!ready && (
-          <motion.div
-            key="splash"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.04, filter: 'blur(8px)' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[9999]"
-          >
-            <SplashLoader />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={ready ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className="min-h-screen depth-bg text-[#F0F4FF] overflow-x-hidden"
-        style={{ fontSize: '16px' }}
-      >
-        <Nav safeTopInset={safeTopInset} />
-        <div style={{ paddingTop: safeTopInset }}>
-          <Hero scrollY={scrollY} />
-          <DisciplineMarquee />
-          <LiveStats />
-          <BentoFeatures />
-          <AIHealthSection />
-          <HowItWorks />
-          <RoleShowcase />
-          <CtaBanner />
-          <Footer />
-        </div>
-      </motion.div>
-    </>
-  );
-}
-
-// ── Splash Loader ─────────────────────────────────────────────────────────────
-// Premium branded loading screen with animated crosshair, sweep line, and text reveal.
-
-function SplashLoader() {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let raf: number;
-    const start = performance.now();
-    const duration = 1400;
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const t = Math.min(elapsed / duration, 1);
-      // Ease-out cubic for smooth deceleration
-      const eased = 1 - Math.pow(1 - t, 3);
-      setProgress(eased * 100);
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return (
-    <div
-      className="fixed inset-0 flex flex-col items-center justify-center"
-      style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(245,166,35,0.04) 0%, #060810 70%)',
-        zIndex: 9999,
-      }}
-    >
-      {/* Ambient orbs */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '20%', left: '30%',
-          width: '40vw', height: '40vw',
-          background: 'radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 65%)',
-          animation: 'orbFloat 8s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '15%', right: '20%',
-          width: '30vw', height: '30vw',
-          background: 'radial-gradient(circle, rgba(79,195,247,0.04) 0%, transparent 65%)',
-          animation: 'orbFloat 10s ease-in-out infinite reverse',
-        }}
-      />
-
-      {/* Crosshair animation */}
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-8">
-        {/* Outer ping ring */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            border: '1px solid rgba(245,166,35,0.3)',
-            animation: 'radarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite',
-          }}
-        />
-        {/* Second ping ring offset */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            border: '1px solid rgba(245,166,35,0.2)',
-            animation: 'radarPing 2s cubic-bezier(0, 0, 0.2, 1) 0.6s infinite',
-          }}
-        />
-        {/* Rotating sweep */}
-        <div
-          className="absolute inset-0 rounded-full overflow-hidden"
-          style={{ animation: 'radarSweep 2.5s linear infinite' }}
-        >
-          <div
-            className="absolute top-0 left-1/2 w-1/2 h-1/2 origin-bottom-left"
-            style={{
-              background: 'conic-gradient(from 0deg, rgba(245,166,35,0.25) 0deg, transparent 60deg)',
-            }}
-          />
-        </div>
-        {/* Crosshair SVG with draw animation */}
-        <svg
-          viewBox="0 0 64 64"
-          fill="none"
-          className="absolute inset-0 w-full h-full"
-          style={{ filter: 'drop-shadow(0 0 12px rgba(245,166,35,0.5))' }}
-        >
-          {/* Outer ring */}
-          <circle
-            cx="32" cy="32" r="27"
-            stroke="#F5A623" strokeWidth="1"
-            opacity="0.35"
-            strokeDasharray="170"
-            style={{ animation: 'ringDraw 1.2s cubic-bezier(0.16,1,0.3,1) forwards' }}
-          />
-          {/* Middle ring */}
-          <circle
-            cx="32" cy="32" r="19"
-            stroke="#F5A623" strokeWidth="1.2"
-            opacity="0.6"
-            strokeDasharray="120"
-            style={{ animation: 'ringDraw 1s cubic-bezier(0.16,1,0.3,1) 0.15s forwards' }}
-          />
-          {/* Inner ring */}
-          <circle
-            cx="32" cy="32" r="10"
-            stroke="#F5A623" strokeWidth="1.5"
-            opacity="0.85"
-            strokeDasharray="63"
-            style={{ animation: 'ringDraw 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards' }}
-          />
-          {/* Center dot — pops in */}
-          <circle
-            cx="32" cy="32" r="3.5"
-            fill="#F5A623"
-            style={{ animation: 'dotPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.6s both' }}
-          />
-          {/* Crosshair lines */}
-          <line x1="32" y1="4" x2="32" y2="20" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
-            strokeDasharray="16"
-            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s forwards' }}
-          />
-          <line x1="32" y1="44" x2="32" y2="60" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
-            strokeDasharray="16"
-            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.45s forwards' }}
-          />
-          <line x1="4" y1="32" x2="20" y2="32" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
-            strokeDasharray="16"
-            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.5s forwards' }}
-          />
-          <line x1="44" y1="32" x2="60" y2="32" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round"
-            strokeDasharray="16"
-            style={{ animation: 'ringDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.55s forwards' }}
-          />
-        </svg>
-      </div>
-
-      {/* Brand text */}
-      <div className="text-center mb-8" style={{ animation: 'revealUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}>
-        <h1
-          className="font-display font-black text-2xl sm:text-3xl tracking-[0.22em] uppercase mb-1"
-          style={{
-            background: 'linear-gradient(135deg, #F5A623 0%, #FFD580 50%, #F5A623 100%)',
-            backgroundSize: '200% 100%',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'shimmer 3s linear infinite',
-          }}
-        >
-          MARKSMAN
-        </h1>
-        <p
-          className="font-display text-[11px] sm:text-[12px] tracking-[0.3em] uppercase"
-          style={{ color: '#4A5568', animation: 'textReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
-        >
-          Precision Analytics
-        </p>
-      </div>
-
-      {/* Progress bar */}
-      <div
-        className="w-48 sm:w-56"
-        style={{ animation: 'revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
-      >
-        <div className="progress-track" style={{ height: 2, background: 'rgba(245,166,35,0.08)' }}>
-          <div
-            className="h-full rounded-full relative overflow-hidden"
-            style={{
-              width: `${progress}%`,
-              background: 'linear-gradient(90deg, #F5A623, #FFD580)',
-              boxShadow: '0 0 12px rgba(245,166,35,0.5), 0 0 4px rgba(245,166,35,0.8)',
-              transition: 'width 60ms linear',
-            }}
-          >
-            {/* Shimmer on the bar */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                backgroundSize: '200% 100%',
-                animation: 'shimmer 1s linear infinite',
-              }}
-            />
-          </div>
-        </div>
-        {/* Loading status text */}
-        <div className="flex justify-between mt-3">
-          <span
-            className="font-display text-[10px] tracking-[0.15em] uppercase"
-            style={{ color: '#4A5568' }}
-          >
-            Initializing
-          </span>
-          <span
-            className="font-jetbrains text-[10px] font-semibold tabular-nums"
-            style={{ color: 'rgba(245,166,35,0.6)' }}
-          >
-            {Math.round(progress)}%
-          </span>
-        </div>
-      </div>
-
-      {/* Subtle grid underlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(245,166,35,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.4) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }}
-      />
-
-      {/* Scan line effect */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{ animation: 'scanLine 3s linear infinite' }}
-      >
-        <div
-          className="w-full h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.15), transparent)' }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ── Nav ──────────────────────────────────────────────────────────────────────
-
-function Nav({ safeTopInset }: { safeTopInset: string }) {
-  const [scrolled,  setScrolled]  = useState(false);
-  const [menuOpen,  setMenuOpen]  = useState(false);
-
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 40);
+    const h = () => setNavSolid(window.scrollY > 60);
     window.addEventListener('scroll', h, { passive: true });
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  useEffect(() => {
-    const h = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
-    window.addEventListener('resize', h);
-    return () => window.removeEventListener('resize', h);
-  }, []);
+  if (!mounted || user) return <PageLoader />;
 
-  // Prevent body scroll while menu open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
-
-  const NAV_LINKS = [
-    { label: 'Features',     href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Coaches',      href: '#coaches' },
-  ];
+  const isDark = resolvedTheme !== 'light';
+  const pageBg   = isDark ? '#060810' : '#F4F6FB';
+  const pageText  = isDark ? '#F0F4FF' : '#0E1118';
+  const navBgSolid = isDark ? 'rgba(6,8,16,0.92)' : 'rgba(244,246,251,0.92)';
+  const navBorderSolid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
 
   return (
-    <>
+    <PageTheme.Provider value={isDark}>
+    <div style={{ background: pageBg, color: pageText, overflowX: 'hidden', transition: 'background 0.4s, color 0.4s' }}>
+
+      {/* ── Navigation ──────────────────────────────────────────────────────── */}
       <nav
-        className="fixed top-0 inset-x-0 z-50 transition-all duration-500 relative overflow-hidden"
-        style={
-          scrolled
-            ? {
-                paddingTop: safeTopInset,
-                background: 'rgba(6,8,16,0.95)',
-                backdropFilter: 'blur(32px) saturate(200%)',
-                WebkitBackdropFilter: 'blur(32px) saturate(200%)',
-                boxShadow: '0 1px 0 rgba(245,166,35,0.07), 0 8px 40px rgba(0,0,0,0.55)',
-              }
-            : {
-                paddingTop: safeTopInset,
-                background: 'transparent',
-              }
-        }
+        className="fixed top-0 inset-x-0 z-50 transition-all duration-500"
+        style={{
+          height: 64,
+          background: navSolid ? navBgSolid : 'transparent',
+          backdropFilter: navSolid ? 'blur(20px) saturate(160%)' : 'none',
+          borderBottom: navSolid ? `1px solid ${navBorderSolid}` : '1px solid transparent',
+        }}
       >
-        <div
-          className="absolute top-0 left-0 right-0 pointer-events-none"
-          style={{
-            height: safeTopInset,
-            background:
-              'linear-gradient(90deg, rgba(245,166,35,0.20) 0%, rgba(79,195,247,0.16) 45%, rgba(0,229,160,0.12) 100%)',
-          }}
-        />
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 h-[64px] sm:h-[72px] flex items-center justify-between gap-4">
+        <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between px-5 sm:px-8 lg:px-12">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0 touch-target">
-            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10">
-              <div
-                className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.25) 0%, transparent 70%)' }}
-              />
-              <CrosshairLogo size={28} />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-black text-[16px] sm:text-[17px] tracking-[0.18em] uppercase text-[#F0F4FF]">
-                Marksman
-              </span>
-              <span className="font-display text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-[#F5A623] opacity-80 mt-0.5">
-                Precision Analytics
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <CrosshairLogo size={26} />
+            <span className="font-display font-black text-[17px] tracking-[0.2em] uppercase" style={{ color: pageText }}>
+              Marksman
+            </span>
           </Link>
 
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-1 flex-1 justify-center">
-            {NAV_LINKS.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="relative px-5 py-2.5 text-[#9CA3B4] hover:text-[#F0F4FF] text-[13px]
-                           font-display uppercase tracking-[0.15em] transition-colors duration-200
-                           group rounded-lg hover:bg-white/[0.04]"
-              >
-                {item.label}
-                <span
-                  className="absolute bottom-1 left-5 right-5 h-px origin-left scale-x-0
-                             group-hover:scale-x-100 transition-transform duration-300"
-                  style={{ background: 'linear-gradient(90deg, #F5A623 0%, rgba(245,166,35,0.2) 100%)' }}
-                />
-              </a>
+          {/* Nav links — desktop */}
+          <div className="hidden md:flex items-center gap-8">
+            {[['Features', '#features'], ['Analytics', '#analytics'], ['AI Coach', '#ai-coach'], ['How it works', '#how']].map(([label, href]) => (
+              <a key={label} href={href}
+                className="text-[13px] font-display font-semibold uppercase tracking-[0.07em] transition-colors duration-200"
+                style={{ color: isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.45)' }}
+                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = pageText; }}
+                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.45)'; }}
+              >{label}</a>
             ))}
           </div>
 
-          {/* Desktop CTAs */}
-          <div className="hidden md:flex items-center gap-3 shrink-0">
-            <MagneticButton>
-              <Link href="/auth/register" className="btn btn-primary text-[13px] py-2.5 px-6 gap-2">
-                Get Started <ArrowRightIcon size={12} />
-              </Link>
-            </MagneticButton>
-          </div>
+          {/* Auth CTAs */}
+          <div className="flex items-center gap-2.5">
 
-          {/* Mobile: hamburger */}
-          <div className="flex md:hidden items-center gap-1">
+            {/* Theme toggle */}
             <button
-              className="w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-xl
-                         transition-colors active:bg-white/[0.06]"
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label="Toggle navigation menu"
+              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+              className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 active:scale-90 shrink-0"
+              style={{
+                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
+                color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.55)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.1)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.35)';
+                (e.currentTarget as HTMLElement).style.color = '#F5A623';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                (e.currentTarget as HTMLElement).style.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)';
+                (e.currentTarget as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.55)';
+              }}
+              aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+              title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              <span
-                className="w-5 h-[1.5px] rounded-full transition-all duration-300 origin-center"
-                style={{
-                  background: '#8892A4',
-                  transform: menuOpen ? 'translateY(6.5px) rotate(45deg)' : 'none',
-                }}
-              />
-              <span
-                className="h-[1.5px] rounded-full transition-all duration-200"
-                style={{
-                  background: '#8892A4',
-                  width: menuOpen ? '20px' : '12px',
-                  opacity: menuOpen ? 0 : 1,
-                }}
-              />
-              <span
-                className="w-5 h-[1.5px] rounded-full transition-all duration-300 origin-center"
-                style={{
-                  background: '#8892A4',
-                  transform: menuOpen ? 'translateY(-6.5px) rotate(-45deg)' : 'none',
-                }}
-              />
+              {resolvedTheme === 'dark' ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
             </button>
+
+            <Link href="/auth/login"
+              className="hidden sm:block text-[13px] font-display font-semibold px-4 py-2 rounded-lg transition-all duration-200"
+              style={{ color: isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = pageText; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)'; }}
+            >Sign in</Link>
+            <Link href="/auth/register"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-display font-bold uppercase tracking-[0.07em] transition-all duration-200 active:scale-95"
+              style={{
+                background: 'rgba(245,166,35,0.12)',
+                border: '1px solid rgba(245,166,35,0.35)',
+                color: '#F5A623',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.2)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.6)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.12)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.35)';
+              }}
+            >Get started</Link>
           </div>
         </div>
-
-        {/* Scrolled bottom border */}
-        <div
-          className="absolute bottom-0 inset-x-0 h-px pointer-events-none transition-opacity duration-500"
-          style={{
-            opacity: scrolled ? 1 : 0,
-            background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.3) 30%, rgba(79,195,247,0.18) 70%, transparent 100%)',
-          }}
-        />
       </nav>
 
-      {/* Mobile drawer */}
-      <div
-        className="fixed inset-0 z-40 md:hidden transition-opacity duration-300"
-        style={{ opacity: menuOpen ? 1 : 0, pointerEvents: menuOpen ? 'auto' : 'none' }}
-      >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(6,8,16,0.75)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
-          onClick={() => setMenuOpen(false)}
-        />
+      {/* ── HERO ─────────────────────────────────────────────────────────────── */}
+      <HeroSection />
 
-        {/* Panel — slides in from top */}
-        <div
-          className="absolute inset-x-0 transition-transform duration-300"
-          style={{
-            top: `calc(60px + ${safeTopInset})`,
-            background: 'rgba(6,8,16,0.98)',
-            borderBottom: '1px solid rgba(245,166,35,0.1)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-            transform: menuOpen ? 'translateY(0)' : 'translateY(-16px)',
-          }}
-        >
-          <div className="px-5 pt-3 pb-6 flex flex-col gap-1">
-            {NAV_LINKS.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-4 text-[#9CA3B4] hover:text-[#F0F4FF] text-base font-display
-                           uppercase tracking-[0.15em] transition-colors rounded-xl active:bg-white/[0.05]
-                           flex items-center justify-between touch-target"
-              >
-                {item.label}
-                <span className="text-[#4A5568] text-xl">›</span>
-              </a>
-            ))}
-            <div
-              className="h-px my-2 mx-4"
-              style={{ background: 'linear-gradient(90deg, rgba(245,166,35,0.2), rgba(245,166,35,0.05))' }}
-            />
-            <div className="px-4 pt-2 flex flex-col gap-3">
-              <Link
-                href="/auth/register"
-                onClick={() => setMenuOpen(false)}
-                className="btn btn-primary text-sm py-3.5 w-full justify-center"
-              >
-                Get Started — Free
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-      <EventPopup />
-    </>
+      {/* ── Stats strip ─────────────────────────────────────────────────────── */}
+      <StatsStrip />
+
+      {/* ── Features ────────────────────────────────────────────────────────── */}
+      <FeaturesSection />
+
+      {/* ── Roles ───────────────────────────────────────────────────────────── */}
+      <RolesSection />
+
+      {/* ── Analytics showcase ──────────────────────────────────────────────── */}
+      <AnalyticsShowcase />
+
+      {/* ── AI Coach ────────────────────────────────────────────────────────── */}
+      <AICoachSection />
+
+      {/* ── How it works ────────────────────────────────────────────────────── */}
+      <HowItWorksSection />
+
+      {/* ── Final CTA ───────────────────────────────────────────────────────── */}
+      <CTASection />
+
+      {/* ── Footer ──────────────────────────────────────────────────────────── */}
+      <Footer />
+
+    </div>
+    </PageTheme.Provider>
   );
 }
 
-// ── Hero ─────────────────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// HERO SECTION
+// GitHub-aurora aesthetic: deep void + shifting colour orbs + product window
+// ═════════════════════════════════════════════════════════════════════════════
 
-function Hero({ scrollY }: { scrollY: number }) {
+const HERO_PARTICLES = [
+  { x: 12, y: 18, s: 3, c: '#F5A623', d: '0s',   dur: '6s'   },
+  { x: 28, y: 72, s: 2, c: '#4FC3F7', d: '1.2s', dur: '8s'   },
+  { x: 45, y: 35, s: 2, c: '#00E5A0', d: '2.4s', dur: '7s'   },
+  { x: 62, y: 58, s: 3, c: '#F5A623', d: '0.6s', dur: '9s'   },
+  { x: 78, y: 22, s: 2, c: '#4FC3F7', d: '3.1s', dur: '6.5s' },
+  { x: 88, y: 80, s: 2, c: '#00E5A0', d: '1.8s', dur: '7.5s' },
+  { x: 8,  y: 55, s: 2, c: '#F5A623', d: '4.0s', dur: '8.5s' },
+  { x: 35, y: 90, s: 3, c: '#4FC3F7', d: '2.0s', dur: '6s'   },
+  { x: 55, y: 12, s: 2, c: '#F5A623', d: '1.5s', dur: '9.5s' },
+  { x: 72, y: 45, s: 2, c: '#00E5A0', d: '3.6s', dur: '7s'   },
+  { x: 18, y: 40, s: 2, c: '#4FC3F7', d: '0.9s', dur: '8s'   },
+  { x: 92, y: 38, s: 3, c: '#F5A623', d: '2.7s', dur: '6.5s' },
+  { x: 40, y: 65, s: 2, c: '#00E5A0', d: '4.5s', dur: '9s'   },
+  { x: 68, y: 88, s: 2, c: '#4FC3F7', d: '1.1s', dur: '7.5s' },
+  { x: 25, y: 8,  s: 2, c: '#F5A623', d: '3.3s', dur: '8s'   },
+  { x: 82, y: 62, s: 3, c: '#00E5A0', d: '0.4s', dur: '6s'   },
+  { x: 52, y: 78, s: 2, c: '#4FC3F7', d: '2.2s', dur: '9s'   },
+  { x: 15, y: 85, s: 2, c: '#F5A623', d: '4.8s', dur: '7s'   },
+  { x: 75, y: 10, s: 2, c: '#00E5A0', d: '1.7s', dur: '8.5s' },
+  { x: 38, y: 50, s: 3, c: '#4FC3F7', d: '3.9s', dur: '6s'   },
+];
+
+function HeroSection() {
+  const isDark = usePageTheme();
+  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
+  const textMut  = isDark ? 'rgba(240,244,255,0.55)'  : 'rgba(14,17,24,0.6)';
+  const textDim  = isDark ? 'rgba(240,244,255,0.4)'   : 'rgba(14,17,24,0.45)';
+  const dotGrid  = isDark ? 'rgba(255,255,255,0.06)'  : 'rgba(0,0,0,0.05)';
+  const scrollBd = isDark ? 'rgba(255,255,255,0.15)'  : 'rgba(0,0,0,0.15)';
+  const secBtnBg = isDark ? 'rgba(240,244,255,0.04)'  : 'rgba(0,0,0,0.04)';
+  const secBtnBd = isDark ? 'rgba(240,244,255,0.1)'   : 'rgba(0,0,0,0.1)';
+  const secBtnTx = isDark ? 'rgba(240,244,255,0.6)'   : 'rgba(14,17,24,0.6)';
+
   return (
-    <section className="relative min-h-screen flex items-center pt-[60px] sm:pt-[68px] overflow-hidden">
+    <section
+      className="relative flex flex-col items-center justify-center overflow-hidden"
+      style={{ minHeight: '100dvh', paddingTop: 64 }}
+    >
+      {/* ── Aurora background ─── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
 
-      {/* Hex grid bg */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-2l26-15V18L28 2 2 18v31L28 64z' fill='none' stroke='%231E2433' stroke-width='0.6' opacity='0.5'/%3E%3C/svg%3E")`,
-          backgroundSize: '40px 72px',
-          opacity: 0.35,
-        }}
-      />
+        {/* Dot grid */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+        }} />
 
-      {/* Floating particles */}
-      <ParticleField />
+        {/* Primary aurora — amber/gold */}
+        <div className="absolute" style={{
+          top: '5%', left: '50%', transform: 'translateX(-50%)',
+          width: '900px', height: '600px',
+          background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.13) 0%, rgba(245,166,35,0.05) 35%, transparent 65%)',
+          filter: 'blur(40px)',
+          animation: 'breathe 8s ease-in-out infinite',
+        }} />
 
-      {/* Drifting orbs */}
-      <div className="absolute pointer-events-none" style={{ width: 500, height: 500, right: '0%', top: '5%', background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.07) 0%, transparent 65%)', animation: 'orbFloat 14s ease-in-out infinite' }} />
-      <div className="absolute pointer-events-none" style={{ width: 300, height: 300, left: '-10%', bottom: '10%', background: 'radial-gradient(ellipse at center, rgba(79,195,247,0.04) 0%, transparent 65%)', animation: 'orbFloat 18s ease-in-out 4s infinite' }} />
+        {/* Secondary aurora — blue */}
+        <div className="absolute" style={{
+          bottom: '10%', right: '5%',
+          width: '600px', height: '500px',
+          background: 'radial-gradient(ellipse, rgba(79,195,247,0.08) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          animation: 'breathe 11s ease-in-out 3s infinite',
+        }} />
 
-      {/* Scan line */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute inset-x-0 h-px opacity-[0.03]"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, #F5A623 40%, #4FC3F7 60%, transparent 100%)', animation: 'scanLine 10s linear infinite' }}
-        />
+        {/* Tertiary aurora — green */}
+        <div className="absolute" style={{
+          top: '30%', left: '-5%',
+          width: '500px', height: '400px',
+          background: 'radial-gradient(ellipse, rgba(0,229,160,0.06) 0%, transparent 60%)',
+          filter: 'blur(60px)',
+          animation: 'breathe 14s ease-in-out 6s infinite',
+        }} />
+
+        {/* Horizontal scan line */}
+        <div className="absolute inset-x-0 top-0 h-px" style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.3) 30%, rgba(79,195,247,0.2) 60%, transparent 100%)',
+          top: 64,
+        }} />
+
+        {/* Floating particles */}
+        {HERO_PARTICLES.map((p, i) => (
+          <div key={i} className="absolute rounded-full pointer-events-none" style={{
+            left: `${p.x}%`, top: `${p.y}%`,
+            width: p.s, height: p.s,
+            background: p.c,
+            opacity: 0.45,
+            boxShadow: `0 0 ${p.s * 3}px ${p.c}80`,
+            animation: `floatY ${p.dur} ease-in-out ${p.d} infinite`,
+          }} />
+        ))}
+
+        {/* Radar ping rings */}
+        <div className="absolute pointer-events-none" style={{
+          bottom: '15%', right: '25%',
+          width: 200, height: 200,
+          borderRadius: '50%',
+          border: '1px solid rgba(245,166,35,0.15)',
+          animation: 'radarPing 3s cubic-bezier(0,0,0.2,1) infinite',
+        }} />
+        <div className="absolute pointer-events-none" style={{
+          bottom: '15%', right: '25%',
+          width: 200, height: 200,
+          borderRadius: '50%',
+          border: '1px solid rgba(79,195,247,0.12)',
+          animation: 'radarPing 3s cubic-bezier(0,0,0.2,1) 1.5s infinite',
+        }} />
+
+        {/* Moving scan line sweep */}
+        <div className="absolute inset-x-0 h-px pointer-events-none" style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.4) 50%, transparent 100%)',
+          animation: 'scanLine 8s linear infinite',
+          opacity: 0.6,
+        }} />
       </div>
 
-      {/* Content */}
-      <div className="relative max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-16 lg:py-24 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 items-center">
+      {/* ── Main content ─── */}
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-20">
+        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-16 items-center">
 
-          {/* Copy — always first on mobile */}
-          <div className="space-y-6 sm:space-y-8" style={{ animation: 'slideUpFade 700ms cubic-bezier(0.16,1,0.3,1) both' }}>
-
-            {/* Eyebrow badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.22)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623] flex-shrink-0" style={{ animation: 'pulseGlow 2.5s ease-in-out infinite' }} />
-              <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.2em]">
-                Precision Training Analytics
+          {/* ── Left: text ── */}
+          <div>
+            {/* Trust badge */}
+            <div
+              className="inline-flex items-center gap-2.5 mb-7 px-3.5 py-1.5 rounded-full"
+              style={{
+                background: 'rgba(245,166,35,0.08)',
+                border: '1px solid rgba(245,166,35,0.22)',
+                animation: 'fadeIn 500ms both',
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F5A623' }} />
+              <span className="text-[11px] font-display font-bold uppercase tracking-[0.15em]" style={{ color: '#F5A623' }}>
+                Trusted by 12 national teams
               </span>
             </div>
 
             {/* Headline */}
-            <div>
-              <h1
-                className="font-display font-black leading-[1.0] tracking-tight"
-                style={{ fontSize: 'clamp(3rem, 11vw, 6.5rem)', letterSpacing: '-0.02em' }}
+            <h1
+              className="font-display font-black leading-[1.03] tracking-[-0.015em] mb-6"
+              style={{ fontSize: 'clamp(2.6rem, 5.8vw, 4.2rem)', animation: 'slideUp 600ms 80ms both' }}
+            >
+              The performance<br />
+              platform built for{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #F5A623 0%, #FFD580 40%, #F5A623 100%)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  animation: 'gradientFlow 4s linear infinite',
+                }}
               >
-                <span className="block text-[#F0F4FF]" style={{ animation: 'textReveal 600ms cubic-bezier(0.16,1,0.3,1) 0ms both' }}>
-                  Master
-                </span>
-                <span className="block gradient-text" style={{ animation: 'textReveal 600ms cubic-bezier(0.16,1,0.3,1) 120ms both' }}>
-                  Every Shot.
-                </span>
-              </h1>
-              <p
-                className="font-body text-[#8892A4] text-[15px] sm:text-[17px] mt-4 sm:mt-6"
-                style={{ animation: 'slideUpFade 700ms 260ms both', maxWidth: '34rem', lineHeight: '1.75' }}
+                elite shooters.
+              </span>
+            </h1>
+
+            {/* Subtext */}
+            <p
+              className="text-base sm:text-[17px] leading-[1.7] mb-9 max-w-[500px]"
+              style={{ color: textMut, animation: 'slideUp 600ms 160ms both' }}
+            >
+              Track every shot with millimetre precision. Detect technique flaws automatically.
+              Receive structured coaching from Claude Opus 4.6 — after every single session.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 mb-10" style={{ animation: 'slideUp 600ms 240ms both' }}>
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-display font-black text-[13px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #F5A623 0%, #E8961A 100%)', color: '#060810', boxShadow: '0 0 40px rgba(245,166,35,0.25), 0 4px 16px rgba(245,166,35,0.3)' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 60px rgba(245,166,35,0.4), 0 6px 24px rgba(245,166,35,0.4)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 40px rgba(245,166,35,0.25), 0 4px 16px rgba(245,166,35,0.3)'; }}
               >
-                The complete analytics platform for competitive shooters and coaches.
-                Log every shot, spot patterns with computer vision, and close the gap
-                to your personal best.
-              </p>
+                Start for free <ArrowRightIcon />
+              </Link>
+              <Link
+                href="/auth/login"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-display font-semibold text-[13px] transition-all duration-200"
+                style={{ background: secBtnBg, border: `1px solid ${secBtnBd}`, color: secBtnTx }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = isDark ? 'rgba(240,244,255,0.08)' : 'rgba(0,0,0,0.08)';
+                  (e.currentTarget as HTMLElement).style.color = textPri;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = secBtnBg;
+                  (e.currentTarget as HTMLElement).style.color = secBtnTx;
+                }}
+              >
+                Sign in to dashboard
+              </Link>
             </div>
 
-            {/* Mini stat pills */}
-            <div
-              className="flex flex-wrap gap-3 sm:gap-6 pt-1"
-              style={{ animation: 'slideUpFade 700ms 340ms both' }}
-            >
+            {/* Live stat pills */}
+            <div className="flex flex-wrap gap-3" style={{ animation: 'slideUp 600ms 320ms both' }}>
               {[
-                { value: '10-Ring', label: 'ISSF scoring', color: '#F5A623' },
-                { value: 'CV Vision', label: 'Photo analysis', color: '#4FC3F7' },
-                { value: 'Real-time', label: 'Coach feedback', color: '#00E5A0' },
-              ].map(({ value, label, color }) => (
-                <div key={label} className="flex flex-col gap-0.5">
-                  <span className="font-display font-bold text-base sm:text-xl leading-none" style={{ color }}>
-                    {value}
-                  </span>
-                  <span className="text-[#6B7A96] text-[10px] sm:text-[11px] font-display uppercase tracking-[0.15em]">
-                    {label}
+                { val: '10.9', label: 'World Record · Air Rifle', color: '#F5A623', glowColor: 'rgba(245,166,35,0.15)' },
+                { val: '2,847', label: 'Shooters tracked', color: '#4FC3F7', glowColor: 'rgba(79,195,247,0.12)' },
+                { val: '98.4%', label: 'AI accuracy', color: '#00E5A0', glowColor: 'rgba(0,229,160,0.12)' },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl"
+                  style={{ background: s.glowColor, border: `1px solid ${s.color}22` }}
+                >
+                  <span className="font-data font-black text-base" style={{ color: s.color }}>{s.val}</span>
+                  <span className="text-[11px] font-display uppercase tracking-[0.08em]" style={{ color: textDim }}>
+                    {s.label}
                   </span>
                 </div>
               ))}
             </div>
-
-            {/* CTAs */}
-            <div
-              className="flex items-center pt-1"
-              style={{ animation: 'slideUpFade 700ms 420ms both' }}
-            >
-              <MagneticButton>
-                <Link href="/auth/register" className="btn btn-primary text-sm px-6 sm:px-8 py-3.5 sm:py-3 gap-2 justify-center">
-                  Start Free →
-                </Link>
-              </MagneticButton>
-            </div>
-
-            {/* Social proof */}
-            <div className="flex items-center gap-3" style={{ animation: 'slideUpFade 700ms 500ms both' }}>
-              <div className="flex -space-x-2">
-                {['AM', 'SC', 'JH', 'RK'].map((init) => (
-                  <div
-                    key={init}
-                    className="w-7 h-7 rounded-full border-2 border-[#080A0F] flex items-center justify-center text-[8px] font-display font-bold"
-                    style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.2), rgba(79,195,247,0.15))' }}
-                  >
-                    <span className="text-[#8892A4]">{init}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[#6B7A96] text-sm font-display">
-                Trusted by <span className="text-[#C8D0E0]">2,400+</span> competitive shooters
-              </p>
-            </div>
           </div>
 
-          {/* Animated target — below copy on mobile */}
-          <div
-            className="flex items-center justify-center"
-            style={{ animation: 'slideUpFade 700ms 250ms both' }}
-          >
-            <AnimatedHeroTarget scrollY={scrollY} />
+          {/* ── Right: product window ── */}
+          <div style={{ animation: 'slideUp 700ms 120ms both' }}>
+            <HeroProductWindow />
           </div>
+
         </div>
       </div>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none" style={{ background: 'linear-gradient(to top, #080A0F, transparent)' }} />
+      {/* Scroll hint */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={{ animation: 'fadeIn 1s 1.5s both', opacity: 0 }}>
+        <div className="w-5 h-8 rounded-full border flex items-start justify-center pt-1.5"
+          style={{ borderColor: scrollBd }}>
+          <div className="w-1 h-1.5 rounded-full" style={{ background: 'rgba(245,166,35,0.6)', animation: 'scrollDot 1.8s ease-in-out infinite' }} />
+        </div>
+      </div>
     </section>
   );
 }
 
-// ── Animated Hero Target ──────────────────────────────────────────────────────
+// ── Hero Product Window ───────────────────────────────────────────────────────
 
-function AnimatedHeroTarget({ scrollY }: { scrollY: number }) {
-  const [tick, setTick]             = useState(0);
-  const [sweepAngle, setSweepAngle] = useState(0);
-  const tickRef = useRef(0);
-
-  const dots = [
-    { x:186, y:178, score:10.3 }, { x:191, y:184, score:10.1 },
-    { x:179, y:187, score:9.7  }, { x:184, y:172, score:10.6 },
-    { x:196, y:180, score:9.9  }, { x:177, y:179, score:10.2 },
-    { x:188, y:191, score:9.6  }, { x:183, y:176, score:10.4 },
-    { x:193, y:188, score:9.8  }, { x:175, y:183, score:10.0 },
-    { x:187, y:195, score:9.3  }, { x:194, y:175, score:10.1 },
-    { x:180, y:192, score:9.5  }, { x:190, y:181, score:10.5 },
-    { x:176, y:186, score:9.8  }, { x:185, y:170, score:10.7 },
-    { x:198, y:185, score:9.2  }, { x:178, y:175, score:10.3 },
-    { x:192, y:193, score:9.6  }, { x:183, y:188, score:10.0 },
-    { x:189, y:177, score:10.4 }, { x:182, y:190, score:9.7  },
-    { x:195, y:183, score:9.9  }, { x:174, y:180, score:10.2 },
-    { x:186, y:194, score:9.4  }, { x:191, y:172, score:10.6 },
-    { x:177, y:185, score:10.1 }, { x:184, y:176, score:10.3 },
-    { x:197, y:189, score:9.5  }, { x:180, y:179, score:10.0 },
-    { x:188, y:196, score:9.2  }, { x:193, y:174, score:10.5 },
-    { x:176, y:182, score:9.8  }, { x:185, y:190, score:9.6  },
-    { x:199, y:177, score:9.3  }, { x:181, y:173, score:10.7 },
-    { x:190, y:186, score:9.9  }, { x:174, y:188, score:10.1 },
-    { x:187, y:180, score:10.4 }, { x:183, y:195, score:9.5  },
-    { x:192, y:178, score:10.2 },
-  ];
+function HeroProductWindow() {
+  const [shots, setShots] = useState(0);
+  const SIZE = 260;
+  const rings = [115, 98, 80, 62, 46, 30, 18, 10];
 
   useEffect(() => {
-    function startCycle() {
-      tickRef.current = 0;
-      setTick(0);
+    const t = setTimeout(() => {
+      let n = 0;
       const id = setInterval(() => {
-        tickRef.current += 1;
-        setTick(tickRef.current);
-        if (tickRef.current >= 41) {
-          clearInterval(id);
-          setTimeout(startCycle, 2000);
-        }
-      }, 400);
-    }
-    startCycle();
-  }, []);
-
-  useEffect(() => {
-    let frame: number;
-    let start: number;
-    const animate = (ts: number) => {
-      if (!start) start = ts;
-      setSweepAngle(((ts - start) / 4000) * 360);
-      frame = requestAnimationFrame(animate);
-    };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const visibleDots = dots.filter((_, i) => tick > i);
-  const avg  = visibleDots.length ? visibleDots.reduce((s, d) => s + d.score, 0) / visibleDots.length : null;
-  const best = visibleDots.length ? Math.max(...visibleDots.map((d) => d.score)) : null;
-  const mpiX = visibleDots.length ? visibleDots.reduce((s, d) => s + d.x, 0) / visibleDots.length : null;
-  const mpiY = visibleDots.length ? visibleDots.reduce((s, d) => s + d.y, 0) / visibleDots.length : null;
-
-  const rings = [76, 63, 50, 38, 28, 18, 10, 5];
-  const cx = 183;
-  const cy = 183;
-  const sweepRad = (sweepAngle * Math.PI) / 180;
-  const sweepX   = cx + 100 * Math.cos(sweepRad);
-  const sweepY   = cy + 100 * Math.sin(sweepRad);
-
-  const dotColor = (s: number) =>
-    s >= 10.5 ? '#F5A623' : s >= 10.0 ? '#4FC3F7' : s >= 9.0 ? '#00E5A0' : '#FF4D6D';
-
-  return (
-    /* Outer wrapper constrains size and positions floating cards safely */
-    <div
-      className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[440px] mx-auto"
-      style={{
-        transform: `translateY(${-Math.min(scrollY * 0.12, 60)}px)`,
-        willChange: 'transform',
-        transition: 'transform 50ms linear',
-      }}
-    >
-
-      {/* Floating cards — visible sm+ only to avoid horizontal overflow on mobile */}
-      {avg !== null && (
-        <div
-          className="hidden sm:block absolute -top-3 -right-3 lg:-top-4 lg:-right-4 z-10 rounded-xl px-3 py-2.5"
-          style={{ background: 'rgba(8,10,15,0.9)', border: '1px solid rgba(245,166,35,0.28)', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', animation: 'floatY 3.5s ease-in-out infinite', minWidth: 88 }}
-        >
-          <p className="text-[#4A5568] text-[9px] font-display uppercase tracking-[0.14em] mb-0.5">Session Avg</p>
-          <p className="font-jetbrains font-bold text-lg leading-none" style={{ color: '#F5A623' }}>{avg.toFixed(2)}</p>
-        </div>
-      )}
-
-      {visibleDots.length >= 3 && (
-        <div
-          className="hidden sm:block absolute -bottom-2 -left-4 lg:-left-6 z-10 rounded-xl px-3 py-2.5"
-          style={{ background: 'rgba(8,10,15,0.9)', border: '1px solid rgba(79,195,247,0.24)', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', animation: 'floatY 4s ease-in-out 1.2s infinite', minWidth: 80 }}
-        >
-          <p className="text-[#4A5568] text-[9px] font-display uppercase tracking-[0.14em] mb-0.5">Shots</p>
-          <p className="font-jetbrains font-bold text-lg leading-none text-[#4FC3F7]">{visibleDots.length}</p>
-        </div>
-      )}
-
-      {best !== null && (
-        <div
-          className="hidden lg:block absolute top-1/2 -right-7 z-10 rounded-xl px-3 py-2.5"
-          style={{ background: 'rgba(8,10,15,0.9)', border: '1px solid rgba(0,229,160,0.22)', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', animation: 'floatY 5s ease-in-out 0.6s infinite', minWidth: 76 }}
-        >
-          <p className="text-[#4A5568] text-[9px] font-display uppercase tracking-[0.14em] mb-0.5">Best</p>
-          <p className="font-jetbrains font-bold text-lg leading-none text-[#00E5A0]">{best.toFixed(1)}</p>
-        </div>
-      )}
-
-      {/* SVG */}
-      <svg
-        viewBox="0 0 366 366"
-        className="w-full"
-        style={{ filter: 'drop-shadow(0 0 40px rgba(245,166,35,0.1)) drop-shadow(0 20px 48px rgba(0,0,0,0.7))' }}
-      >
-        <rect width="366" height="366" rx="16" fill="#0C0F1A" />
-        <rect width="366" height="366" rx="16" fill="none" stroke="#1E2433" strokeWidth="1" />
-
-        <defs>
-          <pattern id="igrid" width="30" height="30" patternUnits="userSpaceOnUse" x={cx - 90} y={cy - 90}>
-            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1A2030" strokeWidth="0.4" />
-          </pattern>
-          <radialGradient id="iradarFade" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(245,166,35,0.12)" />
-            <stop offset="100%" stopColor="rgba(245,166,35,0)" />
-          </radialGradient>
-          <filter id="iglow">
-            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-
-        <rect x={cx - 90} y={cy - 90} width="180" height="180" fill="url(#igrid)" opacity="0.6" />
-
-        {[...rings].reverse().map((r, ri) => {
-          const idx = rings.length - 1 - ri;
-          const isCore = idx <= 1;
-          const isInner = idx <= 3;
-          return (
-            <circle key={r} cx={cx} cy={cy} r={r}
-              fill={isCore ? 'rgba(245,166,35,0.09)' : isInner ? 'rgba(245,166,35,0.04)' : 'none'}
-              stroke={isCore ? 'rgba(245,166,35,0.7)' : isInner ? 'rgba(245,166,35,0.35)' : '#1E2433'}
-              strokeWidth={isCore ? 1 : 0.6}
-              style={{ animation: `fadeIn 400ms ${ri * 60}ms both` }}
-            />
-          );
-        })}
-
-        {/* Radar sweep */}
-        <circle cx={cx} cy={cy} r={100} fill="url(#iradarFade)" opacity={0.35}
-          style={{ transformOrigin: `${cx}px ${cy}px`, transform: `rotate(${sweepAngle}deg)` }} />
-        <line x1={cx} y1={cy} x2={sweepX} y2={sweepY} stroke="rgba(245,166,35,0.55)" strokeWidth="1.2" filter="url(#iglow)" />
-
-        {/* Crosshairs */}
-        <line x1={cx - 95} y1={cy} x2={cx + 95} y2={cy} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 5" />
-        <line x1={cx} y1={cy - 95} x2={cx} y2={cy + 95} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 5" />
-
-        {/* Ring labels */}
-        {[{ r: 63, label: '8' }, { r: 50, label: '9' }, { r: 38, label: '10' }].map(({ r, label }) => (
-          <text key={label} x={cx + r + 4} y={cy + 4} fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="700">{label}</text>
-        ))}
-
-        {/* MPI */}
-        {mpiX !== null && mpiY !== null && (
-          <g opacity={0.75}>
-            <line x1={mpiX - 14} y1={mpiY} x2={mpiX + 14} y2={mpiY} stroke="#4FC3F7" strokeWidth="0.9" />
-            <line x1={mpiX} y1={mpiY - 14} x2={mpiX} y2={mpiY + 14} stroke="#4FC3F7" strokeWidth="0.9" />
-            <circle cx={mpiX} cy={mpiY} r="4" fill="none" stroke="#4FC3F7" strokeWidth="0.9" />
-          </g>
-        )}
-
-        {/* Shot dots */}
-        {dots.map((d, i) => {
-          const visible = tick > i;
-          const c = dotColor(d.score);
-          return (
-            <g key={i} style={{ opacity: visible ? 1 : 0, transition: 'opacity 400ms ease' }}>
-              <circle cx={d.x} cy={d.y} r={visible ? 5 : 0} fill={c} filter="url(#iglow)"
-                style={visible ? { animation: 'dotPop 500ms cubic-bezier(0.16,1,0.3,1) both' } : {}} />
-              {visible && (
-                <circle cx={d.x} cy={d.y} r="5" fill="none" stroke={c} strokeWidth="1.5" opacity="0"
-                  style={{ animation: 'pulseRing 800ms ease-out both' }} />
-              )}
-              <text x={d.x + 8} y={d.y + 3} fill={c} fontSize="7" fontFamily="JetBrains Mono, monospace" fontWeight="600"
-                opacity={visible ? 0.85 : 0} style={{ transition: 'opacity 300ms' }}>
-                {d.score}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Stats bar */}
-        <rect x="8" y="294" width="350" height="64" rx="8" fill="#060810" opacity="0.95" />
-        <rect x="8" y="294" width="350" height="64" rx="8" fill="none" stroke="#1E2433" strokeWidth="0.7" />
-        <line x1="8" y1="294" x2="358" y2="294" stroke="rgba(245,166,35,0.25)" strokeWidth="0.7" />
-
-        {[
-          { x: 40,  label: 'RANGE', value: '40–60',                               color: '#8892A4' },
-          { x: 155, label: 'AVG',   value: avg  !== null ? avg.toFixed(2)  : '—', color: '#F5A623' },
-          { x: 270, label: 'BEST',  value: best !== null ? best.toFixed(1) : '—', color: '#00E5A0' },
-        ].map(({ x, label, value, color }) => (
-          <g key={label}>
-            <text x={x} y="314" fill="#4A5568" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="600" letterSpacing="0.12em">{label}</text>
-            <text x={x} y="334" fill={color} fontSize="15" fontFamily="JetBrains Mono, monospace" fontWeight="700">{value}</text>
-          </g>
-        ))}
-
-        <rect width="366" height="366" rx="16" fill="none" stroke="rgba(245,166,35,0.05)" strokeWidth="1" />
-      </svg>
-    </div>
-  );
-}
-
-// ── Discipline Marquee ────────────────────────────────────────────────────────
-
-function DisciplineMarquee() {
-  const disciplines = [
-    'Air Rifle 10m', 'Air Pistol 10m', '.22 LR Smallbore', 'Biathlon',
-    'Olympic Trap', 'Skeet', 'Sporting Clays', 'ISSF Prone', 'Standing',
-    'Kneeling', '50m Rifle', '300m Rifle', 'Rapid Fire Pistol',
-  ];
-  const [paused, setPaused] = useState(false);
-
-  return (
-    <div
-      className="relative overflow-hidden py-4 sm:py-5"
-      style={{ background: 'linear-gradient(90deg, #080A0F 0%, #0D111C 50%, #080A0F 100%)', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(90deg, #080A0F, transparent)' }} />
-      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-10 pointer-events-none" style={{ background: 'linear-gradient(270deg, #080A0F, transparent)' }} />
-
-      <div className="flex gap-10 sm:gap-14 whitespace-nowrap" style={{ animation: 'marquee 30s linear infinite', animationPlayState: paused ? 'paused' : 'running' }}>
-        {[...disciplines, ...disciplines].map((d, i) => (
-          <span
-            key={i}
-            className="font-display text-[12px] sm:text-[13px] uppercase
-                       tracking-[0.18em] flex-shrink-0 flex items-center gap-2.5 sm:gap-3"
-            style={{ color: '#6B7A96' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-              style={{ background: i % 3 === 0 ? '#F5A623' : i % 3 === 1 ? '#4FC3F7' : '#00E5A0', opacity: 0.7 }} />
-            {d}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Live Stats Counter ────────────────────────────────────────────────────────
-
-function useCountUp(target: number, duration: number, active: boolean): number {
-  const [count, setCount] = useState(0);
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    if (!active) return;
-    let start: number | null = null;
-    const step = (ts: number) => {
-      if (start === null) start = ts;
-      const ease = 1 - Math.pow(1 - Math.min((ts - start) / duration, 1), 3);
-      setCount(Math.floor(ease * target));
-      if (ease < 1) raf.current = requestAnimationFrame(step);
-      else setCount(target);
-    };
-    raf.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf.current);
-  }, [target, duration, active]);
-
-  return count;
-}
-
-function StatItem({ value, suffix, label, color, active, duration }: {
-  value: number; suffix: string; label: string; color: string; active: boolean; duration: number;
-}) {
-  const count = useCountUp(value, duration, active);
-  return (
-    <div className="flex flex-col items-center text-center group px-2">
-      <div
-        className="font-jetbrains font-black leading-none"
-        style={{ fontSize: 'clamp(1.9rem, 7vw, 3.8rem)', color, filter: active ? `drop-shadow(0 0 16px ${color}40)` : 'none', transition: 'filter 300ms' }}
-      >
-        {count.toLocaleString()}{suffix}
-      </div>
-      <p className="text-[#6B7A96] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.18em] mt-2 sm:mt-3">
-        {label}
-      </p>
-      <div
-        className="h-px mt-2 sm:mt-3 w-0 group-hover:w-full transition-all duration-700"
-        style={{ background: `linear-gradient(90deg, transparent, ${color}60, transparent)` }}
-      />
-    </div>
-  );
-}
-
-function LiveStats() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setActive(true); },
-      { threshold: 0.3 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section
-      ref={ref}
-      className="py-12 sm:py-16 lg:py-24 relative overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #080A0F 0%, #0C0F1A 40%, #0C0F1A 60%, #080A0F 100%)' }}
-    >
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.2) 50%, transparent 90%)' }} />
-      <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(79,195,247,0.15) 50%, transparent 90%)' }} />
-
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-16">
-          <StatItem value={2400} suffix="+"      label="Active Shooters"      color="#F5A623" active={active} duration={1800} />
-          <StatItem value={847}  suffix="K+"     label="Shots Logged"         color="#4FC3F7" active={active} duration={2000} />
-          <StatItem value={12}   suffix=" types" label="Disciplines Tracked"  color="#00E5A0" active={active} duration={1400} />
-          <StatItem value={98}   suffix="%"      label="Coach Satisfaction"   color="#F5A623" active={active} duration={1600} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Bento Features ────────────────────────────────────────────────────────────
-
-const FEATURES = [
-  { id: 'canvas',    icon: <TargetIcon />,    color: '#F5A623', glow: 'rgba(245,166,35,0.12)',  title: 'Interactive Target Canvas', desc: 'Click directly on a rendered target to log shot placement. Scores calculate automatically using ISSF 10-ring thresholds.' },
-  { id: 'cv',        icon: <CameraIcon />,    color: '#4FC3F7', glow: 'rgba(79,195,247,0.1)',   title: 'Computer Vision',           desc: 'Photograph paper targets. The vision service detects hole positions, computes scores, and maps them to your shot record.' },
-  { id: 'analytics', icon: <ChartLineIcon />, color: '#00E5A0', glow: 'rgba(0,229,160,0.1)',    title: 'Deep Analytics',            desc: 'Session trends, MPI, group radius, standard deviation, fatigue index, and focus score — all visualised in real time.' },
-  { id: 'coach',     icon: <CoachIcon />,     color: '#4FC3F7', glow: 'rgba(79,195,247,0.1)',   title: 'Coach Connection',          desc: 'Coaches gain read access to full session history and can leave timestamped feedback on any shot.' },
-  { id: 'ai',        icon: <SparkleIcon />,   color: '#F5A623', glow: 'rgba(245,166,35,0.12)',  title: 'AI Training Plan',          desc: 'Groq Llama 3.3-powered personalised 4-week plans generated from your fatigue index, focus score, and outlier patterns.' },
-  { id: 'import',    icon: <ImportIcon />,    color: '#00E5A0', glow: 'rgba(0,229,160,0.1)',    title: 'Multi-format Import',       desc: 'Import from CSV, JSON, or electronic target systems. Scores and positions normalised automatically.' },
-];
-
-function BentoCard({ feature, idx }: { feature: typeof FEATURES[0]; idx: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className="group relative rounded-2xl border overflow-hidden"
-      style={{
-        background: '#0C0F1A',
-        borderColor: '#1E2433',
-        minHeight: '220px',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 600ms ${idx * 60}ms, transform 600ms ${idx * 60}ms cubic-bezier(0.16,1,0.3,1), border-color 300ms, box-shadow 300ms`,
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.borderColor = `${feature.color}40`;
-        el.style.boxShadow   = `0 12px 48px -8px ${feature.color}28, 0 4px 24px rgba(0,0,0,0.5)`;
-        el.style.transform   = 'translateY(-4px)';
-        const glow = el.querySelector('[data-glow]') as HTMLElement | null;
-        if (glow) glow.style.opacity = '1';
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.borderColor = '#1E2433';
-        el.style.boxShadow   = 'none';
-        el.style.transform   = 'translateY(0)';
-        const glow = el.querySelector('[data-glow]') as HTMLElement | null;
-        if (glow) glow.style.opacity = '0.35';
-      }}
-    >
-      {/* Top accent */}
-      <div className="absolute top-0 inset-x-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `linear-gradient(90deg, transparent, ${feature.color}, transparent)` }} />
-
-      {/* Corner glow — always visible at low opacity */}
-      <div
-        data-glow="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at 15% 15%, ${feature.glow} 0%, transparent 60%)`,
-          opacity: 0.35,
-          transition: 'opacity 500ms',
-        }}
-      />
-
-      <div className="relative p-5 sm:p-6 lg:p-7 flex flex-col h-full">
-        {/* Icon */}
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 mb-4 sm:mb-5"
-          style={{ background: feature.glow, color: feature.color }}>
-          {feature.icon}
-        </div>
-
-        <h3 className="font-display font-bold text-[#F0F4FF] text-base sm:text-[17px] tracking-wide mb-2.5">
-          {feature.title}
-        </h3>
-        <p className="text-[#8892A4] text-sm sm:text-[15px] flex-1" style={{ lineHeight: '1.7' }}>{feature.desc}</p>
-
-        {/* Bottom colour tick */}
-        <div className="mt-4 sm:mt-5 h-px w-8 opacity-40 group-hover:w-full group-hover:opacity-60 transition-all duration-500"
-          style={{ background: `linear-gradient(90deg, ${feature.color}, transparent)` }} />
-
-        {/* SVG watermark icon */}
-        <div
-          className="absolute bottom-4 right-4 pointer-events-none select-none"
-          style={{ opacity: 0.055, width: 60, height: 60, color: feature.color }}
-          aria-hidden="true"
-        >
-          <div style={{ transform: 'scale(3)', transformOrigin: 'bottom right' }}>
-            {feature.icon}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BentoFeatures() {
-  const [headRef, headVis] = useSectionReveal();
-  return (
-    <section id="features" className="py-14 sm:py-20 lg:py-32 max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
-      <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
-          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
-          <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Platform Features</span>
-        </div>
-        <h2
-          className="font-display font-black leading-[1.0]"
-          style={{
-            fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
-            letterSpacing: '-0.02em',
-            animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
-            opacity: headVis ? undefined : 0,
-          }}
-        >
-          <span className="text-[#F0F4FF]">Everything a shooter </span>
-          <span className="gradient-text">needs.</span>
-        </h2>
-        <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0" style={{ lineHeight: '1.75' }}>
-          From first session to elite performance — Marksman covers every step of the training loop with tools built for serious competitors.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-        {FEATURES.map((f, i) => <BentoCard key={f.id} feature={f} idx={i} />)}
-      </div>
-    </section>
-  );
-}
-
-// ── AI & Health Section ───────────────────────────────────────────────────────
-
-function BiometricCardContent() {
-  const [bpm, setBpm] = useState(62);
-  const [phase, setPhase] = useState(0); // 0=resting,1=aim,2=peak
-  const [drawn, setDrawn] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Animate BPM value
-  useEffect(() => {
-    const t = setInterval(() => {
-      setBpm(prev => {
-        const drift = (Math.random() - 0.5) * 3;
-        return Math.round(Math.max(55, Math.min(78, prev + drift)));
-      });
+        n++;
+        setShots(n);
+        if (n >= HERO_SHOTS.length) clearInterval(id);
+      }, 280);
+      return () => clearInterval(id);
     }, 900);
-    return () => clearInterval(t);
+    return () => clearTimeout(t);
   }, []);
 
-  // Cycle aim phases
-  useEffect(() => {
-    const t = setInterval(() => setPhase(p => (p + 1) % 3), 2800);
-    return () => clearInterval(t);
-  }, []);
-
-  // Trigger ECG draw on viewport enter
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setDrawn(false); setTimeout(() => setDrawn(true), 50); } else { setDrawn(false); } },
-      { threshold: 0.3 }
-    );
-    if (containerRef.current) io.observe(containerRef.current);
-    return () => io.disconnect();
-  }, []);
-
-  const bpmColor = bpm > 72 ? '#FF4D6D' : bpm > 65 ? '#F5A623' : '#00E5A0';
-  const phaseLabels = ['RESTING', 'AIM PHASE', 'PEAK'];
-  const phaseColors = ['#00E5A0', '#4FC3F7', '#FF4D6D'];
-
-  // ECG path with gradient stroke points
-  const ecgPoints = "0,40 45,40 50,38 55,22 58,10 62,60 66,44 70,40 78,40 120,40 125,38 130,22 133,10 137,60 141,44 145,40 153,40 280,40";
+  const lastShot = HERO_SHOTS[shots - 1];
+  const avg = shots > 0
+    ? (HERO_SHOTS.slice(0, shots).reduce((a, s) => a + s.score, 0) / shots).toFixed(2)
+    : null;
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-3">
-      {/* Live BPM display */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <motion.div
-            className="w-2 h-2 rounded-full"
-            style={{ background: bpmColor }}
-            animate={{ scale: [1, 1.6, 1], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <span className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: '#4A5568' }}>Live BPM</span>
-        </div>
-        <motion.span
-          key={bpm}
-          className="font-data font-black text-xl tabular-nums"
-          style={{ color: bpmColor, textShadow: `0 0 16px ${bpmColor}60` }}
-          initial={{ opacity: 0.5, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-        >
-          {bpm}
-        </motion.span>
-      </div>
+    <div className="relative">
+      {/* Outer glow */}
+      <div className="absolute -inset-8 rounded-3xl pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.07) 0%, transparent 65%)',
+      }} />
 
-      {/* ECG Canvas */}
-      <div className="rounded-xl overflow-hidden relative"
-        style={{ background: '#060810', border: '1px solid rgba(255,77,109,0.15)', boxShadow: `0 0 20px rgba(255,77,109,0.05)` }}>
-        <svg viewBox="0 0 280 80" className="w-full" style={{ display: 'block' }}>
-          <defs>
-            <linearGradient id="ecgGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stopColor="#00E5A0" />
-              <stop offset="50%"  stopColor="#F5A623" />
-              <stop offset="100%" stopColor="#FF4D6D" />
-            </linearGradient>
-            <filter id="ecgGlow">
-              <feGaussianBlur stdDeviation="2" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
-          <rect width="280" height="80" fill="#060810" />
-
-          {/* Grid lines */}
-          {[20,40,60].map(y => (
-            <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 6" />
-          ))}
-
-          {/* ECG fill */}
-          <path
-            d={`M0,80 0,40 45,40 50,38 55,22 58,10 62,60 66,44 70,40 78,40 120,40 125,38 130,22 133,10 137,60 141,44 145,40 153,40 280,40 280,80 Z`}
-            fill="url(#ecgGrad)" fillOpacity="0.07"
-          />
-
-          {/* ECG line */}
-          <polyline
-            points={ecgPoints}
-            fill="none"
-            stroke="url(#ecgGrad)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="800"
-            strokeDashoffset={drawn ? 0 : 800}
-            style={{
-              transition: drawn ? 'stroke-dashoffset 1.8s cubic-bezier(0.16,1,0.3,1)' : 'none',
-              filter: 'url(#ecgGlow)',
-            }}
-          />
-
-          {/* Animated endpoint dot */}
-          <circle cx="280" cy="40" r="3.5" fill="#FF4D6D" style={{ animation: 'pulseGlow 1.4s ease-in-out infinite' }} />
-
-          {/* Phase label */}
-          <text x="10" y="72" fill="#2A3350" fontSize="7" fontFamily="Rajdhani, sans-serif" fontWeight="700" letterSpacing="0.15em">
-            {phaseLabels[phase]}
-          </text>
-        </svg>
-      </div>
-
-      {/* Stats pills */}
-      <div className="flex gap-2 flex-wrap">
-        {[
-          { label: `AVG ${Math.round(bpm - 2)} BPM`, color: '#FF4D6D' },
-          { label: phaseLabels[phase], color: phaseColors[phase] },
-          { label: 'REST 58 BPM', color: '#4FC3F7' },
-        ].map(({ label, color }) => (
-          <span key={label} className="px-2.5 py-1 rounded-full text-[10px] font-display tracking-wide"
-            style={{ background: `${color}10`, border: `1px solid ${color}30`, color }}>
-            {label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── AI Coaching Engine card ────────────────────────────────────────────────────
-
-const AI_MESSAGES = [
-  { role: 'ai', text: 'Detected: Right drift in shots 47–52.' },
-  { role: 'ai', text: 'Trigger finger placement may need adjustment.' },
-  { role: 'ai', text: 'Follow-through consistency: 73%. Improve to 85%+.' },
-];
-
-function AICoachCardContent() {
-  const [visibleMsg, setVisibleMsg] = useState(0);
-  const [typed, setTyped] = useState('');
-  const [scanning, setScanning] = useState(true);
-
-  // Cycle through messages with typewriter
-  useEffect(() => {
-    const full = AI_MESSAGES[visibleMsg].text;
-    let i = 0;
-    setTyped('');
-    const t = setInterval(() => {
-      i++;
-      setTyped(full.slice(0, i));
-      if (i >= full.length) {
-        clearInterval(t);
-        setTimeout(() => setVisibleMsg(m => (m + 1) % AI_MESSAGES.length), 2200);
-      }
-    }, 28);
-    return () => clearInterval(t);
-  }, [visibleMsg]);
-
-  // Scanning pulse
-  useEffect(() => {
-    const t = setInterval(() => setScanning(s => !s), 1600);
-    return () => clearInterval(t);
-  }, []);
-
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Scanning header */}
-      <div className="rounded-xl overflow-hidden relative"
-        style={{ background: '#060810', border: '1px solid rgba(245,166,35,0.18)' }}>
-
-        {/* Shooter silhouette + scan lines */}
-        <div className="relative h-28 flex items-center justify-center overflow-hidden">
-          {/* Grid overlay */}
-          <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 280 112" preserveAspectRatio="none">
-            {[28,56,84].map(y => (
-              <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="#F5A623" strokeWidth="0.4" strokeDasharray="6 8" />
-            ))}
-            {[56,112,168,224].map(x => (
-              <line key={x} x1={x} y1="0" x2={x} y2="112" stroke="#F5A623" strokeWidth="0.4" strokeDasharray="6 8" />
-            ))}
-          </svg>
-
-          {/* Shooter silhouette */}
-          <svg width="56" height="90" viewBox="0 0 56 90" fill="none" className="relative z-10">
-            {/* Head */}
-            <circle cx="28" cy="10" r="8" fill="#1E2A3A" stroke="rgba(245,166,35,0.4)" strokeWidth="0.8" />
-            {/* Torso */}
-            <path d="M16 22 Q28 18 40 22 L38 60 Q28 64 18 60 Z" fill="#1E2A3A" stroke="rgba(245,166,35,0.4)" strokeWidth="0.8" />
-            {/* Arms — aiming pose */}
-            <path d="M16 28 L4 36" stroke="rgba(245,166,35,0.5)" strokeWidth="3" strokeLinecap="round" />
-            <path d="M40 28 L52 26" stroke="rgba(245,166,35,0.5)" strokeWidth="3" strokeLinecap="round" />
-            {/* Rifle */}
-            <rect x="38" y="23" width="18" height="3" rx="1.5" fill="rgba(245,166,35,0.6)" />
-            {/* Legs */}
-            <path d="M20 60 L18 82 M36 60 L38 82" stroke="rgba(245,166,35,0.4)" strokeWidth="3" strokeLinecap="round" />
-          </svg>
-
-          {/* Animated target detection box */}
-          <motion.div
-            className="absolute"
-            style={{
-              width: 64, height: 64,
-              border: '1.5px solid #F5A623',
-              borderRadius: 4,
-              left: '50%', top: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-            animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.04, 0.96] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            {/* Corner accents */}
-            {[
-              { top: -2, left: -2, borderRight: 'none', borderBottom: 'none' },
-              { top: -2, right: -2, borderLeft: 'none', borderBottom: 'none' },
-              { bottom: -2, left: -2, borderRight: 'none', borderTop: 'none' },
-              { bottom: -2, right: -2, borderLeft: 'none', borderTop: 'none' },
-            ].map((s, i) => (
-              <div key={i} className="absolute w-2.5 h-2.5" style={{ border: '2px solid #F5A623', ...s }} />
-            ))}
-          </motion.div>
-
-          {/* Scanning line sweep */}
-          <motion.div
-            className="absolute inset-x-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.6), transparent)' }}
-            animate={{ top: ['10%', '90%', '10%'] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-          />
-
-          {/* Status badge */}
-          <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded-lg"
-            style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.25)' }}>
-            <motion.div className="w-1.5 h-1.5 rounded-full bg-[#F5A623]"
-              animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 0.9, repeat: Infinity }} />
-            <span className="text-[9px] font-display uppercase tracking-widest text-[#F5A623]">Analyzing</span>
+      {/* Window frame */}
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: 'rgba(13,17,28,0.95)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,166,35,0.06), inset 0 1px 0 rgba(255,255,255,0.05)',
+        }}
+      >
+        {/* Title bar */}
+        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,77,109,0.7)' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(245,166,35,0.7)' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(0,229,160,0.7)' }} />
           </div>
-        </div>
-      </div>
-
-      {/* AI message bubble with typewriter */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={visibleMsg}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 10 }}
-          transition={{ duration: 0.3 }}
-          className="px-3.5 py-3 rounded-xl text-[13px] text-[#F0F4FF]"
-          style={{ background: 'rgba(245,166,35,0.06)', borderLeft: '2px solid #F5A623', borderRadius: '0 12px 12px 0' }}
-        >
-          {typed}
-          <span className="inline-block w-0.5 h-3.5 bg-[#F5A623] ml-0.5 animate-pulse align-middle" />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Metrics row */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: 'DRIFT', value: 'RIGHT', color: '#FF4D6D' },
-          { label: 'FOLLOW', value: '73%', color: '#F5A623' },
-          { label: 'PATTERN', value: '6 SHOTS', color: '#4FC3F7' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-lg px-2 py-1.5 text-center"
-            style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
-            <p className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#4A5568' }}>{label}</p>
-            <p className="font-data font-bold text-xs tabular-nums" style={{ color }}>{value}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Performance Prediction card ────────────────────────────────────────────────
-
-const PERF_POINTS: [number, number][] = [[30,72],[65,65],[100,60],[135,55],[170,48],[205,42],[240,38],[265,32]];
-
-function PerfPredictionCardContent() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [drawn, setDrawn] = useState(false);
-  const [projValue, setProjValue] = useState(9.80);
-
-  // Trigger on viewport enter/exit
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) { setDrawn(false); setTimeout(() => setDrawn(true), 80); }
-        else { setDrawn(false); }
-      },
-      { threshold: 0.2 }
-    );
-    if (containerRef.current) io.observe(containerRef.current);
-    return () => io.disconnect();
-  }, []);
-
-  // Animate projected value counting up
-  useEffect(() => {
-    if (!drawn) { setProjValue(9.80); return; }
-    const target = 10.43;
-    const start = 9.80;
-    const duration = 1800;
-    const startTime = performance.now();
-    const raf = (ts: number) => {
-      const p = Math.min((ts - startTime) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setProjValue(+(start + (target - start) * ease).toFixed(2));
-      if (p < 1) requestAnimationFrame(raf);
-    };
-    const id = requestAnimationFrame(raf);
-    return () => cancelAnimationFrame(id);
-  }, [drawn]);
-
-  const pathD = `M${PERF_POINTS.map(([x,y]) => `${x},${y}`).join(' L')}`;
-  const fillD = `M30,82 ${PERF_POINTS.map(([x,y]) => `L${x},${y}`).join(' ')} L265,82 Z`;
-  const totalLen = 520; // approximate polyline length
-
-  return (
-    <div ref={containerRef} className="flex flex-col gap-3">
-      {/* Chart */}
-      <div className="rounded-xl overflow-hidden relative"
-        style={{ background: '#060810', border: '1px solid rgba(79,195,247,0.15)', boxShadow: '0 0 20px rgba(79,195,247,0.04)' }}>
-        <svg viewBox="0 0 290 95" className="w-full" style={{ display: 'block' }}>
-          <defs>
-            <linearGradient id="perfFill2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#4FC3F7" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0"    />
-            </linearGradient>
-            <linearGradient id="perfStroke" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stopColor="#00E5A0" />
-              <stop offset="70%"  stopColor="#4FC3F7" />
-              <stop offset="100%" stopColor="#4FC3F7" />
-            </linearGradient>
-            <filter id="perfGlow">
-              <feGaussianBlur stdDeviation="2.5" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
-          <rect width="290" height="95" fill="#060810" />
-
-          {/* Grid */}
-          {[30,47,64,81].map(y => (
-            <line key={y} x1="28" y1={y} x2="285" y2={y} stroke="#1E2433" strokeWidth="0.5" strokeDasharray="4 6" />
-          ))}
-          {/* Y labels */}
-          {[['10.4',30],['10.0',47],['9.6',64],['9.2',81]].map(([v,y]) => (
-            <text key={String(v)} x="4" y={Number(y)+3} fill="#2A3350" fontSize="6.5" fontFamily="JetBrains Mono,monospace">{v}</text>
-          ))}
-
-          {/* Projection zone */}
-          <rect x="260" y="15" width="28" height="72" fill="rgba(79,195,247,0.03)" />
-          <line x1="261" y1="15" x2="261" y2="85" stroke="#4FC3F7" strokeWidth="0.7" strokeDasharray="3 4" opacity="0.4" />
-          <text x="263" y="20" fill="#4FC3F7" fontSize="6" fontFamily="Rajdhani,sans-serif" fontWeight="600" letterSpacing="0.1em" opacity="0.6">PROJ</text>
-
-          {/* Gradient fill */}
-          <path d={fillD} fill="url(#perfFill2)"
-            style={{
-              opacity: drawn ? 1 : 0,
-              transition: drawn ? 'opacity 600ms 400ms ease' : 'none',
-            }}
-          />
-
-          {/* Main trend line — animated draw */}
-          <polyline
-            points={PERF_POINTS.map(([x,y]) => `${x},${y}`).join(' ')}
-            fill="none"
-            stroke="url(#perfStroke)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray={totalLen}
-            strokeDashoffset={drawn ? 0 : totalLen}
-            style={{
-              transition: drawn ? `stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)` : 'none',
-              filter: 'url(#perfGlow)',
-            }}
-          />
-
-          {/* Projected dashed extension */}
-          <polyline
-            points="265,32 285,20"
-            fill="none" stroke="#4FC3F7" strokeWidth="1.8" strokeDasharray="4 3" opacity="0.7"
-            style={{ filter: 'url(#perfGlow)' }}
-          />
-
-          {/* Historical dots */}
-          {PERF_POINTS.map(([cx,cy],i) => (
-            <circle key={i} cx={cx} cy={cy} r="2.5" fill="#4FC3F7"
-              style={{
-                opacity: drawn ? 1 : 0,
-                transition: `opacity 200ms ${300 + i * 120}ms ease`,
-              }}
-            />
-          ))}
-
-          {/* Projected future dots */}
-          {[[275,26],[285,20]].map(([cx,cy],i) => (
-            <circle key={i} cx={cx} cy={cy} r="2.5" fill="none" stroke="#4FC3F7" strokeWidth="1.5"
-              strokeDasharray="3 2"
-              style={{
-                opacity: drawn ? 0.7 : 0,
-                transition: `opacity 300ms ${1200 + i * 150}ms ease`,
-              }}
-            />
-          ))}
-
-          {/* Glowing endpoint */}
-          <circle cx="285" cy="20" r="4" fill="#4FC3F7"
-            style={{ animation: 'pulseGlow 1.6s ease-in-out infinite', opacity: drawn ? 1 : 0 }} />
-        </svg>
-      </div>
-
-      {/* Animated stat row */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: 'PROJECTED', value: projValue.toFixed(2), color: '#4FC3F7' },
-          { label: 'GAIN', value: '+0.43', color: '#00E5A0' },
-          { label: 'CONFIDENCE', value: '91%', color: '#F5A623' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-lg px-2 py-1.5 text-center"
-            style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
-            <p className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#4A5568' }}>{label}</p>
-            <p className="font-data font-bold text-xs tabular-nums" style={{ color }}>{value}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── AICard wrapper ─────────────────────────────────────────────────────────────
-
-function AICard({ title, tagline, accentColor, icon, idx, children }: {
-  title: string; tagline: string; accentColor: string; icon: React.ReactNode; idx: number; children: React.ReactNode;
-}) {
-  const scrollDir = useScrollDirection();
-
-  return (
-    <motion.div
-      className="relative rounded-2xl flex flex-col"
-      style={{
-        background: 'rgba(10,13,24,0.75)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        overflow: 'hidden',
-      }}
-      initial={{ opacity: 0, y: scrollDir === 'down' ? 36 : -36, filter: 'blur(6px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: false, margin: '-80px' }}
-      transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
-      whileHover={{
-        y: -8,
-        boxShadow: `0 28px 64px -12px ${accentColor}35, 0 0 0 1px ${accentColor}25`,
-        transition: { duration: 0.28, ease: 'easeOut' },
-      }}
-    >
-      {/* Ambient background glow */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${accentColor}08, transparent 70%)` }} />
-
-      {/* Top accent line */}
-      <div className="absolute top-0 inset-x-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
-
-      {/* Subtle corner glow */}
-      <div className="absolute top-0 left-0 w-24 h-24 pointer-events-none"
-        style={{ background: `radial-gradient(circle at 0% 0%, ${accentColor}10, transparent 70%)` }} />
-
-      <div className="p-5 sm:p-6 flex flex-col gap-4 flex-1"
-        style={{ animation: `floatY ${6 + idx * 0.8}s ease-in-out infinite`, animationDelay: `${idx * 0.4}s` }}>
-        <div className="flex items-center gap-3">
-          <motion.div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}20` }}
-            whileHover={{ scale: 1.12, background: `${accentColor}22` }}
-            transition={{ duration: 0.2 }}
-          >
-            {icon}
-          </motion.div>
-          <div>
-            <h3 className="font-display font-bold text-[#F0F4FF] text-base tracking-wide">{title}</h3>
-            <p className="text-[#6B7A96] text-[13px] mt-0.5">{tagline}</p>
-          </div>
-        </div>
-        <div className="flex-1">{children}</div>
-      </div>
-    </motion.div>
-  );
-}
-
-function AIHealthSection() {
-  const scrollDir = useScrollDirection();
-  return (
-    <section
-      id="ai-health"
-      className="py-14 sm:py-20 lg:py-32 relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #080A0F 0%, #080D1A 35%, #0A0F1C 65%, #080A0F 100%)',
-        borderTop: '1px solid #1E2433',
-        borderBottom: '1px solid #1E2433',
-      }}
-    >
-      {/* Background ambient glows */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/3 left-1/4 w-[600px] h-[400px] rounded-full opacity-[0.04]"
-          style={{ background: 'radial-gradient(ellipse, #FF4D6D, transparent)', filter: 'blur(80px)', transform: 'translate(-50%,-50%)' }} />
-        <div className="absolute top-1/2 left-1/2 w-[700px] h-[500px] rounded-full opacity-[0.035]"
-          style={{ background: 'radial-gradient(ellipse, #F5A623, transparent)', filter: 'blur(100px)', transform: 'translate(-50%,-50%)' }} />
-        <div className="absolute top-1/3 right-1/4 w-[600px] h-[400px] rounded-full opacity-[0.04]"
-          style={{ background: 'radial-gradient(ellipse, #4FC3F7, transparent)', filter: 'blur(80px)', transform: 'translate(50%,-50%)' }} />
-        {/* Subtle noise overlay */}
-        <div className="absolute inset-0 opacity-[0.015]"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px' }} />
-      </div>
-
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 relative">
-        {/* Section header — Framer Motion bidirectional */}
-        <motion.div
-          className="text-center mb-12 sm:mb-16 lg:mb-20"
-          initial={{ opacity: 0, y: scrollDir === 'down' ? 30 : -30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, margin: '-80px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
-            style={{ background: 'rgba(79,195,247,0.07)', border: '1px solid rgba(79,195,247,0.22)' }}>
-            <motion.span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]"
-              animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
-              transition={{ duration: 2, repeat: Infinity }} />
-            <span className="text-[#4FC3F7] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">AI-Powered Intelligence</span>
-          </div>
-          <h2
-            className="font-display font-black leading-[1.0]"
-            style={{ fontSize: 'clamp(2.4rem, 6.5vw, 5rem)', letterSpacing: '-0.02em' }}
-          >
-            <span className="text-[#F0F4FF]">Train smarter. </span>
-            <span style={{ background: 'linear-gradient(135deg, #4FC3F7 20%, #00E5A0 80%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Recover faster.
+          <div className="flex-1 text-center">
+            <span className="text-[11px] font-display uppercase tracking-[0.12em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
+              10m Air Rifle · Session #2847
             </span>
-          </h2>
-          <motion.p
-            className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] px-4 sm:px-0"
-            style={{ lineHeight: '1.75' }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: false, margin: '-80px' }}
-            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          >
-            From biometric monitoring to predictive coaching — Marksman&apos;s AI layer turns raw session data into actionable intelligence you can act on immediately.
-          </motion.p>
-        </motion.div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
+            <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Live</span>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Card 1 — Biometric Monitoring */}
-          <AICard title="Stress Monitoring" tagline="Real-time biometrics during aim phases" accentColor="#FF4D6D" icon={<HeartIcon />} idx={0}>
-            <BiometricCardContent />
-          </AICard>
+        {/* Content: target + stats side by side */}
+        <div className="flex gap-0">
 
-          {/* Card 2 — AI Coaching Engine */}
-          <AICard title="AI Coaching Engine" tagline="Pattern analysis and personalized feedback" accentColor="#F5A623" icon={<SparkleIcon />} idx={1}>
-            <AICoachCardContent />
-          </AICard>
+          {/* Target panel */}
+          <div className="flex-shrink-0 flex items-center justify-center p-6"
+            style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: 'rgba(6,8,16,0.5)' }}>
+            <div className="relative" style={{ width: SIZE, height: SIZE }}>
+              <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} className="w-full h-full">
+                {/* Ring fill */}
+                <circle cx={130} cy={130} r={SIZE / 2 - 1} fill="rgba(245,166,35,0.015)" />
+                <circle cx={130} cy={130} r={22}           fill="rgba(245,166,35,0.05)" />
 
-          {/* Card 3 — Performance Prediction */}
-          <AICard title="Performance Prediction" tagline="Score trajectory and projected improvement" accentColor="#4FC3F7" icon={<ChartLineIcon />} idx={2}>
-            <PerfPredictionCardContent />
-          </AICard>
+                {/* Rings */}
+                {rings.map((r, i) => {
+                  const circ = 2 * Math.PI * r;
+                  const isGold = i >= 6;
+                  return (
+                    <circle key={r} cx={130} cy={130} r={r}
+                      fill="none"
+                      stroke={isGold ? 'rgba(245,166,35,0.9)' : 'rgba(255,255,255,0.1)'}
+                      strokeWidth={isGold ? 1.5 : 0.6}
+                      strokeDasharray={circ} strokeDashoffset={circ}
+                      style={{ animation: `dashDraw 1.2s cubic-bezier(0.16,1,0.3,1) ${i * 100}ms forwards` }}
+                    />
+                  );
+                })}
+
+                {/* Crosshair */}
+                {[[130, 5, 130, 105], [130, 155, 130, SIZE - 5], [5, 130, 105, 130], [155, 130, SIZE - 5, 130]].map(([x1, y1, x2, y2], i) => (
+                  <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+                    stroke="rgba(245,166,35,0.5)" strokeWidth="0.8" strokeLinecap="round"
+                    strokeDasharray="200" strokeDashoffset="200"
+                    style={{ animation: `dashDraw 0.6s ease ${900 + i * 50}ms forwards` }}
+                  />
+                ))}
+
+                {/* Center */}
+                <circle cx={130} cy={130} r={3} fill="#F5A623"
+                  style={{ animation: 'fadeIn 200ms 1400ms both' }} />
+
+                {/* Shot dots */}
+                {HERO_SHOTS.slice(0, shots).map((s, i) => {
+                  const px = (s.cx / 100) * SIZE;
+                  const py = (s.cy / 100) * SIZE;
+                  return (
+                    <g key={i}>
+                      <circle cx={px} cy={py} r={4.5} fill={s.r} opacity={0.92}
+                        style={{ filter: `drop-shadow(0 0 4px ${s.r}80)`, animation: 'shotPop 280ms cubic-bezier(0.16,1,0.3,1) both' }} />
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+
+          {/* Stats panel */}
+          <div className="flex-1 flex flex-col justify-between p-4 min-w-[160px]">
+            {/* Live score badge */}
+            {lastShot ? (
+              <div>
+                <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(240,244,255,0.35)' }}>Last shot</p>
+                <p className="font-data font-black text-4xl leading-none mb-0.5"
+                  style={{ color: lastShot.r, filter: `drop-shadow(0 0 12px ${lastShot.r}60)` }}>
+                  {lastShot.score.toFixed(1)}
+                </p>
+                <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.3)' }}>
+                  {lastShot.score >= 10.5 ? 'X-Ring' : lastShot.score >= 10.0 ? '10-Ring' : '9-Ring'}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(240,244,255,0.35)' }}>Session</p>
+                <p className="font-data font-black text-4xl leading-none mb-0.5" style={{ color: 'rgba(240,244,255,0.15)' }}>—</p>
+                <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.2)' }}>Waiting</p>
+              </div>
+            )}
+
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
+
+            {/* Quick stats grid */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: 'Avg', value: avg ?? '—', color: '#F5A623' },
+                { label: 'Shots', value: shots > 0 ? String(shots) : '0', color: '#4FC3F7' },
+                { label: 'X-Ring', value: String(HERO_SHOTS.slice(0, shots).filter(s => s.score >= 10.5).length), color: '#F5A623' },
+                { label: 'Series', value: shots > 0 ? 'S1' : '—', color: '#00E5A0' },
+              ].map((s) => (
+                <div key={s.label} className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                  <p className="text-[9px] font-display uppercase tracking-[0.12em] mb-0.5" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.label}</p>
+                  <p className="font-data font-bold text-base" style={{ color: s.color }}>{s.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
+
+            {/* AI indicator */}
+            <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg" style={{ background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.12)' }}>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F5A623' }} />
+              <span className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: 'rgba(245,166,35,0.7)' }}>
+                AI analysis ready
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex items-center justify-between px-4 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
+          <div className="flex items-center gap-4">
+            {['Session', 'Performance', 'AI Coach'].map((t, i) => (
+              <button key={t} className="text-[10px] font-display uppercase tracking-[0.1em] transition-colors"
+                style={{ color: i === 0 ? '#F5A623' : 'rgba(240,244,255,0.25)', borderBottom: i === 0 ? '1px solid #F5A623' : '1px solid transparent', paddingBottom: 2 }}>
+                {t}
+              </button>
+            ))}
+          </div>
+          <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.2)' }}>
+            10m · 40 shots
+          </span>
         </div>
       </div>
-    </section>
+
+      {/* Floating badges */}
+      <div
+        className="absolute -top-4 -right-4 flex items-center gap-2 px-3.5 py-2.5 rounded-xl"
+        style={{
+          background: 'rgba(13,17,28,0.95)',
+          border: '1px solid rgba(0,229,160,0.25)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          animation: 'floatY 5s ease-in-out infinite',
+        }}
+      >
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,229,160,0.12)' }}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="1,8 3.5,5.5 6,6.5 9,3 11,4.5" />
+          </svg>
+        </div>
+        <div>
+          <p className="font-data font-bold text-sm leading-none" style={{ color: '#00E5A0' }}>+18%</p>
+          <p className="text-[9px] font-display uppercase tracking-widest mt-0.5" style={{ color: 'rgba(240,244,255,0.35)' }}>Group radius</p>
+        </div>
+      </div>
+
+      <div
+        className="absolute -bottom-4 -left-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl"
+        style={{
+          background: 'rgba(13,17,28,0.95)',
+          border: '1px solid rgba(245,166,35,0.25)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          animation: 'floatY 6s ease-in-out 2s infinite',
+        }}
+      >
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(245,166,35,0.12)' }}>
+          <span className="text-[11px]" style={{ color: '#F5A623' }}>✦</span>
+        </div>
+        <div>
+          <p className="font-display font-bold text-[11px] leading-tight" style={{ color: '#F5A623' }}>AI Coach</p>
+          <p className="text-[9px] font-display mt-0.5" style={{ color: 'rgba(240,244,255,0.35)' }}>3 actions identified</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
-// ── How It Works ──────────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// ROLES SECTION  — "Your role. Your platform."
+// ═════════════════════════════════════════════════════════════════════════════
 
-const STEPS = [
-  { num: '01', title: 'Create your account',    desc: 'Register as a shooter, soldier, or coach in under 60 seconds. No credit card required.',                                                                           color: '#F5A623', glow: 'rgba(245,166,35,0.2)'  },
-  { num: '02', title: 'Log your first session', desc: 'Click on the target canvas, upload a photo, or import from a file. Scores computed automatically.',                                                               color: '#4FC3F7', glow: 'rgba(79,195,247,0.18)' },
-  { num: '03', title: 'Analyse & improve',      desc: 'Review fatigue curves, MPI, outlier shots, and AI training plans. Track the gap to your personal best.', color: '#00E5A0', glow: 'rgba(0,229,160,0.16)'  },
+const SHOOTER_FEATURES = [
+  'Shot-by-shot placement on interactive target',
+  'AI coaching feedback after every session',
+  'Biometric overlay — HR, SpO₂, fatigue zones',
+  'Series comparison & consistency scoring',
+  'Competition goal tracking & training plans',
+];
+const COACH_FEATURES = [
+  'Full dashboard across all connected shooters',
+  'Team heatmaps & group radius trends',
+  'Add session feedback with drill recommendations',
+  'Progress tracking toward competition peaks',
+  'Multi-discipline & multi-weapon support',
 ];
 
-function HowItWorks() {
-  const ref    = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(-1);
-  const [headRef, headVis] = useSectionReveal();
+function RolesSection() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal(0.08);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) [0, 1, 2].forEach((i) => setTimeout(() => setActive(i), i * 180)); },
-      { threshold: 0.2 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  const cardBg   = isDark ? 'rgba(13,17,28,0.85)' : 'rgba(255,255,255,0.92)';
+  const cardBord = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
+  const textMut  = isDark ? 'rgba(240,244,255,0.5)' : 'rgba(14,17,24,0.55)';
+  const textDim  = isDark ? 'rgba(240,244,255,0.3)' : 'rgba(14,17,24,0.38)';
+  const chipBg   = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+
+  const roles = [
+    {
+      role: 'Shooter',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#F5A623" strokeWidth="1.6" strokeLinecap="round">
+          <circle cx="11" cy="11" r="9.5" />
+          <circle cx="11" cy="11" r="5.5" />
+          <circle cx="11" cy="11" r="2" fill="#F5A623" stroke="none" />
+          <line x1="11" y1="1.5" x2="11" y2="5.5" />
+          <line x1="11" y1="16.5" x2="11" y2="20.5" />
+          <line x1="1.5" y1="11" x2="5.5" y2="11" />
+          <line x1="16.5" y1="11" x2="20.5" y2="11" />
+        </svg>
+      ),
+      headline: 'The Competitor',
+      sub: 'Every shot mapped. Every session analysed. Compete with precision data behind every decision.',
+      features: SHOOTER_FEATURES,
+      accent: '#F5A623',
+      glow: 'rgba(245,166,35,0.12)',
+      border: 'rgba(245,166,35,0.28)',
+      hoverShadow: '0 0 60px rgba(245,166,35,0.08), 0 20px 50px rgba(0,0,0,0.35)',
+      cta: 'Start as Shooter',
+      href: '/auth/register',
+      tag: 'For Athletes',
+    },
+    {
+      role: 'Coach',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#4FC3F7" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 2L13.09 8.26L20 9.27L15 14.14L16.18 21.02L11 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L11 2Z" />
+        </svg>
+      ),
+      headline: 'The Coach',
+      sub: 'Monitor your full squad in one view. Deliver structured feedback that drives measurable improvement.',
+      features: COACH_FEATURES,
+      accent: '#4FC3F7',
+      glow: 'rgba(79,195,247,0.10)',
+      border: 'rgba(79,195,247,0.28)',
+      hoverShadow: '0 0 60px rgba(79,195,247,0.08), 0 20px 50px rgba(0,0,0,0.35)',
+      cta: 'Set up Coach Account',
+      href: '/auth/register',
+      tag: 'For Coaches',
+    },
+  ];
 
   return (
     <section
-      id="how-it-works"
-      className="py-14 sm:py-20 lg:py-32 relative"
-      style={{ background: 'linear-gradient(180deg, #080A0F 0%, #0C0F1A 30%, #0C0F1A 70%, #080A0F 100%)', borderTop: '1px solid #1E2433', borderBottom: '1px solid #1E2433' }}
+      ref={ref}
+      className="relative py-28 sm:py-36 overflow-hidden"
+      style={{
+        background: isDark ? 'rgba(8,10,18,0.6)' : 'rgba(243,246,252,0.7)',
+        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+      }}
     >
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-12">
-        <div ref={headRef} className="text-center mb-12 sm:mb-16 lg:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 sm:mb-6"
-            style={{ background: 'rgba(0,229,160,0.07)', border: '1px solid rgba(0,229,160,0.2)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2s ease-in-out infinite' }} />
-            <span className="text-[#00E5A0] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Get started in minutes</span>
-          </div>
+      {/* Aurora accent */}
+      {isDark && (
+        <div className="absolute inset-0 pointer-events-none" aria-hidden>
+          <div className="absolute" style={{
+            top: '30%', left: '20%', width: '50vw', height: '40vw',
+            background: 'radial-gradient(ellipse, rgba(245,166,35,0.04) 0%, transparent 60%)',
+            filter: 'blur(60px)',
+          }} />
+          <div className="absolute" style={{
+            top: '20%', right: '10%', width: '40vw', height: '35vw',
+            background: 'radial-gradient(ellipse, rgba(79,195,247,0.04) 0%, transparent 60%)',
+            filter: 'blur(60px)',
+          }} />
+        </div>
+      )}
+
+      <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8">
+
+        {/* Header */}
+        <div className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>
+            Built For You
+          </p>
           <h2
-            className="font-display font-black text-[#F0F4FF] leading-[1.0]"
-            style={{
-              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
-              letterSpacing: '-0.02em',
-              animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
-              opacity: headVis ? undefined : 0,
-            }}
+            className="font-display font-black leading-[1.06] mb-5"
+            style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', color: textPri }}
           >
-            Three steps to<br />
-            <span className="gradient-text">peak performance.</span>
+            Your role.{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #F5A623 0%, #4FC3F7 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>Your platform.</span>
           </h2>
-          <p className="font-body text-[#9CA3B4] mt-5 sm:mt-6 max-w-xl mx-auto text-[16px] sm:text-[18px]" style={{ lineHeight: '1.75' }}>
-            Up and running in under 60 seconds. No setup fees, no credit card required.
+          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
+            Marksman is designed for two perspectives that work better together.
+            A shooter improves with data. A coach leads with insight.
           </p>
         </div>
 
-        <div ref={ref} className="relative grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-8">
-          {/* Connector — desktop only */}
-          <div
-            className="hidden sm:block absolute"
-            style={{
-              top: 36,
-              left: 'calc(16.67% + 2.5rem)',
-              right: 'calc(16.67% + 2.5rem)',
-              height: 1,
-              background: 'linear-gradient(90deg, #F5A623 0%, #4FC3F7 50%, #00E5A0 100%)',
-              opacity: active >= 2 ? 0.55 : 0,
-              transition: 'opacity 800ms 400ms',
-            }}
-          />
-
-          {/* Mobile vertical connector */}
-          <div
-            className="sm:hidden absolute left-[34px] top-[72px] w-px"
-            style={{
-              bottom: 36,
-              background: 'linear-gradient(180deg, #F5A623 0%, #4FC3F7 50%, #00E5A0 100%)',
-              opacity: active >= 2 ? 0.4 : 0,
-              transition: 'opacity 800ms 400ms',
-            }}
-          />
-
-          {STEPS.map((s, i) => (
+        {/* Role cards */}
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+          {roles.map((r, i) => (
             <div
-              key={s.num}
-              className="relative rounded-2xl p-6 sm:p-8 flex flex-row sm:flex-col gap-5 sm:gap-6 sm:items-start"
+              key={r.role}
+              className={`group relative rounded-2xl p-7 sm:p-9 transition-all duration-700 cursor-default flex flex-col ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{
-                background: 'linear-gradient(135deg, rgba(14,17,24,0.95), rgba(10,13,20,0.95))',
-                border: `1px solid ${s.color}22`,
-                boxShadow: active >= i ? `0 0 0 1px ${s.color}18, 0 16px 48px -8px rgba(0,0,0,0.6)` : '0 8px 32px rgba(0,0,0,0.4)',
-                opacity: active >= i ? 1 : 0,
-                transform: active >= i ? 'translateY(0)' : 'translateY(28px)',
-                transition: `all 600ms ${i * 180}ms cubic-bezier(0.16,1,0.3,1)`,
+                background: cardBg,
+                border: `1px solid ${cardBord}`,
+                transitionDelay: `${i * 120}ms`,
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = r.border;
+                el.style.boxShadow = r.hoverShadow;
+                el.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = cardBord;
+                el.style.boxShadow = 'none';
+                el.style.transform = 'translateY(0)';
               }}
             >
-              {/* Number badge */}
-              <div className="shrink-0 flex items-center justify-center z-10"
-                style={{
-                  width: 56, height: 56,
-                  borderRadius: 16,
-                  background: `linear-gradient(135deg, ${s.color}18, ${s.color}08)`,
-                  border: `1px solid ${s.color}40`,
-                  boxShadow: active >= i ? `0 0 20px ${s.glow}` : 'none',
-                  transition: 'box-shadow 600ms',
-                }}>
-                <span className="font-display font-black text-2xl" style={{ color: s.color }}>{s.num}</span>
-              </div>
-              <div className="flex-1 sm:flex-none">
-                {/* Color top bar on desktop */}
-                <div className="hidden sm:block h-px w-10 mb-5" style={{ background: `linear-gradient(90deg, ${s.color}, transparent)` }} />
-                <h3 className="font-display font-bold text-[#F0F4FF] text-xl sm:text-2xl mb-3" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
-                <p className="font-body text-[#8892A4] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.75' }}>{s.desc}</p>
-                <div className="mt-4 sm:mt-5 flex items-center gap-2">
-                  <span className="text-[12px] font-display uppercase tracking-[0.15em]" style={{ color: s.color }}>Step {s.num}</span>
-                  <span className="h-px flex-1 opacity-20" style={{ background: s.color }} />
+              {/* Subtle top accent bar */}
+              <div
+                className="absolute top-0 inset-x-0 h-px rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: `linear-gradient(90deg, transparent 5%, ${r.accent} 50%, transparent 95%)` }}
+              />
+
+              {/* Tag + icon row */}
+              <div className="flex items-center justify-between mb-7">
+                <div
+                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-full"
+                  style={{ background: r.glow, border: `1px solid ${r.border}` }}
+                >
+                  {r.icon}
+                  <span className="text-[11px] font-display font-bold uppercase tracking-[0.14em]" style={{ color: r.accent }}>
+                    {r.tag}
+                  </span>
+                </div>
+                {/* Animated ring indicator */}
+                <div className="relative w-10 h-10 flex items-center justify-center" style={{ animation: 'breathe 3s ease-in-out infinite', animationDelay: `${i * 1.5}s` }}>
+                  <div className="w-6 h-6 rounded-full" style={{ background: r.glow, border: `1.5px solid ${r.accent}40` }} />
+                  <div className="absolute w-10 h-10 rounded-full" style={{ border: `1px solid ${r.accent}18` }} />
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ── Role Showcase ──────────────────────────────────────────────────────────────
-
-type RoleTab = 'shooter' | 'coach' | 'soldier';
-
-function CoachVisualInline() {
-  return (
-    <div
-      className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
-      style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}
-    >
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #4FC3F7, transparent)' }} />
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Your Shooters</p>
-        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
-          style={{ color: '#4FC3F7', background: 'rgba(79,195,247,0.08)', border: '1px solid rgba(79,195,247,0.2)' }}>
-          3 Connected
-        </span>
-      </div>
-      {[
-        { name: 'Alex Morgan', avg: '9.84',  trend: '+0.12', pos: 'Standing', shots: 48, up: true  },
-        { name: 'Sam Chen',    avg: '10.21', trend: '+0.35', pos: 'Prone',    shots: 60, up: true  },
-        { name: 'Jordan Hill', avg: '9.57',  trend: '−0.08', pos: 'Kneeling', shots: 30, up: false },
-      ].map((s) => (
-        <div key={s.name} className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl mb-2"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 font-display font-bold text-sm"
-            style={{ background: 'linear-gradient(135deg, rgba(79,195,247,0.12), rgba(245,166,35,0.06))', color: '#4FC3F7', border: '1px solid rgba(79,195,247,0.15)' }}>
-            {s.name[0]}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[#F0F4FF] text-base font-medium truncate">{s.name}</p>
-            <p className="text-[#6B7A96] text-[12px] font-display uppercase tracking-wide mt-0.5">{s.pos} · {s.shots} shots</p>
-          </div>
-          <div className="text-right shrink-0">
-            <p className="font-jetbrains text-[#F5A623] font-bold text-sm">{s.avg}</p>
-            <p className="text-[10px] font-display font-bold mt-0.5" style={{ color: s.up ? '#00E5A0' : '#FF4D6D' }}>{s.trend}</p>
-          </div>
-        </div>
-      ))}
-      <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl"
-        style={{ background: 'rgba(79,195,247,0.04)', border: '1px solid rgba(79,195,247,0.12)' }}>
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7] flex-shrink-0" style={{ animation: 'pulseGlowBlue 2s ease-in-out infinite' }} />
-          <p className="text-[#4FC3F7] text-[11px] sm:text-[12px] font-display uppercase tracking-[0.14em]">New feedback · Alex's session</p>
-        </div>
-        <p className="text-[#8892A4] text-sm leading-relaxed italic">
-          "Good trigger discipline today. Focus on hold area — still drifting right before release."
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ShooterVisual() {
-  const scores = [8.9, 9.1, 9.3, 9.4, 9.6, 9.8, 10.1, 10.3];
-  const minS = 8.7, maxS = 10.5;
-  const w = 240, h = 80;
-  const toY = (s: number) => h - ((s - minS) / (maxS - minS)) * h;
-  const pts = scores.map((s, i) => `${(i / (scores.length - 1)) * w},${toY(s)}`).join(' ');
-  const fillPts = `${pts} ${w},${h} 0,${h}`;
-  return (
-    <div className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
-      style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}>
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #F5A623, transparent)' }} />
-      <div className="flex items-center justify-between mb-4">
-        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Session Progress</p>
-        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
-          style={{ color: '#00E5A0', background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.2)' }}>Active</span>
-      </div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full mb-4" style={{ display: 'block' }}>
-        <defs>
-          <linearGradient id="shooterFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#F5A623" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polygon points={fillPts} fill="url(#shooterFill)" />
-        <polyline points={pts} fill="none" stroke="#F5A623" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        {scores.map((s, i) => {
-          const x = (i / (scores.length - 1)) * w;
-          const y = toY(s);
-          const isLast = i === scores.length - 1;
-          return (
-            <circle key={i} cx={x} cy={y} r={isLast ? 4 : 2.5} fill="#F5A623"
-              style={isLast ? { animation: 'pulseGlow 2s ease-in-out infinite' } : {}} />
-          );
-        })}
-      </svg>
-      <div className="flex items-center gap-4 mb-3">
-        {[
-          { label: 'AVG', value: '9.71', color: '#F5A623' },
-          { label: 'BEST', value: '10.3', color: '#00E5A0' },
-          { label: 'STREAK', value: '7', color: '#4FC3F7' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="flex flex-col gap-0.5">
-            <span className="font-jetbrains font-bold text-base leading-none" style={{ color }}>{value}</span>
-            <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">{label}</span>
-          </div>
-        ))}
-      </div>
-      <div className="p-2.5 rounded-xl flex items-center justify-between"
-        style={{ background: 'rgba(0,229,160,0.04)', border: '1px solid rgba(0,229,160,0.12)' }}>
-        <p className="text-[#8892A4] text-sm">Session #52 · Prone · 10 shots · <span className="text-[#F5A623] font-jetbrains font-bold">9.94 avg</span></p>
-        <span className="font-bold text-sm" style={{ color: '#00E5A0' }}>↑</span>
-      </div>
-    </div>
-  );
-}
-
-function SoldierVisual() {
-  type WeaponKey = 'ak' | 'insas' | 'pistol';
-  const [weapon, setWeapon] = useState<WeaponKey>('ak');
-  const weapons: Record<WeaponKey, { label: string; score: string; total: string }> = {
-    ak:     { label: 'AK-203',  score: '38', total: '40' },
-    insas:  { label: 'INSAS',   score: '35', total: '40' },
-    pistol: { label: 'Pistol',  score: '29', total: '30' },
-  };
-  const w = weapons[weapon];
-  return (
-    <div className="relative rounded-2xl overflow-hidden p-4 sm:p-6"
-      style={{ background: '#0C0F1A', border: '1px solid #1E2433', boxShadow: '0 20px 60px rgba(0,0,0,0.55)' }}>
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #00E5A0, transparent)' }} />
-      <div className="flex items-center justify-between mb-4">
-        <p className="font-display font-bold text-[#F0F4FF] text-base uppercase tracking-[0.12em]">Qualification Record</p>
-        <span className="text-[11px] font-display uppercase tracking-[0.1em] px-2.5 py-1 rounded-md"
-          style={{ color: '#6B7A96', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>CLASSIFIED</span>
-      </div>
-      <div className="flex gap-1 mb-5">
-        {(['ak', 'insas', 'pistol'] as WeaponKey[]).map((k) => (
-          <button key={k} onClick={() => setWeapon(k)}
-            className="px-3 py-1.5 rounded-lg text-[10px] font-display uppercase tracking-wide transition-all duration-200"
-            style={{
-              background: weapon === k ? 'rgba(0,229,160,0.1)' : 'rgba(255,255,255,0.03)',
-              border: weapon === k ? '1px solid rgba(0,229,160,0.3)' : '1px solid rgba(255,255,255,0.06)',
-              color: weapon === k ? '#00E5A0' : '#4A5568',
-            }}>
-            {weapons[k].label}{weapon === k ? ' ✓' : ''}
-          </button>
-        ))}
-      </div>
-      <div className="flex items-end gap-3 mb-5">
-        <span className="font-jetbrains font-black leading-none" style={{ fontSize: 'clamp(2.8rem, 10vw, 4rem)', color: '#00E5A0' }}>
-          {w.score}/{w.total}
-        </span>
-        <div className="flex flex-col pb-2">
-          <span className="text-[#4A5568] text-[9px] font-display uppercase tracking-[0.14em]">ROUNDS</span>
-          <span className="font-display font-black text-xl mt-1" style={{ color: '#00E5A0' }}>GO ✓</span>
-        </div>
-      </div>
-      {[
-        { label: 'Group Radius', value: '4.2cm',   color: '#F5A623' },
-        { label: 'Qualification', value: 'Q3-2025', color: '#4FC3F7' },
-        { label: 'Distance',     value: '100m',    color: '#00E5A0' },
-      ].map(({ label, value, color }) => (
-        <div key={label} className="flex items-center justify-between py-2 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-          <span className="text-[#6B7A96] text-sm font-display uppercase tracking-wide">{label}</span>
-          <span className="font-jetbrains font-bold text-sm" style={{ color }}>{value}</span>
-        </div>
-      ))}
-      <p className="text-[#4A5568] text-[12px] font-display uppercase tracking-wide mt-3">
-        Next qualification due: Q1-2026
-      </p>
-    </div>
-  );
-}
-
-function ShooterPanel() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
-      <div className="order-2 lg:order-1"><ShooterVisual /></div>
-      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
-          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
-          <span className="text-[#F5A623] font-display text-[11px] uppercase tracking-[0.2em]">For Shooters</span>
-        </div>
-        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
-          <span className="text-[#F0F4FF]">Every shot</span><br />
-          <span className="gradient-text">tells a story.</span>
-        </h2>
-        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
-          Log every session, analyse patterns across hundreds of shots, and let the platform surface what&apos;s holding you back — before your next competition.
-        </p>
-        <ul className="space-y-3 sm:space-y-4">
-          {[
-            { sym: '◎', color: '#F5A623', text: 'Interactive canvas for instant shot logging' },
-            { sym: '↗', color: '#4FC3F7', text: 'Fatigue index and focus score per session' },
-            { sym: '✦', color: '#00E5A0', text: 'AI training plans powered by your data' },
-            { sym: '⊕', color: '#F5A623', text: 'Export targets as PNG or share with coach' },
-          ].map(({ sym, color, text }) => (
-            <li key={text} className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
-                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
-              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="pt-2">
-          <Link href="/auth/register?role=SHOOTER" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
-            Track My Sessions →
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CoachPanel() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
-      <div className="order-2 lg:order-1"><CoachVisualInline /></div>
-      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
-          style={{ background: 'rgba(79,195,247,0.08)', border: '1px solid rgba(79,195,247,0.25)' }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4FC3F7]" />
-          <span className="text-[#4FC3F7] font-display text-[11px] uppercase tracking-[0.2em]">For Coaches</span>
-        </div>
-        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
-          <span className="text-[#F0F4FF]">Data to</span><br />
-          <span style={{ background: 'linear-gradient(135deg, #4FC3F7, #F5A623)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>improvement.</span>
-        </h2>
-        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
-          Coaches search for shooters by email and send connection requests.
-          Once approved, gain full read access to session history and
-          leave timestamped feedback on any individual shot.
-        </p>
-        <ul className="space-y-3 sm:space-y-4">
-          {[
-            { sym: '↗', color: '#4FC3F7', text: 'Browse full sessions with shot-level detail' },
-            { sym: '✦', color: '#F5A623', text: 'Post timestamped feedback on any session' },
-            { sym: '⊕', color: '#00E5A0', text: 'Manage multiple shooters from one dashboard' },
-            { sym: '◎', color: '#4FC3F7', text: 'Real-time WebSocket notifications on new sessions' },
-          ].map(({ sym, color, text }) => (
-            <li key={text} className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
-                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
-              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="pt-2">
-          <Link href="/auth/register?role=COACH" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
-            Join as Coach
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SoldierPanel() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
-      <div className="order-2 lg:order-1"><SoldierVisual /></div>
-      <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full"
-          style={{ background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.25)' }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" />
-          <span className="text-[#00E5A0] font-display text-[11px] uppercase tracking-[0.2em]">For Soldiers</span>
-        </div>
-        <h2 className="font-display font-black leading-[1.0]" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', letterSpacing: '-0.02em' }}>
-          <span className="text-[#F0F4FF]">Mission-ready</span><br />
-          <span style={{ background: 'linear-gradient(135deg, #00E5A0, #4FC3F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>performance.</span>
-        </h2>
-        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[17px]" style={{ lineHeight: '1.75' }}>
-          Track qualification scores across multiple weapon platforms, monitor group precision, and maintain a complete firing record ready for inspection or review.
-        </p>
-        <ul className="space-y-3 sm:space-y-4">
-          {[
-            { sym: '◎', color: '#00E5A0', text: 'Multi-weapon qualification record keeping' },
-            { sym: '↗', color: '#F5A623', text: 'Group radius and precision metrics per range session' },
-            { sym: '✦', color: '#4FC3F7', text: 'Qualification status and next due date tracking' },
-            { sym: '⊕', color: '#00E5A0', text: 'Export full record for review or CO submission' },
-          ].map(({ sym, color, text }) => (
-            <li key={text} className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
-                style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>{sym}</span>
-              <span className="font-body text-[#C8D0E0] text-[15px] sm:text-[16px]" style={{ lineHeight: '1.6' }}>{text}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="pt-2">
-          <Link href="/auth/register?role=SOLDIER" className="btn btn-primary inline-flex text-[15px] py-3.5 px-8 gap-2">
-            Start Qualification →
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RoleShowcase() {
-  const [activeTab, setActiveTab] = useState<RoleTab>('shooter');
-  const [animating, setAnimating] = useState(false);
-
-  const switchTab = (tab: RoleTab) => {
-    if (tab === activeTab || animating) return;
-    setAnimating(true);
-    setTimeout(() => {
-      setActiveTab(tab);
-      setTimeout(() => setAnimating(false), 20);
-    }, 180);
-  };
-
-  return (
-    <section id="coaches" className="py-14 sm:py-20 lg:py-32 max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
-      {/* Section header */}
-      <div className="text-center mb-10 sm:mb-14 lg:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5"
-          style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.22)' }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
-          <span className="text-[#F5A623] font-display text-[11px] sm:text-[12px] uppercase tracking-[0.22em]">Built for every role</span>
-        </div>
-        <h2 className="font-display font-black leading-[1.0] mb-4"
-          style={{ fontSize: 'clamp(2.4rem, 6.5vw, 5rem)', letterSpacing: '-0.02em' }}>
-          <span className="text-[#F0F4FF]">Your role. </span>
-          <span className="gradient-text">Your platform.</span>
-        </h2>
-        <p className="font-body text-[#9CA3B4] max-w-xl mx-auto text-[16px] sm:text-[18px]" style={{ lineHeight: '1.75' }}>
-          Whether you compete, coach, or serve — Marksman gives you the tools that match your mission.
-        </p>
-      </div>
-
-      {/* Tab switcher */}
-      <div
-        className="flex items-center gap-1.5 p-1.5 rounded-2xl mb-10 sm:mb-14 lg:mb-16 mx-auto"
-        style={{ background: '#0C0F1A', border: '1px solid #1E2433', width: 'fit-content' }}
-      >
-        {([
-          { id: 'shooter' as RoleTab, label: 'Shooter', color: '#F5A623' },
-          { id: 'coach'   as RoleTab, label: 'Coach',   color: '#4FC3F7' },
-          { id: 'soldier' as RoleTab, label: 'Soldier', color: '#00E5A0' },
-        ]).map(({ id, label, color }) => {
-          const isActive = activeTab === id;
-          return (
-            <button key={id} onClick={() => switchTab(id)}
-              className="relative flex-1 sm:flex-none px-6 sm:px-10 py-3 rounded-xl font-display
-                         font-bold text-[13px] sm:text-[14px] uppercase tracking-[0.12em] transition-all duration-250"
-              style={{
-                color: isActive ? color : '#6B7A96',
-                background: isActive ? `${color}12` : 'transparent',
-                border: isActive ? `1px solid ${color}35` : '1px solid transparent',
-                boxShadow: isActive ? `0 0 20px ${color}20` : 'none',
-              }}>
-              {isActive && (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
-                  style={{ width: '55%', background: color, boxShadow: `0 0 10px ${color}90` }} />
-              )}
-              {label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Panel crossfade */}
-      <div style={{
-        opacity: animating ? 0 : 1,
-        transform: animating ? 'translateY(6px)' : 'translateY(0)',
-        transition: 'opacity 180ms ease, transform 180ms ease',
-      }}>
-        {activeTab === 'shooter' && <ShooterPanel />}
-        {activeTab === 'coach'   && <CoachPanel />}
-        {activeTab === 'soldier' && <SoldierPanel />}
-      </div>
-    </section>
-  );
-}
-
-// ── CTA Banner ────────────────────────────────────────────────────────────────
-
-function RoleCtaCard({ href, icon, accentColor, role, tagline }: {
-  href: string; icon: React.ReactNode; accentColor: string; role: string; tagline: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center gap-4 p-7 rounded-2xl border transition-all duration-250 relative overflow-hidden"
-      style={{ background: 'rgba(12,15,26,0.85)', borderColor: '#1E2433', backdropFilter: 'blur(12px)' }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLAnchorElement;
-        el.style.borderColor = `${accentColor}45`;
-        el.style.boxShadow = `0 12px 40px -8px ${accentColor}30, 0 0 0 1px ${accentColor}15`;
-        el.style.transform = 'translateY(-5px)';
-        el.style.background = `linear-gradient(135deg, ${accentColor}08, rgba(12,15,26,0.9))`;
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLAnchorElement;
-        el.style.borderColor = '#1E2433';
-        el.style.boxShadow = 'none';
-        el.style.transform = 'translateY(0)';
-        el.style.background = 'rgba(12,15,26,0.85)';
-      }}
-    >
-      <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-        style={{ background: `${accentColor}15`, color: accentColor, border: `1px solid ${accentColor}30` }}>
-        {icon}
-      </div>
-      <span className="font-display font-black text-[15px] tracking-[0.12em] uppercase" style={{ color: accentColor }}>{role}</span>
-      <span className="text-[#9CA3B4] text-sm text-center" style={{ lineHeight: '1.6' }}>{tagline}</span>
-    </Link>
-  );
-}
-
-function CtaBanner() {
-  const [headRef, headVis] = useSectionReveal();
-  return (
-    <section className="py-14 sm:py-20 lg:py-32 px-4 sm:px-6 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20 pointer-events-none"
-        style={{ backgroundImage: 'linear-gradient(#1E2433 1px, transparent 1px), linear-gradient(90deg, #1E2433 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(245,166,35,0.07) 0%, transparent 70%)' }} />
-      <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.22) 50%, transparent 90%)' }} />
-      <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(245,166,35,0.12) 50%, transparent 90%)' }} />
-
-      <div ref={headRef} className="relative max-w-3xl mx-auto text-center space-y-6 sm:space-y-8">
-        {/* Crosshair icon */}
-        <div className="flex items-center justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full -m-3" style={{ border: '1px solid rgba(245,166,35,0.25)', animation: 'radarPing 3s cubic-bezier(0,0,0.2,1) infinite' }} />
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.28)' }}>
-              <CrosshairLogo size={26} />
-            </div>
-          </div>
-        </div>
-
-        <h2
-          className="font-display font-black leading-[1.0] px-2"
-          style={{
-            fontSize: 'clamp(2.6rem, 7.5vw, 5.5rem)',
-            letterSpacing: '-0.02em',
-            animation: headVis ? 'textReveal 700ms cubic-bezier(0.16,1,0.3,1) both' : 'none',
-            opacity: headVis ? undefined : 0,
-          }}
-        >
-          <span className="text-[#F0F4FF]">Choose your </span>
-          <span className="gradient-text">role.</span>
-        </h2>
-
-        <p className="font-body text-[#9CA3B4] text-[16px] sm:text-[18px] max-w-lg mx-auto" style={{ lineHeight: '1.75' }}>
-          Every role, one platform. Up and running in under 60 seconds — no credit card required.
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-8 sm:mt-10">
-          <RoleCtaCard
-            href="/auth/register?role=SHOOTER"
-            icon={<TargetIcon />}
-            accentColor="#F5A623"
-            role="Shooter"
-            tagline="Track every session, every shot."
-          />
-          <RoleCtaCard
-            href="/auth/register?role=COACH"
-            icon={<CoachIcon />}
-            accentColor="#4FC3F7"
-            role="Coach"
-            tagline="Guide shooters with data-driven insight."
-          />
-          <RoleCtaCard
-            href="/auth/register?role=SOLDIER"
-            icon={<SoldierIcon />}
-            accentColor="#00E5A0"
-            role="Soldier"
-            tagline="Military qualification and readiness."
-          />
-        </div>
-
-        <p className="mt-8 text-center text-[#4A5568] text-sm">
-          Already have an account?{' '}
-          <Link href="/auth/login" className="text-[#F5A623] hover:text-amber-400 transition-colors font-medium">
-            Sign in →
-          </Link>
-        </p>
-      </div>
-    </section>
-  );
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-
-function Footer() {
-  const year = new Date().getFullYear();
-
-  const cols = [
-    {
-      heading: 'Platform',
-      links: [
-        { label: 'Features',     href: '#features' },
-        { label: 'How It Works', href: '#how-it-works' },
-        { label: 'For Coaches',  href: '#coaches' },
-        { label: 'Analytics',    href: '/analytics' },
-      ],
-    },
-    {
-      heading: 'Account',
-      links: [
-        { label: 'Sign In',   href: '/auth/login' },
-        { label: 'Register',  href: '/auth/register' },
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Sessions',  href: '/sessions' },
-      ],
-    },
-    {
-      heading: 'Training',
-      links: [
-        { label: 'Performance',     href: '/performance' },
-        { label: 'Training Plan',   href: '/performance/training-plan' },
-        { label: 'Stance Analysis', href: '/performance/pose' },
-        { label: 'AI Coach',        href: '/ai-coach' },
-      ],
-    },
-  ];
-
-  return (
-    <footer style={{ borderTop: '1px solid #1E2433', background: 'linear-gradient(180deg, #0C0F1A 0%, #080A0F 100%)' }}>
-      <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.22) 30%, rgba(79,195,247,0.15) 70%, transparent 100%)' }} />
-
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-20">
-        {/* Brand row — full width on mobile */}
-        <div className="mb-10 sm:mb-12 lg:hidden">
-          <div className="flex items-center gap-3 mb-5">
-            <CrosshairLogo size={28} />
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase text-[#F0F4FF]">Marksman</span>
-              <span className="font-display text-[10px] tracking-[0.2em] uppercase text-[#F5A623] opacity-75 mt-0.5">Precision Analytics</span>
-            </div>
-          </div>
-          <p className="text-[#8892A4] text-sm leading-relaxed max-w-xs">
-            The complete training analytics platform for competitive shooters and coaches.
-          </p>
-          <div className="flex items-center gap-2 mt-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2.5s ease-in-out infinite' }} />
-            <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">All systems operational</span>
-          </div>
-        </div>
-
-        {/* Main grid: 2-col on mobile, 4-col on desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
-
-          {/* Brand column — desktop only */}
-          <div className="hidden lg:flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <CrosshairLogo size={28} />
-              <div className="flex flex-col leading-none">
-                <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase text-[#F0F4FF]">Marksman</span>
-                <span className="font-display text-[10px] tracking-[0.2em] uppercase text-[#F5A623] opacity-75 mt-0.5">Precision Analytics</span>
-              </div>
-            </div>
-            <p className="text-[#8892A4] text-sm leading-relaxed">
-              The complete training analytics platform for competitive shooters and coaches.
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ animation: 'pulseGlowGreen 2.5s ease-in-out infinite' }} />
-              <span className="text-[#6B7A96] text-[11px] font-display uppercase tracking-[0.14em]">All systems operational</span>
-            </div>
-          </div>
-
-          {/* Link columns */}
-          {cols.map((col) => (
-            <div key={col.heading} className="flex flex-col gap-4 sm:gap-5">
-              <p className="font-display text-[12px] sm:text-[13px] uppercase tracking-[0.18em] text-[#C8D0E0] font-bold">
-                {col.heading}
+              {/* Headline */}
+              <h3
+                className="font-display font-black mb-3 leading-tight"
+                style={{ fontSize: 'clamp(1.7rem, 3vw, 2.2rem)', color: r.accent }}
+              >
+                {r.headline}
+              </h3>
+              <p className="text-[14px] sm:text-[15px] leading-relaxed mb-8" style={{ color: textMut }}>
+                {r.sub}
               </p>
-              <ul className="flex flex-col gap-3 sm:gap-3.5">
-                {col.links.map(({ label, href }) => (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      className="text-[#6B7A96] hover:text-[#C8D0E0] text-sm font-display uppercase
-                                 tracking-[0.1em] transition-colors duration-200 inline-flex items-center gap-2 group
-                                 active:text-[#F5A623]"
+
+              {/* Feature list */}
+              <ul className="flex flex-col gap-3 mb-10 flex-1">
+                {r.features.map((f, fi) => (
+                  <li
+                    key={f}
+                    className={`flex items-start gap-3 text-[13px] sm:text-[14px] leading-snug transition-all duration-500 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                    style={{ transitionDelay: `${i * 120 + fi * 60 + 300}ms`, color: textMut }}
+                  >
+                    <span
+                      className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
+                      style={{ background: r.glow, border: `1px solid ${r.border}` }}
                     >
-                      <span className="w-0 h-px bg-[#F5A623] transition-all duration-300 group-hover:w-3" />
-                      {label}
-                    </Link>
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke={r.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="1.5,4 3,5.5 6.5,2" />
+                      </svg>
+                    </span>
+                    {f}
                   </li>
                 ))}
               </ul>
+
+              {/* CTA */}
+              <Link
+                href={r.href}
+                className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-display font-bold text-[13px] uppercase tracking-[0.08em] transition-all duration-200 active:scale-95"
+                style={{
+                  background: r.glow,
+                  border: `1px solid ${r.border}`,
+                  color: r.accent,
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = isDark ? `${r.accent}18` : `${r.accent}15`;
+                  (e.currentTarget as HTMLElement).style.borderColor = r.accent;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = r.glow;
+                  (e.currentTarget as HTMLElement).style.borderColor = r.border;
+                }}
+              >
+                {r.cta} <ArrowRightIcon />
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom connector hint */}
+        <div className={`mt-10 text-center transition-all duration-700 delay-300 ${vis ? 'opacity-100' : 'opacity-0'}`}>
+          <p className="text-[12px] font-display" style={{ color: textDim }}>
+            Shooter and Coach accounts can be linked — coaches see their athletes&apos; live sessions.
+          </p>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// STATS STRIP
+// ═════════════════════════════════════════════════════════════════════════════
+
+function StatsStrip() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal();
+  const n1 = useCounter(12, vis, 800);
+  const n2 = useCounter(2847, vis, 1600);
+  const n3 = useCounter(1200, vis, 1800);
+  const n4 = useCounter(98, vis, 1200);
+
+  const stripBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
+  const textLabel   = isDark ? 'rgba(240,244,255,0.7)' : 'rgba(14,17,24,0.7)';
+  const textSub     = isDark ? 'rgba(240,244,255,0.3)' : 'rgba(14,17,24,0.38)';
+
+  return (
+    <div
+      ref={ref}
+      className="relative py-14"
+      style={{ borderTop: `1px solid ${stripBorder}`, borderBottom: `1px solid ${stripBorder}` }}
+    >
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(90deg, rgba(245,166,35,0.02) 0%, transparent 50%, rgba(79,195,247,0.02) 100%)' }} />
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-4">
+          {[
+            { val: `${n1}+`, label: 'National Teams', sub: 'across 4 continents', c: '#F5A623' },
+            { val: n2.toLocaleString(), label: 'Active Shooters', sub: 'on the platform', c: '#4FC3F7' },
+            { val: `${n3}K+`, label: 'Sessions Logged', sub: 'and counting', c: '#00E5A0' },
+            { val: `${n4}%+`, label: 'AI Accuracy', sub: 'prediction reliability', c: '#F5A623' },
+          ].map((s, i) => (
+            <div
+              key={s.label}
+              className={`text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <p className="font-data font-black mb-1.5" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', color: s.c }}>{s.val}</p>
+              <p className="font-display font-bold text-sm uppercase tracking-[0.08em]" style={{ color: textLabel }}>{s.label}</p>
+              <p className="text-[11px] font-display mt-0.5" style={{ color: textSub }}>{s.sub}</p>
             </div>
           ))}
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Bottom bar */}
-      <div className="border-t px-5 sm:px-8 py-5 sm:py-6" style={{ borderColor: '#1E2433' }}>
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[#4A5568] text-[12px] font-display tracking-widest uppercase">
-            © {year} Marksman · Built for precision
+// ═════════════════════════════════════════════════════════════════════════════
+// FEATURES SECTION
+// ═════════════════════════════════════════════════════════════════════════════
+
+const FEATURES = [
+  { icon: <TargetIcon />, title: 'Shot-by-Shot Analytics', desc: 'Visualise exact placement on an interactive target. Track MPI, group radius, standard deviation, and scoring patterns across every session and series.', c: '#F5A623', tag: 'Core' },
+  { icon: <AISparkIcon />, title: 'AI Coaching (Claude Opus 4.6)', desc: 'Receive expert feedback after every session. Trigger control, breathing patterns, positioning, and fatigue — all analysed and prioritised automatically.', c: '#4FC3F7', tag: 'AI' },
+  { icon: <HeartIcon />, title: 'Biometric Integration', desc: 'Overlay heart rate and SpO₂ data from Apple Watch, Garmin, or Polar onto your shot timeline. Identify optimal shooting windows precisely.', c: '#00E5A0', tag: 'Health' },
+  { icon: <CalendarIcon />, title: 'AI Training Plans', desc: 'Periodised training programmes generated from your discipline, competition schedule, and session performance history. Adapts as you improve.', c: '#F5A623', tag: 'Planning' },
+  { icon: <DownloadIcon />, title: 'Universal Import', desc: 'Import from Sius, Megalink, and ISSF systems. Log manually via interactive target, file upload, or photo capture from paper targets.', c: '#4FC3F7', tag: 'Import' },
+  { icon: <TeamIcon />, title: 'Coach & Team Portal', desc: 'Full dashboard for coaches: monitor multiple shooters, review heatmaps, add feedback, and track progress toward competition targets.', c: '#00E5A0', tag: 'Teams' },
+];
+
+function FeaturesSection() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal();
+
+  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
+  const textMut  = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.55)';
+  const textBody = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
+  const cardBg   = isDark ? 'rgba(13,17,28,0.7)'     : 'rgba(255,255,255,0.85)';
+  const cardBord = isDark ? 'rgba(255,255,255,0.06)'  : 'rgba(0,0,0,0.07)';
+  const cardBgHover  = isDark ? 'rgba(13,17,28,0.95)' : 'rgba(255,255,255,1)';
+  const cardShadHov  = isDark
+    ? (c: string) => `0 0 40px ${c}08, 0 8px 32px rgba(0,0,0,0.4)`
+    : (c: string) => `0 0 30px ${c}12, 0 8px 24px rgba(0,0,0,0.08)`;
+
+  return (
+    <section id="features" ref={ref} className="py-28 sm:py-36">
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className={`max-w-2xl mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>Platform</p>
+          <h2 className="font-display font-black leading-[1.08] mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: textPri }}>
+            Everything a competitive<br />shooter needs.
+          </h2>
+          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
+            Built with national team coaches across 10m Air Rifle, Pistol, 50m Prone, and shotgun disciplines.
+            One platform. Every metric that matters.
           </p>
-          <div className="flex items-center gap-6 sm:gap-8">
-            {['Privacy', 'Terms', 'Docs'].map((item) => (
-              <Link
-                key={item}
-                href={item === 'Docs' ? '/docs' : '#'}
-                className="text-[#4A5568] hover:text-[#8892A4] text-[12px] font-display
-                           uppercase tracking-[0.14em] transition-colors duration-200 touch-target flex items-center"
-              >
-                {item}
-              </Link>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.title}
+              className={`group rounded-2xl p-6 transition-all duration-700 cursor-default ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              style={{ background: cardBg, border: `1px solid ${cardBord}`, transitionDelay: `${i * 70}ms` }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = cardBgHover;
+                el.style.borderColor = `${f.c}30`;
+                el.style.boxShadow = cardShadHov(f.c);
+                el.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = cardBg;
+                el.style.borderColor = cardBord;
+                el.style.boxShadow = 'none';
+                el.style.transform = 'translateY(0)';
+              }}
+            >
+              <div className="flex items-start justify-between mb-5">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: `${f.c}12`, color: f.c, border: `1px solid ${f.c}20` }}>
+                  {f.icon}
+                </div>
+                <span className="text-[9px] font-display font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-lg"
+                  style={{ background: `${f.c}10`, color: f.c }}>
+                  {f.tag}
+                </span>
+              </div>
+              <h3 className="font-display font-bold text-[15px] mb-2.5" style={{ color: textPri }}>{f.title}</h3>
+              <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ANALYTICS SHOWCASE
+// "Understand every shot. Not just your total."
+// ═════════════════════════════════════════════════════════════════════════════
+
+function AnalyticsShowcase() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal(0.08);
+
+  const sectionBg = isDark ? 'rgba(10,13,22,0.5)' : 'rgba(243,246,252,0.7)';
+  const secBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  const dotGrid   = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+  const textPri   = isDark ? '#F0F4FF' : '#0E1118';
+  const textMut   = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.55)';
+  const textDim   = isDark ? 'rgba(240,244,255,0.35)' : 'rgba(14,17,24,0.4)';
+  const textBody  = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
+
+  return (
+    <section
+      id="analytics"
+      ref={ref}
+      className="relative py-28 sm:py-36 overflow-hidden"
+      style={{ background: sectionBg, borderTop: `1px solid ${secBorder}`, borderBottom: `1px solid ${secBorder}` }}
+    >
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {isDark && (
+          <div className="absolute" style={{
+            top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+            width: '80vw', height: '60vw',
+            background: 'radial-gradient(ellipse, rgba(79,195,247,0.05) 0%, transparent 55%)',
+            filter: 'blur(60px)',
+          }} />
+        )}
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+          opacity: 0.4,
+        }} />
+        <div className="absolute top-0 inset-x-0 h-px" style={{
+          background: 'linear-gradient(90deg, transparent 10%, rgba(79,195,247,0.25) 40%, rgba(245,166,35,0.2) 60%, transparent 90%)',
+        }} />
+      </div>
+
+      <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#4FC3F7' }}>Session Analytics</p>
+          <h2 className="font-display font-black leading-[1.06] mb-5" style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', color: textPri }}>
+            Understand every shot.
+            <br />
+            <span style={{ color: textDim }}>Not just your total.</span>
+          </h2>
+          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
+            Every shot has a story — placement, direction, timing. Marksman reads it for you.
+            Track MPI, group radius, series fatigue, and technique bias across every session.
+          </p>
+        </div>
+
+        <div
+          className={`transition-all duration-1000 overflow-x-auto ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}
+          style={{ transitionDelay: '150ms' }}
+        >
+          <AnalyticsProductWindow />
+        </div>
+
+        <div
+          className={`grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+          style={{ transitionDelay: '300ms' }}
+        >
+          {[
+            { title: 'Mean Point of Impact', desc: 'Detect systematic aim error — is your group centred on the bullseye?', color: '#4FC3F7' },
+            { title: 'Group Radius & σ', desc: 'Measure shot-to-shot consistency with standard deviation across each series.', color: '#00E5A0' },
+            { title: 'Series Fatigue Curve', desc: 'Spot performance drop-off across series. Know when fatigue starts affecting your score.', color: '#F5A623' },
+            { title: 'Directional Bias', desc: 'Identify left/right, top/bottom tendencies by series, weapon, or session condition.', color: '#4FC3F7' },
+          ].map((item) => (
+            <div key={item.title} className="flex flex-col gap-2">
+              <div className="w-6 h-0.5 rounded-full" style={{ background: item.color }} />
+              <h4 className="font-display font-bold text-[14px]" style={{ color: textPri }}>{item.title}</h4>
+              <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+// ── Analytics Product Window ──────────────────────────────────────────────────
+
+function AnalyticsProductWindow() {
+  const SIZE = 200;
+  const miniRings = [88, 74, 60, 44, 30, 18, 10];
+
+  return (
+    <div
+      className="rounded-2xl overflow-hidden w-full"
+      style={{
+        background: 'rgba(11,14,24,0.98)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(79,195,247,0.05), inset 0 1px 0 rgba(255,255,255,0.04)',
+      }}
+    >
+      {/* Chrome bar */}
+      <div
+        className="flex items-center gap-3 px-5 py-3.5"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}
+      >
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,77,109,0.6)' }} />
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(245,166,35,0.6)' }} />
+          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(0,229,160,0.6)' }} />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#F5A623' }} />
+            <span className="text-[11px] font-display uppercase tracking-[0.1em]" style={{ color: 'rgba(240,244,255,0.35)' }}>
+              marksman.app / sessions / 2847 — 10m Air Rifle
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
+          <span className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Live</span>
+        </div>
+      </div>
+
+      {/* App layout */}
+      <div className="flex divide-x" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+
+        {/* Sidebar nav */}
+        <div className="w-14 flex flex-col items-center py-4 gap-4 shrink-0" style={{ background: 'rgba(6,8,16,0.6)' }}>
+          {[
+            { icon: '⌂', active: false },
+            { icon: '◎', active: true },
+            { icon: '≈', active: false },
+            { icon: '✦', active: false },
+          ].map((item, i) => (
+            <div key={i}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px]"
+              style={{
+                background: item.active ? 'rgba(245,166,35,0.12)' : 'transparent',
+                color: item.active ? '#F5A623' : 'rgba(240,244,255,0.2)',
+                border: item.active ? '1px solid rgba(245,166,35,0.2)' : '1px solid transparent',
+              }}>
+              {item.icon}
+            </div>
+          ))}
+        </div>
+
+        {/* Target panel */}
+        <div className="flex flex-col items-center justify-center p-6 shrink-0"
+          style={{ background: 'rgba(6,8,16,0.4)', width: SIZE + 48 }}>
+          <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-3 self-start" style={{ color: 'rgba(240,244,255,0.3)' }}>
+            Shot Placement
+          </p>
+          <div className="relative" style={{ width: SIZE, height: SIZE }}>
+            <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE}>
+              <circle cx={100} cy={100} r={SIZE / 2 - 1} fill="rgba(245,166,35,0.015)" />
+              {miniRings.map((r, i) => (
+                <circle key={r} cx={100} cy={100} r={r}
+                  fill="none"
+                  stroke={i >= 5 ? 'rgba(245,166,35,0.7)' : 'rgba(255,255,255,0.08)'}
+                  strokeWidth={i >= 5 ? 1 : 0.5}
+                />
+              ))}
+              {[[100, 4, 100, 84], [100, 116, 100, SIZE - 4], [4, 100, 84, 100], [116, 100, SIZE - 4, 100]].map(([x1, y1, x2, y2], i) => (
+                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke="rgba(245,166,35,0.3)" strokeWidth="0.6" strokeLinecap="round" />
+              ))}
+              <circle cx={100} cy={100} r={2.5} fill="#F5A623" />
+              {TABLE_SHOTS.map((s, i) => {
+                const dx = s.x * 8;
+                const dy = -s.y * 8;
+                const color = s.score >= 10.5 ? '#F5A623' : s.score >= 10.0 ? '#4FC3F7' : '#00E5A0';
+                return (
+                  <g key={i}>
+                    <circle cx={100 + dx} cy={100 + dy} r={4} fill={color} opacity={0.85}
+                      style={{ filter: `drop-shadow(0 0 3px ${color}70)` }} />
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+          {/* MPI indicator */}
+          <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg w-full justify-center"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.3)' }}>MPI</span>
+            <span className="font-data text-xs" style={{ color: '#4FC3F7' }}>x: +0.3 · y: -0.2</span>
+          </div>
+        </div>
+
+        {/* Center: session stats + sparkline */}
+        <div className="flex flex-col gap-4 p-5" style={{ minWidth: 180, maxWidth: 220 }}>
+          <p className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
+            Session Summary
+          </p>
+
+          {/* Big avg */}
+          <div>
+            <p className="font-data font-black text-4xl leading-none" style={{ color: '#F5A623' }}>10.51</p>
+            <p className="text-[10px] font-display uppercase tracking-widest mt-1" style={{ color: 'rgba(240,244,255,0.3)' }}>Session average</p>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { l: 'Best', v: '10.9', c: '#F5A623' },
+              { l: 'Shots', v: '40', c: '#4FC3F7' },
+              { l: 'X-Ring', v: '12', c: '#F5A623' },
+              { l: 'Grp Ø', v: '3.2mm', c: '#00E5A0' },
+            ].map((s) => (
+              <div key={s.l} className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                <p className="text-[8px] font-display uppercase tracking-[0.12em] mb-1" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.l}</p>
+                <p className="font-data font-bold text-sm" style={{ color: s.c }}>{s.v}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Mini sparkline */}
+          <div>
+            <p className="text-[9px] font-display uppercase tracking-widest mb-2" style={{ color: 'rgba(240,244,255,0.25)' }}>Score trend</p>
+            <svg viewBox="0 0 160 40" width="100%" className="w-full">
+              <defs>
+                <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#F5A623" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {/* Band */}
+              <path d="M0,22 L20,18 L40,20 L60,12 L80,16 L100,10 L120,14 L140,8 L160,12 L160,40 L0,40 Z"
+                fill="url(#sg)" opacity="0.5" />
+              {/* Line */}
+              <polyline
+                points="0,22 20,18 40,20 60,12 80,16 100,10 120,14 140,8 160,12"
+                fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+              />
+              {/* Dots */}
+              {[[0,22],[20,18],[40,20],[60,12],[80,16],[100,10],[120,14],[140,8],[160,12]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r={i === 7 ? 3 : 1.5} fill="#F5A623"
+                  style={i === 7 ? { filter: 'drop-shadow(0 0 3px rgba(245,166,35,0.8))' } : {}} />
+              ))}
+            </svg>
+          </div>
+        </div>
+
+        {/* Right: shot table */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <p className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
+              Shot Log
+            </p>
+            <span className="text-[9px] font-data" style={{ color: 'rgba(240,244,255,0.2)' }}>Series 1 · 8 shots</span>
+          </div>
+          <div className="overflow-auto flex-1">
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  {['#', 'Ring', 'Score', 'X', 'Y', 'Δ'].map((h) => (
+                    <th key={h} className="text-left py-2 px-3 text-[9px] font-display font-bold uppercase tracking-[0.12em]"
+                      style={{ color: 'rgba(240,244,255,0.25)' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {TABLE_SHOTS.map((s, i) => {
+                  const color = s.score >= 10.5 ? '#F5A623' : s.score >= 10.0 ? '#4FC3F7' : '#00E5A0';
+                  const ring  = s.score >= 10.5 ? 'X' : s.score >= 10.0 ? '10' : '9';
+                  const prev  = i > 0 ? TABLE_SHOTS[i - 1].score : null;
+                  return (
+                    <tr key={s.n}
+                      className="transition-colors duration-100"
+                      style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                    >
+                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.n}</td>
+                      <td className="py-2 px-3">
+                        <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded"
+                          style={{ color, background: `${color}18` }}>{ring}</span>
+                      </td>
+                      <td className="py-2 px-3 font-data font-bold text-sm" style={{ color }}>{s.score.toFixed(1)}</td>
+                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: s.x < 0 ? '#FF4D6D' : '#4FC3F7' }}>
+                        {s.x > 0 ? '+' : ''}{s.x.toFixed(1)}
+                      </td>
+                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: s.y < 0 ? '#FF4D6D' : '#00E5A0' }}>
+                        {s.y > 0 ? '+' : ''}{s.y.toFixed(1)}
+                      </td>
+                      <td className="py-2 px-3 text-center text-[11px] font-bold">
+                        {prev === null ? <span style={{ color: 'rgba(240,244,255,0.2)' }}>—</span>
+                          : s.score > prev
+                            ? <span style={{ color: '#00E5A0' }}>↑</span>
+                            : <span style={{ color: '#FF4D6D' }}>↓</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {/* Table footer */}
+          <div className="flex items-center gap-4 px-4 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.01)' }}>
+            {[
+              { l: 'Avg', v: '10.5', c: '#F5A623' },
+              { l: 'Std dev', v: '0.27', c: '#4FC3F7' },
+              { l: 'Grp Ø', v: '3.2mm', c: '#00E5A0' },
+            ].map((s) => (
+              <div key={s.l} className="flex items-center gap-1.5">
+                <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.25)' }}>{s.l}</span>
+                <span className="font-data font-bold text-[11px]" style={{ color: s.c }}>{s.v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// AI COACH SECTION
+// ═════════════════════════════════════════════════════════════════════════════
+
+const AI_FINDINGS = [
+  { sev: 'critical', cat: 'Trigger', title: 'Premature release detected on shots 4, 7 & 10', obs: 'X-axis deviation beyond ±1.5mm consistent with early finger movement. Occurs under fatigue in final third of each series.', c: '#FF4D6D', bg: 'rgba(255,77,109,0.05)', border: 'rgba(255,77,109,0.18)' },
+  { sev: 'moderate', cat: 'Breathing', title: 'Group centre drifting upward across series 2–4', obs: 'MPI shifted +2.1mm vertically. Suggests breath hold is shortening as fatigue builds. Common pattern in long sessions.', c: '#F5A623', bg: 'rgba(245,166,35,0.05)', border: 'rgba(245,166,35,0.18)' },
+  { sev: 'positive', cat: 'Consistency', title: 'Group radius improved 18% vs last session', obs: 'Standard deviation reduced from 2.8mm to 2.3mm. Consistent follow-through is measurably improving your tight group performance.', c: '#00E5A0', bg: 'rgba(0,229,160,0.05)', border: 'rgba(0,229,160,0.18)' },
+];
+
+function AICoachSection() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal();
+
+  const cardBg    = isDark ? 'rgba(11,14,24,0.98)'    : 'rgba(255,255,255,0.95)';
+  const cardBord  = isDark ? 'rgba(245,166,35,0.12)'  : 'rgba(245,166,35,0.25)';
+  const cardShadow= isDark ? '0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(245,166,35,0.04)' : '0 20px 60px rgba(0,0,0,0.1), 0 0 40px rgba(245,166,35,0.06)';
+  const headerBg  = isDark ? 'rgba(245,166,35,0.03)'  : 'rgba(245,166,35,0.04)';
+  const headerBord= isDark ? 'rgba(245,166,35,0.1)'   : 'rgba(245,166,35,0.15)';
+  const divider   = isDark ? 'rgba(255,255,255,0.04)'  : 'rgba(0,0,0,0.05)';
+  const textPri   = isDark ? '#F0F4FF'                 : '#0E1118';
+  const textMut   = isDark ? 'rgba(240,244,255,0.5)'   : 'rgba(14,17,24,0.55)';
+  const textBody  = isDark ? 'rgba(240,244,255,0.45)'  : 'rgba(14,17,24,0.5)';
+  const textDim   = isDark ? 'rgba(240,244,255,0.3)'   : 'rgba(14,17,24,0.35)';
+  const textDim2  = isDark ? 'rgba(240,244,255,0.4)'   : 'rgba(14,17,24,0.45)';
+  const textDim3  = isDark ? 'rgba(240,244,255,0.35)'  : 'rgba(14,17,24,0.4)';
+  const checkBg   = isDark ? 'rgba(245,166,35,0.1)'    : 'rgba(245,166,35,0.08)';
+
+  return (
+    <section id="ai-coach" ref={ref} className="py-28 sm:py-36">
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+          {/* Left: mock AI card */}
+          <div className={`transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: cardBg, border: `1px solid ${cardBord}`, boxShadow: cardShadow }}>
+              <div className="relative px-5 py-4" style={{ borderBottom: `1px solid ${headerBord}`, background: headerBg }}>
+                <div className="absolute top-0 inset-x-0 h-px"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.5), transparent)' }} />
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.25)' }}>
+                    <AISparkIcon size={14} color="#F5A623" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-display font-bold text-[13px]" style={{ color: textPri }}>Coach Assessment</p>
+                    <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Powered by Claude Opus 4.6</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-data font-black text-2xl" style={{ color: '#F5A623' }}>8.4</p>
+                    <p className="text-[9px] font-display" style={{ color: textDim }}>/10</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-5 py-4" style={{ borderBottom: `1px solid ${divider}` }}>
+                <p className="text-[13px] leading-relaxed" style={{ color: textMut }}>
+                  Strong technical base with improving group consistency. Primary concern is trigger release
+                  under fatigue — particularly in the final shots of each series. Address trigger discipline
+                  before increasing session volume.
+                </p>
+              </div>
+
+              <div className="p-4 space-y-2.5">
+                {AI_FINDINGS.map((f, i) => (
+                  <div key={i} className="rounded-xl p-4" style={{ background: f.bg, border: `1px solid ${f.border}` }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[9px] font-display font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded"
+                        style={{ color: f.c, background: `${f.c}12` }}>{f.cat}</span>
+                      <span className="text-[9px] font-display font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded"
+                        style={{ color: f.c, border: `1px solid ${f.border}` }}>{f.sev}</span>
+                    </div>
+                    <p className="font-display font-semibold text-[13px] mb-1" style={{ color: textPri }}>{f.title}</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: textDim2 }}>{f.obs}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-5 py-3.5" style={{ borderTop: `1px solid ${divider}` }}>
+                <div className="py-2 rounded-xl text-center text-[11px] font-display font-bold uppercase tracking-[0.12em]"
+                  style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.2)', color: '#F5A623' }}>
+                  3 Priority Actions · 5 Total Findings
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: text + shooter visual */}
+          <div className={`transition-all duration-700 delay-150 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
+
+            {/* Shooter silhouette card */}
+            <div className="relative mb-7 rounded-2xl overflow-hidden flex items-end justify-center"
+              style={{
+                height: 180,
+                background: isDark ? 'rgba(11,14,24,0.6)' : 'rgba(245,166,35,0.04)',
+                border: `1px solid ${isDark ? 'rgba(245,166,35,0.1)' : 'rgba(245,166,35,0.2)'}`,
+              }}>
+              {/* Radar rings behind shooter */}
+              <div className="absolute pointer-events-none" style={{
+                bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 160, height: 160, borderRadius: '50%',
+                border: '1px solid rgba(245,166,35,0.12)',
+                animation: 'radarPing 3s ease-out infinite',
+              }} />
+              <div className="absolute pointer-events-none" style={{
+                bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 160, height: 160, borderRadius: '50%',
+                border: '1px solid rgba(245,166,35,0.08)',
+                animation: 'radarPing 3s ease-out 1.5s infinite',
+              }} />
+              {/* Ground line */}
+              <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'rgba(245,166,35,0.2)' }} />
+              {/* Shooter SVG silhouette — standing rifle position */}
+              <svg width="120" height="160" viewBox="0 0 120 160" fill="none" className="relative z-10"
+                style={{ filter: 'drop-shadow(0 0 12px rgba(245,166,35,0.4))' }}>
+                <circle cx="62" cy="18" r="10" fill="rgba(245,166,35,0.85)" />
+                <path d="M55 28 L50 75 L58 75 L60 50 L65 75 L73 75 L67 28 Z" fill="rgba(245,166,35,0.7)" />
+                <path d="M55 38 L20 48 L22 52 L58 44 Z" fill="rgba(245,166,35,0.65)" />
+                <path d="M67 36 L80 40 L79 44 L66 40 Z" fill="rgba(245,166,35,0.65)" />
+                <rect x="8" y="47" width="75" height="4" rx="2" fill="rgba(245,166,35,0.9)" />
+                <path d="M80 43 L95 50 L90 58 L78 50 Z" fill="rgba(245,166,35,0.75)" />
+                <rect x="35" y="43" width="18" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
+                <path d="M52 75 L48 120 L56 120 L58 85 Z" fill="rgba(245,166,35,0.65)" />
+                <path d="M66 75 L62 85 L64 120 L72 120 Z" fill="rgba(245,166,35,0.65)" />
+                <rect x="44" y="118" width="14" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
+                <rect x="61" y="118" width="14" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
+                <circle cx="6" cy="49" r="2.5" fill="#F5A623" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
+              </svg>
+              {/* Score badge */}
+              <div className="absolute top-4 right-4 text-right">
+                <p className="font-data font-black text-3xl leading-none" style={{ color: '#F5A623', filter: 'drop-shadow(0 0 8px rgba(245,166,35,0.6))' }}>+18%</p>
+                <p className="text-[9px] font-display uppercase tracking-[0.14em] mt-0.5" style={{ color: isDark ? 'rgba(240,244,255,0.4)' : 'rgba(14,17,24,0.4)' }}>group radius</p>
+              </div>
+              {/* Session counter */}
+              <div className="absolute top-4 left-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
+                  <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Session 24</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>AI Coaching</p>
+            <h2 className="font-display font-black leading-[1.08] mb-5"
+              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: textPri }}>
+              Expert coaching,<br />
+              <span style={{ color: '#F5A623' }}>after every session.</span>
+            </h2>
+            <p className="text-[15px] sm:text-[17px] leading-relaxed mb-6" style={{ color: textMut }}>
+              Claude Opus 4.6 analyses your shot data and delivers structured feedback categorised
+              by technique area and severity — like having a national team coach review every session.
+            </p>
+
+            {/* Score trend sparkline */}
+            <div className="mb-8 rounded-xl p-4 flex items-center gap-4"
+              style={{ background: isDark ? 'rgba(245,166,35,0.04)' : 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.12)' }}>
+              <div className="shrink-0">
+                <p className="text-[10px] font-display uppercase tracking-widest mb-0.5" style={{ color: 'rgba(245,166,35,0.6)' }}>Score Trend</p>
+                <p className="font-data font-black text-2xl leading-none" style={{ color: '#F5A623' }}>+2.1</p>
+                <p className="text-[9px] font-display" style={{ color: textDim }}>pts over 6 sessions</p>
+              </div>
+              <svg width="120" height="40" viewBox="0 0 120 40" fill="none" style={{ flex: 1 }}>
+                <polyline
+                  points="0,32 24,28 48,22 72,18 96,12 120,6"
+                  stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  fill="none"
+                  strokeDasharray="200"
+                  strokeDashoffset={vis ? '0' : '200'}
+                  style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s' }}
+                />
+                {([0,24,48,72,96,120] as number[]).map((x, i) => {
+                  const y = [32,28,22,18,12,6][i];
+                  return <circle key={i} cx={x} cy={y} r="3" fill="#F5A623"
+                    style={{ opacity: vis ? 1 : 0, transition: `opacity 0.3s ${0.3 + i*0.1}s` }} />;
+                })}
+              </svg>
+            </div>
+
+            <div className="space-y-4 mb-10">
+              {[
+                { l: 'Technique breakdown', d: 'Trigger, breathing, positioning, sight alignment — each assessed independently.' },
+                { l: 'Fatigue & consistency', d: 'Detect performance patterns across series and between sessions over time.' },
+                { l: 'Drill recommendations', d: 'Specific, actionable drills generated for each identified weakness.' },
+                { l: 'Session-to-session tracking', d: 'Measure how coaching feedback translates into measurable score improvement.' },
+              ].map((item) => (
+                <div key={item.l} className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 w-5 h-5 rounded-lg flex items-center justify-center"
+                    style={{ background: checkBg }}>
+                    <svg width="9" height="9" viewBox="0 0 9 9">
+                      <path d="M1.5 4.5l2 2 3.5-3.5" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-semibold" style={{ color: textPri }}>{item.l}</p>
+                    <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{item.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link href="/auth/register"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-display font-black text-[13px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #F5A623, #E8961A)',
+                color: '#060810',
+                boxShadow: '0 0 40px rgba(245,166,35,0.2)',
+              }}>
+              Try AI Coach <ArrowRightIcon />
+            </Link>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HOW IT WORKS
+// ═════════════════════════════════════════════════════════════════════════════
+
+function HowItWorksSection() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal();
+
+  const sectionBg = isDark ? 'rgba(10,13,22,0.5)' : 'rgba(243,246,252,0.7)';
+  const secBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  const cardBg    = isDark ? 'rgba(13,17,28,0.8)'    : 'rgba(255,255,255,0.9)';
+  const cardBord  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+  const textPri   = isDark ? '#F0F4FF'                : '#0E1118';
+  const textMut   = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
+  const textDim   = isDark ? 'rgba(240,244,255,0.25)' : 'rgba(14,17,24,0.3)';
+  const chipBg    = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+  const chipBord  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)';
+  const chipText  = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.5)';
+
+  return (
+    <section
+      id="how"
+      ref={ref}
+      className="py-28 sm:py-36 relative"
+      style={{ background: sectionBg, borderTop: `1px solid ${secBorder}` }}
+    >
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className={`text-center max-w-xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#00E5A0' }}>Getting Started</p>
+          <h2 className="font-display font-black leading-[1.08] mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: textPri }}>
+            From first session<br />to peak performance.
+          </h2>
+          <p className="text-[15px] leading-relaxed" style={{ color: textMut }}>
+            Set up in under 5 minutes. See actionable insights from your very first session.
+          </p>
+        </div>
+
+        {/* Desktop: horizontal connected timeline */}
+        <div className="hidden lg:block relative mb-12">
+          {/* Base connector line */}
+          <div className="absolute h-px" style={{
+            top: 24, left: '12.5%', right: '12.5%',
+            background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
+          }} />
+          {/* Animated fill line */}
+          <div className="absolute h-px transition-all duration-[2000ms] ease-out" style={{
+            top: 24,
+            left: '12.5%',
+            right: vis ? '12.5%' : '87.5%',
+            background: 'linear-gradient(90deg, #F5A623, #4FC3F7, #00E5A0, #F5A623)',
+            transitionDelay: '200ms',
+          }} />
+
+          <div className="grid grid-cols-4 gap-4">
+            {[
+              { n: '01', title: 'Create your profile', desc: 'Select discipline, weapon, and competition goals. Connect a coach for team-based training.', c: '#F5A623',
+                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5"><circle cx="9" cy="6" r="3.5"/><circle cx="9" cy="9" r="7.5" strokeDasharray="3 2"/></svg> },
+              { n: '02', title: 'Log your sessions', desc: 'Import from scoring systems, log manually on an interactive target, or capture paper targets with your camera.', c: '#4FC3F7',
+                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="8" width="12" height="8" rx="1.5"/><path d="M9 2v8M6 5l3-3 3 3"/></svg> },
+              { n: '03', title: 'Receive AI feedback', desc: 'After each session, get structured coaching from Claude Opus 4.6 with prioritised drills and technique flags.', c: '#00E5A0',
+                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7l-4 3V4a1 1 0 0 1 1-1z"/><circle cx="9" cy="7.5" r="1" fill="#00E5A0" stroke="none"/></svg> },
+              { n: '04', title: 'Track your progress', desc: 'Monitor scoring trends, consistency metrics, and training plan adherence toward competition peak.', c: '#F5A623',
+                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2,14 6,10 10,12 16,5"/><polyline points="12,5 16,5 16,9"/></svg> },
+            ].map((s, i) => (
+              <div key={s.n}
+                className={`flex flex-col items-center text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 relative z-10"
+                  style={{
+                    background: isDark ? 'rgba(13,17,28,1)' : 'rgba(255,255,255,1)',
+                    border: `2px solid ${s.c}`,
+                    boxShadow: `0 0 16px ${s.c}30`,
+                  }}>
+                  {s.icon}
+                </div>
+                <p className="font-data font-black text-[11px] uppercase tracking-[0.2em] mb-1.5" style={{ color: s.c }}>{s.n}</p>
+                <h3 className="font-display font-bold text-[14px] mb-2" style={{ color: textPri }}>{s.title}</h3>
+                <p className="text-[12px] leading-relaxed" style={{ color: textMut }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile: vertical timeline */}
+        <div className="lg:hidden space-y-0 mb-12">
+          {[
+            { n: '01', title: 'Create your profile', desc: 'Select discipline, weapon, and competition goals. Connect a coach for team-based training.', c: '#F5A623',
+              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5"><circle cx="9" cy="6" r="3.5"/><circle cx="9" cy="9" r="7.5" strokeDasharray="3 2"/></svg> },
+            { n: '02', title: 'Log your sessions', desc: 'Import from scoring systems, log manually on an interactive target, or capture paper targets with your camera.', c: '#4FC3F7',
+              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="8" width="12" height="8" rx="1.5"/><path d="M9 2v8M6 5l3-3 3 3"/></svg> },
+            { n: '03', title: 'Receive AI feedback', desc: 'After each session, get structured coaching from Claude Opus 4.6 with prioritised drills and technique flags.', c: '#00E5A0',
+              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7l-4 3V4a1 1 0 0 1 1-1z"/><circle cx="9" cy="7.5" r="1" fill="#00E5A0" stroke="none"/></svg> },
+            { n: '04', title: 'Track your progress', desc: 'Monitor scoring trends, consistency metrics, and training plan adherence toward competition peak.', c: '#F5A623',
+              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2,14 6,10 10,12 16,5"/><polyline points="12,5 16,5 16,9"/></svg> },
+          ].map((s, i) => (
+            <div key={s.n}
+              className={`flex gap-4 transition-all duration-700 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}
+              style={{ transitionDelay: `${i * 120}ms` }}>
+              <div className="flex flex-col items-center shrink-0">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{
+                    background: isDark ? 'rgba(13,17,28,1)' : '#fff',
+                    border: `2px solid ${s.c}`,
+                    boxShadow: `0 0 12px ${s.c}25`,
+                  }}>
+                  {s.icon}
+                </div>
+                {i < 3 && <div className="w-px flex-1 my-1" style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', minHeight: 32 }} />}
+              </div>
+              <div className="pb-8">
+                <p className="font-data font-bold text-[10px] uppercase tracking-[0.18em] mb-0.5" style={{ color: s.c }}>{s.n}</p>
+                <h3 className="font-display font-bold text-[15px] mb-1.5" style={{ color: textPri }}>{s.title}</h3>
+                <p className="text-[13px] leading-relaxed" style={{ color: textMut }}>{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          className={`rounded-2xl p-6 sm:p-8 transition-all duration-700 delay-300 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+          style={{ background: cardBg, border: `1px solid ${cardBord}` }}
+        >
+          <p className="text-[10px] font-display font-bold uppercase tracking-[0.18em] mb-5" style={{ color: textDim }}>Supported Disciplines</p>
+          <div className="flex flex-wrap gap-2.5">
+            {['10m Air Rifle', '10m Air Pistol', '25m Rapid Fire Pistol', '50m Rifle 3×40', '50m Rifle Prone', '50m Pistol', 'Trap', 'Skeet', 'Double Trap'].map((d) => (
+              <span key={d} className="px-3.5 py-1.5 rounded-xl text-[12px] font-display font-semibold"
+                style={{ background: chipBg, border: `1px solid ${chipBord}`, color: chipText }}>
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CTA
+// ═════════════════════════════════════════════════════════════════════════════
+
+function CTASection() {
+  const isDark = usePageTheme();
+  const [ref, vis] = useSectionReveal();
+
+  const textPri   = isDark ? '#F0F4FF' : '#0E1118';
+  const textMut   = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
+  const dotGrid   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+  const secBtnBg  = isDark ? 'rgba(240,244,255,0.04)' : 'rgba(0,0,0,0.04)';
+  const secBtnBord= isDark ? 'rgba(240,244,255,0.1)'  : 'rgba(0,0,0,0.1)';
+  const secBtnTxt = isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.6)';
+
+  return (
+    <section ref={ref} className="relative py-28 sm:py-36 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(245,166,35,0.07) 0%, transparent 60%)' }} />
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+        }} />
+        <div className="absolute top-0 inset-x-0 h-px" style={{
+          background: 'linear-gradient(90deg, transparent 20%, rgba(245,166,35,0.2) 50%, transparent 80%)',
+        }} />
+      </div>
+
+      <div className={`relative z-10 max-w-2xl mx-auto px-5 sm:px-8 text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full mb-8"
+          style={{ background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.2)' }}>
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
+          <span className="text-[11px] font-display font-bold uppercase tracking-[0.15em]" style={{ color: '#00E5A0' }}>
+            Free to start · No credit card needed
+          </span>
+        </div>
+
+        <h2 className="font-display font-black leading-[1.04] mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', color: textPri }}>
+          Start training with<br />
+          <span style={{
+            background: 'linear-gradient(135deg, #F5A623, #FFD580)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+          }}>data on your side.</span>
+        </h2>
+
+        <p className="text-base sm:text-[17px] mb-10" style={{ color: textMut }}>
+          Join 2,847 shooters who use Marksman to train smarter and compete at their best.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link href="/auth/register"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl font-display font-black text-[14px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #F5A623, #E8961A)', color: '#060810', boxShadow: '0 0 60px rgba(245,166,35,0.3)' }}>
+            Create free account <ArrowRightIcon />
+          </Link>
+          <Link href="/auth/login"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-display font-semibold text-[14px] transition-all duration-200"
+            style={{ background: secBtnBg, border: `1px solid ${secBtnBord}`, color: secBtnTxt }}>
+            Sign in to dashboard
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// FOOTER
+// ═════════════════════════════════════════════════════════════════════════════
+
+function Footer() {
+  const isDark = usePageTheme();
+  const border  = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
+  const logoCl  = isDark ? 'rgba(240,244,255,0.4)'  : 'rgba(14,17,24,0.4)';
+  const caption = isDark ? 'rgba(240,244,255,0.2)'  : 'rgba(14,17,24,0.3)';
+  const linkCl  = isDark ? 'rgba(240,244,255,0.25)' : 'rgba(14,17,24,0.3)';
+  const linkHov = isDark ? 'rgba(240,244,255,0.6)'  : 'rgba(14,17,24,0.7)';
+
+  return (
+    <footer className="py-10" style={{ borderTop: `1px solid ${border}` }}>
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="flex items-center gap-2.5">
+            <CrosshairLogo size={18} />
+            <span className="font-display font-black text-[14px] tracking-[0.18em] uppercase" style={{ color: logoCl }}>
+              Marksman
+            </span>
+          </div>
+          <p className="text-[12px] font-display text-center" style={{ color: caption }}>
+            Precision analytics for competitive shooters. Built for athletes, by athletes.
+          </p>
+          <div className="flex items-center gap-6">
+            {['Privacy', 'Terms', 'Contact'].map((l) => (
+              <a key={l} href="#"
+                className="text-[12px] font-display transition-colors duration-200"
+                style={{ color: linkCl }}
+                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = linkHov; }}
+                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = linkCl; }}>
+                {l}
+              </a>
             ))}
           </div>
         </div>
@@ -2558,69 +1846,108 @@ function Footer() {
   );
 }
 
-// ── Icons ─────────────────────────────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════════════════════════
+// PAGE LOADER
+// ═════════════════════════════════════════════════════════════════════════════
 
-function CrosshairLogo({ size = 32 }: { size?: number }) {
+function PageLoader() {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <circle cx="16" cy="16" r="10" stroke="#F5A623" strokeWidth="1.4" />
-      <circle cx="16" cy="16" r="5"  stroke="#F5A623" strokeWidth="1.4" />
-      <circle cx="16" cy="16" r="2"  fill="#F5A623" />
-      <line x1="16" y1="2"  x2="16" y2="8"  stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="16" y1="24" x2="16" y2="30" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="2"  y1="16" x2="8"  y2="16" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="24" y1="16" x2="30" y2="16" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
+    <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#060810' }}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-t-[#F5A623] border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+          <div className="absolute inset-2 rounded-full border border-t-transparent border-r-[#4FC3F7] border-b-transparent border-l-transparent animate-spin"
+            style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full" style={{ background: '#F5A623' }} />
+          </div>
+        </div>
+        <p className="text-[11px] font-display uppercase tracking-widest animate-pulse" style={{ color: 'rgba(240,244,255,0.3)' }}>
+          Loading
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SHARED ICONS
+// ═════════════════════════════════════════════════════════════════════════════
+
+function CrosshairLogo({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true"
+      style={{ filter: 'drop-shadow(0 0 4px rgba(245,166,35,0.5))' }}>
+      <circle cx="16" cy="16" r="13" stroke="#F5A623" strokeWidth="1" opacity="0.45" />
+      <circle cx="16" cy="16" r="9"  stroke="#F5A623" strokeWidth="1" opacity="0.75" />
+      <circle cx="16" cy="16" r="4"  stroke="#F5A623" strokeWidth="1.2" />
+      <circle cx="16" cy="16" r="1.5" fill="#F5A623" />
+      <line x1="16" y1="2"  x2="16" y2="10" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="16" y1="22" x2="16" y2="30" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="2"  y1="16" x2="10" y2="16" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="22" y1="16" x2="30" y2="16" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
 
-function ArrowRightIcon({ size = 14 }: { size?: number }) {
+function ArrowRightIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <line x1="2" y1="7" x2="12" y2="7" />
-      <polyline points="8,3 12,7 8,11" />
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="2" y1="6.5" x2="11" y2="6.5" />
+      <polyline points="7.5,3 11,6.5 7.5,10" />
     </svg>
   );
 }
 
 function TargetIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10" cy="10" r="8" /><circle cx="10" cy="10" r="4.5" /><circle cx="10" cy="10" r="1.8" fill="currentColor" stroke="none" /></svg>;
-}
-
-function CameraIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="6" width="16" height="12" rx="2" /><circle cx="10" cy="12" r="3" /><path d="M7 6l1.5-2.5h3L13 6" /></svg>;
-}
-
-function ChartLineIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2,15 6,9 11,12 17,5" /><line x1="2" y1="18" x2="18" y2="18" /></svg>;
-}
-
-function CoachIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="7" r="3" /><path d="M2 18c0-4 2.7-6 6-6s6 2 6 6" /><path d="M14 5l2 2 3-3" /></svg>;
-}
-
-function ImportIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M12 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5" /><polyline points="15,3 17,5 12,10" /><line x1="10" y1="10" x2="17" y2="3" /></svg>;
-}
-
-function SparkleIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v2.5M10 15.5V18M2 10h2.5M15.5 10H18M4 4l1.8 1.8M14.2 14.2L16 16M4 16l1.8-1.8M14.2 5.8L16 4" /><circle cx="10" cy="10" r="3" fill="currentColor" stroke="none" opacity="0.8" /></svg>;
-}
-
-function HeartIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 19s-8-5.5-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 5.5-8 11-8 11z"/>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <circle cx="9" cy="9" r="7.5" /><circle cx="9" cy="9" r="4.5" /><circle cx="9" cy="9" r="1.8" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
-function SoldierIcon() {
+function AISparkIcon({ size = 18, color }: { size?: number; color?: string }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="10,2 12.5,7.5 18.5,7.5 13.5,11 15.5,17 10,13.5 4.5,17 6.5,11 1.5,7.5 7.5,7.5" />
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" stroke={color ?? 'currentColor'} strokeWidth="1.5" strokeLinecap="round">
+      <path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1l1.1-1.1M13 5l1.1-1.1" />
+      <circle cx="9" cy="9" r="2.8" fill={color ?? 'currentColor'} stroke="none" opacity="0.85" />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1,9 4,9 6,4 8,14 10,6 12,11 14,9 17,9" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="14" height="13" rx="2" />
+      <line x1="2" y1="7" x2="16" y2="7" />
+      <line x1="6" y1="1" x2="6" y2="5" />
+      <line x1="12" y1="1" x2="12" y2="5" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 2v9M5.5 7.5L9 11l3.5-3.5" /><path d="M3 13.5v1a1 1 0 001 1h10a1 1 0 001-1v-1" />
+    </svg>
+  );
+}
+
+function TeamIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="7" cy="6" r="2.8" /><path d="M1.5 15.5c0-3 2.5-5.5 5.5-5.5" />
+      <circle cx="13" cy="7" r="2.2" /><path d="M10.5 15.5c0-2.2 1.1-4 2.5-4s2.5 1.8 2.5 4" />
     </svg>
   );
 }

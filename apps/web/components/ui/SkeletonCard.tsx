@@ -9,7 +9,7 @@ interface SkeletonCardProps {
 }
 
 const shimmerStyle = (delay: number = 0): React.CSSProperties => ({
-  background: 'linear-gradient(105deg, rgba(26,32,53,0.6) 25%, rgba(35,43,68,0.85) 50%, rgba(26,32,53,0.6) 75%)',
+  background: 'linear-gradient(105deg, var(--skeleton-from) 25%, var(--skeleton-mid) 50%, var(--skeleton-from) 75%)',
   backgroundSize: '200% 100%',
   animation: `shimmer 2s linear ${delay}ms infinite`,
   borderRadius: 8,
@@ -28,7 +28,7 @@ export function SkeletonCard({
         minHeight: height,
         animationDelay: `${animationDelay}ms`,
         background: 'rgba(10,13,20,0.85)',
-        border: '1px solid rgba(255,255,255,0.04)',
+        border: '1px solid var(--glass-border)',
       }}
       aria-hidden="true"
       role="presentation"
@@ -63,7 +63,7 @@ export function SkeletonRow({ animationDelay = 0 }: { animationDelay?: number })
       className="flex items-center gap-4 px-5 py-4 animate-fade-in"
       style={{
         animationDelay: `${animationDelay}ms`,
-        borderBottom: '1px solid rgba(26,32,53,0.6)',
+        borderBottom: '1px solid var(--border-subtle)',
       }}
       aria-hidden="true"
     >

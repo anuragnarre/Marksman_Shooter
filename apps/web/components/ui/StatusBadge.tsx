@@ -53,9 +53,9 @@ const VARIANT_CONFIG = {
   },
   discipline: {
     dot:    'bg-[#8892A4]',
-    border: 'border-[#1E2433]',
-    text:   'text-[#8892A4]',
-    bg:     'bg-[#1E2433]',
+    border: 'border-border-subtle',
+    text:   'text-text-secondary',
+    bg:     'bg-subtle',
     label:  '',
   },
 };

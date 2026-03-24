@@ -4,12 +4,15 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '../../components/AppShell';
+import { DeviceManager } from '../../components/DeviceManager';
 import { useAuth } from '../../contexts/auth-context';
+import { useTheme } from '../../contexts/theme-context';
 import { apiFetch } from '../../lib/api';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user, setUser, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   // ── Profile ───────────────────────────────────────────────────────────────
   const [name, setName]                   = useState('');
@@ -115,7 +118,6 @@ export default function SettingsPage() {
   const roleBadgeColor: Record<string, string> = {
     SHOOTER: 'bg-[rgba(79,195,247,0.12)] text-[#4FC3F7] border-[rgba(79,195,247,0.25)]',
     COACH:   'bg-[rgba(245,166,35,0.12)] text-[#F5A623] border-[rgba(245,166,35,0.25)]',
-    SOLDIER: 'bg-[rgba(0,229,160,0.12)] text-[#00E5A0] border-[rgba(0,229,160,0.25)]',
   };
 
   return (
@@ -124,8 +126,8 @@ export default function SettingsPage() {
 
         {/* ── Profile ──────────────────────────────────────────────────────── */}
         <section className="card p-6 animate-slide-up" style={{ animationDelay: '0ms' }}>
-          <h2 className="font-display font-bold text-xl text-[#F0F4FF] mb-1">Profile</h2>
-          <p className="text-[#8892A4] text-sm mb-5">Update your display name.</p>
+          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Profile</h2>
+          <p className="text-text-secondary text-sm mb-5">Update your display name.</p>
 
           <form onSubmit={handleProfileSave} className="space-y-4">
             <div>
@@ -157,8 +159,8 @@ export default function SettingsPage() {
 
         {/* ── Account ──────────────────────────────────────────────────────── */}
         <section className="card p-6 animate-slide-up" style={{ animationDelay: '80ms' }}>
-          <h2 className="font-display font-bold text-xl text-[#F0F4FF] mb-1">Account</h2>
-          <p className="text-[#8892A4] text-sm mb-5">Your account details.</p>
+          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Account</h2>
+          <p className="text-text-secondary text-sm mb-5">Your account details.</p>
 
           <div className="space-y-4">
             <div>
@@ -187,10 +189,61 @@ export default function SettingsPage() {
           </div>
         </section>
 
+        {/* ── Appearance ──────────────────────────────────────────────────── */}
+        <section className="card p-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
+          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Appearance</h2>
+          <p className="text-text-secondary text-sm mb-5">Choose your preferred theme.</p>
+
+          <div className="flex gap-3">
+            {([
+              { value: 'dark' as const, label: 'Dark', icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )},
+              { value: 'light' as const, label: 'Light', icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              )},
+              { value: 'system' as const, label: 'System', icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              )},
+            ]).map(({ value, label, icon }) => (
+              <button
+                key={value}
+                onClick={() => setTheme(value)}
+                className={`flex-1 flex flex-col items-center gap-2 py-4 px-3 rounded-xl border
+                            font-display font-semibold text-sm uppercase tracking-wider
+                            transition-all duration-200 ${
+                              theme === value
+                                ? 'border-accent bg-accent/10 text-accent'
+                                : 'border-border-subtle bg-transparent text-text-secondary hover:border-accent/30 hover:bg-accent/5'
+                            }`}
+              >
+                {icon}
+                {label}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* ── Change Password ──────────────────────────────────────────────── */}
-        <section className="card p-6 animate-slide-up" style={{ animationDelay: '160ms' }}>
-          <h2 className="font-display font-bold text-xl text-[#F0F4FF] mb-1">Change Password</h2>
-          <p className="text-[#8892A4] text-sm mb-5">
+        <section className="card p-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Change Password</h2>
+          <p className="text-text-secondary text-sm mb-5">
             Use a strong password with at least 8 characters.
           </p>
 
@@ -251,13 +304,22 @@ export default function SettingsPage() {
           </form>
         </section>
 
+        {/* ── Devices ─────────────────────────────────────────────────────── */}
+        <section className="card p-6 animate-slide-up" style={{ animationDelay: '240ms' }}>
+          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Devices</h2>
+          <p className="text-text-secondary text-sm mb-5">
+            Connect biometric sensors and health devices to track heart rate and SpO2 during sessions.
+          </p>
+          <DeviceManager />
+        </section>
+
         {/* ── Danger Zone ──────────────────────────────────────────────────── */}
         <section
           className="card p-6 border-[rgba(255,77,109,0.25)] animate-slide-up"
-          style={{ animationDelay: '240ms' }}
+          style={{ animationDelay: '320ms' }}
         >
           <h2 className="font-display font-bold text-xl text-[#FF4D6D] mb-1">Danger Zone</h2>
-          <p className="text-[#8892A4] text-sm mb-5">
+          <p className="text-text-secondary text-sm mb-5">
             Permanently delete your account and all associated data. This action cannot be undone.
           </p>
 

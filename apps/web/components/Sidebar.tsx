@@ -9,42 +9,44 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
 
-interface NavItem {
+interface NavGroup {
   href: string;
   label: string;
   icon: React.ReactNode;
-  roles?: ('SHOOTER' | 'COACH' | 'SOLDIER')[];
+  children?: { href: string; label: string; icon: React.ReactNode }[];
 }
 
-const ALL_NAV: NavItem[] = [
-  { href: '/dashboard',               label: 'Dashboard',      icon: <GridIcon /> },
-  { href: '/sessions',                label: 'Sessions',       icon: <TargetIcon />,    roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/sessions/new',            label: 'New Session',    icon: <PlusIcon />,      roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/analytics',               label: 'Analytics',      icon: <AnalyticsIcon />, roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/performance',             label: 'Performance',    icon: <PulseIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/performance/training-plan', label: 'Training Plan', icon: <PlanIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/performance/pose',        label: 'Stance',         icon: <PoseIcon />,      roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/goals',                   label: 'Goals',          icon: <GoalIcon />,      roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/sessions/compare',        label: 'Compare',        icon: <CompareIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/connect',                 label: 'Connect',        icon: <LinkIcon />,      roles: ['SHOOTER'] },
-  { href: '/biometrics',              label: 'Biometrics',     icon: <HeartPulseIcon />, roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/ai-coach',                label: 'AI Coach',       icon: <SparkleIcon />,   roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/ai-assistant',            label: 'AI Assistant',   icon: <BrainIcon />,     roles: ['SHOOTER', 'COACH', 'SOLDIER'] },
-  { href: '/calendar',                label: 'Calendar',       icon: <CalendarIcon />,  roles: ['COACH'] },
-  { href: '/calendar',                label: 'Schedule',       icon: <CalendarIcon />,  roles: ['SHOOTER', 'SOLDIER'] },
-  { href: '/soldier/weapons',         label: 'Weapons',        icon: <WeaponIcon />,    roles: ['SOLDIER'] },
-  { href: '/soldier/analytics',       label: 'Field Analytics',icon: <FieldIcon />,     roles: ['SOLDIER'] },
-  { href: '/coach/shooters',          label: 'Shooters',       icon: <PeopleIcon />,    roles: ['COACH'] },
-  { href: '/events',                   label: 'Events',         icon: <EventsIcon /> },
-  { href: '/settings',                label: 'Settings',       icon: <SettingsIcon /> },
-  { href: '/guidance',                 label: 'Guidance',       icon: <GuidanceIcon /> },
-  { href: '/docs',                    label: 'Docs',           icon: <DocsIcon /> },
+const NAV_GROUPS: NavGroup[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: <GridIcon /> },
+  {
+    href: '/sessions', label: 'Sessions', icon: <TargetIcon />,
+    children: [
+      { href: '/sessions/new', label: 'New Session', icon: <PlusIcon /> },
+      { href: '/sessions/compare', label: 'Compare', icon: <CompareIcon /> },
+    ],
+  },
+  {
+    href: '/planning', label: 'Planning', icon: <CalendarIcon />,
+    children: [
+      { href: '/planning/training-plan', label: 'Training Plan', icon: <PlanIcon /> },
+    ],
+  },
+  {
+    href: '/performance', label: 'Performance', icon: <PulseIcon />,
+    children: [
+      { href: '/performance/ai-coach', label: 'AI Coach', icon: <SparkleIcon /> },
+      { href: '/performance/ai-assistant', label: 'AI Assistant', icon: <BrainIcon /> },
+      { href: '/performance/health', label: 'Health', icon: <HeartPulseIcon /> },
+    ],
+  },
+  { href: '/docs', label: 'Docs & Guides', icon: <DocsIcon /> },
+  { href: '/connect', label: 'Connect', icon: <LinkIcon /> },
+  { href: '/settings', label: 'Settings', icon: <SettingsIcon /> },
 ];
 
 const ROLE_COLOR: Record<string, { color: string; bg: string; label: string }> = {
   SHOOTER: { color: '#F5A623', bg: 'rgba(245,166,35,0.15)', label: 'Shooter' },
   COACH:   { color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)', label: 'Coach' },
-  SOLDIER: { color: '#00E5A0', bg: 'rgba(0,229,160,0.12)',  label: 'Soldier' },
 };
 
 export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } = {}) {
@@ -63,10 +65,6 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
 
   if (!mounted) return null;
 
-  const nav = ALL_NAV.filter(
-    (item) => !item.roles || (user?.role && item.roles.includes(user.role)),
-  );
-
   function handleLogout() {
     logout();
     router.push('/auth/login');
@@ -79,14 +77,14 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
     <aside
       data-sidebar
       className="fixed left-0 top-0 bottom-0 z-sidebar hidden lg:flex flex-col
-                 border-r border-white/[0.05]
                  transition-all duration-300 ease-spring overflow-hidden"
       style={{
         width: W,
-        background: 'linear-gradient(180deg, rgba(6,8,16,0.97) 0%, rgba(10,13,22,0.97) 100%)',
+        background: 'var(--glass-heavy-bg)',
         backdropFilter: 'blur(32px) saturate(180%)',
         WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-        boxShadow: '4px 0 32px rgba(0,0,0,0.6), 1px 0 0 rgba(245,166,35,0.06)',
+        boxShadow: 'var(--shadow-glass)',
+        borderRight: '1px solid var(--border-subtle)',
       }}
       aria-label="Main navigation"
     >
@@ -106,7 +104,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
         style={{
           padding: expanded ? '0 18px' : '0',
           justifyContent: expanded ? 'flex-start' : 'center',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid var(--glass-border)',
         }}
       >
         <CrosshairLogo />
@@ -136,12 +134,12 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
           <button
             onClick={onCommandPalette}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl mb-1 transition-all duration-200"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', justifyContent: expanded ? 'flex-start' : 'center' }}
+            style={{ background: 'var(--chip-bg)', border: '1px solid var(--glass-border)', justifyContent: expanded ? 'flex-start' : 'center' }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(245,166,35,0.06)'; e.currentTarget.style.borderColor = 'rgba(245,166,35,0.15)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--chip-bg)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
             aria-label="Open command palette"
           >
-            <span className="shrink-0 w-5 h-5 flex items-center justify-center" style={{ color: '#4A5568' }}>
+            <span className="shrink-0 w-5 h-5 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
                 <circle cx="5.5" cy="5.5" r="4" />
                 <line x1="8.5" y1="8.5" x2="12.5" y2="12.5" />
@@ -149,35 +147,50 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             </span>
             {expanded && (
               <>
-                <span className="flex-1 font-display font-semibold text-[12px] tracking-wide text-left" style={{ color: '#4A5568' }}>
+                <span className="flex-1 font-display font-semibold text-[12px] tracking-wide text-left" style={{ color: 'var(--text-muted)' }}>
                   Search
                 </span>
-                <kbd className="px-1 py-0.5 rounded text-[9px] font-display" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#2A3350' }}>⌘K</kbd>
+                <kbd className="px-1 py-0.5 rounded text-[9px] font-display" style={{ background: 'var(--chip-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>⌘K</kbd>
               </>
             )}
           </button>
         )}
-        {nav.map((item) => {
-          const active = (() => {
-            if (item.href === '/dashboard') return pathname === '/dashboard';
-            const exactOrChild = pathname === item.href || pathname.startsWith(item.href + '/');
-            if (exactOrChild) {
-              const moreSpecific = nav.some(
-                other => other.href !== item.href && other.href.startsWith(item.href) && pathname.startsWith(other.href)
-              );
-              return !moreSpecific;
-            }
-            return false;
+        {NAV_GROUPS.map((group) => {
+          const groupActive = (() => {
+            if (group.href === '/dashboard') return pathname === '/dashboard';
+            return pathname === group.href || pathname.startsWith(group.href + '/');
           })();
+          const childActive = group.children?.some(
+            (c) => pathname === c.href || pathname.startsWith(c.href + '/'),
+          );
           return (
-            <SidebarItem
-              key={item.href}
-              href={item.href}
-              label={item.label}
-              icon={item.icon}
-              active={active}
-              expanded={expanded}
-            />
+            <div key={group.href}>
+              <SidebarItem
+                href={group.href}
+                label={group.label}
+                icon={group.icon}
+                active={groupActive && !childActive}
+                expanded={expanded}
+              />
+              {expanded && group.children && groupActive && (
+                <div className="ml-6 mt-0.5 space-y-0.5">
+                  {group.children.map((child) => {
+                    const isChildActive = pathname === child.href || pathname.startsWith(child.href + '/');
+                    return (
+                      <SidebarItem
+                        key={child.href}
+                        href={child.href}
+                        label={child.label}
+                        icon={child.icon}
+                        active={isChildActive}
+                        expanded={expanded}
+                        isChild
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
@@ -185,7 +198,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
       {/* ── User section ────────────────────────────────────────────────── */}
       <div
         className="shrink-0 p-3 space-y-2"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+        style={{ borderTop: '1px solid var(--glass-border)' }}
       >
         {user && (
           <div
@@ -211,7 +224,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
                 className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
                 style={{
                   background: '#00E5A0',
-                  borderColor: 'rgba(6,8,16,0.97)',
+                  borderColor: 'var(--bg-void)',
                   boxShadow: '0 0 6px rgba(0,229,160,0.7)',
                 }}
               />
@@ -219,7 +232,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
 
             {expanded && (
               <div className="flex-1 min-w-0">
-                <p className="text-[#F0F4FF] text-[12px] font-semibold truncate leading-tight">
+                <p className="text-text-primary text-[12px] font-semibold truncate leading-tight">
                   {user.name}
                 </p>
                 <p
@@ -238,10 +251,10 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
           <button
             onClick={() => setExpanded(!expanded)}
             className="flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200
-                       text-[#4A5568] hover:text-[#F0F4FF]"
-            style={{ background: 'rgba(255,255,255,0.04)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+                       text-text-muted hover:text-text-primary"
+            style={{ background: 'var(--chip-bg)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--btn-ghost-hover-bg)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--chip-bg)'; }}
             aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             <ChevronIcon collapsed={!expanded} />
@@ -251,7 +264,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             <button
               onClick={handleLogout}
               className="flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg
-                         text-[#4A5568] hover:text-[#FF4D6D] transition-all duration-200
+                         text-text-muted hover:text-[#FF4D6D] transition-all duration-200
                          text-[11px] font-display font-semibold uppercase tracking-wide"
               style={{ background: 'transparent' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,77,109,0.06)'; }}
@@ -264,13 +277,13 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             <button
               onClick={handleLogout}
               className="flex items-center justify-center w-8 h-8 rounded-lg
-                         text-[#4A5568] hover:text-[#FF4D6D] transition-all duration-200"
-              style={{ background: 'rgba(255,255,255,0.04)' }}
+                         text-text-muted hover:text-[#FF4D6D] transition-all duration-200"
+              style={{ background: 'var(--chip-bg)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(255,77,109,0.08)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.background = 'var(--chip-bg)';
               }}
               aria-label="Sign out"
             >
@@ -286,21 +299,21 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
 // ── Sidebar Item ──────────────────────────────────────────────────────────────
 
 function SidebarItem({
-  href, label, icon, active, expanded,
+  href, label, icon, active, expanded, isChild,
 }: {
   href: string; label: string; icon: React.ReactNode;
-  active: boolean; expanded: boolean;
+  active: boolean; expanded: boolean; isChild?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200"
+      className={`group relative flex items-center gap-3 px-3 ${isChild ? 'py-2' : 'py-2.5'} rounded-xl transition-all duration-200`}
       style={{
         background: active
           ? 'linear-gradient(135deg, rgba(245,166,35,0.12) 0%, rgba(245,166,35,0.06) 100%)'
           : 'transparent',
         border: active ? '1px solid rgba(245,166,35,0.2)' : '1px solid transparent',
-        color: active ? '#F5A623' : '#8892A4',
+        color: active ? '#F5A623' : 'var(--text-secondary)',
         boxShadow: active
           ? '0 0 20px rgba(245,166,35,0.08), inset 0 1px 0 rgba(245,166,35,0.1)'
           : 'none',
@@ -308,14 +321,14 @@ function SidebarItem({
       }}
       onMouseEnter={(e) => {
         if (active) return;
-        e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-        e.currentTarget.style.color = '#F0F4FF';
+        e.currentTarget.style.background = 'var(--btn-ghost-bg)';
+        e.currentTarget.style.color = 'var(--text-primary)';
         e.currentTarget.style.transform = 'translateX(2px)';
       }}
       onMouseLeave={(e) => {
         if (active) return;
         e.currentTarget.style.background = 'transparent';
-        e.currentTarget.style.color = '#8892A4';
+        e.currentTarget.style.color = 'var(--text-secondary)';
         e.currentTarget.style.transform = 'translateX(0)';
       }}
       role="menuitem"
@@ -344,7 +357,7 @@ function SidebarItem({
 
       {/* Label */}
       {expanded && (
-        <span className="font-display font-semibold text-[13px] tracking-wide whitespace-nowrap overflow-hidden">
+        <span className={`font-display font-semibold ${isChild ? 'text-[12px]' : 'text-[13px]'} tracking-wide whitespace-nowrap overflow-hidden`}>
           {label}
         </span>
       )}
@@ -353,11 +366,11 @@ function SidebarItem({
       {!expanded && (
         <span
           className="absolute left-full ml-3 px-3 py-1.5 rounded-lg text-xs font-display
-                     font-semibold text-[#F0F4FF] whitespace-nowrap z-tooltip
+                     font-semibold text-text-primary whitespace-nowrap z-tooltip
                      opacity-0 pointer-events-none group-hover:opacity-100
                      transition-all duration-150 translate-x-1 group-hover:translate-x-0"
           style={{
-            background: 'rgba(12,15,26,0.95)',
+            background: 'var(--glass-heavy-bg)',
             backdropFilter: 'blur(16px)',
             border: '1px solid rgba(245,166,35,0.2)',
             boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
@@ -437,17 +450,6 @@ function LinkIcon() {
   );
 }
 
-function PeopleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-      <circle cx="6" cy="6" r="3" />
-      <path d="M1 15c0-2.8 2.2-5 5-5" />
-      <circle cx="13" cy="6" r="2.5" />
-      <path d="M13 11c2.2.2 4 2 4 4.5" />
-    </svg>
-  );
-}
-
 function ChevronIcon({ collapsed }: { collapsed: boolean }) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
@@ -486,35 +488,6 @@ function SignOutIcon() {
   );
 }
 
-function WeaponIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 10h10l2-3h2" />
-      <path d="M2 10l1 3h3" />
-      <circle cx="7" cy="14" r="1" fill="currentColor" stroke="none" />
-      <path d="M12 7v-2h2v2" />
-    </svg>
-  );
-}
-
-function AnalyticsIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="1,13 5,8 9,10 13,5 17,7" />
-      <line x1="1" y1="16" x2="17" y2="16" />
-    </svg>
-  );
-}
-
-function FieldIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-      <path d="M1 14l4-8 4 5 3-4 5 7" />
-      <circle cx="14" cy="4" r="2" />
-    </svg>
-  );
-}
-
 function PulseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -531,18 +504,6 @@ function PlanIcon() {
       <line x1="6" y1="9"  x2="12" y2="9"  />
       <line x1="6" y1="12" x2="9"  y2="12" />
       <circle cx="13" cy="13" r="3" fill="rgba(0,0,0,0)" />
-    </svg>
-  );
-}
-
-function PoseIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="3.5" r="1.5" />
-      <line x1="9" y1="5" x2="9" y2="10" />
-      <line x1="5" y1="7.5" x2="13" y2="7.5" />
-      <line x1="9" y1="10" x2="6" y2="15" />
-      <line x1="9" y1="10" x2="12" y2="15" />
     </svg>
   );
 }
@@ -587,24 +548,6 @@ function HeartPulseIcon() {
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 15.5l-5.5-5.5C2 8.5 2 6 3.5 4.5S7.5 3 9 5c1.5-2 4-2 5.5-.5S16 8.5 14.5 10L9 15.5z" />
       <polyline points="4,9 7,9 8,7 10,11 11,9 14,9" />
-    </svg>
-  );
-}
-
-function GuidanceIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="9" r="7.5" />
-      <path d="M6.5 7a2.5 2.5 0 015 0c0 1.5-1.5 2-2.5 3" />
-      <circle cx="9" cy="13" r="0.8" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function EventsIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="9,2 11,7 16,7.5 12.5,11 13.5,16 9,13.5 4.5,16 5.5,11 2,7.5 7,7" />
     </svg>
   );
 }

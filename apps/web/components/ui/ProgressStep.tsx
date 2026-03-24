@@ -29,7 +29,7 @@ export function ProgressStep({ steps }: ProgressStepProps) {
                     ? 'bg-accent text-[#080A0F]'
                     : step.status === 'active'
                     ? 'bg-accent/20 border border-accent text-accent animate-pulse-glow'
-                    : 'bg-[#1E2433] border border-[#2A3040] text-[#4A5568]'
+                    : 'bg-subtle border border-[#2A3040] text-text-muted'
                 }`}
               >
                 {step.status === 'done' ? '✓' : i + 1}
@@ -41,7 +41,7 @@ export function ProgressStep({ steps }: ProgressStepProps) {
                     ? 'text-[#00E5A0]'
                     : step.status === 'active'
                     ? 'text-accent'
-                    : 'text-[#4A5568]'
+                    : 'text-text-muted'
                 }`}
               >
                 {step.label}
@@ -61,7 +61,7 @@ export function ProgressStep({ steps }: ProgressStepProps) {
           </div>
 
           {/* Progress bar */}
-          <div className="h-0.5 rounded-full bg-[#1E2433] overflow-hidden">
+          <div className="h-0.5 rounded-full bg-subtle overflow-hidden">
             {step.status === 'done' && (
               <div className="h-full rounded-full bg-accent w-full transition-all duration-500" />
             )}

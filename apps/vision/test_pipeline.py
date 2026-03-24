@@ -40,8 +40,8 @@ def process_image(image_path: str, target_type: str = "air_rifle_10m"):
     # Detect target
     cal = detect_target(gray, target_type)
 
-    # Perspective correction
-    if cal.eccentricity > 0.05:
+    # Perspective correction (skip extreme angles — see analyzer.py for rationale)
+    if 0.05 < cal.eccentricity < 0.45:
         img_bgr, gray, cal = correct_perspective(img_bgr, gray, cal)
 
     # Detect holes

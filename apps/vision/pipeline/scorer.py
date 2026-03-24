@@ -50,8 +50,10 @@ def score_holes(
         # 10.9 is center, each ring_width_mm step decreases by 1.0
         raw_score = spec.max_score() - (scoring_dist_mm / spec.ring_width_mm)
 
-        # Clamp to valid range
-        score = max(0.0, min(spec.max_score(), raw_score))
+        # Clamp to valid range; skip shots completely outside ring 1 (score < 1)
+        if raw_score < 1.0:
+            continue
+        score = min(spec.max_score(), raw_score)
 
         # Map to target coordinate space (-10 to +10)
         target_x = (hole.x - cx) * (10.0 / target_pixel_radius) if target_pixel_radius > 0 else 0.0

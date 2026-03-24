@@ -26,7 +26,7 @@ export default function GoogleCallbackPage() {
   }, [router, setUser]);
 
   return (
-    <div className="min-h-screen bg-[#080A0F] flex items-center justify-center">
+    <div className="min-h-screen bg-void flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         {error ? (
           <>
@@ -44,7 +44,7 @@ export default function GoogleCallbackPage() {
               <div className="absolute inset-0 rounded-full border-2 border-t-[#F5A623] border-r-transparent border-b-transparent border-l-transparent animate-spin" />
               <div className="absolute inset-2 rounded-full border border-t-transparent border-r-[#4FC3F7] border-b-transparent border-l-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
             </div>
-            <p className="text-[#4A5568] text-[11px] font-display uppercase tracking-widest animate-pulse">
+            <p className="text-text-muted text-[11px] font-display uppercase tracking-widest animate-pulse">
               Signing you in...
             </p>
           </>

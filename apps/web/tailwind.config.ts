@@ -20,46 +20,46 @@ const config: Config = {
     extend: {
       // ── Color System ──────────────────────────────────────────────────────
       colors: {
-        // Backgrounds — layered depth
-        void:     '#080A0F',
-        surface:  '#0E1118',
-        elevated: '#161B26',
-        subtle:   '#1E2433',
+        // Backgrounds — theme-aware via CSS variables
+        void:     'var(--bg-void)',
+        surface:  'var(--bg-surface)',
+        elevated: 'var(--bg-elevated)',
+        subtle:   'var(--bg-subtle)',
 
-        // Accent — Electric Amber (precision / energy)
+        // Accent — Electric Amber (precision / energy) — same in both themes
         accent: {
           DEFAULT: '#F5A623',
-          glow:    'rgba(245, 166, 35, 0.25)',
-          dim:     'rgba(245, 166, 35, 0.12)',
+          glow:    'var(--accent-glow)',
+          dim:     'var(--accent-dim)',
           border:  'rgba(245, 166, 35, 0.375)',
         },
 
         // Accent — Ice Blue (data / analytics)
         blue: {
           data:    '#4FC3F7',
-          glow:    'rgba(79, 195, 247, 0.19)',
+          glow:    'var(--data-blue-glow)',
         },
 
         // Accent — Signal Red (alerts / critical)
         red: {
           signal: '#FF4D6D',
-          glow:   'rgba(255, 77, 109, 0.19)',
+          glow:   'var(--signal-red-glow)',
         },
 
         // Accent — Emerald (success / improvement)
         emerald: {
           signal: '#00E5A0',
-          glow:   'rgba(0, 229, 160, 0.12)',
+          glow:   'var(--success-glow)',
         },
 
-        // Typography
-        'text-primary':   '#F0F4FF',
-        'text-secondary': '#8892A4',
-        'text-muted':     '#4A5568',
+        // Typography — theme-aware
+        'text-primary':   'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-muted':     'var(--text-muted)',
 
-        // Borders
-        'border-subtle': '#1E2433',
-        'border-active': 'rgba(245, 166, 35, 0.375)',
+        // Borders — theme-aware
+        'border-subtle': 'var(--border-subtle)',
+        'border-active': 'var(--border-active)',
       },
 
       // ── Typography ────────────────────────────────────────────────────────

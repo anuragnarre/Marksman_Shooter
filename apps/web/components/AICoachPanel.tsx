@@ -3,9 +3,11 @@
 // AICoachPanel — floating AI coach assistant.
 // Appears as a pulsing button in the bottom-right corner.
 // Expands to show insight cards with typewriter animation.
+// Shows on every page (desktop + mobile), positioned above BottomNav on mobile.
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/auth-context';
+import { useIsMobile } from '../lib/use-mobile';
 
 const SPARKLE = (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -102,9 +104,9 @@ function InsightCard({ insight, delay = 0 }: { insight: Insight; delay?: number 
   const typed = useTypewriter(insight.text, 15, typing);
 
   const colors: Record<Insight['type'], { color: string; bg: string; border: string }> = {
-    info:  { color: '#4FC3F7', bg: 'rgba(79,195,247,0.06)', border: 'rgba(79,195,247,0.2)' },
-    warn:  { color: '#FF4D6D', bg: 'rgba(255,77,109,0.06)', border: 'rgba(255,77,109,0.2)' },
-    tip:   { color: '#00E5A0', bg: 'rgba(0,229,160,0.06)', border: 'rgba(0,229,160,0.2)' },
+    info:  { color: '#4FC3F7', bg: 'rgba(79,195,247,0.06)',  border: 'rgba(79,195,247,0.2)'  },
+    warn:  { color: '#FF4D6D', bg: 'rgba(255,77,109,0.06)',  border: 'rgba(255,77,109,0.2)'  },
+    tip:   { color: '#00E5A0', bg: 'rgba(0,229,160,0.06)',   border: 'rgba(0,229,160,0.2)'   },
   };
   const icons = { info: INSIGHT_ICON, warn: WARN_ICON, tip: TIP_ICON };
   const c = colors[insight.type];
@@ -128,7 +130,7 @@ function InsightCard({ insight, delay = 0 }: { insight: Insight; delay?: number 
           {icons[insight.type]}
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-[12px] leading-relaxed" style={{ color: '#C8D0E0' }}>
+          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             {typed}
             {typed.length < insight.text.length && (
               <span
@@ -139,13 +141,10 @@ function InsightCard({ insight, delay = 0 }: { insight: Insight; delay?: number 
           </p>
           {insight.metric && typed === insight.text && (
             <div className="flex items-center gap-1.5 mt-1.5" style={{ animation: 'fadeIn 300ms both' }}>
-              <span
-                className="font-jetbrains font-bold text-[13px]"
-                style={{ color: c.color }}
-              >
+              <span className="font-jetbrains font-bold text-[13px]" style={{ color: c.color }}>
                 {insight.metric}
               </span>
-              <span className="text-[10px] font-display uppercase tracking-[0.1em]" style={{ color: '#4A5568' }}>
+              <span className="text-[10px] font-display uppercase tracking-[0.1em]" style={{ color: 'var(--text-muted)' }}>
                 {insight.metricLabel}
               </span>
             </div>
@@ -158,12 +157,18 @@ function InsightCard({ insight, delay = 0 }: { insight: Insight; delay?: number 
 
 export function AICoachPanel() {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState(0);
 
   if (!user) return null;
 
   const insights = user.role === 'COACH' ? COACH_INSIGHTS : SHOOTER_INSIGHTS;
+
+  // On mobile, position above the bottom nav (68px nav + safe-area)
+  const bottomOffset = isMobile
+    ? 'calc(78px + env(safe-area-inset-bottom, 0px))'
+    : 'calc(24px + env(safe-area-inset-bottom, 0px))';
 
   const handleOpen = () => {
     setKey((k) => k + 1);
@@ -176,16 +181,16 @@ export function AICoachPanel() {
       {!open && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-6 right-6 z-[9990] flex items-center gap-2.5 px-4 py-3 rounded-2xl
+          className="fixed right-4 z-[9990] flex items-center gap-2.5 px-4 py-3 rounded-2xl
                      transition-all duration-300 group"
           style={{
+            bottom: bottomOffset,
             background: 'linear-gradient(135deg, rgba(245,166,35,0.15) 0%, rgba(245,166,35,0.08) 100%)',
             border: '1px solid rgba(245,166,35,0.35)',
             boxShadow:
               '0 8px 32px rgba(245,166,35,0.15), 0 0 0 1px rgba(245,166,35,0.08), inset 0 1px 0 rgba(245,166,35,0.12)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
           }}
           aria-label="Open AI Coach"
         >
@@ -220,18 +225,17 @@ export function AICoachPanel() {
       {/* Expanded panel */}
       {open && (
         <div
-          className="fixed z-[9990] flex flex-col"
+          className="fixed right-4 z-[9990] flex flex-col"
           style={{
-            bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
-            right: 24,
-            width: 340,
-            maxWidth: 'calc(100vw - 48px)',
-            maxHeight: '70vh',
-            background: 'rgba(8,10,18,0.96)',
+            bottom: bottomOffset,
+            width: isMobile ? 'calc(100vw - 32px)' : 340,
+            maxWidth: isMobile ? 'calc(100vw - 32px)' : 340,
+            maxHeight: isMobile ? '60vh' : '70vh',
+            background: 'var(--bg-elevated)',
             border: '1px solid rgba(245,166,35,0.2)',
             borderRadius: 20,
             boxShadow:
-              '0 0 0 1px rgba(245,166,35,0.06), 0 32px 80px rgba(0,0,0,0.8), 0 0 60px rgba(245,166,35,0.08)',
+              '0 0 0 1px rgba(245,166,35,0.06), 0 32px 80px rgba(0,0,0,0.35), 0 0 60px rgba(245,166,35,0.08)',
             backdropFilter: 'blur(32px)',
             WebkitBackdropFilter: 'blur(32px)',
             animation: 'glassReveal 300ms cubic-bezier(0.16,1,0.3,1) both',
@@ -249,7 +253,7 @@ export function AICoachPanel() {
           {/* Header */}
           <div
             className="flex items-center gap-3 px-4 py-3.5 shrink-0"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+            style={{ borderBottom: '1px solid var(--glass-border)' }}
           >
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center"
@@ -263,7 +267,7 @@ export function AICoachPanel() {
               {SPARKLE}
             </div>
             <div className="flex-1">
-              <p className="font-display font-bold text-[13px] text-[#F0F4FF] tracking-wide">
+              <p className="font-display font-bold text-[13px] text-text-primary tracking-wide">
                 AI Coach
               </p>
               <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: '#00E5A0' }}>
@@ -273,9 +277,9 @@ export function AICoachPanel() {
             <button
               onClick={() => setOpen(false)}
               className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-150"
-              style={{ color: '#4A5568' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F0F4FF'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#4A5568'; e.currentTarget.style.background = 'transparent'; }}
+              style={{ color: 'var(--text-muted)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--chip-bg)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
               aria-label="Close AI Coach"
             >
               {CLOSE_ICON}
@@ -289,7 +293,7 @@ export function AICoachPanel() {
           >
             <p
               className="text-[11px] font-display uppercase tracking-[0.14em] px-1 mb-3"
-              style={{ color: '#2A3350' }}
+              style={{ color: 'var(--text-muted)' }}
             >
               Based on your recent sessions
             </p>
@@ -301,10 +305,10 @@ export function AICoachPanel() {
           {/* Footer */}
           <div
             className="shrink-0 px-4 py-3"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+            style={{ borderTop: '1px solid var(--glass-border)' }}
           >
             <a
-              href="/ai-coach"
+              href="/performance/ai-coach"
               className="block w-full py-2 rounded-xl text-center text-[12px] font-display font-bold
                          uppercase tracking-[0.12em] transition-all duration-200"
               style={{

@@ -12,7 +12,6 @@ import { register } from '../../../lib/auth';
 import { googleSignIn } from '../../../lib/google-auth';
 import { useAuth } from '../../../contexts/auth-context';
 import type { UserRole } from '@shooting-platform/shared-types';
-import { ARMY_WEAPONS } from '@shooting-platform/shared-types';
 import { useIsMobile } from '../../../lib/use-mobile';
 
 function RegisterPageInner() {
@@ -22,7 +21,7 @@ function RegisterPageInner() {
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   const searchParams = useSearchParams();
-  const VALID_ROLES: UserRole[] = ['SHOOTER', 'COACH', 'SOLDIER'];
+  const VALID_ROLES: UserRole[] = ['SHOOTER', 'COACH'];
   const paramRole = searchParams.get('role') as UserRole;
   const initialRole: UserRole = VALID_ROLES.includes(paramRole) ? paramRole : 'SHOOTER';
 
@@ -30,7 +29,6 @@ function RegisterPageInner() {
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
   const [role, setRole]               = useState<UserRole>(initialRole);
-  const [primaryWeapon, setPrimary]   = useState<string>('AK-203');
   const [error, setError]             = useState<string | null>(null);
   const [loading, setLoading]         = useState(false);
 
@@ -52,7 +50,7 @@ function RegisterPageInner() {
 
   return (
     <div
-      className="min-h-screen flex bg-[#080A0F] relative overflow-hidden"
+      className="min-h-screen flex bg-void relative overflow-hidden"
       style={{ paddingTop: safeTopInset }}
     >
       <div
@@ -68,7 +66,7 @@ function RegisterPageInner() {
       <div
         className="hidden lg:flex lg:w-[55%] relative overflow-hidden flex-col justify-end p-12 noise-overlay"
         style={{
-          background: 'radial-gradient(ellipse at 60% 60%, #0f2d1f 0%, #080A0F 70%)',
+          background: 'radial-gradient(ellipse at 60% 60%, rgba(15,45,31,0.5) 0%, var(--bg-void) 70%)',
         }}
       >
         <AnimatedRingsGreen />
@@ -79,7 +77,7 @@ function RegisterPageInner() {
           <InfoPill icon={<PillTeamIcon />}   text="Coach-shooter collaboration tools" delay={900} />
         </div>
 
-        <p className="relative z-10 text-[#4A5568] italic text-sm font-body animate-fade-in"
+        <p className="relative z-10 text-text-muted italic text-sm font-body animate-fade-in"
            style={{ animationDelay: '1100ms' }}>
           "Excellence is a habit, not an act."
         </p>
@@ -92,16 +90,16 @@ function RegisterPageInner() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
             <CrosshairMark />
-            <span className="font-display font-bold text-2xl tracking-widest text-[#F0F4FF]">
+            <span className="font-display font-bold text-2xl tracking-widest text-text-primary">
               MARKSMAN
             </span>
           </div>
 
           <div className="mb-7">
-            <h1 className="font-display font-bold text-3xl text-[#F0F4FF] mb-1">
+            <h1 className="font-display font-bold text-3xl text-text-primary mb-1">
               Create account
             </h1>
-            <p className="text-[#8892A4] text-sm">
+            <p className="text-text-secondary text-sm">
               Join the precision training platform.
             </p>
           </div>
@@ -139,7 +137,7 @@ function RegisterPageInner() {
             {/* Role selector */}
             <div>
               <span className="label block mb-2">I am a</span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <RoleCard
                   id="SHOOTER"
                   selected={role === 'SHOOTER'}
@@ -156,42 +154,8 @@ function RegisterPageInner() {
                   label="Coach"
                   description="Manage and review shooters"
                 />
-                <RoleCard
-                  id="SOLDIER"
-                  selected={role === 'SOLDIER'}
-                  onSelect={() => setRole('SOLDIER')}
-                  icon={<SoldierIcon />}
-                  label="Soldier"
-                  description="Military training & qualification"
-                />
               </div>
             </div>
-
-            {/* Soldier weapon selection panel */}
-            {role === 'SOLDIER' && (
-              <div className="animate-slide-down overflow-hidden">
-                <span className="label block mb-2">Primary weapon</span>
-                <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
-                  {ARMY_WEAPONS.map((w) => (
-                    <button
-                      key={w}
-                      type="button"
-                      onClick={() => setPrimary(w)}
-                      className={`
-                        text-left px-3 py-2 rounded-lg border text-xs font-display tracking-wide
-                        transition-all duration-150
-                        ${primaryWeapon === w
-                          ? 'border-accent bg-accent/10 text-accent'
-                          : 'border-[#1E2433] bg-[#161B26] text-[#8892A4] hover:border-[#2A3040] hover:text-[#F0F4FF]'
-                        }
-                      `}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {error && (
               <div role="alert"
@@ -214,9 +178,9 @@ function RegisterPageInner() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-[#1E2433]" />
-            <span className="text-[10px] font-display uppercase tracking-widest text-[#4A5568]">or</span>
-            <div className="flex-1 h-px bg-[#1E2433]" />
+            <div className="flex-1 h-px bg-subtle" />
+            <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
+            <div className="flex-1 h-px bg-subtle" />
           </div>
 
           {/* Google Sign Up */}
@@ -224,14 +188,14 @@ function RegisterPageInner() {
             type="button"
             onClick={() => googleSignIn()}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-                       border border-[#1E2433] bg-[#161B26] text-[#F0F4FF] text-sm font-medium
+                       border border-border-subtle bg-elevated text-text-primary text-sm font-medium
                        hover:border-[#2A3040] hover:bg-[#1A2030] transition-all duration-200"
           >
             <GoogleIcon />
             Continue with Google
           </button>
 
-          <p className="mt-6 text-center text-[#4A5568] text-sm">
+          <p className="mt-6 text-center text-text-muted text-sm">
             Already have an account?{' '}
             <Link href="/auth/login" className="text-accent hover:text-amber-400 transition-colors font-medium">
               Sign in
@@ -269,17 +233,17 @@ function RoleCard({
         text-center transition-all duration-200 cursor-pointer
         ${selected
           ? 'border-accent bg-accent/10 shadow-glow-sm'
-          : 'border-[#1E2433] bg-[#161B26] hover:border-[#2A3040]'
+          : 'border-border-subtle bg-elevated hover:border-[#2A3040]'
         }
       `}
     >
-      <span className={`transition-colors duration-200 ${selected ? 'text-accent' : 'text-[#4A5568]'}`}>
+      <span className={`transition-colors duration-200 ${selected ? 'text-accent' : 'text-text-muted'}`}>
         {icon}
       </span>
-      <span className={`font-display font-bold text-sm tracking-wide uppercase transition-colors duration-200 ${selected ? 'text-accent' : 'text-[#8892A4]'}`}>
+      <span className={`font-display font-bold text-sm tracking-wide uppercase transition-colors duration-200 ${selected ? 'text-accent' : 'text-text-secondary'}`}>
         {label}
       </span>
-      <span className="text-[10px] text-[#4A5568] leading-tight">{description}</span>
+      <span className="text-[10px] text-text-muted leading-tight">{description}</span>
     </button>
   );
 }
@@ -316,7 +280,7 @@ function InfoPill({ icon, text, delay }: { icon: React.ReactNode; text: string; 
       style={{ animationDelay: `${delay}ms` }}
     >
       <span className="text-[#00E5A0] shrink-0">{icon}</span>
-      <span className="text-[#8892A4] text-xs font-body">{text}</span>
+      <span className="text-text-secondary text-xs font-body">{text}</span>
     </div>
   );
 }
@@ -364,15 +328,6 @@ function CoachIcon() {
   );
 }
 
-function SoldierIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="14,3 17,10 25,10 19,15 21,23 14,18 7,23 9,15 3,10 11,10" />
-    </svg>
-  );
-}
-
 function Spinner() {
   return (
     <span className="w-4 h-4 border-2 border-[#F5A623]/30 border-t-[#F5A623] rounded-full animate-spin" aria-hidden="true" />
@@ -409,7 +364,7 @@ function PasswordStrength({ password }: { password: string }) {
             <span
               key={c.label}
               className="text-[9px] font-display tracking-wide"
-              style={{ color: c.pass ? '#00E5A0' : '#4A5568' }}
+              style={{ color: c.pass ? '#00E5A0' : 'var(--text-muted)' }}
             >
               {c.pass ? '\u2713' : '\u2717'} {c.label}
             </span>

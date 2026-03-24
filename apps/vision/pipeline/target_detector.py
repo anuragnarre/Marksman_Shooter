@@ -74,16 +74,29 @@ def detect_target(
         radius = max_reasonable_radius
         confidence *= 0.7
 
-    # Refine center (on original image, limited iterations)
-    cx, cy = _refine_center_symmetry(gray, cx, cy, radius)
-
-    # Calibrate rings (vectorized)
+    # Calibrate rings using full-image harmonic analysis
     mm_per_pixel, ring_radii = _calibrate_rings(gray, cx, cy, radius, spec)
 
-    # Perspective estimation
+    # ring_radii[0] = outer ring (ring 1) in pixels, corrected by harmonic analysis.
+    # Use it as the definitive radius (overrides the possibly-wrong Hough radius).
+    calibrated_radius = ring_radii[0]
+
+    # Refine center with the corrected radius
+    cx, cy = _refine_center_symmetry(gray, cx, cy, calibrated_radius)
+
+    # Estimate perspective using the calibrated, correct radius
     major_r, minor_r, rotation, eccentricity = _estimate_perspective(
-        gray, cx, cy, radius
+        gray, cx, cy, calibrated_radius
     )
+
+    # Clamp: _estimate_perspective can return wildly wrong semi_major when
+    # Canny edges in the 80-120% annular zone include the paper boundary or
+    # background clutter (causes the green ring to extend beyond the paper).
+    if major_r > calibrated_radius * 1.25 or major_r < calibrated_radius * 0.70:
+        major_r = calibrated_radius
+        minor_r = calibrated_radius
+        rotation = 0.0
+        eccentricity = 0.0
 
     return TargetCalibration(
         center=(cx, cy),
@@ -418,54 +431,96 @@ def _refine_center_symmetry(
 def _calibrate_rings(
     gray: np.ndarray, cx: float, cy: float, radius: float, spec: TargetSpec
 ) -> Tuple[float, List[float]]:
-    """Vectorized ring calibration using radial profile."""
+    """
+    Compute mm_per_pixel using harmonic period analysis on the full radial profile.
+
+    Key improvement over previous version: extend the profile to the full
+    image boundary (not radius * 1.3), then search for the period k
+    (ring_width_px) that explains the most gradient peaks via arithmetic
+    progression.  This self-corrects when the initial radius guess is wrong
+    (e.g. Hough found ring 3 instead of ring 1).
+    """
+    simple_ratio = spec.outer_radius_mm / max(radius, 1.0)
     h, w = gray.shape[:2]
-    max_r = int(min(radius * 1.3, min(cx, cy, w - cx, h - cy) - 1))
-    if max_r < 20:
-        mm_per_pixel = spec.outer_radius_mm / max(radius, 1)
-        return mm_per_pixel, []
 
-    profile = _compute_radial_profile(gray, cx, cy, max_r, num_angles=48)
+    # Extend profile to near-full image boundary (was capped at radius * 1.3)
+    max_r = int(min(cx, cy, w - cx, h - cy) * 0.96)
+    max_r = max(max_r, int(radius * 1.5), 30)
 
-    # Smooth and find gradient peaks
-    kernel_size = max(3, int(radius * 0.015))
-    if kernel_size % 2 == 0:
-        kernel_size += 1
+    profile = _compute_radial_profile(gray, cx, cy, max_r, num_angles=60)
+
+    # Smooth then compute gradient magnitude
+    ks = max(5, int(radius * 0.02) | 1)
     smoothed = cv2.GaussianBlur(
-        profile.reshape(1, -1).astype(np.float32), (kernel_size, 1), 0
+        profile.reshape(1, -1).astype(np.float32), (1, ks), 0
     ).flatten()
-
     gradient = np.abs(np.diff(smoothed))
 
-    # Find peaks
-    ring_positions_px = []
-    min_ring_gap = max(3, int(radius / spec.num_rings * 0.4))
-    threshold = np.percentile(gradient, 80)
-
+    # Find all candidate ring-boundary peaks
+    min_gap = max(8, int(radius / spec.num_rings * 0.3))
+    threshold = np.percentile(gradient, 70)
+    peaks: List[float] = []
     i = 0
     while i < len(gradient):
         if gradient[i] > threshold:
             j = i
             while j < len(gradient) - 1 and gradient[j + 1] >= gradient[j]:
                 j += 1
-            ring_positions_px.append(float(j))
-            i = j + max(min_ring_gap, 1)
+            if gradient[j] > threshold:
+                peaks.append(float(j))
+            i = j + min_gap
         else:
             i += 1
 
-    mm_per_pixel = spec.outer_radius_mm / max(radius, 1)
+    if len(peaks) < 3:
+        ring_radii = [spec.ring_radius_mm(n) / simple_ratio
+                      for n in range(1, spec.num_rings + 1)]
+        return simple_ratio, ring_radii
 
-    if len(ring_positions_px) >= 3:
-        known_radii_mm = [spec.ring_radius_mm(n) for n in range(1, spec.num_rings + 1)]
-        detected = np.array(ring_positions_px[:min(len(ring_positions_px), len(known_radii_mm))])
-        known = np.array(known_radii_mm[:len(detected)])
-        if np.sum(detected ** 2) > 0:
-            fit = float(np.dot(known, detected) / np.dot(detected, detected))
-            if 0.005 < fit < 20.0:
-                mm_per_pixel = fit
+    # ── Harmonic period search ─────────────────────────────────────────────
+    # ISSF rings are evenly spaced at ring_width_mm per ring.
+    # Gradient peaks should form an arithmetic progression with period k = ring_width_px.
+    ring_width_mm = spec.ring_width_mm
+    k_min = max(8.0, ring_width_mm / 0.18)   # densest plausible (0.18 mm/px)
+    k_max = min(float(max_r) / 2, ring_width_mm / 0.025)  # coarsest (0.025 mm/px)
 
-    ring_radii = [spec.ring_radius_mm(n) / mm_per_pixel for n in range(1, spec.num_rings + 1)]
+    peaks_arr = np.array(peaks, dtype=np.float64)
+    best_k: Optional[float] = None
+    best_count = 0
+    best_p0 = 0.0
 
+    for k in np.arange(k_min, k_max, 0.5):
+        tol = k * 0.18
+        for p0 in peaks:
+            offsets = (peaks_arr - p0) % k
+            count = int(np.sum((offsets <= tol) | (offsets >= k - tol)))
+            if count > best_count:
+                best_count = count
+                best_k = k
+                best_p0 = p0
+
+    mm_per_pixel = simple_ratio
+
+    if best_k is not None and best_count >= 4:
+        mm_harmonic = ring_width_mm / best_k
+        # Find outermost peak that fits the harmonic pattern
+        tol = best_k * 0.18
+        offsets = (peaks_arr - best_p0) % best_k
+        fitting = peaks_arr[(offsets <= tol) | (offsets >= best_k - tol)]
+        if len(fitting):
+            # Recompute ring-1 radius in pixels from harmonic mm_per_pixel
+            ring1_px = spec.outer_radius_mm / mm_harmonic
+            # Accept only if harmonic result is at least as large as Hough radius
+            # (harmonic should enlarge/confirm, never shrink the detected target)
+            # and fits within the available image region.
+            if ring1_px >= radius * 0.9 and ring1_px < max_r * 0.98:
+                mm_per_pixel = mm_harmonic
+
+    # Hard clamp: never more than 3× off from simple-ratio baseline
+    mm_per_pixel = float(np.clip(mm_per_pixel, simple_ratio / 3.0, simple_ratio * 3.0))
+
+    ring_radii = [spec.ring_radius_mm(n) / mm_per_pixel
+                  for n in range(1, spec.num_rings + 1)]
     return mm_per_pixel, ring_radii
 
 

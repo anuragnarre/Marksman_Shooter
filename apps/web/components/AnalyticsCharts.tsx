@@ -28,9 +28,9 @@ import type { Shot } from '@shooting-platform/shared-types';
 const CHART_MARGIN = { top: 8, right: 8, bottom: 4, left: -20 };
 
 const AXIS_STYLE = {
-  tick: { fill: '#4A5568', fontSize: 11, fontFamily: 'var(--font-jetbrains)' },
-  axisLine: { stroke: '#1E2433' },
-  tickLine: { stroke: '#1E2433' },
+  tick: { fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-jetbrains)' },
+  axisLine: { stroke: 'var(--border-subtle)' },
+  tickLine: { stroke: 'var(--border-subtle)' },
 };
 
 // ── Glowing active dot ────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ function ChartTooltip({
 
   return (
     <div className="tooltip-glass px-3 py-2 min-w-[100px]">
-      <p className="text-[10px] font-display uppercase tracking-widest text-[#4A5568] mb-1">
+      <p className="text-[10px] font-display uppercase tracking-widest text-text-muted mb-1">
         {labelPrefix} {label}
       </p>
       <p
@@ -84,7 +84,7 @@ function ChartTooltip({
       >
         {Number(payload[0].value).toFixed(decimals)}
       </p>
-      <p className="text-[10px] text-[#8892A4] mt-0.5">{valueLabel}</p>
+      <p className="text-[10px] text-text-secondary mt-0.5">{valueLabel}</p>
     </div>
   );
 }
@@ -131,12 +131,12 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
             </filter>
           </defs>
 
-          <CartesianGrid stroke="#1E2433" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="var(--border-subtle)" strokeDasharray="3 3" vertical={false} />
 
           <XAxis
             dataKey="shot"
             {...AXIS_STYLE}
-            label={{ value: 'Shot', position: 'insideBottom', dy: 14, fontSize: 10, fill: '#4A5568', fontFamily: 'var(--font-rajdhani)' }}
+            label={{ value: 'Shot', position: 'insideBottom', dy: 14, fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--font-rajdhani)' }}
           />
           <YAxis domain={[minY, maxY]} {...AXIS_STYLE} tickCount={5} />
 
@@ -167,7 +167,7 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
             y={10}
             stroke="rgba(255,255,255,0.08)"
             strokeDasharray="8 4"
-            label={{ value: 'Perfect', position: 'right', fontSize: 9, fill: '#4A5568', fontFamily: 'var(--font-rajdhani)' }}
+            label={{ value: 'Perfect', position: 'right', fontSize: 9, fill: 'var(--text-muted)', fontFamily: 'var(--font-rajdhani)' }}
           />
 
           {/* Animated area + gradient line — draws left-to-right on mount */}
@@ -216,12 +216,12 @@ export function ScoreDistributionChart({ shots }: ScoreDistributionProps) {
     <div aria-label="Score distribution chart" role="figure">
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={buckets} margin={CHART_MARGIN} barCategoryGap="30%">
-          <CartesianGrid stroke="#1E2433" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="var(--border-subtle)" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="ring" {...AXIS_STYLE} />
           <YAxis
             allowDecimals={false}
             {...AXIS_STYLE}
-            label={{ value: 'Count', angle: -90, position: 'insideLeft', dx: 20, fontSize: 10, fill: '#4A5568', fontFamily: 'var(--font-rajdhani)' }}
+            label={{ value: 'Count', angle: -90, position: 'insideLeft', dx: 20, fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--font-rajdhani)' }}
           />
           <Tooltip
             content={<ChartTooltip labelPrefix="Ring" valueLabel="Shots" valueColor="#F5A623" decimals={0} />}
@@ -269,7 +269,7 @@ export function SeriesComparisonChart({ sessions }: SeriesComparisonProps) {
     <div aria-label="Series comparison chart" role="figure">
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} margin={CHART_MARGIN} barCategoryGap="25%" barGap={3}>
-          <CartesianGrid stroke="#1E2433" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="var(--border-subtle)" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="series" {...AXIS_STYLE} />
           <YAxis domain={[0, 10.9]} {...AXIS_STYLE} />
           <Tooltip
@@ -277,11 +277,11 @@ export function SeriesComparisonChart({ sessions }: SeriesComparisonProps) {
               if (!active || !payload?.length) return null;
               return (
                 <div className="tooltip-glass px-3 py-2">
-                  <p className="text-[10px] font-display uppercase tracking-widest text-[#4A5568] mb-2">{label}</p>
+                  <p className="text-[10px] font-display uppercase tracking-widest text-text-muted mb-2">{label}</p>
                   {payload.map((p, i) => (
                     <div key={i} className="flex items-center gap-2 mb-1">
                       <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-                      <span className="text-xs text-[#8892A4] font-display">{p.name}</span>
+                      <span className="text-xs text-text-secondary font-display">{p.name}</span>
                       <span className="score-value text-sm ml-auto" style={{ color: p.color }}>
                         {Number(p.value).toFixed(2)}
                       </span>

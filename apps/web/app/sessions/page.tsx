@@ -126,8 +126,16 @@ export default function SessionsPage() {
     let list = sessions;
     if (filterDisc !== 'All') list = list.filter(s => s.discipline === filterDisc);
     if (filterMode !== 'All') list = list.filter(s => s.trainingMode === filterMode);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(s =>
+        s.discipline.toLowerCase().includes(q) ||
+        s.weaponType.toLowerCase().includes(q) ||
+        new Date(s.sessionDate).toLocaleDateString().includes(q)
+      );
+    }
     return list;
-  }, [sessions, filterDisc, filterMode]);
+  }, [sessions, filterDisc, filterMode, search]);
 
   const grouped = groupByMonth(filteredSessions);
   const months  = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
@@ -140,8 +148,8 @@ export default function SessionsPage() {
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4 animate-slide-up">
           <div>
-            <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">Training Sessions</h1>
-            <p className="text-[#4A5568] text-sm mt-1">
+            <h1 className="font-display font-bold text-2xl text-text-primary">Training Sessions</h1>
+            <p className="text-text-muted text-sm mt-1">
               {isCoach
                 ? `Sessions for ${selectedShooter?.name ?? 'selected shooter'}`
                 : 'All your recorded training sessions'}
@@ -197,7 +205,7 @@ export default function SessionsPage() {
               <div key={stat.label} className="card px-4 py-3.5">
                 <p className="label">{stat.label}</p>
                 <p className="score-value text-accent text-2xl font-bold mt-1">{stat.value}</p>
-                <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-widest mt-0.5">
+                <p className="text-text-muted text-[10px] font-display uppercase tracking-widest mt-0.5">
                   {stat.sub}
                 </p>
               </div>
@@ -208,6 +216,13 @@ export default function SessionsPage() {
         {/* ── Filters ────────────────────────────────────────────────────── */}
         {!loading && sessions.length > 1 && (
           <div className="flex flex-wrap gap-2 animate-slide-up">
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search sessions..."
+              className="field text-xs py-1.5 px-3 w-full sm:w-48"
+            />
             <select
               value={filterDisc}
               onChange={e => setFilterDisc(e.target.value)}
@@ -224,11 +239,11 @@ export default function SessionsPage() {
                 {modes.map(m => <option key={m} value={m}>{m === 'All' ? 'All Modes' : m}</option>)}
               </select>
             )}
-            {(filterDisc !== 'All' || filterMode !== 'All') && (
+            {(filterDisc !== 'All' || filterMode !== 'All' || search) && (
               <button
-                onClick={() => { setFilterDisc('All'); setFilterMode('All'); }}
-                className="text-xs font-display px-3 py-1.5 rounded-lg text-[#4A5568] hover:text-[#F0F4FF] transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                onClick={() => { setFilterDisc('All'); setFilterMode('All'); setSearch(''); }}
+                className="text-xs font-display px-3 py-1.5 rounded-lg text-text-muted hover:text-text-primary transition-colors"
+                style={{ background: 'var(--chip-bg)', border: '1px solid var(--glass-border)' }}
               >
                 Clear filters
               </button>
@@ -261,7 +276,7 @@ export default function SessionsPage() {
               <div key={month} className="animate-slide-up" style={{ animationDelay: `${gi * 80}ms` }}>
                 <div className="flex items-center gap-3 mb-3">
                   <p className="label">{month}</p>
-                  <span className="text-[#4A5568] text-xs font-display">
+                  <span className="text-text-muted text-xs font-display">
                     {grouped[month].length} session{grouped[month].length !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -314,7 +329,7 @@ function SessionRow({
   return (
     <div
       className={`relative flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 sm:py-4 table-row-hover min-h-[64px]
-                  ${!isLast ? 'border-b border-[#1E2433]/60' : ''}`}
+                  ${!isLast ? 'border-b border-border-subtle/60' : ''}`}
     >
       {/* Discipline colour accent bar */}
       <span
@@ -325,13 +340,13 @@ function SessionRow({
 
       {/* Date badge */}
       <div className="shrink-0 w-14 text-center">
-        <p className="text-[#F0F4FF] font-display font-bold text-xl leading-none">
+        <p className="text-text-primary font-display font-bold text-xl leading-none">
           {date.getDate()}
         </p>
-        <p className="text-[#4A5568] text-[10px] font-display uppercase tracking-wide">
+        <p className="text-text-muted text-[10px] font-display uppercase tracking-wide">
           {date.toLocaleDateString('en-US', { month: 'short' })}
         </p>
-        <p className="text-[#4A5568] text-[10px] font-data mt-0.5 leading-none">
+        <p className="text-text-muted text-[10px] font-data mt-0.5 leading-none">
           {new Date(session.sessionDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
         </p>
       </div>
@@ -339,7 +354,7 @@ function SessionRow({
       {/* Main info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-[#F0F4FF] font-semibold text-sm truncate">{session.discipline}</p>
+          <p className="text-text-primary font-semibold text-sm truncate">{session.discipline}</p>
           <StatusBadge variant="discipline" label={session.weaponType} size="sm" />
           {session.trainingMode && (
             <span
@@ -353,8 +368,8 @@ function SessionRow({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3 mt-0.5 text-[#4A5568] text-[11px] font-display uppercase tracking-wide">
-          <span className="text-[#8892A4] normal-case tracking-normal font-data">
+        <div className="flex items-center gap-3 mt-0.5 text-text-muted text-[11px] font-display uppercase tracking-wide">
+          <span className="text-text-secondary normal-case tracking-normal font-data">
             Started {formatSessionStart(session.sessionDate)}
           </span>
           <span className="opacity-30">·</span>
@@ -381,8 +396,8 @@ function SessionRow({
             </button>
             <button
               onClick={onCancel}
-              className="text-xs px-2.5 py-1 rounded border border-[#1E2433]
-                         text-[#8892A4] hover:text-[#F0F4FF] transition-colors font-display uppercase tracking-wide"
+              className="text-xs px-2.5 py-1 rounded border border-border-subtle
+                         text-text-secondary hover:text-text-primary transition-colors font-display uppercase tracking-wide"
             >
               No
             </button>
@@ -392,7 +407,7 @@ function SessionRow({
             <button
               onClick={onConfirm}
               className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-                         text-[#4A5568] hover:text-[#FF4D6D] hover:bg-[rgba(255,77,109,0.08)]
+                         text-text-muted hover:text-[#FF4D6D] hover:bg-[rgba(255,77,109,0.08)]
                          transition-all duration-150"
               aria-label="Delete session"
             >
@@ -430,8 +445,8 @@ function EmptyState() {
           <line x1="62" y1="40" x2="78" y2="40" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       </div>
-      <p className="text-[#F0F4FF] font-display font-bold text-xl">No sessions yet</p>
-      <p className="text-[#4A5568] text-sm mt-2 max-w-xs">
+      <p className="text-text-primary font-display font-bold text-xl">No sessions yet</p>
+      <p className="text-text-muted text-sm mt-2 max-w-xs">
         Start your first training session to begin tracking your performance and scores.
       </p>
       <Link href="/sessions/new" className="btn btn-primary text-sm py-2.5 px-6 mt-6">

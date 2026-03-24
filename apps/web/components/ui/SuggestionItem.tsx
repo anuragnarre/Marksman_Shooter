@@ -81,9 +81,9 @@ export function SuggestionItem({
               {cfg.label}
             </span>
           </div>
-          <p className="text-[#F0F4FF] text-sm leading-snug font-medium">{title}</p>
+          <p className="text-text-primary text-sm leading-snug font-medium">{title}</p>
           {detail && (
-            <p className="text-[#8892A4] text-xs mt-1 leading-relaxed">{detail}</p>
+            <p className="text-text-secondary text-xs mt-1 leading-relaxed">{detail}</p>
           )}
         </div>
       </div>

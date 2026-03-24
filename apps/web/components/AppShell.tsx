@@ -8,6 +8,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
+import { useTheme } from '../contexts/theme-context';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
@@ -31,6 +32,7 @@ const SIDEBAR_COLLAPSED = 72;
 
 export function AppShell({ children, title, isLive = false }: AppShellProps) {
   const { isLoggedIn, isLoading } = useAuth();
+  const { resolvedTheme } = useTheme();
   const router    = useRouter();
   const isMobile  = useIsMobile();
   const [sidebarW, setSidebarW] = useState(SIDEBAR_EXPANDED);
@@ -96,7 +98,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
               </svg>
             </div>
           </div>
-          <p className="text-[#4A5568] text-[11px] font-display uppercase tracking-widest animate-pulse">
+          <p className="text-text-muted text-[11px] font-display uppercase tracking-widest animate-pulse">
             Loading
           </p>
         </div>
@@ -114,38 +116,41 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
   return (
     <div className="min-h-screen grid-bg relative overflow-x-hidden">
 
-      {/* ── Ambient background orbs ─────────────────────────────────────── */}
-      <div
-        className="fixed pointer-events-none no-print"
-        style={{
-          top: '-10%', left: '-5%',
-          width: '50vw', height: '50vw',
-          background: 'radial-gradient(circle, rgba(245,166,35,0.055) 0%, transparent 65%)',
-          animation: 'orbFloat 18s ease-in-out infinite',
-          zIndex: 0,
-        }}
-      />
-      <div
-        className="fixed pointer-events-none no-print"
-        style={{
-          bottom: '10%', right: '-10%',
-          width: '40vw', height: '40vw',
-          background: 'radial-gradient(circle, rgba(79,195,247,0.04) 0%, transparent 65%)',
-          animation: 'orbFloat 22s ease-in-out infinite reverse',
-          zIndex: 0,
-        }}
-      />
-      {/* Third deep purple orb for visual richness */}
-      <div
-        className="fixed pointer-events-none no-print"
-        style={{
-          top: '40%', left: '30%',
-          width: '30vw', height: '30vw',
-          background: 'radial-gradient(circle, rgba(120,80,255,0.018) 0%, transparent 65%)',
-          animation: 'orbFloat 28s ease-in-out 6s infinite',
-          zIndex: 0,
-        }}
-      />
+      {/* ── Ambient background orbs (dark mode only) ─────────────────── */}
+      {resolvedTheme === 'dark' && (
+        <>
+          <div
+            className="fixed pointer-events-none no-print"
+            style={{
+              top: '-10%', left: '-5%',
+              width: '50vw', height: '50vw',
+              background: 'radial-gradient(circle, rgba(245,166,35,0.055) 0%, transparent 65%)',
+              animation: 'orbFloat 18s ease-in-out infinite',
+              zIndex: 0,
+            }}
+          />
+          <div
+            className="fixed pointer-events-none no-print"
+            style={{
+              bottom: '10%', right: '-10%',
+              width: '40vw', height: '40vw',
+              background: 'radial-gradient(circle, rgba(79,195,247,0.04) 0%, transparent 65%)',
+              animation: 'orbFloat 22s ease-in-out infinite reverse',
+              zIndex: 0,
+            }}
+          />
+          <div
+            className="fixed pointer-events-none no-print"
+            style={{
+              top: '40%', left: '30%',
+              width: '30vw', height: '30vw',
+              background: 'radial-gradient(circle, rgba(120,80,255,0.018) 0%, transparent 65%)',
+              animation: 'orbFloat 28s ease-in-out 6s infinite',
+              zIndex: 0,
+            }}
+          />
+        </>
+      )}
 
       <Sidebar onCommandPalette={() => setCmdOpen(true)} />
       <TopBar
@@ -181,8 +186,8 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
       {/* Command Palette */}
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
 
-      {/* AI Coach Panel — hidden on mobile bottom nav area */}
-      {!isMobile && <AICoachPanel />}
+      {/* AI Coach Panel — bottom-right, above BottomNav on mobile */}
+      <AICoachPanel />
 
       {/* Offline/network banner — slides in from top */}
       <OfflineBanner />

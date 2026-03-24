@@ -41,6 +41,114 @@
   --glass-bg:        rgba(12, 15, 26, 0.7);
   --glass-border:    rgba(255, 255, 255, 0.055);
   --glass-heavy-bg:  rgba(6, 8, 16, 0.85);
+
+  /* Shadows */
+  --shadow-card:     0 2px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  --shadow-card-hover: 0 8px 40px -8px rgba(245,166,35,0.18), 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(245,166,35,0.08);
+  --shadow-glass:    0 4px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  --shadow-toast:    0 8px 32px rgba(0,0,0,0.6);
+  --shadow-tooltip:  0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(245,166,35,0.06);
+
+  /* Inset / field */
+  --field-bg:        rgba(19, 24, 38, 0.8);
+  --field-border:    rgba(30, 36, 51, 0.9);
+  --field-shadow:    inset 0 2px 4px rgba(0,0,0,0.3);
+  --field-focus-bg:  rgba(19, 24, 38, 1);
+
+  /* Button ghost */
+  --btn-ghost-bg:       rgba(26, 32, 53, 0.6);
+  --btn-ghost-border:   rgba(30, 36, 51, 0.9);
+  --btn-ghost-hover-bg: rgba(30, 36, 51, 0.9);
+
+  /* Skeleton */
+  --skeleton-from: rgba(26, 32, 53, 0.8);
+  --skeleton-mid:  rgba(30, 36, 51, 1);
+
+  /* Chip */
+  --chip-bg: rgba(26, 32, 53, 0.7);
+  --chip-hover-bg: rgba(30, 36, 51, 0.9);
+
+  /* Scrollbar */
+  --scrollbar-thumb: var(--bg-subtle);
+  --scrollbar-thumb-hover: #2A3350;
+
+  /* Autofill */
+  --autofill-bg: rgba(19, 24, 38, 0.95);
+
+  /* Neon text-shadow strength */
+  --neon-strength: 1;
+}
+
+/* ── Light Theme Overrides ──────────────────────────────────────────────── */
+:root.light {
+  /* Backgrounds */
+  --bg-void:        #F5F6FA;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #F0F1F5;
+  --bg-subtle:      #E8EAF0;
+
+  /* Accents — keep hues, adjust glows for light */
+  --accent-glow:     rgba(245, 166, 35, 0.15);
+  --accent-dim:      rgba(245, 166, 35, 0.06);
+  --data-blue-glow:  rgba(79, 195, 247, 0.12);
+  --signal-red-glow: rgba(255, 77, 109, 0.12);
+  --success-glow:    rgba(0, 229, 160, 0.10);
+
+  /* Typography */
+  --text-primary:   #1A1D26;
+  --text-secondary: #5A6178;
+  --text-muted:     #9CA3B8;
+
+  /* Borders */
+  --border-subtle: #DFE2EA;
+  --border-active: rgba(220, 140, 15, 0.45);
+
+  /* Shot colors — slightly deeper for light bg contrast */
+  --shot-gold:    #D48E1A;
+  --shot-blue:    #2196D6;
+  --shot-green:   #00B87A;
+  --shot-red:     #E8365A;
+
+  /* Glass */
+  --glass-bg:        rgba(255, 255, 255, 0.75);
+  --glass-border:    rgba(0, 0, 0, 0.08);
+  --glass-heavy-bg:  rgba(245, 246, 250, 0.92);
+
+  /* Shadows */
+  --shadow-card:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(245,166,35,0.12);
+  --shadow-glass:      0 2px 16px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  --shadow-toast:      0 4px 20px rgba(0,0,0,0.1);
+  --shadow-tooltip:    0 4px 20px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06);
+
+  /* Field / inputs */
+  --field-bg:        rgba(0, 0, 0, 0.03);
+  --field-border:    #DFE2EA;
+  --field-shadow:    inset 0 1px 2px rgba(0,0,0,0.06);
+  --field-focus-bg:  #FFFFFF;
+
+  /* Button ghost */
+  --btn-ghost-bg:       rgba(0, 0, 0, 0.04);
+  --btn-ghost-border:   #DFE2EA;
+  --btn-ghost-hover-bg: rgba(0, 0, 0, 0.07);
+
+  /* Skeleton */
+  --skeleton-from: #E8EAF0;
+  --skeleton-mid:  #F0F1F5;
+
+  /* Chip */
+  --chip-bg:       rgba(0, 0, 0, 0.04);
+  --chip-hover-bg: rgba(0, 0, 0, 0.07);
+
+  /* Scrollbar */
+  --scrollbar-thumb: #D0D4DE;
+  --scrollbar-thumb-hover: #B8BCC8;
+
+  /* Autofill */
+  --autofill-bg: #F5F6FA;
+
+  /* Neon text-shadow strength — suppress in light mode */
+  --neon-strength: 0;
 }
 
 /* ── Base Reset ──────────────────────────────────────────────────────────── */
@@ -109,8 +217,8 @@ input, textarea, select, button {
 /* ── Scrollbar Styling ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: var(--bg-subtle); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #2A3350; }
+::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 /* ── Selection ───────────────────────────────────────────────────────────── */
 ::selection {
@@ -347,7 +455,7 @@ input, textarea, select, button {
       border-color  280ms cubic-bezier(0.16, 1, 0.3, 1),
       box-shadow    280ms cubic-bezier(0.16, 1, 0.3, 1),
       transform     280ms cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: var(--shadow-card);
   }
 
   /* Top amber accent gradient line */
@@ -376,10 +484,7 @@ input, textarea, select, button {
 
   .card:hover {
     border-color: rgba(245, 166, 35, 0.3);
-    box-shadow:
-      0 8px 40px -8px rgba(245,166,35,0.18),
-      0 4px 24px rgba(0,0,0,0.5),
-      inset 0 1px 0 rgba(245,166,35,0.08);
+    box-shadow: var(--shadow-card-hover);
     transform: translateY(-1px);
   }
 
@@ -418,20 +523,15 @@ input, textarea, select, button {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
-    box-shadow:
-      0 4px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-glass);
   }
 
   .glass-heavy {
     background: var(--glass-heavy-bg);
     backdrop-filter: blur(32px) saturate(200%);
     -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow:
-      0 8px 48px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
   }
 
   /* ── Bento Grid Cards ─────────────────────────────────────────────────── */
@@ -442,7 +542,7 @@ input, textarea, select, button {
     position: relative;
     overflow: hidden;
     transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.025);
+    box-shadow: var(--shadow-card);
   }
 
   .bento-card::before {
@@ -488,24 +588,24 @@ input, textarea, select, button {
   .neon-amber {
     color: #F5A623;
     text-shadow:
-      0 0 8px rgba(245, 166, 35, 0.8),
-      0 0 20px rgba(245, 166, 35, 0.5),
-      0 0 40px rgba(245, 166, 35, 0.25);
+      0 0 calc(8px * var(--neon-strength)) rgba(245, 166, 35, 0.8),
+      0 0 calc(20px * var(--neon-strength)) rgba(245, 166, 35, 0.5),
+      0 0 calc(40px * var(--neon-strength)) rgba(245, 166, 35, 0.25);
   }
 
   .neon-blue {
     color: #4FC3F7;
     text-shadow:
-      0 0 8px rgba(79, 195, 247, 0.7),
-      0 0 20px rgba(79, 195, 247, 0.4),
-      0 0 40px rgba(79, 195, 247, 0.2);
+      0 0 calc(8px * var(--neon-strength)) rgba(79, 195, 247, 0.7),
+      0 0 calc(20px * var(--neon-strength)) rgba(79, 195, 247, 0.4),
+      0 0 calc(40px * var(--neon-strength)) rgba(79, 195, 247, 0.2);
   }
 
   .neon-green {
     color: #00E5A0;
     text-shadow:
-      0 0 8px rgba(0, 229, 160, 0.7),
-      0 0 20px rgba(0, 229, 160, 0.4);
+      0 0 calc(8px * var(--neon-strength)) rgba(0, 229, 160, 0.7),
+      0 0 calc(20px * var(--neon-strength)) rgba(0, 229, 160, 0.4);
   }
 
   /* ── Glow Border ──────────────────────────────────────────────────────── */
@@ -558,8 +658,8 @@ input, textarea, select, button {
   /* ── Inputs ───────────────────────────────────────────────────────────── */
   .field {
     width: 100%;
-    background: rgba(19, 24, 38, 0.8);
-    border: 1px solid rgba(30, 36, 51, 0.9);
+    background: var(--field-bg);
+    border: 1px solid var(--field-border);
     border-radius: 10px;
     padding: 11px 16px;
     color: var(--text-primary);
@@ -567,15 +667,15 @@ input, textarea, select, button {
     font-size: 14px;
     outline: none;
     transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow: var(--field-shadow);
   }
 
   .field:focus {
     border-color: rgba(245, 166, 35, 0.55);
-    background: rgba(19, 24, 38, 1);
+    background: var(--field-focus-bg);
     box-shadow:
       0 0 0 3px rgba(245, 166, 35, 0.12),
-      inset 0 2px 4px rgba(0,0,0,0.2);
+      var(--field-shadow);
   }
 
   .field::placeholder { color: var(--text-muted); }
@@ -653,14 +753,14 @@ input, textarea, select, button {
   }
 
   .btn-ghost {
-    background: rgba(26, 32, 53, 0.6);
+    background: var(--btn-ghost-bg);
     color: var(--text-secondary);
-    border: 1px solid rgba(30, 36, 51, 0.9);
+    border: 1px solid var(--btn-ghost-border);
     backdrop-filter: blur(8px);
   }
 
   .btn-ghost:hover {
-    background: rgba(30, 36, 51, 0.9);
+    background: var(--btn-ghost-hover-bg);
     color: var(--text-primary);
     border-color: rgba(245, 166, 35, 0.3);
     box-shadow: 0 0 16px rgba(245,166,35,0.1);
@@ -684,9 +784,9 @@ input, textarea, select, button {
   .skeleton {
     background: linear-gradient(
       105deg,
-      rgba(26, 32, 53, 0.8) 25%,
-      rgba(30, 36, 51, 1) 50%,
-      rgba(26, 32, 53, 0.8) 75%
+      var(--skeleton-from) 25%,
+      var(--skeleton-mid) 50%,
+      var(--skeleton-from) 75%
     );
     background-size: 200% 100%;
     animation: shimmer 1.8s linear infinite;
@@ -736,7 +836,7 @@ input, textarea, select, button {
     align-items: center;
     gap: 5px;
     padding: 4px 12px;
-    background: rgba(26, 32, 53, 0.7);
+    background: var(--chip-bg);
     border: 1px solid var(--border-subtle);
     border-radius: 8px;
     font-size: 12px;
@@ -745,7 +845,7 @@ input, textarea, select, button {
   }
 
   .chip:hover {
-    background: rgba(30, 36, 51, 0.9);
+    background: var(--chip-hover-bg);
     border-color: rgba(245,166,35,0.2);
   }
 
@@ -758,7 +858,7 @@ input, textarea, select, button {
     letter-spacing: 0.05em;
     padding: 3px 10px;
     border-radius: 6px;
-    background: rgba(245, 166, 35, 0.08);
+    background: var(--accent-dim);
     border: 1px solid rgba(245, 166, 35, 0.2);
     color: var(--text-secondary);
   }
@@ -776,14 +876,14 @@ input, textarea, select, button {
       radial-gradient(ellipse at 20% 50%, rgba(245, 166, 35, 0.04) 0%, transparent 55%),
       radial-gradient(ellipse at 80% 20%, rgba(79, 195, 247, 0.03) 0%, transparent 55%),
       radial-gradient(ellipse at 50% 90%, rgba(120, 80, 255, 0.015) 0%, transparent 50%),
-      linear-gradient(rgba(26, 32, 53, 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(26, 32, 53, 0.28) 1px, transparent 1px);
+      linear-gradient(var(--border-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
   }
 
   /* ── Premium depth background for landing/hero ────────────────────────── */
   .depth-bg {
-    background-color: #080A0F;
+    background-color: var(--bg-void);
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
       radial-gradient(ellipse 70% 90% at 75% 40%, rgba(245,166,35,0.07) 0%, transparent 60%),
@@ -794,13 +894,13 @@ input, textarea, select, button {
 
   /* ── Canvas container vignette ────────────────────────────────────────── */
   .canvas-vignette {
-    background: radial-gradient(ellipse at center, #0d1117 0%, #060810 100%);
+    background: radial-gradient(ellipse at center, var(--bg-surface) 0%, var(--bg-void) 100%);
   }
 
   /* ── Progress Bar ─────────────────────────────────────────────────────── */
   .progress-track {
     height: 3px;
-    background: rgba(26, 32, 53, 0.8);
+    background: var(--bg-subtle);
     border-radius: 99px;
     overflow: hidden;
   }
@@ -867,14 +967,12 @@ input, textarea, select, button {
 
   /* ── Frosted tooltip ──────────────────────────────────────────────────── */
   .tooltip-glass {
-    background: rgba(12, 15, 26, 0.92);
+    background: var(--glass-heavy-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(245, 166, 35, 0.2);
     border-radius: 10px;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.6),
-      0 0 0 1px rgba(245,166,35,0.06);
+    box-shadow: var(--shadow-tooltip);
   }
 
   /* ── Tab indicator ────────────────────────────────────────────────────── */
@@ -927,7 +1025,7 @@ input, textarea, select, button {
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px rgba(19, 24, 38, 0.95) inset !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg) inset !important;
     -webkit-text-fill-color: var(--text-primary) !important;
     caret-color: var(--text-primary);
   }
@@ -943,6 +1041,171 @@ input, textarea, select, button {
     background: linear-gradient(90deg, transparent, rgba(245,166,35,0.4), transparent);
     opacity: 0.35;
   }
+
+  /* ── Light Mode Component Overrides ──────────────────────────────────── */
+
+  :root.light .card::before {
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgba(245,166,35,0.3) 35%,
+      rgba(245,166,35,0.5) 50%,
+      rgba(245,166,35,0.3) 65%,
+      transparent 95%
+    );
+    opacity: 0.35;
+  }
+
+  :root.light .card:hover {
+    border-color: rgba(245, 166, 35, 0.2);
+  }
+
+  :root.light .card-interactive:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.1), 0 0 0 1px rgba(245,166,35,0.12);
+  }
+
+  :root.light .bento-card:hover {
+    border-color: rgba(245,166,35,0.18);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  }
+
+  :root.light .btn-primary {
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(245,166,35,0.25);
+  }
+
+  :root.light .btn-primary:hover {
+    box-shadow: 0 4px 14px rgba(245,166,35,0.35);
+  }
+
+  :root.light .btn-danger {
+    border-color: rgba(255, 77, 109, 0.2);
+  }
+
+  :root.light .btn-danger:hover {
+    background: rgba(255, 77, 109, 0.06);
+    border-color: rgba(255, 77, 109, 0.35);
+    box-shadow: none;
+  }
+
+  :root.light .table-row-hover:hover {
+    background: rgba(245, 166, 35, 0.04);
+  }
+
+  :root.light .table-row-hover::before {
+    background: linear-gradient(to bottom, var(--accent-primary), rgba(245,166,35,0.3));
+  }
+
+  :root.light .active-dot {
+    box-shadow:
+      0 0 0 2px rgba(245, 166, 35, 0.15),
+      0 0 6px rgba(245, 166, 35, 0.3);
+  }
+
+  :root.light .toast {
+    box-shadow: var(--shadow-toast);
+  }
+
+  :root.light .toast-success {
+    background: rgba(0,229,160,0.06);
+    border: 1px solid rgba(0,229,160,0.2);
+  }
+
+  :root.light .toast-error {
+    background: rgba(255,77,109,0.06);
+    border: 1px solid rgba(255,77,109,0.2);
+  }
+
+  :root.light .toast-info {
+    background: rgba(79,195,247,0.06);
+    border: 1px solid rgba(79,195,247,0.2);
+  }
+
+  :root.light .toast-warning {
+    background: rgba(245,166,35,0.06);
+    border: 1px solid rgba(245,166,35,0.2);
+  }
+
+  :root.light .glow-border-amber {
+    border: 1px solid rgba(245, 166, 35, 0.25);
+    box-shadow: 0 0 0 1px rgba(245, 166, 35, 0.06);
+  }
+
+  :root.light .glow-border-blue {
+    border: 1px solid rgba(79, 195, 247, 0.25);
+    box-shadow: 0 0 0 1px rgba(79, 195, 247, 0.06);
+  }
+
+  :root.light .animated-border::before {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 166, 35, 0.3),
+      rgba(79, 195, 247, 0.15),
+      rgba(0, 229, 160, 0.15),
+      rgba(245, 166, 35, 0.3)
+    );
+  }
+
+  :root.light .animated-border::after {
+    background: var(--bg-surface);
+  }
+
+  :root.light .holographic {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 166, 35, 0.04) 0%,
+      rgba(79, 195, 247, 0.02) 25%,
+      rgba(0, 229, 160, 0.02) 50%,
+      rgba(245, 166, 35, 0.04) 75%,
+      rgba(79, 195, 247, 0.02) 100%
+    );
+  }
+
+  :root.light .depth-bg {
+    background-color: var(--bg-void);
+    background-image:
+      radial-gradient(ellipse 70% 90% at 75% 40%, rgba(245,166,35,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 15% 20%, rgba(79,195,247,0.02) 0%, transparent 55%);
+    background-size: 100% 100%, 100% 100%;
+  }
+
+  :root.light .noise-overlay::after {
+    opacity: 0.015;
+  }
+
+  :root.light .gradient-text {
+    background: linear-gradient(135deg, #D48E1A 0%, #B8780E 50%, #D48E1A 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  :root.light .gradient-text-cool {
+    background: linear-gradient(135deg, #2196D6 0%, #00B87A 50%, #2196D6 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  :root.light ::selection {
+    background: rgba(245, 166, 35, 0.18);
+    color: #1A1D26;
+  }
+
+  :root.light .cmd-hint kbd {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  :root.light .status-dot-offline {
+    background: #9CA3B8;
+  }
+
+  :root.light .radar-ring {
+    border-color: rgba(245, 166, 35, 0.25);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -951,12 +1214,34 @@ input, textarea, select, button {
 @media print {
   /* Hide app chrome */
   [data-sidebar], [data-topbar], [data-bottomnav],
-  .no-print { display: none !important; }
+  .no-print, .btn, button, nav { display: none !important; }
 
   body {
-    background: #000 !important;
+    background: #fff !important;
+    color: #111 !important;
     padding: 0 !important;
     margin: 0 !important;
+    font-size: 12pt;
+  }
+
+  /* Make cards and content readable */
+  .card {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    color: #111 !important;
+  }
+
+  p, span, td, th, .label {
+    color: #333 !important;
+  }
+
+  .score-value {
+    color: #111 !important;
   }
 
   /* Show only the print target */
@@ -966,6 +1251,27 @@ input, textarea, select, button {
     height: auto !important;
     page-break-inside: avoid;
   }
+
+  /* Print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Hide interactive elements */
+  select, input[type="text"], .field {
+    border: 1px solid #ccc !important;
+    background: transparent !important;
+    color: #111 !important;
+  }
+
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+}
+
+.print-only {
+  display: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1071,7 +1377,7 @@ input, textarea, select, button {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(245,166,35,0.15);
-    box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(245,166,35,0.08);
+    box-shadow: var(--shadow-glass);
   }
 
   .glass-blue {
@@ -1079,7 +1385,7 @@ input, textarea, select, button {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(79,195,247,0.15);
-    box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(79,195,247,0.06);
+    box-shadow: var(--shadow-glass);
   }
 
   /* ── Gradient border card (premium bento) ─────────────────────────────── */
@@ -1199,4 +1505,41 @@ input, textarea, select, button {
     background: #FF4D6D;
     box-shadow: 0 0 8px rgba(255,77,109,0.4);
   }
+}
+
+/* ── Light Mode Component Shadow Overrides ───────────────────────────────── */
+/* Card variants use hardcoded dark rgba shadows; override them for light mode */
+:root.light .bento-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+}
+:root.light .card-interactive:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.09), 0 0 0 1px rgba(245,166,35,0.15);
+}
+:root.light .card-blue:hover {
+  box-shadow: 0 4px 16px rgba(79,195,247,0.14), 0 2px 8px rgba(0,0,0,0.05);
+}
+:root.light .card-red:hover {
+  box-shadow: 0 4px 16px rgba(255,77,109,0.12), 0 2px 8px rgba(0,0,0,0.05);
+}
+:root.light .card-green:hover {
+  box-shadow: 0 4px 16px rgba(0,229,160,0.1), 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* cmd-hint kbd uses hardcoded rgba(white) — fix for light mode */
+:root.light .cmd-hint kbd {
+  background: var(--chip-bg);
+  border-color: var(--border-subtle);
+}
+
+/* Shot dot pop animation for homepage hero target */
+@keyframes shotPop {
+  from { opacity: 0; transform: scale(0); }
+  60%  { transform: scale(1.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Scroll indicator dot bounce (homepage hero mouse graphic) */
+@keyframes scrollDot {
+  0%, 100% { transform: translateY(0);   opacity: 0.8; }
+  50%       { transform: translateY(6px); opacity: 0.2; }
 }

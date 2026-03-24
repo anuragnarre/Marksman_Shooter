@@ -21,7 +21,7 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
 
   const isHome     = pathname === '/dashboard';
   const isSessions = pathname.startsWith('/sessions') && !pathname.startsWith('/sessions/compare');
-  const isStats    = pathname.startsWith('/analytics') || pathname.startsWith('/performance');
+  const isStats    = pathname.startsWith('/performance');
   const isNew      = pathname === '/sessions/new';
 
   return (
@@ -31,11 +31,11 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
       style={{
         height: 'calc(68px + env(safe-area-inset-bottom, 0px))',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        background: 'rgba(6, 8, 16, 0.94)',
+        background: 'var(--glass-heavy-bg)',
         backdropFilter: 'blur(32px) saturate(200%)',
         WebkitBackdropFilter: 'blur(32px) saturate(200%)',
-        borderTop: '1px solid rgba(255,255,255,0.04)',
-        boxShadow: '0 -8px 32px rgba(0,0,0,0.5)',
+        borderTop: '1px solid var(--glass-border)',
+        boxShadow: 'var(--shadow-glass)',
       }}
       aria-label="Mobile navigation"
     >
@@ -126,7 +126,7 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
 
         {/* Stats */}
         <NavItem
-          href="/analytics"
+          href="/performance"
           label="Stats"
           active={isStats}
           icon={
@@ -154,7 +154,7 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
                      transition-all duration-200 active:scale-90"
           aria-label="Open menu"
         >
-          <span style={{ color: '#4A5568' }}>
+          <span style={{ color: 'var(--text-muted)' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
               <line x1="4" y1="7" x2="20" y2="7" />
               <line x1="4" y1="12" x2="16" y2="12" />
@@ -163,7 +163,7 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
           </span>
           <span
             className="text-[10px] font-display font-bold uppercase tracking-wider leading-none"
-            style={{ color: '#4A5568' }}
+            style={{ color: 'var(--text-muted)' }}
           >
             More
           </span>
@@ -199,7 +199,7 @@ function NavItem({ href, label, icon, active }: {
       <span
         className="transition-all duration-200"
         style={{
-          color: active ? '#F5A623' : '#4A5568',
+          color: active ? '#F5A623' : 'var(--text-muted)',
           filter: active ? 'drop-shadow(0 0 5px rgba(245,166,35,0.4))' : 'none',
           transform: active ? 'translateY(-1px)' : 'none',
         }}
@@ -208,7 +208,7 @@ function NavItem({ href, label, icon, active }: {
       </span>
       <span
         className="text-[10px] font-display font-bold uppercase tracking-wider leading-none"
-        style={{ color: active ? '#F5A623' : '#4A5568' }}
+        style={{ color: active ? '#F5A623' : 'var(--text-muted)' }}
       >
         {label}
       </span>

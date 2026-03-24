@@ -140,7 +140,7 @@ export default function SessionDetailPage() {
           <div className="flex items-start flex-wrap gap-4 animate-slide-up">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">
+                <h1 className="font-display font-bold text-2xl text-text-primary">
                   {session?.discipline}
                 </h1>
                 {isLive && <StatusBadge variant="live" size="sm" />}
@@ -172,7 +172,7 @@ export default function SessionDetailPage() {
             </div>
             <div className="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
               <Link
-                href={shooterId ? `/coach/shooters` : '/sessions'}
+                href={shooterId ? `/connect` : '/sessions'}
                 className="btn btn-ghost text-xs py-2"
               >
                 {shooterId ? '← Shooter' : '← Sessions'}
@@ -225,7 +225,7 @@ export default function SessionDetailPage() {
                 onClick={() => setPageTab(t)}
                 className="px-4 py-2.5 text-xs font-display font-semibold uppercase tracking-wide transition-all duration-200"
                 style={{
-                  color: pageTab === t ? '#F5A623' : '#4A5568',
+                  color: pageTab === t ? '#F5A623' : 'var(--text-muted)',
                   borderBottom: pageTab === t ? '2px solid #F5A623' : '2px solid transparent',
                   marginBottom: '-1px',
                 }}
@@ -275,7 +275,7 @@ export default function SessionDetailPage() {
 
             {/* Target canvas — 7 cols */}
             <div className="lg:col-span-7 card p-5 animate-slide-up stagger-4">
-              <h3 className="font-display font-semibold text-base text-[#F0F4FF] mb-4">
+              <h3 className="font-display font-semibold text-base text-text-primary mb-4">
                 Target View
               </h3>
               <TargetCanvas shots={shots} mpi={analytics?.mpi} size={isMobile ? 320 : 420} />
@@ -287,19 +287,19 @@ export default function SessionDetailPage() {
               {shots.length > 0 && (
                 <>
                   <div className="card p-4 animate-slide-up stagger-5">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Score Trend</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-3">Score Trend</h3>
                     <ScoreOverTimeChart shots={shots} average={analytics?.averageScore} />
                   </div>
                   <div className="card p-4 animate-slide-up stagger-6">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Distribution</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-3">Distribution</h3>
                     <ScoreDistributionChart shots={shots} />
                   </div>
                   <div className="card p-4 animate-slide-up stagger-7">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Shot Heatmap</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-3">Shot Heatmap</h3>
                     <ShotHeatmap shots={shots} animated />
                   </div>
                   <div className="card p-4 animate-slide-up stagger-8">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3">Timeline Replay</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-3">Timeline Replay</h3>
                     <ShotTimelineSlider shots={shots} />
                   </div>
                 </>
@@ -307,7 +307,7 @@ export default function SessionDetailPage() {
 
               {suggestions.length > 0 && (
                 <div className="card p-4 animate-slide-up stagger-7">
-                  <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-3 flex items-center gap-2">
+                  <h3 className="font-display font-semibold text-sm text-text-primary mb-3 flex items-center gap-2">
                     <span className="text-accent"><ChipTargetIcon /></span>
                     AI Suggestions
                   </h3>
@@ -340,8 +340,8 @@ export default function SessionDetailPage() {
           {/* ── Shot Table ───────────────────────────────────────────────── */}
           <div className="card animate-slide-up stagger-8">
             <div className="flex items-center justify-between p-5 pb-0">
-              <h3 className="font-display font-semibold text-base text-[#F0F4FF]">
-                Shots {shots.length > 0 && <span className="text-[#4A5568] font-data text-sm ml-1">({shots.length})</span>}
+              <h3 className="font-display font-semibold text-base text-text-primary">
+                Shots {shots.length > 0 && <span className="text-text-muted font-data text-sm ml-1">({shots.length})</span>}
               </h3>
             </div>
             <div className="mt-2">
@@ -352,15 +352,15 @@ export default function SessionDetailPage() {
           {/* Coach feedback */}
           {session?.feedback && session.feedback.length > 0 && (
             <div className="card p-5 animate-slide-up stagger-9">
-              <h3 className="font-display font-semibold text-base text-[#F0F4FF] mb-4">
+              <h3 className="font-display font-semibold text-base text-text-primary mb-4">
                 Coach Feedback
               </h3>
               <div className="space-y-3">
                 {session.feedback.map((fb) => (
                   <div key={fb.id}
                     className="border-l-2 border-[#4FC3F7] bg-[rgba(79,195,247,0.06)] rounded-r-lg px-4 py-3">
-                    <p className="text-[#F0F4FF] text-sm">{fb.feedback}</p>
-                    <p className="text-[#4A5568] text-xs mt-2 font-display uppercase tracking-wide">
+                    <p className="text-text-primary text-sm">{fb.feedback}</p>
+                    <p className="text-text-muted text-xs mt-2 font-display uppercase tracking-wide">
                       {fb.coach?.name ?? 'Coach'} · {new Date(fb.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -495,7 +495,7 @@ function PerformanceTab({
       {/* Fatigue area chart */}
       {seriesData.length >= 2 && (
         <div className="card p-5 animate-slide-up">
-          <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-4">Series Fatigue Chart</h3>
+          <h3 className="font-display font-semibold text-sm text-text-primary mb-4">Series Fatigue Chart</h3>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={seriesData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
               <defs>
@@ -505,14 +505,14 @@ function PerformanceTab({
                 </linearGradient>
               </defs>
               <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="series" tick={{ fill: '#4A5568', fontSize: 11 }} />
-              <YAxis domain={['auto', 'auto']} tick={{ fill: '#4A5568', fontSize: 11 }} />
+              <XAxis dataKey="series" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
               <Tooltip
                 contentStyle={{
                   background: 'rgba(14,17,24,0.95)',
                   border: '1px solid rgba(245,166,35,0.2)',
                   borderRadius: 8,
-                  color: '#F0F4FF',
+                  color: 'var(--text-primary)',
                   fontSize: 12,
                 }}
               />
@@ -521,16 +521,16 @@ function PerformanceTab({
           </ResponsiveContainer>
           {deepAnalysis && (
             <div className="flex gap-4 mt-3 text-xs font-display">
-              <span style={{ color: '#4A5568' }}>
+              <span style={{ color: 'var(--text-muted)' }}>
                 Fatigue Index: <span style={{ color: deepAnalysis.fatigueIndex >= 0 ? '#00E5A0' : '#FF4D6D' }}>
                   {deepAnalysis.fatigueIndex > 0 ? '+' : ''}{deepAnalysis.fatigueIndex.toFixed(3)}
                 </span>
               </span>
-              <span style={{ color: '#4A5568' }}>
+              <span style={{ color: 'var(--text-muted)' }}>
                 Focus Score: <span style={{ color: '#4FC3F7' }}>{deepAnalysis.focusScore}/100</span>
               </span>
               {deepAnalysis.peakSeriesAvg > 0 && (
-                <span style={{ color: '#4A5568' }}>
+                <span style={{ color: 'var(--text-muted)' }}>
                   Peak: <span style={{ color: '#F5A623' }}>S{deepAnalysis.peakSeriesIndex + 1} ({deepAnalysis.peakSeriesAvg})</span>
                 </span>
               )}
@@ -543,7 +543,7 @@ function PerformanceTab({
       {shots.length > 0 && (
         <div className="card animate-slide-up stagger-1">
           <div className="flex items-center justify-between p-5 pb-0">
-            <h3 className="font-display font-semibold text-sm text-[#F0F4FF]">
+            <h3 className="font-display font-semibold text-sm text-text-primary">
               Shots
               {deepAnalysis && deepAnalysis.outlierShots.length > 0 && (
                 <span className="ml-2 text-xs font-normal text-[#FF4D6D]">
@@ -557,7 +557,7 @@ function PerformanceTab({
               <thead>
                 <tr className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                   {['#', 'Score', 'Direction', 'X', 'Y'].map((h) => (
-                    <th key={h} className={`text-left px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] font-display uppercase tracking-wide text-[#4A5568]${h === 'X' || h === 'Y' ? ' hidden lg:table-cell' : ''}`}>{h}</th>
+                    <th key={h} className={`text-left px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] font-display uppercase tracking-wide text-text-muted${h === 'X' || h === 'Y' ? ' hidden lg:table-cell' : ''}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -574,7 +574,7 @@ function PerformanceTab({
                         background: isOutlier ? 'rgba(255,77,109,0.06)' : 'transparent',
                       }}
                     >
-                      <td className="px-3 sm:px-5 py-2 font-data text-[#4A5568]">{s.shotNumber}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-text-muted">{s.shotNumber}</td>
                       <td className="px-3 sm:px-5 py-2 font-data font-bold" style={{
                         color: s.score >= 10.5 ? '#F5A623' : s.score >= 10 ? '#4FC3F7' : s.score >= 9 ? '#00E5A0' : '#FF4D6D',
                       }}>
@@ -582,8 +582,8 @@ function PerformanceTab({
                         {isOutlier && <span className="ml-2 text-[10px] text-[#FF4D6D] font-display">OUTLIER</span>}
                       </td>
                       <td className="px-3 sm:px-5 py-2 font-data text-xs" style={{ color: directionColor(dir) }}>{dir}</td>
-                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4] hidden lg:table-cell">{s.x.toFixed(2)}</td>
-                      <td className="px-3 sm:px-5 py-2 font-data text-[#8892A4] hidden lg:table-cell">{s.y.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-text-secondary hidden lg:table-cell">{s.x.toFixed(2)}</td>
+                      <td className="px-3 sm:px-5 py-2 font-data text-text-secondary hidden lg:table-cell">{s.y.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -598,7 +598,7 @@ function PerformanceTab({
 
       {/* Session Context form */}
       <div className="card p-5 animate-slide-up stagger-2">
-        <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-4">Session Context</h3>
+        <h3 className="font-display font-semibold text-sm text-text-primary mb-4">Session Context</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="label block mb-1">Heart Rate (bpm)</label>
@@ -622,7 +622,7 @@ function PerformanceTab({
               onChange={(e) => setCtx((c) => ({ ...c, perceivedEffort: parseInt(e.target.value) }))}
               className="w-full accent-[#F5A623]"
             />
-            <div className="flex justify-between text-xs text-[#4A5568] font-display mt-1">
+            <div className="flex justify-between text-xs text-text-muted font-display mt-1">
               <span>1 Easy</span>
               <span className="font-bold" style={{ color: '#F5A623' }}>{ctx.perceivedEffort ?? 5}</span>
               <span>10 Max</span>
@@ -679,8 +679,8 @@ function PerformanceTab({
       {/* Device Motion stability capture */}
       {hasMotion && (
         <div className="card p-5 animate-slide-up stagger-3">
-          <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-1">Capture Stability</h3>
-          <p className="text-[#4A5568] text-xs mb-4">10-second hold to measure device steadiness (gyroscope)</p>
+          <h3 className="font-display font-semibold text-sm text-text-primary mb-1">Capture Stability</h3>
+          <p className="text-text-muted text-xs mb-4">10-second hold to measure device steadiness (gyroscope)</p>
 
           {!capturing && stability === null && (
             <button
@@ -706,7 +706,7 @@ function PerformanceTab({
                     }}
                   />
                 ))}
-                <span className="text-[#4A5568] text-xs ml-2">X · Y · Z</span>
+                <span className="text-text-muted text-xs ml-2">X · Y · Z</span>
               </div>
             </div>
           )}
@@ -724,10 +724,10 @@ function PerformanceTab({
                 {stability}
               </div>
               <div>
-                <p className="font-display font-semibold text-sm text-[#F0F4FF]">
+                <p className="font-display font-semibold text-sm text-text-primary">
                   Stability Score: {stability}/100
                 </p>
-                <p className="text-[#4A5568] text-xs mt-0.5">
+                <p className="text-text-muted text-xs mt-0.5">
                   {stability >= 70 ? 'Excellent steadiness' : stability >= 40 ? 'Moderate movement — work on hold' : 'High movement — check stance & breathing'}
                 </p>
               </div>
@@ -760,8 +760,8 @@ function BiometricsSection({ sessionId, shots }: { sessionId: string; shots: Sho
   if (!summary || summary.readingCount === 0) {
     return (
       <div className="card p-5 animate-slide-up stagger-1">
-        <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-2">Biometrics</h3>
-        <p className="text-xs" style={{ color: '#4A5568' }}>
+        <h3 className="font-display font-semibold text-sm text-text-primary mb-2">Biometrics</h3>
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
           No biometric readings for this session. Connect a wearable device to track heart rate and SpO2.
         </p>
       </div>
@@ -770,30 +770,30 @@ function BiometricsSection({ sessionId, shots }: { sessionId: string; shots: Sho
 
   return (
     <div className="card p-5 animate-slide-up stagger-1 space-y-4">
-      <h3 className="font-display font-semibold text-sm text-[#F0F4FF]">Biometrics</h3>
+      <h3 className="font-display font-semibold text-sm text-text-primary">Biometrics</h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="text-center">
-          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>Avg HR</p>
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Avg HR</p>
           <p className="font-mono text-lg font-bold" style={{ color: '#FF4D6D' }}>
-            {summary.avgHeartRate} <span className="text-xs" style={{ color: '#4A5568' }}>bpm</span>
+            {summary.avgHeartRate} <span className="text-xs" style={{ color: 'var(--text-muted)' }}>bpm</span>
           </p>
         </div>
         <div className="text-center">
-          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>HR Range</p>
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>HR Range</p>
           <p className="font-mono text-lg font-bold" style={{ color: '#FF4D6D' }}>
             {summary.minHeartRate}-{summary.maxHeartRate}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>HRV</p>
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>HRV</p>
           <p className="font-mono text-lg font-bold" style={{ color: '#F5A623' }}>
             {summary.hrv}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: '#8892A4' }}>SpO2</p>
+          <p className="text-[10px] font-display font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>SpO2</p>
           <p className="font-mono text-lg font-bold" style={{ color: '#4FC3F7' }}>
-            {summary.avgSpo2}<span className="text-xs" style={{ color: '#4A5568' }}>%</span>
+            {summary.avgSpo2}<span className="text-xs" style={{ color: 'var(--text-muted)' }}>%</span>
           </p>
         </div>
       </div>
@@ -833,18 +833,18 @@ function AddShotsPanel({
                    hover:bg-[rgba(245,166,35,0.03)] transition-colors group"
         aria-expanded={open}
       >
-        <span className="font-display font-bold text-sm text-[#F0F4FF] tracking-wide uppercase">
+        <span className="font-display font-bold text-sm text-text-primary tracking-wide uppercase">
           + Add Shots
         </span>
-        <span className={`text-[#4A5568] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}>
+        <span className={`text-text-muted transition-transform duration-300 ${open ? 'rotate-180' : ''}`}>
           ▾
         </span>
       </button>
 
       {open && (
-        <div className="border-t border-[#1E2433] animate-slide-down">
+        <div className="border-t border-border-subtle animate-slide-down">
           {/* Tab bar */}
-          <div className="flex border-b border-[#1E2433] overflow-x-auto">
+          <div className="flex border-b border-border-subtle overflow-x-auto">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -854,7 +854,7 @@ function AddShotsPanel({
                             transition-colors duration-150 border-b-2 -mb-px
                             ${tab === t.id
                               ? 'text-accent border-accent'
-                              : 'text-[#4A5568] hover:text-[#8892A4] border-transparent'
+                              : 'text-text-muted hover:text-text-secondary border-transparent'
                             }`}
                 aria-selected={tab === t.id}
                 role="tab"
@@ -1006,8 +1006,9 @@ function InteractiveTab({
 
     // Background radial gradient
     const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, CANVAS_SIZE * 0.7);
-    bg.addColorStop(0, '#0d1117');
-    bg.addColorStop(1, '#080A0F');
+    const cs = getComputedStyle(document.documentElement);
+    bg.addColorStop(0, cs.getPropertyValue('--bg-surface').trim() || '#0d1117');
+    bg.addColorStop(1, cs.getPropertyValue('--bg-void').trim() || '#080A0F');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
@@ -1227,14 +1228,14 @@ function InteractiveTab({
 
   return (
     <div className="space-y-4">
-      <p className="text-[#8892A4] text-xs">
+      <p className="text-text-secondary text-xs">
         Click to place a shot · Drag any marker to fine-tune its position · Score updates in real time
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4">
         {/* ── Interactive canvas ─────────────────────────────────────────── */}
         <div
-          className="relative rounded-xl overflow-hidden border border-[#1E2433] shrink-0"
+          className="relative rounded-xl overflow-hidden border border-border-subtle shrink-0"
           style={{ width: CANVAS_SIZE, maxWidth: '100%' }}
         >
           <canvas
@@ -1263,21 +1264,21 @@ function InteractiveTab({
         {/* ── Shot list ─────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col gap-3">
           {shots.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center border border-dashed border-[#1E2433]
+            <div className="flex-1 flex items-center justify-center border border-dashed border-border-subtle
                             rounded-xl py-8 text-center">
               <div>
-                <p className="text-[#4A5568] text-sm">No shots placed yet</p>
-                <p className="text-[#4A5568]/50 text-xs mt-1">Click the target to begin</p>
+                <p className="text-text-muted text-sm">No shots placed yet</p>
+                <p className="text-text-muted/50 text-xs mt-1">Click the target to begin</p>
               </div>
             </div>
           ) : (
             <div className="flex-1 overflow-auto max-h-72 pr-1">
               <table className="w-full min-w-[280px] text-xs">
                 <thead>
-                  <tr className="border-b border-[#1E2433]">
-                    <th className="py-2 text-left w-8 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
-                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
-                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
+                  <tr className="border-b border-border-subtle">
+                    <th className="py-2 text-left w-8 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">#</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Score</th>
+                    <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Direction</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1288,13 +1289,13 @@ function InteractiveTab({
                     return (
                       <tr
                         key={shot.shotNumber}
-                        className={`border-b border-[#1E2433]/40 transition-colors duration-100 ${
+                        className={`border-b border-border-subtle/40 transition-colors duration-100 ${
                           isDrag  ? 'bg-accent/8'
                           : isHover ? 'bg-white/[0.02]'
                           : ''
                         }`}
                       >
-                        <td className="py-1.5 pr-2 score-value text-[#4A5568]">{shot.shotNumber}</td>
+                        <td className="py-1.5 pr-2 score-value text-text-muted">{shot.shotNumber}</td>
                         <td className="py-1.5">
                           <span
                             className="score-value font-bold tabular-nums"
@@ -1303,7 +1304,7 @@ function InteractiveTab({
                             {shot.score.toFixed(1)}
                           </span>
                           {isDrag && (
-                            <span className="ml-1.5 text-[#4A5568] text-[10px] font-display uppercase tracking-wide">
+                            <span className="ml-1.5 text-text-muted text-[10px] font-display uppercase tracking-wide">
                               adjusting
                             </span>
                           )}
@@ -1417,20 +1418,20 @@ function ManualTab({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[340px] text-xs">
           <thead>
-            <tr className="border-b border-[#1E2433]">
-              <th className="py-2 text-left w-10 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">#</th>
-              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Score</th>
-              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">X</th>
-              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568] hidden sm:table-cell">Y</th>
-              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-[#4A5568]">Direction</th>
+            <tr className="border-b border-border-subtle">
+              <th className="py-2 text-left w-10 pr-2 text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">#</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Score</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden sm:table-cell">X</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted hidden sm:table-cell">Y</th>
+              <th className="py-2 text-left text-[10px] font-display font-semibold uppercase tracking-[0.1em] text-text-muted">Direction</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, i) => {
               const dir = shotDirection(Number(row.x) || 0, Number(row.y) || 0);
               return (
-              <tr key={i} className="border-b border-[#1E2433]/40">
-                <td className="py-1 pr-3 score-value text-[#4A5568]">{row.shotNumber}</td>
+              <tr key={i} className="border-b border-border-subtle/40">
+                <td className="py-1 pr-3 score-value text-text-muted">{row.shotNumber}</td>
                 <td className="py-1 pr-2">
                   <input
                     type="number" min="0" max="10.9" step="0.1"
@@ -1731,7 +1732,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
 
       {/* Web mode toggle (non-native only) */}
       {!isNative() && state === 'idle' && (
-        <div className="flex gap-1 p-1 rounded-lg bg-[#0E1118] border border-[#1E2433] w-fit">
+        <div className="flex gap-1 p-1 rounded-lg bg-surface border border-border-subtle w-fit">
           {(['upload', 'camera'] as PhotoMode[]).map((m) => (
             <button
               key={m}
@@ -1739,7 +1740,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
               className={`px-4 py-1.5 rounded text-xs font-display uppercase tracking-widest transition-all
                           ${mode === m
                             ? 'bg-accent text-[#080A0F] font-bold shadow'
-                            : 'text-[#4A5568] hover:text-[#8892A4]'
+                            : 'text-text-muted hover:text-text-secondary'
                           }`}
             >
               {m === 'upload' ? 'Upload' : 'Camera'}
@@ -1758,8 +1759,8 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         >
           <span className="text-accent opacity-50"><LargeUploadIcon /></span>
           <div className="text-center">
-            <p className="text-[#F0F4FF] text-sm font-medium">Upload target photo</p>
-            <p className="text-[#4A5568] text-xs mt-1">JPEG · PNG · TIFF · BMP</p>
+            <p className="text-text-primary text-sm font-medium">Upload target photo</p>
+            <p className="text-text-muted text-xs mt-1">JPEG · PNG · TIFF · BMP</p>
           </div>
           <input
             ref={fileInputRef}
@@ -1791,10 +1792,10 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
               </div>
 
               {/* Browser-specific quick-fix hint */}
-              <div className="text-[#4A5568] text-xs space-y-1 pl-7">
-                <p className="font-display uppercase tracking-widest text-[10px] text-[#4A5568] mb-1">Quick fix</p>
-                <p>Chrome / Edge: click the <strong className="text-[#8892A4]">lock icon</strong> in the address bar → Camera → Allow.</p>
-                <p>Firefox: click the <strong className="text-[#8892A4]">camera icon</strong> in the address bar → Allow.</p>
+              <div className="text-text-muted text-xs space-y-1 pl-7">
+                <p className="font-display uppercase tracking-widest text-[10px] text-text-muted mb-1">Quick fix</p>
+                <p>Chrome / Edge: click the <strong className="text-text-secondary">lock icon</strong> in the address bar → Camera → Allow.</p>
+                <p>Firefox: click the <strong className="text-text-secondary">camera icon</strong> in the address bar → Allow.</p>
                 <p>Safari: Settings → Websites → Camera → Allow for this site.</p>
               </div>
 
@@ -1818,14 +1819,14 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
             <>
               {/* ── Video preview ──────────────────────────────────────── */}
               <div
-                className="relative rounded-xl overflow-hidden border border-[#1E2433] bg-[#080A0F]"
+                className="relative rounded-xl overflow-hidden border border-border-subtle bg-void"
                 style={{ aspectRatio: '16/9' }}
               >
                 {/* Loading spinner shown until stream is ready */}
                 {!cameraReady && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
                     <span className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                    <span className="text-[#4A5568] text-xs font-display uppercase tracking-widest">
+                    <span className="text-text-muted text-xs font-display uppercase tracking-widest">
                       Starting camera…
                     </span>
                   </div>
@@ -1857,7 +1858,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
                 )}
               </div>
 
-              <p className="text-[#4A5568] text-xs text-center">
+              <p className="text-text-muted text-xs text-center">
                 Point the camera at the target. Hold steady, then capture.
               </p>
 
@@ -1868,7 +1869,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
               >
                 {capturing ? (
                   <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-[#080A0F] border-t-transparent rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-[#F5A623]/30 border-t-[#F5A623] rounded-full animate-spin" />
                     Capturing…
                   </span>
                 ) : (
@@ -1883,7 +1884,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
       {/* ── Shared: Analysing ───────────────────────────────────────────── */}
       {state === 'uploading' && (
         <div className="space-y-4">
-          <p className="text-[#8892A4] text-xs font-display uppercase tracking-widest">Analysing image…</p>
+          <p className="text-text-secondary text-xs font-display uppercase tracking-widest">Analysing image…</p>
           <ProgressStep steps={steps} />
         </div>
       )}
@@ -1942,7 +1943,7 @@ function ImportTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () 
 
   return (
     <div className="space-y-4">
-      <p className="text-[#8892A4] text-xs">
+      <p className="text-text-secondary text-xs">
         Import shot data from an electronic target system or scoring software.
         Supported formats: PDF, CSV (columns: shotNumber, score, x, y), JSON.
       </p>
@@ -1972,8 +1973,8 @@ function ImportTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () 
       >
         <span className="text-accent opacity-40"><LargeImportIcon /></span>
         <div className="text-center">
-          <p className="text-[#F0F4FF] text-sm font-medium">Drop your target file here</p>
-          <p className="text-[#4A5568] text-xs mt-1">PDF · CSV · JSON — up to 10 MB</p>
+          <p className="text-text-primary text-sm font-medium">Drop your target file here</p>
+          <p className="text-text-muted text-xs mt-1">PDF · CSV · JSON — up to 10 MB</p>
         </div>
         <input
           ref={inputRef}
@@ -2006,11 +2007,11 @@ function ImportTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () 
 
       {/* CSV format hint */}
       <details className="group">
-        <summary className="text-[#4A5568] text-xs cursor-pointer hover:text-[#8892A4] transition-colors font-display uppercase tracking-wide">
+        <summary className="text-text-muted text-xs cursor-pointer hover:text-text-secondary transition-colors font-display uppercase tracking-wide">
           CSV format reference
         </summary>
-        <div className="mt-2 p-3 bg-[#080A0F] rounded-lg border border-[#1E2433]">
-          <pre className="text-[#8892A4] text-[10px] font-mono leading-relaxed">{`shotNumber,score,x,y
+        <div className="mt-2 p-3 bg-void rounded-lg border border-border-subtle">
+          <pre className="text-text-secondary text-[10px] font-mono leading-relaxed">{`shotNumber,score,x,y
 1,9.8,1.23,-0.45
 2,10.0,0.12,0.34
 3,9.5,-2.10,1.88`}</pre>

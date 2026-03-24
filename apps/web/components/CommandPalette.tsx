@@ -74,14 +74,16 @@ const BASE_COMMANDS: Command[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: NAV_ICON, category: 'Navigate', keywords: ['home', 'overview'] },
   { id: 'sessions', label: 'Sessions', description: 'View all shooting sessions', href: '/sessions', icon: TARGET_ICON, category: 'Navigate' },
   { id: 'new-session', label: 'New Session', description: 'Start a new training session', href: '/sessions/new', icon: PLUS_ICON, category: 'Actions' },
-  { id: 'analytics', label: 'Analytics', description: 'Performance analytics', href: '/analytics', icon: CHART_ICON, category: 'Navigate' },
-  { id: 'biometrics', label: 'Biometrics', description: 'Heart rate, SpO2, wearable data', href: '/biometrics', icon: CHART_ICON, category: 'Navigate' },
-  { id: 'device-settings', label: 'Device Settings', description: 'Manage wearable devices', href: '/settings/devices', icon: NAV_ICON, category: 'Navigate' },
-  { id: 'ai-coach', label: 'AI Coach', description: 'Get AI-powered coaching insights', href: '/ai-coach', icon: AI_ICON, category: 'Navigate' },
-  { id: 'goals', label: 'Goals', description: 'Track your shooting goals', href: '/goals', icon: GOAL_ICON, category: 'Navigate', roles: ['SHOOTER', 'SOLDIER'] },
+  { id: 'performance', label: 'Performance', description: 'Analytics, heatmaps, and trends', href: '/performance', icon: CHART_ICON, category: 'Navigate', keywords: ['analytics', 'stats'] },
+  { id: 'ai-coach', label: 'AI Coach', description: 'Get AI-powered coaching insights', href: '/performance/ai-coach', icon: AI_ICON, category: 'Navigate' },
+  { id: 'ai-assistant', label: 'AI Assistant', description: 'Performance analysis assistant', href: '/performance/ai-assistant', icon: AI_ICON, category: 'Navigate' },
+  { id: 'health', label: 'Health', description: 'Heart rate, SpO2, wearable data', href: '/performance/health', icon: CHART_ICON, category: 'Navigate', keywords: ['biometrics', 'heart rate'] },
+  { id: 'planning', label: 'Planning', description: 'Schedule and goals', href: '/planning', icon: NAV_ICON, category: 'Navigate', keywords: ['calendar', 'schedule', 'goals'] },
+  { id: 'training-plan', label: 'Training Plan', description: 'AI-generated training program', href: '/planning/training-plan', icon: AI_ICON, category: 'Navigate' },
   { id: 'compare', label: 'Compare Sessions', description: 'Side-by-side session analysis', href: '/sessions/compare', icon: COMPARE_ICON, category: 'Navigate' },
-  { id: 'performance', label: 'Performance', href: '/performance', icon: CHART_ICON, category: 'Navigate' },
-  { id: 'training-plan', label: 'Training Plan', description: 'AI-generated training program', href: '/performance/training-plan', icon: AI_ICON, category: 'Navigate' },
+  { id: 'docs', label: 'Docs & Guides', description: 'Documentation and training guides', href: '/docs', icon: NAV_ICON, category: 'Navigate', keywords: ['guidance', 'help'] },
+  { id: 'connect', label: 'Connect', description: 'Coach-shooter connection', href: '/connect', icon: NAV_ICON, category: 'Navigate' },
+  { id: 'settings', label: 'Settings', description: 'Profile, devices, and preferences', href: '/settings', icon: NAV_ICON, category: 'Navigate', keywords: ['devices', 'profile'] },
 ];
 
 function fuzzy(query: string, text: string): boolean {
@@ -168,7 +170,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   // Scroll selected item into view
   useEffect(() => {
     const item = listRef.current?.children[selected] as HTMLElement;
-    item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    item?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }, [selected]);
 
   if (!open) return null;
@@ -185,7 +187,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       <div
         className="absolute inset-0"
         style={{
-          background: 'rgba(4,6,14,0.75)',
+          background: 'rgba(0,0,0,0.55)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           animation: 'fadeIn 150ms ease both',
@@ -196,11 +198,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       <div
         className="relative w-full max-w-[560px] mx-4 overflow-hidden"
         style={{
-          background: 'rgba(10,13,24,0.97)',
+          background: 'var(--bg-elevated)',
           border: '1px solid rgba(245,166,35,0.2)',
           borderRadius: 16,
           boxShadow:
-            '0 0 0 1px rgba(245,166,35,0.06), 0 32px 80px rgba(0,0,0,0.8), 0 0 60px rgba(245,166,35,0.06)',
+            '0 0 0 1px rgba(245,166,35,0.06), 0 32px 80px rgba(0,0,0,0.4), 0 0 60px rgba(245,166,35,0.06)',
           animation: 'slideDownFade 200ms cubic-bezier(0.16,1,0.3,1) both',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -217,7 +219,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         {/* Search input */}
         <div
           className="flex items-center gap-3 px-4"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          style={{ borderBottom: '1px solid var(--glass-border)' }}
         >
           <div style={{ color: '#F5A623', opacity: 0.7, flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -230,7 +232,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search commands, pages, sessions…"
-            className="flex-1 bg-transparent py-4 text-[14px] text-[#F0F4FF] outline-none placeholder:text-[#3A4458]"
+            className="flex-1 bg-transparent py-4 text-[14px] text-text-primary outline-none placeholder:text-text-muted"
             style={{ fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif' }}
             autoComplete="off"
             spellCheck={false}
@@ -238,9 +240,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           <kbd
             className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-display"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: '#4A5568',
+              background: 'var(--chip-bg)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-muted)',
             }}
           >
             ESC
@@ -255,7 +257,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         >
           {filtered.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-[#3A4458] text-sm font-display">No results for "{query}"</p>
+              <p className="text-text-muted text-sm font-display">No results for "{query}"</p>
             </div>
           ) : (
             categories.map((cat) => {
@@ -268,7 +270,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   >
                     <span
                       className="text-[10px] font-display font-bold uppercase tracking-[0.15em]"
-                      style={{ color: '#3A4458' }}
+                      style={{ color: 'var(--text-muted)' }}
                     >
                       {cat}
                     </span>
@@ -296,8 +298,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                           style={{
                             background: isSelected
                               ? 'rgba(245,166,35,0.15)'
-                              : 'rgba(255,255,255,0.04)',
-                            color: isSelected ? '#F5A623' : '#4A5568',
+                              : 'var(--chip-bg)',
+                            color: isSelected ? '#F5A623' : 'var(--text-secondary)',
                             transition: 'all 150ms',
                           }}
                         >
@@ -306,12 +308,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         <div className="flex-1 min-w-0">
                           <p
                             className="text-[13px] font-semibold"
-                            style={{ color: isSelected ? '#F0F4FF' : '#8892A4' }}
+                            style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}
                           >
                             {cmd.label}
                           </p>
                           {cmd.description && (
-                            <p className="text-[11px] truncate" style={{ color: '#3A4458' }}>
+                            <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>
                               {cmd.description}
                             </p>
                           )}
@@ -340,7 +342,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         {/* Footer hint */}
         <div
           className="flex items-center gap-4 px-4 py-2.5"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+          style={{ borderTop: '1px solid var(--glass-border)' }}
         >
           {[
             { keys: ['↑', '↓'], label: 'navigate' },
@@ -354,16 +356,16 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     key={k}
                     className="px-1.5 py-0.5 rounded text-[9px] font-display"
                     style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.07)',
-                      color: '#3A4458',
+                      background: 'var(--chip-bg)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-muted)',
                     }}
                   >
                     {k}
                   </kbd>
                 ))}
               </div>
-              <span className="text-[10px] font-display" style={{ color: '#2A3350' }}>
+              <span className="text-[10px] font-display" style={{ color: 'var(--text-muted)' }}>
                 {label}
               </span>
             </div>

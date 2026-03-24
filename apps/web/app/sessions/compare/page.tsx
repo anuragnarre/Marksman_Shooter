@@ -18,10 +18,10 @@ const C = {
   blue:  '#4FC3F7',
   green: '#00E5A0',
   red:   '#FF4D6D',
-  muted: '#4A5568',
-  dim:   '#8892A4',
-  text:  '#F0F4FF',
-  border:'#1E2433',
+  muted: 'var(--text-muted)',
+  dim:   'var(--text-secondary)',
+  text:  'var(--text-primary)',
+  border:'var(--border-subtle)',
 } as const;
 
 function avgScoreColor(s: number) {
@@ -120,8 +120,8 @@ export default function ComparePage() {
         {/* Header */}
         <div className="animate-slide-up flex items-center justify-between gap-4">
           <div>
-            <h1 className="font-display font-bold text-2xl text-[#F0F4FF]">Session Comparison</h1>
-            <p className="text-[#4A5568] text-sm mt-1">Compare two training sessions side-by-side.</p>
+            <h1 className="font-display font-bold text-2xl text-text-primary">Session Comparison</h1>
+            <p className="text-text-muted text-sm mt-1">Compare two training sessions side-by-side.</p>
           </div>
           <Link href="/sessions" className="btn btn-ghost text-sm">← Sessions</Link>
         </div>
@@ -131,7 +131,7 @@ export default function ComparePage() {
           <SkeletonCard height={56} animationDelay={0} />
         ) : allSessions.length < 2 ? (
           <div className="card p-8 text-center">
-            <p className="text-[#4A5568] text-sm">You need at least 2 sessions to compare.</p>
+            <p className="text-text-muted text-sm">You need at least 2 sessions to compare.</p>
             <Link href="/sessions/new" className="btn btn-primary mt-4 inline-block">Create Session</Link>
           </div>
         ) : (
@@ -218,7 +218,7 @@ export default function ComparePage() {
                 {/* Metrics comparison table */}
                 {metrics && (
                   <div className="card p-5">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-4">Analytics Comparison</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-4">Analytics Comparison</h3>
                     <div className="space-y-2">
                       {metrics.map(m => {
                         const delta = m.lv - m.rv;
@@ -230,7 +230,7 @@ export default function ComparePage() {
                                     : false;
                         return (
                           <div key={m.label} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-2"
-                            style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            style={{ borderBottom: '1px solid var(--glass-border)' }}>
                             <div className="text-right">
                               <p
                                 className="font-data font-bold text-sm"
@@ -241,7 +241,7 @@ export default function ComparePage() {
                               </p>
                             </div>
                             <div className="text-center w-28">
-                              <p className="text-[9px] font-display uppercase tracking-widest text-[#4A5568]">{m.label}</p>
+                              <p className="text-[9px] font-display uppercase tracking-widest text-text-muted">{m.label}</p>
                               {m.higher !== null && (
                                 <p className="text-[9px] mt-0.5 font-data" style={{ color: deltaColor(delta) }}>
                                   {delta > 0 ? '+' : ''}{m.fmt(delta)}
@@ -267,7 +267,7 @@ export default function ComparePage() {
                 {/* Series averages comparison */}
                 {leftData.analytics.seriesAverages?.length > 0 && rightData.analytics.seriesAverages?.length > 0 && (
                   <div className="card p-5">
-                    <h3 className="font-display font-semibold text-sm text-[#F0F4FF] mb-4">Series Averages</h3>
+                    <h3 className="font-display font-semibold text-sm text-text-primary mb-4">Series Averages</h3>
                     <div className="space-y-2">
                       {Array.from({ length: Math.max(leftData.analytics.seriesAverages.length, rightData.analytics.seriesAverages.length) }).map((_, i) => {
                         const lv = leftData.analytics.seriesAverages[i] ?? null;
@@ -285,7 +285,7 @@ export default function ComparePage() {
                               )}
                               <p className="font-data text-sm shrink-0" style={{ color: C.amber }}>{lv?.toFixed(2) ?? '—'}</p>
                             </div>
-                            <p className="text-[9px] font-display uppercase tracking-widest text-[#4A5568] w-14 text-center">
+                            <p className="text-[9px] font-display uppercase tracking-widest text-text-muted w-14 text-center">
                               Series {i + 1}
                             </p>
                             <div className="flex items-center gap-2">
@@ -324,11 +324,11 @@ function SessionInfoCard({
         <div className="w-2 h-2 rounded-full" style={{ background: color }} />
         <p className="text-[9px] font-display uppercase tracking-widest" style={{ color }}>Session {label}</p>
       </div>
-      <p className="font-display font-bold text-sm text-[#F0F4FF]">{session.discipline}</p>
-      <p className="text-[#8892A4] text-xs mt-1">
+      <p className="font-display font-bold text-sm text-text-primary">{session.discipline}</p>
+      <p className="text-text-secondary text-xs mt-1">
         {session.distance}m · {session.weaponType} · {session.numberOfShots} shots
       </p>
-      <p className="text-[#4A5568] text-[10px] mt-0.5 font-data">
+      <p className="text-text-muted text-[10px] mt-0.5 font-data">
         {formatSessionStart(session.sessionDate, { includeYear: true })}
       </p>
       <Link

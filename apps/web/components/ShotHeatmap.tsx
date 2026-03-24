@@ -59,7 +59,7 @@ export function ShotHeatmap({
     ctx.clearRect(0, 0, W, W);
 
     // ── Background ────────────────────────────────────────────────────────
-    ctx.fillStyle = '#0C0F1A';
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-surface').trim() || '#0C0F1A';
     ctx.beginPath();
     ctx.roundRect(0, 0, W, W, 16);
     ctx.fill();
@@ -249,7 +249,7 @@ export function ShotHeatmap({
             ))}
             <circle cx="20" cy="20" r="2" fill="#F5A623" />
           </svg>
-          <p className="text-[#4A5568] text-xs font-display uppercase tracking-widest">No shot data</p>
+          <p className="text-text-muted text-xs font-display uppercase tracking-widest">No shot data</p>
         </div>
       )}
 
@@ -264,7 +264,7 @@ export function ShotHeatmap({
           ].map(({ label, color }) => (
             <div key={label} className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 4px ${color}` }} />
-              <span className="text-[9px] font-display" style={{ color: '#4A5568' }}>{label}</span>
+              <span className="text-[9px] font-display" style={{ color: 'var(--text-muted)' }}>{label}</span>
             </div>
           ))}
         </div>

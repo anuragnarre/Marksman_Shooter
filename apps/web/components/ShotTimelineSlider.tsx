@@ -53,7 +53,7 @@ export function ShotTimelineSlider({
     ctx.clearRect(0, 0, W, W);
 
     // Background
-    ctx.fillStyle = '#080A0F';
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-void').trim() || '#080A0F';
     ctx.beginPath();
     ctx.roundRect(0, 0, W, W, 12);
     ctx.fill();
@@ -190,8 +190,8 @@ export function ShotTimelineSlider({
   if (shots.length === 0) {
     return (
       <div className={`flex items-center justify-center h-40 rounded-2xl ${className}`}
-        style={{ background: '#0C0F1A', border: '1px solid #1E2433' }}>
-        <p className="text-[#4A5568] text-xs font-display uppercase tracking-widest">No shots to replay</p>
+        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
+        <p className="text-text-muted text-xs font-display uppercase tracking-widest">No shots to replay</p>
       </div>
     );
   }
@@ -208,7 +208,7 @@ export function ShotTimelineSlider({
           className="rounded-xl shrink-0"
           style={{
             width: 160, height: 160,
-            border: '1px solid rgba(255,255,255,0.04)',
+            border: '1px solid var(--glass-border)',
             boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}
           aria-label="Shot replay canvas"
@@ -217,7 +217,7 @@ export function ShotTimelineSlider({
         {/* Live stats */}
         <div className="flex flex-col gap-3 flex-1 min-w-0">
           <div>
-            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: '#4A5568' }}>Shot</p>
+            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>Shot</p>
             <p className="font-data font-black text-2xl leading-none tabular-nums"
               style={{ color: current ? shotColor(current.score) : '#F0F4FF',
                        textShadow: current ? `0 0 16px ${shotColor(current.score)}60` : 'none' }}>
@@ -225,14 +225,14 @@ export function ShotTimelineSlider({
             </p>
           </div>
           <div>
-            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: '#4A5568' }}>Running Avg</p>
+            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>Running Avg</p>
             <p className="font-data font-semibold text-base leading-none tabular-nums" style={{ color: '#F5A623' }}>
               {avg.toFixed(2)}
             </p>
           </div>
           <div>
-            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: '#4A5568' }}>Shots shown</p>
-            <p className="font-data font-semibold text-base leading-none tabular-nums" style={{ color: '#8892A4' }}>
+            <p className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>Shots shown</p>
+            <p className="font-data font-semibold text-base leading-none tabular-nums" style={{ color: 'var(--text-secondary)' }}>
               {index + 1} / {shots.length}
             </p>
           </div>
@@ -296,7 +296,7 @@ export function ShotTimelineSlider({
         <button
           onClick={() => { stopPlay(); setIndex(0); }}
           className="flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#4A5568' }}
+          style={{ background: 'var(--chip-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}
           title="Reset to first shot"
         >
           <ResetIcon />
@@ -305,13 +305,13 @@ export function ShotTimelineSlider({
         <button
           onClick={() => { stopPlay(); setIndex(shots.length - 1); }}
           className="flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#4A5568' }}
+          style={{ background: 'var(--chip-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}
           title="Jump to last shot"
         >
           <EndIcon />
         </button>
 
-        <span className="ml-auto font-data text-[11px] tabular-nums" style={{ color: '#4A5568' }}>
+        <span className="ml-auto font-data text-[11px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
           {index + 1} / {shots.length}
         </span>
       </div>

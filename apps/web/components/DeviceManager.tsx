@@ -166,14 +166,14 @@ export function DeviceManager() {
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 font-mono text-xs break-all p-2 rounded"
-              style={{ background: 'rgba(0,0,0,0.3)', color: '#F0F4FF' }}>
+              style={{ background: 'rgba(0,0,0,0.3)', color: 'var(--text-primary)' }}>
               {createdKey}
             </code>
             <button onClick={handleCopyKey} className="btn-primary px-3 py-1.5 text-xs shrink-0">
               {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
-          <button onClick={() => setCreatedKey(null)} className="text-xs mt-2 underline" style={{ color: '#8892A4' }}>
+          <button onClick={() => setCreatedKey(null)} className="text-xs mt-2 underline" style={{ color: 'var(--text-secondary)' }}>
             I've saved it, dismiss
           </button>
         </div>
@@ -201,8 +201,8 @@ export function DeviceManager() {
                   }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#F0F4FF] truncate">{d.deviceName}</p>
-                  <p className="text-[10px] font-display uppercase tracking-wider" style={{ color: '#8892A4' }}>
+                  <p className="text-sm font-semibold text-text-primary truncate">{d.deviceName}</p>
+                  <p className="text-[10px] font-display uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                     {d.deviceType.replace(/_/g, ' ')}
                     {d.lastSeenAt ? ` · Last seen ${formatTimeAgo(d.lastSeenAt)}` : ' · Never connected'}
                   </p>
@@ -231,7 +231,7 @@ export function DeviceManager() {
                 <div className="card mt-1 p-5 space-y-4 animate-slide-up" style={{ borderTop: '2px solid rgba(245,166,35,0.15)' }}>
                   {detailLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <span className="text-sm" style={{ color: '#4A5568' }}>Loading device details...</span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading device details...</span>
                     </div>
                   ) : detail ? (
                     <>
@@ -250,7 +250,7 @@ export function DeviceManager() {
                       {/* Last reading */}
                       {detail.lastReading && (
                         <div className="card p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                          <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-2" style={{ color: '#8892A4' }}>
+                          <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-secondary)' }}>
                             Latest Reading
                           </p>
                           <div className="flex items-center gap-6">
@@ -259,7 +259,7 @@ export function DeviceManager() {
                                 <span className="font-mono text-xl font-bold" style={{ color: '#FF4D6D' }}>
                                   {detail.lastReading.heartRate}
                                 </span>
-                                <span className="text-xs" style={{ color: '#4A5568' }}>bpm</span>
+                                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>bpm</span>
                               </div>
                             )}
                             {detail.lastReading.spo2 !== null && (
@@ -267,10 +267,10 @@ export function DeviceManager() {
                                 <span className="font-mono text-xl font-bold" style={{ color: '#4FC3F7' }}>
                                   {detail.lastReading.spo2}
                                 </span>
-                                <span className="text-xs" style={{ color: '#4A5568' }}>% SpO2</span>
+                                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>% SpO2</span>
                               </div>
                             )}
-                            <span className="text-[10px] ml-auto" style={{ color: '#4A5568' }}>
+                            <span className="text-[10px] ml-auto" style={{ color: 'var(--text-muted)' }}>
                               {new Date(detail.lastReading.timestamp).toLocaleString()}
                             </span>
                           </div>
@@ -280,23 +280,23 @@ export function DeviceManager() {
                       {/* Recent readings mini table */}
                       {detail.recentReadings.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-2" style={{ color: '#8892A4' }}>
+                          <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-secondary)' }}>
                             Recent Readings ({Math.min(detail.recentReadings.length, 10)} of {detail.totalReadings})
                           </p>
                           <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                               <thead>
                                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                  <th className="text-left py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: '#4A5568' }}>Time</th>
+                                  <th className="text-left py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Time</th>
                                   <th className="text-right py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: '#FF4D6D' }}>HR</th>
                                   <th className="text-right py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: '#4FC3F7' }}>SpO2</th>
-                                  <th className="text-right py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: '#8892A4' }}>Type</th>
+                                  <th className="text-right py-1.5 px-2 font-display uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Type</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {detail.recentReadings.slice(0, 10).map((r, i) => (
                                   <tr key={r.id ?? i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                    <td className="py-1.5 px-2 font-mono" style={{ color: '#8892A4' }}>
+                                    <td className="py-1.5 px-2 font-mono" style={{ color: 'var(--text-secondary)' }}>
                                       {new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                     </td>
                                     <td className="py-1.5 px-2 text-right font-mono font-bold" style={{ color: '#FF4D6D' }}>
@@ -305,7 +305,7 @@ export function DeviceManager() {
                                     <td className="py-1.5 px-2 text-right font-mono font-bold" style={{ color: '#4FC3F7' }}>
                                       {r.spo2 != null ? `${r.spo2}%` : '-'}
                                     </td>
-                                    <td className="py-1.5 px-2 text-right font-mono" style={{ color: '#4A5568' }}>
+                                    <td className="py-1.5 px-2 text-right font-mono" style={{ color: 'var(--text-muted)' }}>
                                       {r.readingType?.replace('_', ' ')}
                                     </td>
                                   </tr>
@@ -365,7 +365,7 @@ export function DeviceManager() {
                       </div>
 
                       {/* Device info */}
-                      <div className="text-[10px] space-y-0.5 pt-1" style={{ color: '#4A5568' }}>
+                      <div className="text-[10px] space-y-0.5 pt-1" style={{ color: 'var(--text-muted)' }}>
                         <p>Device ID: <span className="font-mono">{d.id}</span></p>
                         <p>Type: {d.deviceType.replace(/_/g, ' ')}</p>
                         <p>Registered: {new Date(d.createdAt).toLocaleDateString()}</p>
@@ -389,8 +389,8 @@ export function DeviceManager() {
               <polyline points="6,11 10,11 11,9 13,13 14,11 18,11" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-[#F0F4FF] mb-1">No Devices Registered</p>
-          <p className="text-xs mb-4" style={{ color: '#8892A4' }}>
+          <p className="text-sm font-semibold text-text-primary mb-1">No Devices Registered</p>
+          <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
             Connect an Arduino pulse sensor or Android wearable to start tracking biometrics during sessions.
           </p>
         </div>
@@ -400,8 +400,8 @@ export function DeviceManager() {
       {showForm ? (
         <div className="card p-5 space-y-4">
           <div>
-            <p className="font-display font-semibold text-sm text-[#F0F4FF]">Register Arduino Sensor</p>
-            <p className="text-[10px] mt-0.5" style={{ color: '#8892A4' }}>
+            <p className="font-display font-semibold text-sm text-text-primary">Register Arduino Sensor</p>
+            <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
               Give your device a name. You'll get a unique API key to put in the Arduino firmware.
             </p>
           </div>
@@ -415,7 +415,7 @@ export function DeviceManager() {
           />
           <div className="flex gap-2">
             <button onClick={handleRegister} className="btn-primary px-4 py-2 text-sm">Register & Get API Key</button>
-            <button onClick={() => { setShowForm(false); setNewType('CUSTOM_SENSOR'); }} className="px-4 py-2 text-sm rounded" style={{ color: '#8892A4' }}>Cancel</button>
+            <button onClick={() => { setShowForm(false); setNewType('CUSTOM_SENSOR'); }} className="px-4 py-2 text-sm rounded" style={{ color: 'var(--text-secondary)' }}>Cancel</button>
           </div>
         </div>
       ) : (
@@ -433,8 +433,8 @@ export function DeviceManager() {
             </svg>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#F0F4FF]">Health Connect (Android Wearables)</p>
-            <p className="text-xs mt-1" style={{ color: '#8892A4' }}>
+            <p className="text-sm font-semibold text-text-primary">Health Connect (Android Wearables)</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               Health Connect syncs data from smartwatches and fitness bands (Samsung Galaxy Watch, Pixel Watch, Fitbit, etc.) to this platform automatically.
             </p>
 
@@ -452,16 +452,16 @@ export function DeviceManager() {
                   </svg>
                   Health Connect is only available on the Android app
                 </div>
-                <div className="text-xs space-y-1.5 pl-1" style={{ color: '#4A5568' }}>
-                  <p><strong style={{ color: '#8892A4' }}>How it works:</strong></p>
+                <div className="text-xs space-y-1.5 pl-1" style={{ color: 'var(--text-muted)' }}>
+                  <p><strong style={{ color: 'var(--text-secondary)' }}>How it works:</strong></p>
                   <p>1. Install the MarksmansProapp on your Android phone</p>
                   <p>2. Make sure Health Connect app is installed (built into Android 14+, or download from Play Store for Android 9-13)</p>
                   <p>3. Open MarksmansProon Android and tap "Connect Health Connect"</p>
                   <p>4. Grant permissions for Heart Rate, Blood Oxygen, and Respiratory Rate</p>
                   <p>5. Data from your wearable syncs automatically during shooting sessions</p>
                 </div>
-                <div className="text-xs mt-2 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', color: '#8892A4' }}>
-                  <strong style={{ color: '#F0F4FF' }}>Supported wearables:</strong> Samsung Galaxy Watch, Google Pixel Watch, Fitbit, Garmin (with Health Connect sync), Xiaomi Mi Band, OnePlus Watch, and any device that syncs to Health Connect.
+                <div className="text-xs mt-2 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', color: 'var(--text-secondary)' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Supported wearables:</strong> Samsung Galaxy Watch, Google Pixel Watch, Fitbit, Garmin (with Health Connect sync), Xiaomi Mi Band, OnePlus Watch, and any device that syncs to Health Connect.
                 </div>
               </div>
             )}
@@ -481,8 +481,8 @@ export function DeviceManager() {
             </svg>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#F0F4FF]">No Wearable? Use Manual Entry</p>
-            <p className="text-xs mt-1" style={{ color: '#8892A4' }}>
+            <p className="text-sm font-semibold text-text-primary">No Wearable? Use Manual Entry</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               You can manually enter your heart rate in the session Performance tab under "Session Context".
               Use a pulse oximeter or count your pulse for 15 seconds and multiply by 4.
             </p>
@@ -498,7 +498,7 @@ export function DeviceManager() {
 function StatBox({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="card p-3 text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
-      <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-1" style={{ color: '#8892A4' }}>{label}</p>
+      <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--text-secondary)' }}>{label}</p>
       <p className="font-mono text-lg font-bold" style={{ color }}>{value}</p>
     </div>
   );

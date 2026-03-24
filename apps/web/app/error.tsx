@@ -14,7 +14,7 @@ export default function RootError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[#080A0F] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-void flex items-center justify-center px-6">
       <div className="flex flex-col items-center text-center max-w-md animate-slide-up">
         {/* Error icon */}
         <div
@@ -31,10 +31,10 @@ export default function RootError({
           </svg>
         </div>
 
-        <h2 className="font-display font-bold text-xl text-[#F0F4FF] mb-2">
+        <h2 className="font-display font-bold text-xl text-text-primary mb-2">
           Something went wrong
         </h2>
-        <p className="text-[#4A5568] text-sm mb-6">
+        <p className="text-text-muted text-sm mb-6">
           An unexpected error occurred. This has been logged and we will investigate.
         </p>
 

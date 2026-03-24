@@ -145,13 +145,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 gap: '0.75rem',
                 padding: '0.875rem 1rem',
                 borderRadius: '0.625rem',
-                background: 'rgba(12, 15, 26, 0.85)',
+                background: 'var(--glass-heavy-bg)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                border: `1px solid rgba(255, 255, 255, 0.055)`,
+                border: `1px solid var(--glass-border)`,
                 borderLeft: `3px solid ${colors.border}`,
-                boxShadow: `0 8px 32px rgba(0, 0, 0, 0.45), inset 0 0 48px ${colors.bg}`,
-                color: '#F0F4FF',
+                boxShadow: `var(--shadow-toast), inset 0 0 48px ${colors.bg}`,
+                color: 'var(--text-primary)',
                 animation: t.exiting
                   ? `toastExit ${EXIT_ANIMATION_MS}ms ease-in forwards`
                   : 'toastEnter 300ms ease-out forwards',
@@ -198,7 +198,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   flexShrink: 0,
                   background: 'transparent',
                   border: 'none',
-                  color: '#8892A4',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   padding: '0.125rem',
                   fontSize: '1rem',
@@ -207,10 +207,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   transition: 'color 150ms',
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = '#F0F4FF')
+                  (e.currentTarget.style.color = 'var(--text-primary)')
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = '#8892A4')
+                  (e.currentTarget.style.color = 'var(--text-secondary)')
                 }
               >
                 {'\u2715'}

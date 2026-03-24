@@ -2,19 +2,22 @@
 
 // CursorGlow — premium ambient cursor trail.
 // A warm amber radial gradient that smoothly follows the cursor.
-// Disabled on touch devices. Kept deliberately subtle.
+// Disabled on touch devices and in light mode. Kept deliberately subtle.
 
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../contexts/theme-context';
 
 export function CursorGlow() {
   const glowRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ x: -400, y: -400 });
   const cur = useRef({ x: -400, y: -400 });
   const raf = useRef<number>(0);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    // Only run on pointer devices
+    // Only run on pointer devices in dark mode
     if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (resolvedTheme === 'light') return;
 
     const onMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY };
@@ -37,7 +40,9 @@ export function CursorGlow() {
       window.removeEventListener('mousemove', onMove);
       cancelAnimationFrame(raf.current);
     };
-  }, []);
+  }, [resolvedTheme]);
+
+  if (resolvedTheme === 'light') return null;
 
   return (
     <div

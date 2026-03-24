@@ -141,10 +141,10 @@ export default function ConnectPage() {
 
         {/* ── Page header ──────────────────────────────────────────────────── */}
         <div className="animate-slide-up">
-          <h2 className="font-display font-bold text-2xl text-[#F0F4FF] leading-tight">
+          <h2 className="font-display font-bold text-2xl text-text-primary leading-tight">
             Coach Connections
           </h2>
-          <p className="text-[#8892A4] text-sm mt-1">
+          <p className="text-text-secondary text-sm mt-1">
             Browse coaches and send a request, or accept invitations from coaches who found you.
             Data is only shared once both sides confirm.
           </p>
@@ -237,13 +237,13 @@ export default function ConnectPage() {
         {/* ── Connections summary ──────────────────────────────────────────── */}
         {!loading && connections.length > 0 && (
           <section className="animate-slide-up">
-            <p className="label mb-4">All Connections <span className="normal-case font-body text-[#4A5568] ml-1">({connections.length})</span></p>
-            <div className="rounded-xl border border-[#1E2433] overflow-hidden bg-[#0E1118]">
+            <p className="label mb-4">All Connections <span className="normal-case font-body text-text-muted ml-1">({connections.length})</span></p>
+            <div className="rounded-xl border border-border-subtle overflow-hidden bg-surface">
               {/* Top accent line */}
               <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.4), transparent)' }} />
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#1E2433]">
+                  <tr className="border-b border-border-subtle">
                     <th className="text-left py-3 px-5 label">Coach</th>
                     <th className="text-left py-3 px-5 label hidden sm:table-cell">Direction</th>
                     <th className="text-right py-3 px-5 label">Status</th>
@@ -253,7 +253,7 @@ export default function ConnectPage() {
                   {connections.map((conn) => {
                     const s = STATUS_COLOR[conn.status as CS];
                     return (
-                      <tr key={conn.id} className="border-b border-[#1E2433]/50 table-row-hover">
+                      <tr key={conn.id} className="border-b border-border-subtle/50 table-row-hover">
                         <td className="py-3 px-5">
                           <div className="flex items-center gap-3">
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0
@@ -263,15 +263,15 @@ export default function ConnectPage() {
                               </span>
                             </div>
                             <div>
-                              <p className="text-[#F0F4FF] font-medium text-sm leading-none">
+                              <p className="text-text-primary font-medium text-sm leading-none">
                                 {conn.coach?.name}
                               </p>
-                              <p className="text-[#4A5568] text-[11px] mt-0.5">{conn.coach?.email}</p>
+                              <p className="text-text-muted text-[11px] mt-0.5">{conn.coach?.email}</p>
                             </div>
                           </div>
                         </td>
                         <td className="py-3 px-5 hidden sm:table-cell">
-                          <span className="text-[10px] font-display uppercase tracking-wide text-[#4A5568]">
+                          <span className="text-[10px] font-display uppercase tracking-wide text-text-muted">
                             {conn.initiatedBy === 'SHOOTER' ? 'You requested' : 'Coach invited'}
                           </span>
                         </td>
@@ -308,7 +308,7 @@ function InviteCard({
   return (
     <div
       className="group relative rounded-xl border border-[rgba(79,195,247,0.25)]
-                 bg-[#0E1118] overflow-hidden transition-all duration-300
+                 bg-surface overflow-hidden transition-all duration-300
                  hover:border-[rgba(79,195,247,0.5)] animate-slide-up"
       style={{
         animationDelay: `${animDelay}ms`,
@@ -341,12 +341,12 @@ function InviteCard({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-[#F0F4FF] font-semibold text-sm truncate">
+            <p className="text-text-primary font-semibold text-sm truncate">
               {invite.coach?.name}
             </p>
             <StatusBadge variant="coach" size="sm" />
           </div>
-          <p className="text-[#4A5568] text-[11px] truncate mt-0.5">{invite.coach?.email}</p>
+          <p className="text-text-muted text-[11px] truncate mt-0.5">{invite.coach?.email}</p>
           <p className="text-[#4FC3F7] text-[10px] mt-1 font-display uppercase tracking-widest">
             Wants to coach you
           </p>
@@ -364,8 +364,8 @@ function InviteCard({
           <button
             onClick={() => onReject(invite.id)}
             disabled={isActing}
-            className="text-xs px-3 py-1.5 rounded-lg border border-[#1E2433]
-                       text-[#8892A4] hover:text-[#FF4D6D] hover:border-[rgba(255,77,109,0.4)]
+            className="text-xs px-3 py-1.5 rounded-lg border border-border-subtle
+                       text-text-secondary hover:text-[#FF4D6D] hover:border-[rgba(255,77,109,0.4)]
                        transition-colors font-display uppercase tracking-wide disabled:opacity-50"
           >
             Decline
@@ -404,7 +404,7 @@ function CoachCard({
 
   return (
     <div
-      className="group relative rounded-xl bg-[#0E1118] overflow-hidden
+      className="group relative rounded-xl bg-surface overflow-hidden
                  transition-all duration-300 animate-slide-up"
       style={{
         border: `1px solid ${borderColor}`,
@@ -448,10 +448,10 @@ function CoachCard({
         {/* Name / email */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-[#F0F4FF] font-semibold text-sm truncate">{coach.name}</p>
+            <p className="text-text-primary font-semibold text-sm truncate">{coach.name}</p>
             <StatusBadge variant="coach" size="sm" />
           </div>
-          <p className="text-[#4A5568] text-[11px] truncate mt-0.5">{coach.email}</p>
+          <p className="text-text-muted text-[11px] truncate mt-0.5">{coach.email}</p>
         </div>
 
         {/* Action / status */}
@@ -498,15 +498,15 @@ function StatusPill({ status }: { status: CS }) {
 
 function EmptyCoaches() {
   return (
-    <div className="rounded-xl border border-[#1E2433] bg-[#0E1118] p-12
+    <div className="rounded-xl border border-border-subtle bg-surface p-12
                     flex flex-col items-center text-center animate-fade-in">
       <svg width="52" height="52" viewBox="0 0 52 52" className="mb-5 opacity-20" aria-hidden="true">
         <circle cx="26" cy="18" r="10" stroke="#F5A623" strokeWidth="1.5" fill="none" />
         <path d="M8 44c0-9.9 8.1-18 18-18s18 8.1 18 18"
               stroke="#4FC3F7" strokeWidth="1.5" fill="none" strokeDasharray="4 3" />
       </svg>
-      <p className="text-[#F0F4FF] font-display font-bold text-lg">No coaches registered yet</p>
-      <p className="text-[#4A5568] text-sm mt-1.5">
+      <p className="text-text-primary font-display font-bold text-lg">No coaches registered yet</p>
+      <p className="text-text-muted text-sm mt-1.5">
         Coaches will appear here once they create an account.
       </p>
     </div>

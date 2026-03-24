@@ -60,25 +60,25 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-display font-bold uppercase tracking-wider"
-              style={{ color: '#8892A4' }}>
+              style={{ color: 'var(--text-secondary)' }}>
               Live Vitals
             </p>
             {hr !== null ? (
               <div className="flex items-baseline gap-3 mt-0.5">
                 <span className="font-mono text-lg font-bold" style={{ color: '#FF4D6D' }}>
-                  {hr} <span className="text-xs font-normal" style={{ color: '#4A5568' }}>bpm</span>
+                  {hr} <span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>bpm</span>
                 </span>
                 {spo2 !== null && (
                   <span className="font-mono text-lg font-bold" style={{ color: '#4FC3F7' }}>
-                    {spo2}<span className="text-xs font-normal" style={{ color: '#4A5568' }}>%</span>
+                    {spo2}<span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>%</span>
                   </span>
                 )}
               </div>
             ) : (
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs" style={{ color: '#4A5568' }}>No device connected</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No device connected</p>
                 <Link
-                  href="/settings/devices"
+                  href="/settings"
                   className="text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded transition-all"
                   style={{ color: '#F5A623', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.15)' }}
                 >
@@ -96,7 +96,7 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
   return (
     <div className="card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display font-semibold text-base text-[#F0F4FF]">Live Monitor</h3>
+        <h3 className="font-display font-semibold text-base text-text-primary">Live Monitor</h3>
         <StatusDot active={!!isRecent} />
       </div>
 
@@ -110,7 +110,7 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
             {hr ?? '--'}
           </span>
           <span className="text-[10px] font-display font-bold uppercase tracking-wider mt-1"
-            style={{ color: '#8892A4' }}>
+            style={{ color: 'var(--text-secondary)' }}>
             BPM
           </span>
         </div>
@@ -135,21 +135,21 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
             </span>
           </div>
           <span className="text-[10px] font-display font-bold uppercase tracking-wider"
-            style={{ color: '#8892A4' }}>
+            style={{ color: 'var(--text-secondary)' }}>
             SpO2 %
           </span>
         </div>
       </div>
 
       {lastSeen ? (
-        <p className="text-[10px] mt-4" style={{ color: '#4A5568' }}>
+        <p className="text-[10px] mt-4" style={{ color: 'var(--text-muted)' }}>
           Last reading: {lastSeen.toLocaleTimeString()}
         </p>
       ) : (
         <div className="mt-4 flex items-center gap-3">
-          <p className="text-xs" style={{ color: '#4A5568' }}>No device connected.</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No device connected.</p>
           <Link
-            href="/settings/devices"
+            href="/settings"
             className="text-xs font-display font-semibold px-3 py-1.5 rounded-lg transition-all"
             style={{ color: '#F5A623', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)' }}
           >

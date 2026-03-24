@@ -73,7 +73,9 @@ def correct_perspective(
         minor_radius=a,  # Now circular
         rotation_deg=0.0,
         eccentricity=0.0,
-        ring_radii=[r * (a / b) for r in calibration.ring_radii] if calibration.ring_radii and b > 0 else [],
+        # Ring radii are measured along the major axis which is unchanged by the warp.
+        # Scaling by a/b is wrong: the homography leaves major-axis distances intact.
+        ring_radii=list(calibration.ring_radii),
         confidence=calibration.confidence,
         mm_per_pixel=new_mm_per_pixel,
     )

@@ -21,7 +21,7 @@ export default function RootLoading() {
             </svg>
           </div>
         </div>
-        <p className="text-[#4A5568] text-[11px] font-display uppercase tracking-widest animate-pulse">
+        <p className="text-text-muted text-[11px] font-display uppercase tracking-widest animate-pulse">
           Loading
         </p>
       </div>

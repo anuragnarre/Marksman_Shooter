@@ -79,7 +79,7 @@ function AggregateChart({ days, height }: { days: number; height: number }) {
         <YAxis yAxisId="spo2" orientation="right" tick={{ fill: '#4FC3F7', fontSize: 10 }} stroke="rgba(255,255,255,0.06)" domain={[90, 100]} />
         <Tooltip
           contentStyle={{ background: 'rgba(14,17,24,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: '#8892A4' }}
+          labelStyle={{ color: 'var(--text-secondary)' }}
         />
         <Area yAxisId="hr" type="monotone" dataKey="maxHeartRate" stroke="none" fill="url(#hrBandGrad)" name="Max HR" />
         <Area yAxisId="hr" type="monotone" dataKey="minHeartRate" stroke="none" fill="rgba(14,17,24,1)" name="Min HR" />
@@ -222,7 +222,7 @@ function RealtimeChart({ mode, height }: { mode: 'live' | '1h' | '1d'; height: n
           />
           <Tooltip
             contentStyle={{ background: 'rgba(14,17,24,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, fontSize: 11 }}
-            labelStyle={{ color: '#8892A4' }}
+            labelStyle={{ color: 'var(--text-secondary)' }}
           />
           {/* Optimal HR zone */}
           <ReferenceLine yAxisId="hr" y={60} stroke="rgba(0,229,160,0.15)" strokeDasharray="4 4" />
@@ -272,7 +272,7 @@ function toPoint(r: BiometricReading): ReadingPoint {
 
 function ChartPlaceholder({ height, text }: { height: number; text: string }) {
   return (
-    <div className="flex items-center justify-center" style={{ height, color: '#4A5568' }}>
+    <div className="flex items-center justify-center" style={{ height, color: 'var(--text-muted)' }}>
       <span className="text-sm font-display">{text}</span>
     </div>
   );

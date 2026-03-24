@@ -49,7 +49,10 @@ def analyze_target_image(
     calibration = detect_target(gray, target_type)
 
     # Stage 3: Perspective correction
-    if calibration.eccentricity > 0.05:
+    # Skip for extreme angles (ecc > 0.45 → a/b > 1.8): the affine warp amplifies
+    # JPEG artifacts and the ring boundaries become highly non-circular, producing
+    # many false positives. At these angles only centre-zone (black) shots are reliable.
+    if 0.05 < calibration.eccentricity < 0.45:
         img_bgr, gray, calibration = correct_perspective(img_bgr, gray, calibration)
 
     # Stage 4: Zone-aware hole detection (direct on grayscale)

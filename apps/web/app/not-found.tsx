@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen bg-[#080A0F] flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-void flex items-center justify-center px-6 relative overflow-hidden">
       {/* Ambient orbs */}
       <div
         className="fixed pointer-events-none"
@@ -65,10 +65,10 @@ export default function NotFoundPage() {
           404
         </h1>
 
-        <h2 className="font-display font-bold text-xl text-[#F0F4FF] mb-2">
+        <h2 className="font-display font-bold text-xl text-text-primary mb-2">
           Shot missed the target
         </h2>
-        <p className="text-[#4A5568] text-sm mb-8 max-w-xs">
+        <p className="text-text-muted text-sm mb-8 max-w-xs">
           The page you are looking for does not exist or has been moved to a different range.
         </p>
 
