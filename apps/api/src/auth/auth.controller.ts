@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Get,
+  Delete,
   Body,
   HttpCode,
   HttpStatus,
@@ -65,5 +66,12 @@ export class AuthController {
       body.currentPassword,
       body.newPassword,
     );
+  }
+
+  @Delete('account')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAccount(@CurrentUser() user: JwtPayload): Promise<void> {
+    return this.authService.deleteAccount(user.sub);
   }
 }

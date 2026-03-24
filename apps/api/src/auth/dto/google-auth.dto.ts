@@ -1,13 +1,11 @@
-import { IsString, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, IsOptional } from 'class-validator';
 
 export class GoogleAuthDto {
-  @IsEmail()
-  email!: string;
+  @IsString()
+  @IsNotEmpty()
+  credential!: string; // Google ID token returned by the Sign-In Library
 
   @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsString()
-  googleId!: string;
+  @IsIn(['SHOOTER', 'COACH'])
+  role?: 'SHOOTER' | 'COACH';
 }

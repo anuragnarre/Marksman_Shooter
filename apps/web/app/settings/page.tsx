@@ -31,7 +31,6 @@ export default function SettingsPage() {
     setProfileLoading(true);
 
     try {
-      // TODO: Create PUT /auth/profile endpoint on the API if it doesn't exist yet
       const updated = await apiFetch<{ id: string; name: string; email: string; role: string }>(
         '/auth/profile',
         { method: 'PUT', body: JSON.stringify({ name }) },
@@ -70,7 +69,6 @@ export default function SettingsPage() {
 
     setPwLoading(true);
     try {
-      // TODO: Create PUT /auth/password endpoint on the API if it doesn't exist yet
       await apiFetch('/auth/password', {
         method: 'PUT',
         body: JSON.stringify({ currentPassword, newPassword }),
@@ -101,7 +99,6 @@ export default function SettingsPage() {
     setDeleteLoading(true);
     setDeleteErr(null);
     try {
-      // TODO: Create DELETE /auth/account endpoint on the API if it doesn't exist yet
       await apiFetch('/auth/account', { method: 'DELETE' });
       logout();
       router.push('/auth/login');

@@ -55,20 +55,6 @@ export function persistUser(user: User): void {
   }
 }
 
-export async function googleLogin(data: {
-  email: string;
-  name?: string;
-  googleId: string;
-}): Promise<AuthResponse> {
-  const res = await apiFetch<AuthResponse>('/auth/google', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  persistToken(res.access_token);
-  persistUser(res.user);
-  return res;
-}
-
 export function isAuthenticated(): boolean {
   return typeof window !== 'undefined' && !!localStorage.getItem('access_token');
 }
