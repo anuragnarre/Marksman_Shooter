@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -107,7 +108,8 @@ export class AuthService {
         idToken: dto.credential,
         audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
-    } catch {
+    } catch (err) {
+      console.error('[googleLogin] verifyIdToken failed:', err);
       throw new UnauthorizedException('Invalid Google token');
     }
 
@@ -119,41 +121,49 @@ export class AuthService {
     const name = payload.name ?? email.split('@')[0];
     const googleId = payload.sub;
 
-    let user = await this.prisma.user.findFirst({
-      where: { OR: [{ googleId }, { email }] },
-    });
+    try {
+      let user = await this.prisma.user.findFirst({
+        where: { OR: [{ googleId }, { email }] },
+      });
 
-    if (user) {
-      // Link googleId if this email already has a local account
-      if (!user.googleId) {
-        user = await this.prisma.user.update({
-          where: { id: user.id },
-          data: { googleId },
+      if (user) {
+        // Link googleId if this email already has a local account
+        if (!user.googleId) {
+          user = await this.prisma.user.update({
+            where: { id: user.id },
+            data: { googleId },
+          });
+        }
+      } else {
+        user = await this.prisma.user.create({
+          data: {
+            name,
+            email,
+            googleId,
+            role: dto.role ?? 'SHOOTER',
+          },
         });
       }
-    } else {
-      user = await this.prisma.user.create({
-        data: {
-          name,
-          email,
-          googleId,
-          role: dto.role ?? 'SHOOTER',
+
+      const token = this.signToken({ sub: user.id, email: user.email, role: user.role });
+
+      return {
+        access_token: token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
         },
-      });
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err;
+      console.error('[googleLogin] DB/token error:', err);
+      throw new InternalServerErrorException(
+        (err as Error)?.message ?? 'Google login failed',
+      );
     }
-
-    const token = this.signToken({ sub: user.id, email: user.email, role: user.role });
-
-    return {
-      access_token: token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
-    };
   }
 
   async getProfile(userId: string) {
