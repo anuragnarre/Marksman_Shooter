@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['framer-motion'],
   },
+  async headers() {
+    return [
+      {
+        // Apply to all routes — Google Sign-In popup needs allow-popups
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
