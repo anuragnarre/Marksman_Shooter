@@ -15,14 +15,17 @@ import { toLocalDateTimeInput } from '../../../lib/session-time';
 import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { Session } from '@shooting-platform/shared-types';
 
-const DISCIPLINES = [
-  '10m Air Rifle', '10m Air Pistol', '25m Rapid Fire Pistol',
-  '50m Rifle 3 Positions', '50m Rifle Prone', '50m Pistol',
-  'Skeet', 'Trap', 'Double Trap', 'Other',
+const DISCIPLINES: { label: string; weapon: string; distance: number; shots: number }[] = [
+  { label: '10m Air Rifle',          weapon: 'Air Rifle',       distance: 10, shots: 60  },
+  { label: '10m Air Pistol',         weapon: 'Air Pistol',      distance: 10, shots: 40  },
+  { label: '25m Rapid Fire Pistol',  weapon: 'Standard Pistol', distance: 25, shots: 60  },
+  { label: '50m Rifle 3 Positions',  weapon: 'Standard Rifle',  distance: 50, shots: 120 },
+  { label: '50m Rifle Prone',        weapon: 'Standard Rifle',  distance: 50, shots: 60  },
+  { label: '50m Pistol',             weapon: 'Free Pistol',     distance: 50, shots: 60  },
 ];
 
 const WEAPON_TYPES = [
-  'Air Rifle', 'Air Pistol', 'Standard Pistol', 'Free Pistol', 'Shotgun', 'Other',
+  'Air Rifle', 'Air Pistol', 'Standard Rifle', 'Standard Pistol', 'Free Pistol',
 ];
 
 export default function NewSessionPage() {
@@ -48,19 +51,22 @@ export default function NewSessionPage() {
       : selectedShooterId)
     : null;
 
-  const weaponList = WEAPON_TYPES;
-
-  const [discipline, setDiscipline]       = useState(DISCIPLINES[0]);
-  const [weaponType, setWeaponType]       = useState(weaponList[0]);
-  const [customWeapon, setCustomWeapon]   = useState('');
-  const [distance, setDistance]           = useState(10);
-  const [numberOfShots, setShots]         = useState(60);
+  const [discipline, setDisciplineState]  = useState(DISCIPLINES[0].label);
+  const [weaponType, setWeaponType]       = useState(DISCIPLINES[0].weapon);
+  const [distance, setDistance]           = useState(DISCIPLINES[0].distance);
+  const [numberOfShots, setShots]         = useState(DISCIPLINES[0].shots);
   const [sessionDate, setSessionDate]     = useState(toLocalDateTimeInput(new Date()));
   const [error, setError]                 = useState<string | null>(null);
   const [loading, setLoading]             = useState(false);
 
-  const isCustom = weaponType === 'Custom Gun';
-  const resolvedWeapon = isCustom ? customWeapon : weaponType;
+  function setDiscipline(label: string) {
+    const d = DISCIPLINES.find(d => d.label === label);
+    if (!d) return;
+    setDisciplineState(d.label);
+    setWeaponType(d.weapon);
+    setDistance(d.distance);
+    setShots(d.shots);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -69,7 +75,7 @@ export default function NewSessionPage() {
 
     const body: Record<string, unknown> = {
       discipline,
-      weaponType: resolvedWeapon,
+      weaponType,
       distance,
       numberOfShots,
       sessionDate: new Date(sessionDate).toISOString(),
@@ -159,7 +165,7 @@ export default function NewSessionPage() {
                 onChange={(e) => setDiscipline(e.target.value)}
                 className="field bg-elevated"
               >
-                {DISCIPLINES.map((d) => <option key={d} value={d}>{d}</option>)}
+                {DISCIPLINES.map((d) => <option key={d.label} value={d.label}>{d.label}</option>)}
               </select>
             </div>
 
@@ -172,18 +178,8 @@ export default function NewSessionPage() {
                 onChange={(e) => setWeaponType(e.target.value)}
                 className="field bg-elevated"
               >
-                {weaponList.map((w) => <option key={w} value={w}>{w}</option>)}
+                {WEAPON_TYPES.map((w) => <option key={w} value={w}>{w}</option>)}
               </select>
-              {isCustom && (
-                <input
-                  type="text"
-                  placeholder="Enter weapon name…"
-                  value={customWeapon}
-                  onChange={(e) => setCustomWeapon(e.target.value)}
-                  required
-                  className="field mt-2"
-                />
-              )}
             </div>
 
             {/* Distance + shots row */}
@@ -243,24 +239,16 @@ export default function NewSessionPage() {
         {/* Quick-start presets */}
         <div className="mt-4 animate-slide-up stagger-3">
           <p className="label mb-3 px-1">Quick presets</p>
-          <div className="grid grid-cols-1 xs:grid-cols-3 gap-2">
-            {[
-              { label: '60-Shot Air Rifle', disc: '10m Air Rifle', weapon: 'Air Rifle', dist: 10, shots: 60 },
-              { label: '40-Shot Air Pistol', disc: '10m Air Pistol', weapon: 'Air Pistol', dist: 10, shots: 40 },
-              { label: '3P Rifle', disc: '50m Rifle 3 Positions', weapon: 'Air Rifle', dist: 50, shots: 120 },
-            ].map((p) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {DISCIPLINES.map((d) => (
               <button
-                key={p.label}
+                key={d.label}
                 type="button"
-                onClick={() => {
-                  setDiscipline(p.disc);
-                  setWeaponType(p.weapon);
-                  setDistance(p.dist);
-                  setShots(p.shots);
-                }}
-                className="btn btn-ghost text-xs py-2 px-3 leading-tight"
+                onClick={() => setDiscipline(d.label)}
+                className={`btn text-xs py-2 px-3 leading-tight text-left ${discipline === d.label ? 'btn-primary' : 'btn-ghost'}`}
               >
-                {p.label}
+                <span className="block font-display font-semibold">{d.label}</span>
+                <span className="block text-[10px] opacity-60 mt-0.5">{d.shots} shots · {d.distance}m</span>
               </button>
             ))}
           </div>

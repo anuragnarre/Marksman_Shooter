@@ -28,6 +28,7 @@ def detect_holes(
     calibration: TargetCalibration,
     pellet_diameter_mm: float = 4.5,
     diff_img: Optional[np.ndarray] = None,
+    dark_center_rings: int = 5,
 ) -> List[FusedHole]:
     """Detect bullet holes using disc-convolution matched filter."""
     cx, cy = calibration.center
@@ -63,7 +64,8 @@ def detect_holes(
         ring_radii_px = [spec.ring_radius_mm(n) / mm_per_pixel for n in range(1, spec.num_rings + 1)]
 
     # ── Find black centre zone ─────────────────────────────────────────────────
-    black_zone, black_radius = _find_black_zone(gray, cx, cy, radius, target_mask)
+    black_zone, black_radius = _find_black_zone(
+        gray, cx, cy, radius, target_mask, ring_width_px, dark_center_rings)
     cream_zone = target_mask & ~black_zone
 
     # ── Erode zone edges to avoid ring-boundary contamination ─────────────────
@@ -77,21 +79,22 @@ def detect_holes(
     # ── Inpaint ring numbers BEFORE detection ─────────────────────────────────
     gray_clean = _inpaint_ring_features(gray, cx, cy, ring_radii_px, ring_width_px, black_radius)
 
-    # ── Fill ring boundary lines in cream zone ─────────────────────────────────
-    # Replaces the ring-line dark signal with local cream background so the disc
-    # filter never sees ring arcs. Real holes at ring radii survive because their
-    # signal comes from the hole interior, not the ring line.
-    gray_cream = _fill_ring_lines(gray_clean, cx, cy, ring_radii_px, ring_width_px, black_radius)
+    # ── Fill ALL ring boundary lines (both zones) ──────────────────────────────
+    # Black zone: white ring arcs → fill with local dark background
+    # Cream zone: dark ring arcs → fill with local cream background
+    # Both detectors use gray_filled so neither sees ring lines as holes.
+    gray_filled = _fill_ring_lines(gray_clean, cx, cy, ring_radii_px, ring_width_px, black_radius)
 
     # ── Detect holes via disc convolution ─────────────────────────────────────
     candidates: List[FusedHole] = []
 
-    holes_black = _detect_disc(gray_clean, black_roi, cx, cy,
-                                visible_r_black, pellet_radius_px, bright=True)
+    holes_black = _detect_disc(gray_filled, black_roi, cx, cy,
+                                visible_r_black, pellet_radius_px, bright=True,
+                                ring_radii_px=ring_radii_px)
     candidates.extend(holes_black)
 
-    # Ring suppression not needed: ring lines are already filled in gray_cream
-    holes_cream = _detect_disc(gray_cream, cream_roi, cx, cy,
+    # Ring suppression not needed: ring lines are already filled in gray_filled
+    holes_cream = _detect_disc(gray_filled, cream_roi, cx, cy,
                                 visible_r_cream, pellet_radius_px, bright=False,
                                 ring_radii_px=ring_radii_px,
                                 ring_suppress_px=0.0)
@@ -120,7 +123,11 @@ def detect_holes(
     ]
 
     # ── Remove ring-arc patterns ───────────────────────────────────────────────
-    candidates = _filter_ring_artifacts(candidates, cx, cy, min(visible_r_black, visible_r_cream))
+    candidates = _filter_ring_artifacts(
+        candidates, cx, cy, min(visible_r_black, visible_r_cream),
+        ring_radii_px=ring_radii_px, ring_width_px=ring_width_px,
+        black_radius=black_radius,
+    )
 
     return candidates
 
@@ -135,34 +142,53 @@ def _circle_mask(h: int, w: int, cx: float, cy: float, r: float) -> np.ndarray:
 def _find_black_zone(
     gray: np.ndarray, cx: float, cy: float, radius: float,
     target_mask: np.ndarray,
+    ring_width_px: float = 0.0,
+    dark_center_rings: int = 5,
 ) -> Tuple[np.ndarray, float]:
-    """Locate the filled black centre zone via radial median profile."""
+    """
+    Locate the filled black centre zone.
+
+    Strategy: build a radial median brightness profile, then find the radius
+    where the profile first crosses from dark to cream.  The black/cream
+    boundary is the SUSTAINED brightness transition, not a single peak in the
+    gradient (which always picks an inner ring-line spike instead).
+
+    The search is anchored to the spec range [0.45, 0.70] × radius so that
+    inner ring-line transitions (at ~0.35–0.45 × r) cannot be mistaken for
+    the real black/cream boundary.
+    """
     h, w = gray.shape[:2]
     max_r = int(radius)
     if max_r < 10:
         return np.zeros((h, w), dtype=bool), 0.0
 
-    angles = np.linspace(0, 2 * np.pi, 36, endpoint=False)
+    angles = np.linspace(0, 2 * np.pi, 72, endpoint=False)   # denser sampling
     radii  = np.arange(0, max_r)
     cos_a  = np.cos(angles)[:, None]
     sin_a  = np.sin(angles)[:, None]
     r_arr  = radii[None, :]
-    px = np.clip((cx + r_arr * cos_a).astype(int), 0, w - 1)
-    py = np.clip((cy + r_arr * sin_a).astype(int), 0, h - 1)
-    profile = np.median(gray[py, px].astype(np.float64), axis=0)
+    px_arr = np.clip((cx + r_arr * cos_a).astype(int), 0, w - 1)
+    py_arr = np.clip((cy + r_arr * sin_a).astype(int), 0, h - 1)
+    profile = np.median(gray[py_arr, px_arr].astype(np.float64), axis=0)
 
-    if len(profile) < 20:
-        black_r = radius * 0.40
-    else:
-        gradient = np.diff(profile)
-        if len(gradient) > 5:
-            gradient = np.convolve(gradient, np.ones(5) / 5, mode='same')
-        s = max(1, int(max_r * 0.15))
-        e = min(len(gradient), int(max_r * 0.65))
-        if e > s:
-            black_r = float(np.argmax(gradient[s:e]) + s)
-        else:
-            black_r = radius * 0.40
+    # Smooth the profile to suppress ring-line spikes (σ ≈ half a ring width)
+    smooth_k = max(5, int(ring_width_px * 0.5) | 1)
+    profile_s = np.convolve(profile, np.ones(smooth_k) / smooth_k, mode='same')
+
+    # Brightness threshold: midpoint between inner dark level and outer cream level
+    inner_dark  = float(np.median(profile_s[:max(1, int(max_r * 0.30))]))
+    outer_cream = float(np.median(profile_s[int(max_r * 0.70):]))
+    mid_thresh  = inner_dark + 0.45 * (outer_cream - inner_dark)
+
+    # Search for the first crossing of mid_thresh in the plausible boundary zone
+    s = max(1, int(max_r * 0.45))
+    e = min(len(profile_s), int(max_r * 0.72))
+    black_r = radius * 0.55   # fallback = spec-like value
+    if e > s:
+        for i in range(s, e):
+            if profile_s[i] >= mid_thresh:
+                black_r = float(i)
+                break
 
     return _circle_mask(h, w, cx, cy, black_r), black_r
 
@@ -191,7 +217,7 @@ def _inpaint_ring_features(
     num_r_mid = max(5, int(ring_width_px * 0.65))   # Inpaint radius at midpoint
     num_r_bnd = max(4, int(ring_width_px * 0.40))   # Inpaint radius at boundary
 
-    angles_rad = [0.0, math.pi / 2, math.pi, 3 * math.pi / 2]
+    angles_rad = [i * math.pi / 4 for i in range(8)]  # every 45°: 0,45,90,135,180,225,270,315
 
     def _inpaint_at(ring_r: float, inpaint_r: int) -> None:
         if ring_r <= black_radius * 1.05:
@@ -234,18 +260,20 @@ def _fill_ring_lines(
     black_radius: float,
 ) -> np.ndarray:
     """
-    Fill cream-zone ring boundary lines with local background before disc detection.
+    Fill ALL ring boundary lines with local background before disc detection.
 
-    Ring lines are dark printed arcs at known radii. The disc filter cannot
-    distinguish them from bullet holes, so we paint them with the cream
-    background sampled from adjacent ring-band midpoints BEFORE running the
-    filter. Only actual dark holes remain after filling.
+    Ring lines are printed arcs at known radii:
+      - Inside black zone: WHITE arcs on dark BG → appear bright → bright detector false positives
+      - Inside cream zone: DARK arcs on cream BG → appear dark → dark detector false positives
+
+    For each ring boundary r_i, we sample the background from the two adjacent
+    ring-band midpoints (at r_i ± ring_width_px*0.45) and paint the ring line
+    pixels with that average.  This erases both white (black-zone) and dark
+    (cream-zone) ring lines so the disc filter only responds to actual holes.
 
     Strategy (vectorised):
-      For each cream-zone ring boundary r_i:
-        mask  = pixels where |dist_from_centre - r_i| ≤ half_w
-        fill  = average of gray sampled at (r_i - offset) and (r_i + offset)
-                where offset = ring_width_px * 0.45 (ring-band midpoints)
+      mask  = pixels where |dist_from_centre - r_i| ≤ half_w
+      fill  = average(gray at r_i - offset, gray at r_i + offset)
     """
     h, w = gray.shape[:2]
     result = gray.astype(np.float32).copy()
@@ -259,29 +287,37 @@ def _fill_ring_lines(
     cos_a = dx / safe_dists
     sin_a = dy / safe_dists
 
-    half_w = 3.0          # ±3 px covers ISSF ring line (0.3–0.5 mm @ phone scale)
+    # Black-zone ring lines (white on dark): tight fill so adjacent shots aren't erased.
+    # ISSF ring line ≈ 0.3 mm = ~2-3 px at phone scale → ±2 px covers the line.
+    # Cream-zone ring lines (dark on cream): wider fill to cover the line + JPEG blur.
+    half_w_black = 2.0    # px — black zone: tight — avoids erasing adjacent shots (ring line ≈ 0.3mm = 2-3px)
+    half_w_cream = 5.0    # px — cream zone: wider — covers ring line + JPEG blur bleed
     offset = ring_width_px * 0.45   # sample from ~centre of adjacent bands
 
     for r in ring_radii_px:
-        if r <= black_radius * 0.88:
-            continue   # skip ring lines clearly inside the black zone (white-on-black, not cream arcs)
+        is_black_zone_ring = r <= black_radius * 1.15
+        half_w = half_w_black if is_black_zone_ring else half_w_cream
 
         mask = (np.abs(dists - r) <= half_w) & (dists > 0.5)
         if not np.any(mask):
             continue
 
-        # Sample inner band midpoint (closer to centre)
+        # Inner band midpoint — always inside (darker) side
         r_in = max(1.0, r - offset)
         sx_in = np.clip(np.round(cx + r_in * cos_a).astype(int), 0, w - 1)
         sy_in = np.clip(np.round(cy + r_in * sin_a).astype(int), 0, h - 1)
 
-        # Sample outer band midpoint (further from centre)
-        r_out = r + offset
-        sx_out = np.clip(np.round(cx + r_out * cos_a).astype(int), 0, w - 1)
-        sy_out = np.clip(np.round(cy + r_out * sin_a).astype(int), 0, h - 1)
+        if is_black_zone_ring:
+            # Black-zone ring: fill with inner DARK sample only (no cream contamination)
+            fill = gray[sy_in, sx_in].astype(np.float32)
+        else:
+            # Cream-zone ring: average of inner and outer cream-band midpoints
+            r_out = r + offset
+            sx_out = np.clip(np.round(cx + r_out * cos_a).astype(int), 0, w - 1)
+            sy_out = np.clip(np.round(cy + r_out * sin_a).astype(int), 0, h - 1)
+            fill = (gray[sy_in, sx_in].astype(np.float32) +
+                    gray[sy_out, sx_out].astype(np.float32)) * 0.5
 
-        fill = (gray[sy_in, sx_in].astype(np.float32) +
-                gray[sy_out, sx_out].astype(np.float32)) * 0.5
         result[mask] = fill[mask]
 
     return result.astype(np.uint8)
@@ -493,14 +529,22 @@ def _detect_disc(
                         abs(cy_ref - py) < visible_r * 0.6):
                     px, py = cx_ref, cy_ref
 
-        # Fill-ratio check: real holes are solid discs; ink strokes/arcs/writing
-        # only partially cover the disc → rejected by a fill threshold.
-        # Cream zone is stricter (0.38) because ring arcs and handwriting are the
-        # main false-positive sources. Black zone is more lenient (0.28) because
-        # torn paper creates irregular bright patches.
-        # Black zone: lenient fill (torn paper, overlapping holes create irregular shapes)
-        # Cream zone: strict fill (must be a solid circular dark spot, not a ring arc or mark)
+        # Fill-ratio check: real holes are solid discs; ring-boundary arcs/lines
+        # only partially fill the matched disc → low fill ratio → rejected.
+        # Base thresholds: black zone lenient (torn paper → irregular patches),
+        # cream zone strict (ring arcs and handwriting are the main false positives).
+        # Near ANY known ring radius: use a stricter threshold for BOTH zones because
+        # ring lines (white in black zone, dark in cream zone) produce arc responses.
         fill_min = 0.22 if bright else 0.42
+        if ring_radii_px:
+            dist_c = math.sqrt((px - cx) ** 2 + (py - cy) ** 2)
+            for _rr in ring_radii_px:
+                if abs(dist_c - _rr) < visible_r * 1.8:
+                    # Black zone near ring: white ring lines are arc artefacts → moderate filter.
+                    # Cream zone near ring: dark ring lines produce strong arc peaks that pass
+                    # the base 0.42 threshold but real holes have fill ≥ 0.80.
+                    fill_min = 0.52 if bright else 0.76
+                    break
         if _fill_ratio_check(signal, px, py, visible_r) < fill_min:
             continue
 
@@ -550,14 +594,28 @@ def _deduplicate(holes: List[FusedHole], merge_r: float) -> List[FusedHole]:
 
 
 def _filter_ring_artifacts(
-    holes: List[FusedHole], cx: float, cy: float, visible_r: float
+    holes: List[FusedHole], cx: float, cy: float, visible_r: float,
+    ring_radii_px: Optional[List[float]] = None,
+    ring_width_px: float = 0.0,
+    black_radius: float = 0.0,
 ) -> List[FusedHole]:
     """Remove circular arc patterns (ring-line false positives).
 
-    Two strategies:
-    1. Groups of ≥ 3 at the same radius → keep top 2 (obvious arc cluster).
-    2. Diametrically-opposed pairs at the same radius → remove lower-confidence
-       one.  Ring lines generate symmetric ghosts 180° apart.
+    Three strategies (in order):
+
+    1. Multiple detections at the SAME known ring-boundary radius in the CREAM
+       ZONE → all are arc responses.  Black-zone ring lines are filled with dark
+       background before detection, so they don't produce false positives there.
+       Cream-zone ring lines may still slip through, but a single bullet cannot
+       appear at two angular positions on the same ring → remove ALL if ≥ 2 found
+       at the same cream-zone ring radius (within ±4 px).
+
+    2. Groups of ≥ 3 at the same radius (without knowing ring radii) →
+       keep only the top-2 by confidence.
+
+    3. Diametrically-opposed pairs at the same radius → ring lines generate
+       symmetric ghosts 180° apart; remove the weaker one (or both if
+       medium-confidence).
     """
     if len(holes) <= 1:
         return holes
@@ -565,9 +623,25 @@ def _filter_ring_artifacts(
     dists = [math.sqrt((h.x - cx) ** 2 + (h.y - cy) ** 2) for h in holes]
     angles = [math.atan2(h.y - cy, h.x - cx) for h in holes]
     tol = max(3.0, visible_r * 0.6)
-
-    sorted_idx = sorted(range(len(dists)), key=lambda i: dists[i])
     artifacts: set = set()
+
+    # ── Strategy 1: cream-zone clusters at known ring radii ────────────────────
+    # Apply only to cream-zone detections (dist > black_radius).  Black-zone ring
+    # lines are filled → no arc responses there.  Tight snap=4px: ring-arc peaks
+    # appear within 1-2px of the ring boundary; real shots are at pellet_radius
+    # (30+ px) away from the boundary they score against.
+    if ring_radii_px and ring_width_px > 0:
+        snap = 4.0
+        for ring_r in ring_radii_px:
+            at_ring = [i for i, d in enumerate(dists)
+                       if abs(d - ring_r) <= snap and d > black_radius]
+            if len(at_ring) >= 2:
+                # 2+ cream-zone holes at one ring boundary → arc ghosts; remove all
+                for i in at_ring:
+                    artifacts.add(i)
+
+    # ── Strategies 2 & 3: radius-grouping heuristics ──────────────────────────
+    sorted_idx = sorted(range(len(dists)), key=lambda i: dists[i])
 
     i = 0
     while i < len(sorted_idx):

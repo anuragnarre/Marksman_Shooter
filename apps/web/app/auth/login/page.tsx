@@ -20,11 +20,12 @@ export default function LoginPage() {
   const isMobile = useIsMobile();
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState<string | null>(null);
-  const [loading, setLoading]   = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
+  const [loading, setLoading]     = useState(false);
+  const [hasError, setHasError]   = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -47,7 +48,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex bg-void relative overflow-hidden"
+      className="min-h-screen flex flex-col lg:flex-row bg-void relative overflow-hidden"
       style={{ paddingTop: safeTopInset }}
     >
       <div
@@ -59,13 +60,31 @@ export default function LoginPage() {
         }}
       />
 
+      {/* ── Mobile image banner (shown only on small screens) ────────── */}
+      <div className="lg:hidden relative h-32 overflow-hidden flex-shrink-0">
+        <img
+          src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80"
+          className="w-full h-full object-cover"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(6,8,16,0.45) 0%, rgba(6,8,16,0.96) 100%)' }} />
+        <div className="absolute bottom-4 left-6 flex items-center gap-2.5">
+          <CrosshairMark />
+          <span className="font-display font-bold text-xl tracking-widest text-[#F0F4FF] uppercase">MARKSMAN</span>
+        </div>
+      </div>
+
       {/* ── Left visual panel (hidden on mobile) ───────────────────────── */}
       <div
         className="hidden lg:flex lg:w-[55%] relative overflow-hidden flex-col justify-between p-12 noise-overlay"
         style={{
-          background: 'radial-gradient(ellipse at 40% 50%, rgba(15,31,61,0.5) 0%, var(--bg-void) 70%)',
-          animation: 'radialShift 8s ease infinite',
-          backgroundSize: '200% 200%',
+          backgroundImage: [
+            'linear-gradient(135deg, rgba(6,8,16,0.82) 0%, rgba(8,12,28,0.60) 50%, rgba(6,8,16,0.90) 100%)',
+            'url(https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&auto=format&fit=crop&q=80)',
+          ].join(', '),
+          backgroundSize: 'cover, cover',
+          backgroundPosition: 'center, center',
         }}
       >
         {/* Animated target rings SVG */}
@@ -143,16 +162,26 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="label">Password</label>
-              <input
-                id="password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`field ${hasError ? 'field-error' : ''}`}
-                placeholder="Your password"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`field pr-10 ${hasError ? 'field-error' : ''}`}
+                  placeholder="Your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
+              </div>
             </div>
 
             {error && (
@@ -310,6 +339,27 @@ function AlertIcon() {
       <path d="M7 1L13 12H1z" />
       <line x1="7" y1="5.5" x2="7" y2="8" />
       <circle cx="7" cy="10" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
     </svg>
   );
 }

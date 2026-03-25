@@ -176,8 +176,8 @@ export function TopBar({
       {/* Spacer when no search */}
       {!onCommandPalette && <div className="flex-1" />}
 
-      {/* ── Right: search icon (tablet), live, theme toggle, avatar ── */}
-      <div className="flex items-center gap-2 shrink-0">
+      {/* ── Right: search icon (tablet), live, separator, theme toggle, avatar ── */}
+      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
 
         {/* Compact search — tablet (md, not lg) */}
         {onCommandPalette && (
@@ -210,6 +210,12 @@ export function TopBar({
           </div>
         )}
 
+        {/* Vertical separator */}
+        <div
+          className="w-px h-5 mx-1 shrink-0"
+          style={{ background: 'var(--border-subtle)' }}
+        />
+
         {/* Theme toggle */}
         <button
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
@@ -237,37 +243,42 @@ export function TopBar({
 
         {/* User avatar */}
         {user && (
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2.5 pl-1.5 pr-1 py-1 rounded-xl cursor-default
+                       transition-all duration-200"
+            style={{
+              background: `${roleColor}08`,
+              border: `1px solid ${roleColor}20`,
+            }}
+            title={`${user.name} · ${user.role}`}
+          >
             {/* Role label - hidden on mobile */}
             <span
-              className="hidden sm:block text-[10px] font-display font-bold uppercase tracking-[0.12em]"
-              style={{ color: roleColor, opacity: 0.8 }}
+              className="hidden sm:block text-[10px] font-display font-bold uppercase tracking-[0.12em] pl-0.5"
+              style={{ color: roleColor, opacity: 0.85 }}
             >
               {user.role.toLowerCase()}
             </span>
 
             {/* Avatar with colored ring */}
             <div
-              className="relative w-[34px] h-[34px] rounded-full flex items-center justify-center
-                         font-display font-black text-[13px] cursor-default select-none
-                         transition-all duration-200 hover:scale-105"
+              className="relative w-[30px] h-[30px] rounded-full flex items-center justify-center
+                         font-display font-black text-[12px] select-none"
               style={{
-                background: `linear-gradient(135deg, var(--bg-void) 0%, var(--bg-subtle) 100%)`,
-                border: `2px solid ${roleColor}50`,
+                background: `linear-gradient(135deg, ${roleColor}20 0%, ${roleColor}0a 100%)`,
+                border: `1.5px solid ${roleColor}60`,
                 color: roleColor,
-                boxShadow: `0 0 0 1px ${roleColor}20, 0 0 16px ${roleColor}25`,
               }}
-              title={`${user.name} · ${user.role}`}
             >
               {user.name.charAt(0).toUpperCase()}
 
               {/* Online dot */}
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
+                className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full"
                 style={{
                   background: '#00E5A0',
-                  border: '2px solid var(--bg-void)',
-                  boxShadow: '0 0 6px rgba(0,229,160,0.6)',
+                  border: '1.5px solid var(--bg-void)',
+                  boxShadow: '0 0 5px rgba(0,229,160,0.6)',
                 }}
               />
             </div>

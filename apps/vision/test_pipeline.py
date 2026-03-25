@@ -45,7 +45,8 @@ def process_image(image_path: str, target_type: str = "air_rifle_10m"):
         img_bgr, gray, cal = correct_perspective(img_bgr, gray, cal)
 
     # Detect holes
-    holes = detect_holes(gray, cal, spec.pellet_diameter_mm)
+    holes = detect_holes(gray, cal, spec.pellet_diameter_mm,
+                         dark_center_rings=spec.dark_center_rings)
 
     # Score
     shots = score_holes(holes, cal, target_type)
@@ -66,11 +67,11 @@ def process_image(image_path: str, target_type: str = "air_rifle_10m"):
     # Draw outer ring
     cv2.circle(debug, (cx, cy), int(cal.major_radius), (0, 200, 0), 1)
 
-    # Draw each detected hole at actual pellet size
+    # Draw each detected hole: circle outline at actual pellet size + centre crosshair
     for hole in holes:
         hx, hy = int(round(hole.x)), int(round(hole.y))
         cv2.circle(debug, (hx, hy), pellet_radius_px, (0, 0, 255), 2)
-        cv2.drawMarker(debug, (hx, hy), (0, 128, 255), cv2.MARKER_CROSS, 7, 1)
+        cv2.drawMarker(debug, (hx, hy), (0, 200, 255), cv2.MARKER_CROSS, 7, 1)
 
     # Draw scores next to each shot
     for s in shots:

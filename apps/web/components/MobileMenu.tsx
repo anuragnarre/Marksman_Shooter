@@ -1,35 +1,54 @@
 // apps/web/components/MobileMenu.tsx
 'use client';
 
-// Clean slide-in navigation drawer for mobile. Compact (280px), flat list, no section clutter.
+// Clean slide-in navigation drawer for mobile. Grouped + expandable nav matching desktop sidebar.
 // Swipe-left to dismiss.
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { useAuth } from '../contexts/auth-context';
 
-interface NavItem {
+interface NavChild {
   href: string;
   label: string;
   icon: React.ReactNode;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard',                label: 'Dashboard',     icon: <IconGrid /> },
-  { href: '/sessions',                 label: 'Sessions',      icon: <IconTarget /> },
-  { href: '/sessions/new',             label: 'New Session',   icon: <IconPlus /> },
-  { href: '/performance',              label: 'Performance',   icon: <IconPulse /> },
-  { href: '/performance/ai-coach',     label: 'AI Coach',      icon: <IconSparkle /> },
-  { href: '/performance/ai-assistant', label: 'AI Assistant',  icon: <IconBrain /> },
-  { href: '/performance/health',       label: 'Health',        icon: <IconHeart /> },
-  { href: '/planning',                  label: 'Schedule',      icon: <IconCalendar /> },
-  { href: '/planning/training-plan',   label: 'Training Plan', icon: <IconPlan /> },
-  { href: '/sessions/compare',         label: 'Compare',       icon: <IconCompare /> },
-  { href: '/docs',                     label: 'Docs & Guides', icon: <IconDocs /> },
-  { href: '/connect',                  label: 'Connect',       icon: <IconLink /> },
-  { href: '/settings',                 label: 'Settings',      icon: <IconSettings /> },
+interface NavGroup {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  children?: NavChild[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: <IconGrid /> },
+  {
+    href: '/sessions', label: 'Sessions', icon: <IconTarget />,
+    children: [
+      { href: '/sessions/new',     label: 'New Session', icon: <IconPlus /> },
+      { href: '/sessions/compare', label: 'Compare',     icon: <IconCompare /> },
+    ],
+  },
+  {
+    href: '/planning', label: 'Planning', icon: <IconCalendar />,
+    children: [
+      { href: '/planning/training-plan', label: 'Training Plan', icon: <IconPlan /> },
+    ],
+  },
+  {
+    href: '/performance', label: 'Performance', icon: <IconPulse />,
+    children: [
+      { href: '/performance/ai-coach',     label: 'AI Coach',     icon: <IconSparkle /> },
+      { href: '/performance/ai-assistant', label: 'AI Assistant', icon: <IconBrain /> },
+      { href: '/performance/health',       label: 'Health',       icon: <IconHeart /> },
+    ],
+  },
+  { href: '/docs',     label: 'Docs & Guides', icon: <IconDocs /> },
+  { href: '/connect',  label: 'Connect',       icon: <IconLink /> },
+  { href: '/settings', label: 'Settings',      icon: <IconSettings /> },
 ];
 
 const ROLE_COLOR: Record<string, { text: string; bg: string }> = {
@@ -48,14 +67,24 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const { user, logout } = useAuth();
   const dragX = useMotionValue(0);
 
+  // Track expanded groups (auto-expand active parent)
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+
+  // Auto-expand the active parent group when drawer opens
+  useEffect(() => {
+    if (!open) return;
+    const active = NAV_GROUPS.find(g =>
+      g.children?.some(c => pathname === c.href || pathname.startsWith(c.href + '/'))
+    );
+    if (active) {
+      setExpanded(prev => new Set([...prev, active.href]));
+    }
+  }, [open, pathname]);
+
   useEffect(() => { onClose(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = open ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
@@ -73,9 +102,23 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
     onClose();
   }
 
+  function toggleGroup(href: string) {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(href)) next.delete(href); else next.add(href);
+      return next;
+    });
+  }
+
   if (!user) return null;
 
   const rs = ROLE_COLOR[user.role] ?? ROLE_COLOR.SHOOTER;
+
+  function isGroupActive(group: NavGroup): boolean {
+    if (pathname === group.href) return true;
+    if (group.children?.some(c => pathname === c.href || pathname.startsWith(c.href + '/'))) return true;
+    return pathname.startsWith(group.href + '/');
+  }
 
   return (
     <AnimatePresence>
@@ -185,62 +228,116 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               </div>
             </div>
 
-            {/* ── Nav list ─────────────────────────────────────── */}
+            {/* ── Nav list (grouped) ────────────────────────────── */}
             <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 min-h-0">
-              {NAV_ITEMS.map((item, i) => {
-                const isNew = item.href === '/sessions/new';
-                const active = (() => {
-                  if (item.href === '/dashboard') return pathname === '/dashboard';
-                  return pathname === item.href || pathname.startsWith(item.href + '/');
-                })();
-
-                if (isNew) {
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5
-                                 transition-all duration-150 active:scale-[0.98] min-h-[44px]"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(245,166,35,0.15) 0%, rgba(245,166,35,0.08) 100%)',
-                        border: '1px solid rgba(245,166,35,0.25)',
-                        color: '#F5A623',
-                      }}
-                    >
-                      <span className="w-4 h-4 shrink-0 flex items-center justify-center">{item.icon}</span>
-                      <span className="font-display font-semibold text-[13px] tracking-wide">{item.label}</span>
-                    </Link>
-                  );
-                }
+              {NAV_GROUPS.map((group) => {
+                const active   = isGroupActive(group);
+                const hasKids  = !!(group.children?.length);
+                const isOpen   = expanded.has(group.href);
 
                 return (
-                  <Link
-                    key={item.href + i}
-                    href={item.href}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5
-                               transition-all duration-150 active:scale-[0.98] min-h-[44px] relative"
-                    style={{
-                      background: active
-                        ? 'linear-gradient(135deg, rgba(245,166,35,0.1) 0%, rgba(245,166,35,0.04) 100%)'
-                        : 'transparent',
-                      border: active ? '1px solid rgba(245,166,35,0.18)' : '1px solid transparent',
-                      color: active ? '#F5A623' : 'var(--text-secondary)',
-                    }}
-                  >
-                    {active && (
-                      <span
-                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
-                        style={{ background: '#F5A623', boxShadow: '0 0 8px rgba(245,166,35,0.5)' }}
-                      />
-                    )}
-                    <span
-                      className="w-4 h-4 shrink-0 flex items-center justify-center"
-                      style={{ filter: active ? 'drop-shadow(0 0 4px rgba(245,166,35,0.4))' : 'none' }}
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="font-display font-semibold text-[13px] tracking-wide">{item.label}</span>
-                  </Link>
+                  <div key={group.href} className="mb-0.5">
+                    {/* Parent row */}
+                    <div className="flex items-center gap-0.5">
+                      <Link
+                        href={group.href}
+                        className="flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl
+                                   transition-all duration-150 active:scale-[0.98] min-h-[44px] relative"
+                        style={{
+                          background: active
+                            ? 'linear-gradient(135deg, rgba(245,166,35,0.1) 0%, rgba(245,166,35,0.04) 100%)'
+                            : 'transparent',
+                          border: active ? '1px solid rgba(245,166,35,0.18)' : '1px solid transparent',
+                          color: active ? '#F5A623' : 'var(--text-secondary)',
+                        }}
+                      >
+                        {active && (
+                          <span
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
+                            style={{ background: '#F5A623', boxShadow: '0 0 8px rgba(245,166,35,0.5)' }}
+                          />
+                        )}
+                        <span
+                          className="w-4 h-4 shrink-0 flex items-center justify-center"
+                          style={{ filter: active ? 'drop-shadow(0 0 4px rgba(245,166,35,0.4))' : 'none' }}
+                        >
+                          {group.icon}
+                        </span>
+                        <span className="font-display font-semibold text-[13px] tracking-wide flex-1">
+                          {group.label}
+                        </span>
+                      </Link>
+
+                      {/* Expand toggle — only for groups with children */}
+                      {hasKids && (
+                        <button
+                          onClick={() => toggleGroup(group.href)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0
+                                     transition-all duration-200 active:scale-90"
+                          style={{ color: active ? '#F5A623' : 'var(--text-muted)' }}
+                          aria-label={isOpen ? 'Collapse' : 'Expand'}
+                        >
+                          <svg
+                            width="12" height="12" viewBox="0 0 12 12" fill="none"
+                            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
+                            style={{
+                              transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.2s ease',
+                            }}
+                          >
+                            <polyline points="2,4 6,8 10,4" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Children */}
+                    <AnimatePresence initial={false}>
+                      {hasKids && isOpen && (
+                        <motion.div
+                          key="children"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2, ease: 'easeInOut' }}
+                          style={{ overflow: 'hidden' }}
+                        >
+                          <div className="pl-4 pb-1 space-y-0.5">
+                            {group.children!.map((child) => {
+                              const childActive = pathname === child.href || pathname.startsWith(child.href + '/');
+                              return (
+                                <Link
+                                  key={child.href}
+                                  href={child.href}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-xl
+                                             transition-all duration-150 active:scale-[0.98] min-h-[40px] relative"
+                                  style={{
+                                    background: childActive
+                                      ? 'rgba(245,166,35,0.08)'
+                                      : 'transparent',
+                                    border: childActive ? '1px solid rgba(245,166,35,0.15)' : '1px solid transparent',
+                                    color: childActive ? '#F5A623' : 'var(--text-muted)',
+                                  }}
+                                >
+                                  {/* Connector line */}
+                                  <span
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 w-px h-4 rounded-full"
+                                    style={{ background: childActive ? 'rgba(245,166,35,0.5)' : 'var(--border-subtle)' }}
+                                  />
+                                  <span className="w-4 h-4 shrink-0 flex items-center justify-center opacity-80">
+                                    {child.icon}
+                                  </span>
+                                  <span className="font-display font-medium text-[12px] tracking-wide">
+                                    {child.label}
+                                  </span>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 );
               })}
 

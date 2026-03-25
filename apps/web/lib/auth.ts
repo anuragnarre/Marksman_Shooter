@@ -13,6 +13,7 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
   persistToken(res.access_token);
+  persistUser(res.user);
   return res;
 }
 
@@ -22,6 +23,7 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
   persistToken(res.access_token);
+  persistUser(res.user);
   return res;
 }
 

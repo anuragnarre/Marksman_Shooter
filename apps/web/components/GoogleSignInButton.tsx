@@ -1,6 +1,7 @@
 // apps/web/components/GoogleSignInButton.tsx
-// Renders the official Google Sign-In button using the GSI library on web,
-// and a native Google Sign-In button via the Capacitor plugin on Android/iOS.
+// On native Capacitor (Android/iOS) → NativeGoogleSignInButton using the plugin.
+// On web → WebGoogleSignInButton using the GSI library rendered button.
+// Platform detection is deferred to useEffect to avoid SSR/hydration mismatch.
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -17,32 +18,26 @@ interface GoogleSignInButtonProps {
   role?: 'SHOOTER' | 'COACH';
 }
 
-export function GoogleSignInButton({
-  onSuccess,
-  onError,
-  text = 'continue_with',
-  role,
-}: GoogleSignInButtonProps) {
-  // Native path — Capacitor Android/iOS
-  if (Capacitor.isNativePlatform()) {
-    return (
-      <NativeGoogleSignInButton
-        role={role}
-        onSuccess={onSuccess}
-        onError={onError}
-      />
-    );
+export function GoogleSignInButton(props: GoogleSignInButtonProps) {
+  // Defer platform detection to the client to avoid SSR hydration mismatch.
+  const [isNative, setIsNative] = useState(false);
+  const [mounted, setMounted]   = useState(false);
+
+  useEffect(() => {
+    setIsNative(Capacitor.isNativePlatform());
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Show skeleton while determining platform
+    return <ButtonSkeleton />;
   }
 
-  // Web path — GSI library rendered button
-  return (
-    <WebGoogleSignInButton
-      text={text}
-      role={role}
-      onSuccess={onSuccess}
-      onError={onError}
-    />
-  );
+  if (isNative) {
+    return <NativeGoogleSignInButton {...props} />;
+  }
+
+  return <WebGoogleSignInButton {...props} />;
 }
 
 // ── Native button (Android / iOS) ─────────────────────────────────────────────
@@ -51,11 +46,7 @@ function NativeGoogleSignInButton({
   role,
   onSuccess,
   onError,
-}: {
-  role?: 'SHOOTER' | 'COACH';
-  onSuccess: (user: User) => void;
-  onError: (message: string) => void;
-}) {
+}: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false);
   const roleRef = useRef(role);
   roleRef.current = role;
@@ -67,10 +58,15 @@ function NativeGoogleSignInButton({
       onSuccess(result.user);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Google sign-in failed';
-      // User cancelled the picker — don't surface as an error
-      if (!msg.includes('cancel') && !msg.includes('Cancel') && !msg.includes('dismissed')) {
-        onError(msg);
+      // User dismissed the picker — not an error worth surfacing
+      if (
+        msg.toLowerCase().includes('cancel') ||
+        msg.toLowerCase().includes('dismiss') ||
+        msg.toLowerCase().includes('closed')
+      ) {
+        return;
       }
+      onError(msg);
     } finally {
       setLoading(false);
     }
@@ -81,7 +77,7 @@ function NativeGoogleSignInButton({
       type="button"
       onClick={handlePress}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-3 rounded-[4px] h-[44px] transition-opacity disabled:opacity-60"
+      className="w-full flex items-center justify-center gap-3 rounded-[4px] h-[44px] transition-opacity active:opacity-70 disabled:opacity-50"
       style={{ background: '#1F1F1F', border: '1px solid rgba(255,255,255,0.12)' }}
     >
       {loading ? (
@@ -92,9 +88,7 @@ function NativeGoogleSignInButton({
       ) : (
         <>
           <GoogleIcon />
-          <span className="text-white text-sm font-medium">
-            {' '}Continue with Google
-          </span>
+          <span className="text-white text-sm font-medium">Continue with Google</span>
         </>
       )}
     </button>
@@ -104,22 +98,16 @@ function NativeGoogleSignInButton({
 // ── Web button (GSI library) ───────────────────────────────────────────────────
 
 function WebGoogleSignInButton({
-  text,
+  text = 'continue_with',
   role,
   onSuccess,
   onError,
-}: {
-  text: 'signin_with' | 'signup_with' | 'continue_with';
-  role?: 'SHOOTER' | 'COACH';
-  onSuccess: (user: User) => void;
-  onError: (message: string) => void;
-}) {
+}: GoogleSignInButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const roleRef      = useRef(role);
   const [loading, setLoading] = useState(false);
   const [ready, setReady]     = useState(false);
 
-  // Keep ref in sync so the GSI callback always reads the latest role
   roleRef.current = role;
 
   useEffect(() => {
@@ -166,14 +154,11 @@ function WebGoogleSignInButton({
 
   return (
     <div className="relative w-full">
-      {/* Google's rendered button */}
       <div
         ref={containerRef}
         className="w-full"
         style={{ minHeight: 44, visibility: ready && !loading ? 'visible' : 'hidden' }}
       />
-
-      {/* Loading overlay */}
       {loading && (
         <div
           className="absolute inset-0 flex items-center justify-center rounded-[4px]"
@@ -183,17 +168,21 @@ function WebGoogleSignInButton({
           <span className="ml-2 text-white text-sm font-medium">Signing in...</span>
         </div>
       )}
+      {!ready && !loading && <ButtonSkeleton />}
+    </div>
+  );
+}
 
-      {/* Skeleton while GSI script loads */}
-      {!ready && !loading && (
-        <div
-          className="w-full rounded-[4px] flex items-center justify-center gap-3"
-          style={{ height: 44, background: '#1F1F1F', border: '1px solid rgba(255,255,255,0.1)' }}
-        >
-          <GoogleIcon />
-          <span className="text-white text-sm font-medium">Continue with Google</span>
-        </div>
-      )}
+// ── Shared ────────────────────────────────────────────────────────────────────
+
+function ButtonSkeleton() {
+  return (
+    <div
+      className="w-full rounded-[4px] flex items-center justify-center gap-3"
+      style={{ height: 44, background: '#1F1F1F', border: '1px solid rgba(255,255,255,0.1)' }}
+    >
+      <GoogleIcon />
+      <span className="text-white text-sm font-medium">Continue with Google</span>
     </div>
   );
 }

@@ -57,7 +57,8 @@ def analyze_target_image(
 
     # Stage 4: Zone-aware hole detection (direct on grayscale)
     spec = get_spec(target_type)
-    holes = detect_holes(gray, calibration, spec.pellet_diameter_mm)
+    holes = detect_holes(gray, calibration, spec.pellet_diameter_mm,
+                         dark_center_rings=spec.dark_center_rings)
 
     # Stage 5: ISSF decimal scoring
     shots_data = score_holes(holes, calibration, target_type)

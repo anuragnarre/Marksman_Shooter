@@ -2,12 +2,11 @@
 // Google Sign-In — two paths:
 //   Web:    GSI library renders the official button, returns a credential JWT
 //   Native: @codetrix-studio/capacitor-google-auth uses the Android/iOS native
-//           Google Sign-In SDK, also returns an ID token.
+//           Google Sign-In SDK and returns an ID token from the native picker.
 // Both paths send the ID token to the backend /auth/google endpoint.
 
 import { Capacitor } from '@capacitor/core';
 import { apiFetch } from './api';
-import { persistUser } from './auth';
 import type { AuthResponse, User } from '@shooting-platform/shared-types';
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
@@ -84,33 +83,27 @@ export async function googleSignIn(
   });
   if (typeof window !== 'undefined') {
     localStorage.setItem('access_token', res.access_token);
-    persistUser(res.user);
   }
   return res;
 }
 
 /**
  * Native Google Sign-In via @codetrix-studio/capacitor-google-auth.
- * Triggers the native Android/iOS Google account picker, gets an ID token,
- * then sends it to the backend — same flow as the web GSI button.
+ *
+ * On native (Android/iOS), the plugin reads serverClientId directly from
+ * capacitor.config.ts — initialize() must NOT be called on native as it
+ * is only required for the web fallback path.
  */
 export async function nativeGoogleSignIn(
   role?: 'SHOOTER' | 'COACH',
 ): Promise<{ access_token: string; user: User }> {
   const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
 
-  // Initialize is idempotent — safe to call each time
-  GoogleAuth.initialize({
-    clientId: GOOGLE_CLIENT_ID,
-    scopes: ['profile', 'email'],
-    grantOfflineAccess: false,
-  });
-
   const googleUser = await GoogleAuth.signIn();
   const idToken = googleUser.authentication.idToken;
 
   if (!idToken) {
-    throw new Error('Google Sign-In did not return an ID token.');
+    throw new Error('Google Sign-In did not return an ID token. Ensure serverClientId is set in capacitor.config.ts.');
   }
 
   return googleSignIn(idToken, role);
@@ -118,8 +111,8 @@ export async function nativeGoogleSignIn(
 
 /**
  * Sign out — clears local state.
- * On native, also signs out from the Google Capacitor plugin to clear the
- * cached account so the user is prompted to choose an account next time.
+ * On native, also signs out from the Capacitor Google plugin so the account
+ * picker appears again on next sign-in.
  */
 export async function googleSignOut(): Promise<void> {
   if (typeof window !== 'undefined') {

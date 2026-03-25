@@ -15,6 +15,7 @@ import {
   logout as authLogout,
   persistUser,
 } from '../lib/auth';
+import { apiFetch } from '../lib/api';
 
 interface AuthContextValue {
   user: User | null;
@@ -31,10 +32,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      setUserState(getStoredUser());
+    if (!isAuthenticated()) {
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+    const stored = getStoredUser();
+    if (stored) {
+      setUserState(stored);
+      setIsLoading(false);
+    } else {
+      // Token exists but user not in localStorage — fetch from API
+      apiFetch<User>('/auth/me')
+        .then((u) => {
+          persistUser(u);
+          setUserState(u);
+        })
+        .catch(() => {
+          // Token is invalid/expired — clear it
+          authLogout();
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, []);
 
   const setUser = useCallback((u: User) => {

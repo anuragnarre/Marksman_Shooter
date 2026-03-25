@@ -18,15 +18,12 @@ import { TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 // ── Discipline colour map ─────────────────────────────────────────────────────
 
 const DISC_COLOR: Record<string, string> = {
-  '10m Air Rifle':           '#4FC3F7',
-  '10m Air Pistol':          '#F5A623',
-  '25m Rapid Fire Pistol':   '#F5A623',
-  '50m Rifle 3 Positions':   '#00E5A0',
-  '50m Rifle Prone':         '#00E5A0',
-  '50m Pistol':              '#F5A623',
-  'Skeet':                   '#FF4D6D',
-  'Trap':                    '#FF4D6D',
-  'Double Trap':             '#FF4D6D',
+  '10m Air Rifle':          '#4FC3F7',
+  '10m Air Pistol':         '#F5A623',
+  '25m Rapid Fire Pistol':  '#F5A623',
+  '50m Rifle 3 Positions':  '#00E5A0',
+  '50m Rifle Prone':        '#00E5A0',
+  '50m Pistol':             '#F5A623',
 };
 
 function discColor(d: string) {

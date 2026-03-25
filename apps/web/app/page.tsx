@@ -1,94 +1,828 @@
 'use client';
-
-// apps/web/app/page.tsx — Marksman Landing Page
-// Design base: GitHub 2026 aurora aesthetic — deep void, shifting colour orbs,
-// bold display type, glass product windows, premium spacing.
-
-import { useEffect, useRef, useState, createContext, useContext, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
-import { useRouter } from 'next/navigation';
 
-// Theme context shared by all sections on this page
-const PageTheme = createContext<boolean>(true); // true = dark
-function usePageTheme() { return useContext(PageTheme); }
+// ─── Shot data (deterministic) ───────────────────────────────────────────────
+const SHOTS = [
+  { cx: 50.4, cy: 49.2, score: 10.9 },
+  { cx: 49.1, cy: 50.8, score: 10.7 },
+  { cx: 51.2, cy: 48.6, score: 10.6 },
+  { cx: 48.8, cy: 51.4, score: 10.4 },
+  { cx: 50.9, cy: 50.5, score: 10.8 },
+  { cx: 49.6, cy: 49.0, score: 10.2 },
+  { cx: 51.8, cy: 51.1, score: 10.1 },
+  { cx: 47.9, cy: 48.7, score: 9.9 },
+];
 
-// ── Hooks ─────────────────────────────────────────────────────────────────────
+function shotColor(score: number): string {
+  if (score >= 10.5) return '#F5A623';
+  if (score >= 10.0) return '#4FC3F7';
+  if (score >= 9.0)  return '#00E5A0';
+  return '#FF4D6D';
+}
 
-function useSectionReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null!);
-  const [vis, setVis] = useState(false);
+// ─── SVG Icons ────────────────────────────────────────────────────────────────
+function IconCrosshair({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="3" />
+      <line x1="12" y1="2" x2="12" y2="6" />
+      <line x1="12" y1="18" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="6" y2="12" />
+      <line x1="18" y1="12" x2="22" y2="12" />
+    </svg>
+  );
+}
+
+function IconBrain({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14Z" />
+      <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14Z" />
+    </svg>
+  );
+}
+
+function IconUsers({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function IconTrophy({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+      <path d="M4 22h16" />
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+    </svg>
+  );
+}
+
+function IconMenu({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function IconX({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function IconSun({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="2" x2="12" y2="4" />
+      <line x1="12" y1="20" x2="12" y2="22" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="2" y1="12" x2="4" y2="12" />
+      <line x1="20" y1="12" x2="22" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+function IconMoon({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+// ─── Target Canvas Mockup ─────────────────────────────────────────────────────
+function TargetMockup() {
+  const rings = [50, 40, 30, 22, 15, 9, 5, 2.5];
+  const ringColors = [
+    'rgba(255,255,255,0.05)',
+    'rgba(255,255,255,0.05)',
+    'rgba(255,255,255,0.07)',
+    'rgba(255,255,255,0.07)',
+    '#1a2035',
+    '#1a2035',
+    'rgba(79,195,247,0.12)',
+    'rgba(245,166,35,0.18)',
+  ];
+
+  return (
+    <svg viewBox="0 0 100 100" className="w-full h-full" aria-label="Air rifle target with shot markers">
+      <circle cx="50" cy="50" r="50" fill="#060810" />
+      {rings.map((r, i) => (
+        <circle
+          key={r}
+          cx="50"
+          cy="50"
+          r={r}
+          fill={ringColors[i]}
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth="0.4"
+        />
+      ))}
+      <line x1="50" y1="2" x2="50" y2="22" stroke="rgba(255,255,255,0.12)" strokeWidth="0.4" />
+      <line x1="50" y1="78" x2="50" y2="98" stroke="rgba(255,255,255,0.12)" strokeWidth="0.4" />
+      <line x1="2" y1="50" x2="22" y2="50" stroke="rgba(255,255,255,0.12)" strokeWidth="0.4" />
+      <line x1="78" y1="50" x2="98" y2="50" stroke="rgba(255,255,255,0.12)" strokeWidth="0.4" />
+      {SHOTS.map((shot, i) => {
+        const color = shotColor(shot.score);
+        return (
+          <g key={i}>
+            <circle cx={shot.cx} cy={shot.cy} r="1.6" fill={color} opacity="0.25" />
+            <circle cx={shot.cx} cy={shot.cy} r="0.9" fill={color} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ─── Dashboard Mockup ─────────────────────────────────────────────────────────
+function DashboardMockup({ isDark }: { isDark: boolean }) {
+  const miniShots = SHOTS.slice(0, 4);
+  return (
+    <div
+      className="relative w-full max-w-[420px] mx-auto"
+      style={{ animation: 'lp-floatY 5s ease-in-out infinite' }}
+    >
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: isDark ? 'rgba(12,15,26,0.88)' : 'rgba(255,255,255,0.95)',
+          border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+          backdropFilter: 'blur(24px)',
+          boxShadow: isDark
+            ? '0 0 60px rgba(245,166,35,0.15), 0 0 120px rgba(79,195,247,0.08), 0 24px 64px rgba(0,0,0,0.6)'
+            : '0 0 40px rgba(245,166,35,0.10), 0 8px 40px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.8) inset',
+        }}
+      >
+        {/* Card header */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <div>
+            <p className="font-display font-bold text-[11px] tracking-widest text-[#F5A623] uppercase">Session #047</p>
+            <p className="font-data text-[10px] mt-0.5" style={{ color: isDark ? '#4A5568' : '#8892A4' }}>Air Rifle · 10m · 2026-03-21</p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]" style={{ boxShadow: '0 0 6px #00E5A0' }} />
+            <span className="font-data text-[10px] text-[#00E5A0]">LIVE</span>
+          </div>
+        </div>
+
+        {/* Target */}
+        <div className="px-4 pb-2">
+          <div
+            className="relative w-full aspect-square rounded-xl overflow-hidden"
+            style={{
+              background: isDark ? '#060810' : '#0C1020',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.15)',
+            }}
+          >
+            <TargetMockup />
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-3 gap-2 px-4 pb-3">
+          {[
+            { label: 'AVG', value: '10.45', color: '#F5A623' },
+            { label: 'LAST', value: '9.9', color: '#4FC3F7' },
+            { label: 'MPI', value: '0.8mm', color: '#00E5A0' },
+          ].map(({ label, value, color }) => (
+            <div
+              key={label}
+              className="rounded-lg px-2 py-2 text-center"
+              style={{
+                background: isDark ? 'rgba(19,24,38,0.8)' : 'rgba(0,0,0,0.04)',
+                border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.07)',
+              }}
+            >
+              <p className="font-data font-bold text-sm leading-none" style={{ color }}>{value}</p>
+              <p className="font-data text-[9px] mt-1 tracking-widest" style={{ color: isDark ? '#4A5568' : '#8892A4' }}>{label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Mini shot list */}
+        <div className="px-4 pb-4 space-y-1.5">
+          {miniShots.map((shot, i) => {
+            const color = shotColor(shot.score);
+            const badge = shot.score >= 10.5 ? 'GOLD' : shot.score >= 10.0 ? 'BLUE' : 'GRN';
+            return (
+              <div
+                key={i}
+                className="flex items-center justify-between rounded-lg px-3 py-1.5"
+                style={{
+                  background: isDark ? 'rgba(19,24,38,0.6)' : 'rgba(0,0,0,0.03)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.06)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-data text-[10px]" style={{ color: isDark ? '#4A5568' : '#8892A4' }}>#{String(i + 1).padStart(2, '0')}</span>
+                  <span className="font-data text-[10px] font-bold" style={{ color }}>{shot.score.toFixed(1)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-data text-[9px]" style={{ color: isDark ? '#4A5568' : '#8892A4' }}>
+                    x{shot.cx.toFixed(1)} y{shot.cy.toFixed(1)}
+                  </span>
+                  <span
+                    className="rounded-full px-1.5 py-0.5 font-data text-[8px] font-bold"
+                    style={{ background: `${color}22`, color, border: `1px solid ${color}44` }}
+                  >
+                    {badge}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Ambient orbs */}
+      <div
+        className="absolute -z-10 w-48 h-48 rounded-full blur-3xl pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
+          top: '20%',
+          left: '10%',
+          animation: 'lp-orbFloat 12s ease-in-out infinite',
+        }}
+      />
+      <div
+        className="absolute -z-10 w-40 h-40 rounded-full blur-3xl pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(79,195,247,0.08) 0%, transparent 70%)',
+          bottom: '10%',
+          right: '5%',
+          animation: 'lp-orbFloat 15s ease-in-out infinite reverse',
+        }}
+      />
+    </div>
+  );
+}
+
+// ─── Trust Marquee ────────────────────────────────────────────────────────────
+const TRUST_ITEMS = [
+  { code: 'IND', color: '#FF671F' },
+  { code: 'GER', color: '#FFCE00' },
+  { code: 'CHN', color: '#DE2910' },
+  { code: 'USA', color: '#3C3B6E' },
+  { code: 'RUS', color: '#0039A6' },
+  { code: 'KOR', color: '#C60C30' },
+  { code: 'GBR', color: '#00247D' },
+  { code: 'FRA', color: '#002395' },
+  { code: 'NOR', color: '#EF2B2D' },
+  { code: 'AUT', color: '#ED2939' },
+  { code: 'SRB', color: '#0C4076' },
+  { code: 'HUN', color: '#CE2939' },
+];
+
+function TrustMarquee() {
+  const items = [...TRUST_ITEMS, ...TRUST_ITEMS];
+  return (
+    <div className="relative overflow-hidden">
+      <div
+        className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+        style={{ background: 'linear-gradient(to right, var(--bg-surface), transparent)' }}
+      />
+      <div
+        className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+        style={{ background: 'linear-gradient(to left, var(--bg-surface), transparent)' }}
+      />
+      <div
+        className="flex gap-6 py-3"
+        style={{ animation: 'lp-marquee 32s linear infinite', width: 'max-content' }}
+      >
+        {items.map((item, i) => (
+          <span key={i} className="flex items-center gap-3 whitespace-nowrap">
+            <span
+              className="inline-flex items-center justify-center rounded font-display font-bold text-[10px] tracking-widest px-2 py-0.5"
+              style={{
+                background: `${item.color}22`,
+                border: `1px solid ${item.color}55`,
+                color: item.color,
+              }}
+            >
+              {item.code}
+            </span>
+            <span style={{ color: 'var(--border-subtle)', fontSize: '10px' }}>·</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Feature Card ─────────────────────────────────────────────────────────────
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      className="relative rounded-2xl p-6 transition-all duration-300 cursor-default"
+      style={{
+        background: 'var(--bg-elevated)',
+        border: `1px solid ${hovered ? 'rgba(245,166,35,0.3)' : 'var(--border-subtle)'}`,
+        boxShadow: hovered
+          ? '0 8px 40px rgba(0,0,0,0.4), 0 0 40px -10px rgba(245,166,35,0.15)'
+          : 'none',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+        style={{
+          background: 'rgba(245,166,35,0.12)',
+          border: '1px solid rgba(245,166,35,0.2)',
+        }}
+      >
+        {icon}
+      </div>
+      <h3 className="font-display font-bold text-lg tracking-wide mb-2" style={{ color: 'var(--text-primary)' }}>
+        {title}
+      </h3>
+      <p className="font-body text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        {description}
+      </p>
+    </div>
+  );
+}
+
+// ─── Step Item ────────────────────────────────────────────────────────────────
+interface StepItemProps {
+  number: string;
+  title: string;
+  description: string;
+}
+
+function StepItem({ number, title, description }: StepItemProps) {
+  return (
+    <div className="flex gap-6">
+      <div className="flex-shrink-0 w-16">
+        <span
+          className="font-display font-bold text-5xl leading-none select-none"
+          style={{
+            background: 'linear-gradient(135deg, #F5A623 0%, rgba(245,166,35,0.3) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          {number}
+        </span>
+      </div>
+      <div className="pt-1">
+        <h3 className="font-display font-bold text-xl tracking-wide mb-2" style={{ color: 'var(--text-primary)' }}>
+          {title}
+        </h3>
+        <p className="font-body text-sm leading-relaxed max-w-xs" style={{ color: 'var(--text-secondary)' }}>
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Additional Icons ─────────────────────────────────────────────────────────
+function IconBarChart({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  );
+}
+function IconZap({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+function IconDownload({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+function IconCamera({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" />
+    </svg>
+  );
+}
+function IconShield({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+function IconActivity({ className = '' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  );
+}
+
+// ─── Scroll Reveal Hook ────────────────────────────────────────────────────────
+function useReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVis(true); },
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
       { threshold }
     );
-    if (ref.current) io.observe(ref.current);
-    return () => io.disconnect();
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [threshold]);
-  return [ref, vis] as const;
+  return { ref, visible };
 }
 
-function useCounter(target: number, active: boolean, duration = 1400) {
-  const [val, setVal] = useState(0);
+// ─── Animated Counter ─────────────────────────────────────────────────────────
+function AnimatedCounter({ end, suffix = '', prefix = '', duration = 2000 }: {
+  end: number; suffix?: string; prefix?: string; duration?: number;
+}) {
+  const { ref, visible } = useReveal(0.3);
+  const [count, setCount] = useState(0);
   useEffect(() => {
-    if (!active) return;
-    let v = 0;
-    const step = target / (duration / 16);
-    const t = setInterval(() => {
-      v = Math.min(v + step, target);
-      setVal(Math.round(v));
-      if (v >= target) clearInterval(t);
-    }, 16);
-    return () => clearInterval(t);
-  }, [active, target, duration]);
-  return val;
+    if (!visible) return;
+    const steps = 60;
+    let step = 0;
+    const id = setInterval(() => {
+      step++;
+      setCount(Math.round(end * Math.min(step / steps, 1)));
+      if (step >= steps) clearInterval(id);
+    }, duration / steps);
+    return () => clearInterval(id);
+  }, [visible, end, duration]);
+  return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>;
 }
 
-// ── Deterministic shot data (SSR-safe — no Math.random) ──────────────────────
-
-const HERO_SHOTS = [
-  { cx: 50.4, cy: 49.2, score: 10.9, r: '#F5A623' },
-  { cx: 49.1, cy: 50.8, score: 10.7, r: '#F5A623' },
-  { cx: 51.2, cy: 48.6, score: 10.6, r: '#F5A623' },
-  { cx: 48.8, cy: 51.4, score: 10.4, r: '#4FC3F7' },
-  { cx: 50.9, cy: 50.5, score: 10.8, r: '#F5A623' },
-  { cx: 49.6, cy: 49.0, score: 10.2, r: '#4FC3F7' },
-  { cx: 51.8, cy: 51.1, score: 10.1, r: '#4FC3F7' },
-  { cx: 47.9, cy: 48.7, score:  9.9, r: '#00E5A0' },
+// ─── Stats Section ────────────────────────────────────────────────────────────
+const STATS = [
+  { end: 1200000, suffix: '+', label: 'Shots Analyzed', color: '#F5A623', icon: <IconCrosshair className="w-5 h-5" /> },
+  { end: 48000,   suffix: '+', label: 'Sessions Logged', color: '#4FC3F7', icon: <IconBarChart className="w-5 h-5" /> },
+  { end: 127,     suffix: '',  label: 'Nations Active',  color: '#00E5A0', icon: <IconUsers className="w-5 h-5" /> },
+  { end: 97,      suffix: '.8%', label: 'AI Accuracy',  color: '#A78BFA', icon: <IconActivity className="w-5 h-5" /> },
 ];
 
-const TABLE_SHOTS = [
-  { n:  1, score: 10.3, x: -1.2, y:  0.8 },
-  { n:  2, score: 10.6, x:  0.3, y: -0.4 },
-  { n:  3, score: 10.8, x: -0.6, y:  0.2 },
-  { n:  4, score: 10.1, x:  1.8, y: -1.1 },
-  { n:  5, score: 10.7, x: -0.1, y:  0.6 },
-  { n:  6, score: 10.9, x:  0.4, y: -0.3 },
-  { n:  7, score: 10.4, x: -0.8, y:  0.9 },
-  { n:  8, score: 10.2, x:  1.1, y: -0.7 },
+function StatsSection() {
+  const { ref, visible } = useReveal(0.1);
+  return (
+    <section ref={ref} style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {STATS.map((stat, i) => (
+            <div
+              key={stat.label}
+              className="relative flex flex-col items-center text-center p-6 rounded-2xl transition-all duration-500"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(32px)',
+                transition: `opacity 600ms ${i * 120}ms cubic-bezier(0.16,1,0.3,1), transform 600ms ${i * 120}ms cubic-bezier(0.16,1,0.3,1)`,
+              }}
+            >
+              {/* Top accent line */}
+              <div className="absolute top-0 left-1/4 right-1/4 h-px rounded-full" style={{ background: `linear-gradient(90deg, transparent, ${stat.color}80, transparent)` }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 flex-shrink-0" style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}30`, color: stat.color }}>
+                {stat.icon}
+              </div>
+              <div className="font-data font-black text-3xl lg:text-4xl mb-1 leading-none" style={{ color: stat.color }}>
+                {visible ? <AnimatedCounter end={stat.end} suffix={stat.suffix} /> : '0'}
+              </div>
+              <div className="font-display text-[11px] font-bold tracking-widest uppercase mt-1" style={{ color: 'var(--text-muted)' }}>
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Bento Grid Features ──────────────────────────────────────────────────────
+const BENTO_FEATURES = [
+  {
+    icon: <IconCrosshair className="w-6 h-6" />,
+    title: 'Shot-by-Shot Analysis',
+    description: 'Every shot mapped with x/y coordinates, score deviation, MPI, and group radius. Understand exactly where and why shots land.',
+    color: '#F5A623',
+    span: 'lg:col-span-2',
+    tag: 'Core',
+  },
+  {
+    icon: <IconActivity className="w-6 h-6" />,
+    title: 'Live Biometric Feed',
+    description: 'Sync HRV, heart rate, and breath rhythm. Correlate physiological state with shot scores in real time.',
+    color: '#4FC3F7',
+    span: 'lg:col-span-1',
+    tag: 'Pro',
+  },
+  {
+    icon: <IconUsers className="w-6 h-6" />,
+    title: 'Coach Dashboard',
+    description: 'Invite coaches to review sessions, add structured feedback, and track athlete progression over time.',
+    color: '#00E5A0',
+    span: 'lg:col-span-1',
+    tag: 'Teams',
+  },
+  {
+    icon: <IconBrain className="w-6 h-6" />,
+    title: 'AI Coaching Engine',
+    description: 'Proprietary rules engine delivers structured coaching feedback immediately after every session — no human review needed.',
+    color: '#A78BFA',
+    span: 'lg:col-span-2',
+    tag: 'AI',
+  },
+  {
+    icon: <IconCamera className="w-6 h-6" />,
+    title: 'Vision AI',
+    description: 'Camera-based target analysis. Point, shoot, upload — automatic hole detection and scoring via computer vision.',
+    color: '#FF4D6D',
+    span: 'lg:col-span-1',
+    tag: 'Vision',
+  },
+  {
+    icon: <IconDownload className="w-6 h-6" />,
+    title: 'Export & Reports',
+    description: 'PDF session reports, CSV exports, and shareable session links. Your data, your way.',
+    color: '#F5A623',
+    span: 'lg:col-span-1',
+    tag: 'Export',
+  },
 ];
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
+function BentoFeaturesSection() {
+  return (
+    <section id="features" className="py-24 lg:py-32" style={{ background: 'var(--bg-void)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <p className="font-display font-bold text-[11px] tracking-widest uppercase mb-3" style={{ color: '#F5A623' }}>
+            Platform Capabilities
+          </p>
+          <h2 className="font-display font-bold text-3xl lg:text-5xl" style={{ color: 'var(--text-primary)', lineHeight: '1.15' }}>
+            Built for precision at every level
+          </h2>
+          <p className="font-body text-base mt-4 max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+            Six core capabilities working together to give you an unfair analytical advantage.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {BENTO_FEATURES.map((feat, i) => {
+            const { ref, visible } = useRevealStatic(i);
+            return (
+              <div
+                key={feat.title}
+                ref={ref}
+                className={`relative rounded-2xl p-6 overflow-hidden group cursor-default ${feat.span}`}
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'translateY(0)' : 'translateY(32px)',
+                  transition: `opacity 600ms ${i * 80}ms cubic-bezier(0.16,1,0.3,1), transform 600ms ${i * 80}ms cubic-bezier(0.16,1,0.3,1), border-color 250ms ease, box-shadow 250ms ease`,
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = `${feat.color}40`;
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 40px -8px ${feat.color}22, 0 4px 24px rgba(0,0,0,0.4)`;
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-subtle)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLDivElement).style.transform = visible ? 'translateY(0)' : 'translateY(32px)';
+                }}
+              >
+                {/* Top gradient line */}
+                <div className="absolute top-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, transparent 5%, ${feat.color}60 50%, transparent 95%)`, opacity: 0.6 }} />
+                {/* Background glow blob */}
+                <div className="absolute top-4 right-4 w-32 h-32 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(circle, ${feat.color}08 0%, transparent 70%)` }} />
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${feat.color}16`, border: `1px solid ${feat.color}30`, color: feat.color }}>
+                      {feat.icon}
+                    </div>
+                    <span className="font-display font-bold text-[10px] tracking-widest uppercase px-2 py-0.5 rounded-full" style={{ background: `${feat.color}14`, border: `1px solid ${feat.color}30`, color: feat.color }}>
+                      {feat.tag}
+                    </span>
+                  </div>
+                  <h3 className="font-display font-bold text-lg tracking-wide mb-2" style={{ color: 'var(--text-primary)' }}>{feat.title}</h3>
+                  <p className="font-body text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{feat.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
+// Hooks can't be called inside .map, use a pre-built stable approach
+const BENTO_REFS: Array<{ ref: React.RefObject<HTMLDivElement | null>; visible: boolean }> = [];
+function useRevealStatic(_index: number) {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useReveal(0.1);
+}
+
+// ─── App Preview Section ─────────────────────────────────────────────────────
+function AppPreviewSection({ isDark }: { isDark: boolean }) {
+  const { ref, visible } = useReveal(0.1);
+  return (
+    <section ref={ref} className="py-24 lg:py-32 overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left: text */}
+          <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateX(0)' : 'translateX(-32px)', transition: 'opacity 700ms cubic-bezier(0.16,1,0.3,1), transform 700ms cubic-bezier(0.16,1,0.3,1)' }}>
+            <p className="font-display font-bold text-[11px] tracking-widest uppercase mb-3" style={{ color: '#F5A623' }}>See It In Action</p>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl mb-5" style={{ color: 'var(--text-primary)', lineHeight: '1.15' }}>
+              Your entire session,<br />in one intelligent view.
+            </h2>
+            <p className="font-body text-base leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
+              The Marksman dashboard brings together your shot map, score timeline, AI coaching feedback, and biometric data — all in real time. Nothing gets lost between the firing point and your next training plan.
+            </p>
+            <ul className="space-y-3">
+              {[
+                { icon: <IconCrosshair className="w-4 h-4" />, text: 'Interactive shot-by-shot replay', color: '#F5A623' },
+                { icon: <IconBarChart className="w-4 h-4" />, text: 'Series score trend analysis',     color: '#4FC3F7' },
+                { icon: <IconBrain className="w-4 h-4" />,   text: 'Instant AI coaching feedback',    color: '#A78BFA' },
+                { icon: <IconZap className="w-4 h-4" />,     text: 'Live session with coach access',  color: '#00E5A0' },
+              ].map(({ icon, text, color }) => (
+                <li key={text} className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${color}14`, color }}>{icon}</span>
+                  <span className="font-body text-sm" style={{ color: 'var(--text-secondary)' }}>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right: browser chrome + dashboard */}
+          <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateX(0)' : 'translateX(32px)', transition: 'opacity 700ms 150ms cubic-bezier(0.16,1,0.3,1), transform 700ms 150ms cubic-bezier(0.16,1,0.3,1)' }}>
+            <div className="relative" style={{ animation: 'lp-floatY 6s ease-in-out infinite' }}>
+              {/* Browser chrome */}
+              <div className="rounded-2xl overflow-hidden" style={{ border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)', boxShadow: isDark ? '0 32px 80px rgba(0,0,0,0.7), 0 0 80px rgba(245,166,35,0.08)' : '0 16px 60px rgba(0,0,0,0.15)' }}>
+                {/* URL bar */}
+                <div className="flex items-center gap-3 px-4 py-3" style={{ background: isDark ? '#0C0F1A' : '#F8F9FC', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)' }}>
+                  <div className="flex gap-1.5">
+                    {['#FF5F57','#FFBD2E','#28CA41'].map((c, i) => <div key={i} className="w-3 h-3 rounded-full" style={{ background: c }} />)}
+                  </div>
+                  <div className="flex-1 rounded-md px-3 py-1 text-center" style={{ background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                    <span className="font-data text-[10px]" style={{ color: 'var(--text-muted)' }}>app.marksmanspro.com/sessions</span>
+                  </div>
+                </div>
+                {/* Dashboard content */}
+                <DashboardMockup isDark={isDark} />
+              </div>
+              {/* Ambient glow */}
+              <div className="absolute -z-10 inset-4 rounded-3xl blur-3xl opacity-30" style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.3) 0%, rgba(79,195,247,0.15) 50%, transparent 80%)' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+const TESTIMONIALS = [
+  {
+    quote: "The shot grouping analysis alone changed how I approach each series. I can pinpoint exactly which shots are technique errors vs. ammunition variance.",
+    name: 'Arjun Babuta',
+    role: 'National Rifle Team · IND',
+    initials: 'AB',
+    score: '629.1',
+    scoreLabel: 'World Cup Score',
+    color: '#F5A623',
+  },
+  {
+    quote: "I monitor all my athletes simultaneously in real-time. The AI coaching suggestions surface patterns I'd miss reviewing manually — it's a genuine force multiplier.",
+    name: 'M. Kovalenko',
+    role: 'Olympic Coach · UKR',
+    initials: 'MK',
+    score: '12',
+    scoreLabel: 'Athletes Managed',
+    color: '#4FC3F7',
+  },
+  {
+    quote: "My average improved by 0.4 points in six weeks using the breathing sync analysis. The data doesn't lie — and now neither does my trigger hand.",
+    name: 'Seo Yu-jin',
+    role: 'World Championship Medallist · KOR',
+    initials: 'SY',
+    score: '10.8',
+    scoreLabel: 'Session Average',
+    color: '#00E5A0',
+  },
+];
+
+function TestimonialsSection() {
+  const { ref, visible } = useReveal(0.1);
+  return (
+    <section ref={ref} className="py-24 lg:py-32" style={{ background: 'var(--bg-void)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <p className="font-display font-bold text-[11px] tracking-widest uppercase mb-3" style={{ color: '#F5A623' }}>Social Proof</p>
+          <h2 className="font-display font-bold text-3xl lg:text-5xl" style={{ color: 'var(--text-primary)', lineHeight: '1.15' }}>
+            Trusted by elite athletes
+          </h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={t.name}
+              className="relative rounded-2xl p-6 flex flex-col"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(36px)',
+                transition: `opacity 700ms ${i * 120}ms cubic-bezier(0.16,1,0.3,1), transform 700ms ${i * 120}ms cubic-bezier(0.16,1,0.3,1)`,
+              }}
+            >
+              {/* Top accent */}
+              <div className="absolute top-0 left-6 right-6 h-px" style={{ background: `linear-gradient(90deg, transparent, ${t.color}60, transparent)` }} />
+              {/* Quote mark */}
+              <span className="font-serif text-5xl leading-none mb-3 select-none" style={{ color: `${t.color}40` }}>"</span>
+              <p className="font-body text-sm leading-relaxed flex-1 mb-6" style={{ color: 'var(--text-secondary)' }}>"{t.quote}"</p>
+              {/* Score badge */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="rounded-xl px-3 py-2 text-center" style={{ background: `${t.color}12`, border: `1px solid ${t.color}25` }}>
+                  <div className="font-data font-black text-xl leading-none" style={{ color: t.color }}>{t.score}</div>
+                  <div className="font-display text-[9px] font-bold tracking-widest uppercase mt-0.5" style={{ color: `${t.color}80` }}>{t.scoreLabel}</div>
+                </div>
+              </div>
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center font-display font-black text-sm flex-shrink-0" style={{ background: `${t.color}20`, color: t.color, border: `1.5px solid ${t.color}40` }}>
+                  {t.initials}
+                </div>
+                <div>
+                  <div className="font-display font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{t.name}</div>
+                  <div className="font-body text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const { user }  = useAuth();
+  const { user } = useAuth();
+  const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
-  const router    = useRouter();
-  const [mounted, setMounted]     = useState(false);
-  const [navSolid, setNavSolid]   = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => { if (mounted && user) router.replace('/dashboard'); }, [user, mounted, router]);
   useEffect(() => {
-    const h = () => setNavSolid(window.scrollY > 60);
-    window.addEventListener('scroll', h, { passive: true });
-    return () => window.removeEventListener('scroll', h);
+    setMounted(true);
   }, []);
 
-  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -98,1939 +832,677 @@ export default function HomePage() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
-  if (!mounted || user) return <PageLoader />;
+  const isLoggedIn = mounted && !!user;
+  const isDark = !mounted || resolvedTheme !== 'light';
 
-  const isDark = resolvedTheme !== 'light';
-  const pageBg   = isDark ? '#060810' : '#F4F6FB';
-  const pageText  = isDark ? '#F0F4FF' : '#0E1118';
-  const navBgSolid = isDark ? 'rgba(6,8,16,0.92)' : 'rgba(244,246,251,0.92)';
-  const navBorderSolid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
+  const scrollTo = (id: string) => {
+    setMobileMenuOpen(false);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <PageTheme.Provider value={isDark}>
-    <div style={{ background: pageBg, color: pageText, overflowX: 'hidden', transition: 'background 0.4s, color 0.4s' }}>
+    <>
+      <style>{`
+        @keyframes lp-marquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        @keyframes lp-floatY {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-8px); }
+        }
+        @keyframes lp-orbFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33%       { transform: translate(16px, -18px) scale(1.06); }
+          66%       { transform: translate(-10px, 8px) scale(0.96); }
+        }
+        @keyframes lp-heroFadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lp-heroFadeUpDelay {
+          0%   { opacity: 0; transform: translateY(28px); }
+          20%  { opacity: 0; transform: translateY(28px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lp-drawerIn {
+          from { transform: translateX(100%); }
+          to   { transform: translateX(0); }
+        }
+        @keyframes lp-counterUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lp-sectionReveal {
+          from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(3px); }
+          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes lp-borderPulse {
+          0%, 100% { border-color: rgba(245,166,35,0.25); }
+          50% { border-color: rgba(245,166,35,0.6); box-shadow: 0 0 24px rgba(245,166,35,0.15); }
+        }
+        @keyframes lp-scanH {
+          from { transform: translateX(-100%); }
+          to   { transform: translateX(200%); }
+        }
+        html { scroll-behavior: smooth; }
+      `}</style>
 
-      {/* ── Navigation ──────────────────────────────────────────────────────── */}
-      <nav
-        className="fixed top-0 inset-x-0 z-50 transition-all duration-500"
-        style={{
-          height: 64,
-          background: navSolid || mobileMenuOpen ? navBgSolid : 'transparent',
-          backdropFilter: navSolid || mobileMenuOpen ? 'blur(20px) saturate(160%)' : 'none',
-          borderBottom: navSolid || mobileMenuOpen ? `1px solid ${navBorderSolid}` : '1px solid transparent',
-        }}
-      >
-        <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between px-4 sm:px-8 lg:px-12">
+      <div className="min-h-screen font-body" style={{ background: 'var(--bg-void)', color: 'var(--text-primary)' }}>
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <CrosshairLogo size={24} />
-            <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase" style={{ color: pageText }}>
-              Marksman
-            </span>
-          </Link>
+        {/* ── NAVBAR ─────────────────────────────────────────────────────── */}
+        <nav
+          className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+          style={scrolled ? {
+            backdropFilter: 'blur(12px)',
+            background: 'rgba(8,10,15,0.85)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          } : {}}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
 
-          {/* Nav links — desktop */}
-          <div className="hidden md:flex items-center gap-8">
-            {[['Features', '#features'], ['Analytics', '#analytics'], ['AI Coach', '#ai-coach'], ['How it works', '#how']].map(([label, href]) => (
-              <a key={label} href={href}
-                className="text-[13px] font-display font-semibold uppercase tracking-[0.07em] transition-colors duration-200"
-                style={{ color: isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.45)' }}
-                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = pageText; }}
-                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.45)'; }}
-              >{label}</a>
-            ))}
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+                <div className="w-8 h-8 text-[#F5A623]">
+                  <IconCrosshair className="w-full h-full" />
+                </div>
+                <span className="font-display font-bold text-xl tracking-widest text-[#F0F4FF] uppercase">
+                  Marksman
+                </span>
+              </Link>
+
+              {/* Desktop center links */}
+              <div className="hidden md:flex items-center gap-8">
+                {[
+                  { label: 'Features', id: 'features' },
+                  { label: 'How it Works', id: 'how-it-works' },
+                  { label: 'Pricing', id: 'pricing' },
+                ].map(({ label, id }) => (
+                  <button
+                    key={id}
+                    onClick={() => scrollTo(id)}
+                    className="font-body text-sm transition-colors duration-200 hover:text-[#F5A623]"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Desktop right CTA */}
+              <div className="hidden md:flex items-center gap-4">
+                {/* Theme toggle */}
+                {mounted && (
+                  <button
+                    onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200"
+                    style={{ color: 'var(--text-secondary)' }}
+                    aria-label={resolvedTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                  >
+                    {resolvedTheme === 'light' ? <IconMoon className="w-4.5 h-4.5" /> : <IconSun className="w-4.5 h-4.5" />}
+                  </button>
+                )}
+                {isLoggedIn ? (
+                  <Link
+                    href="/dashboard"
+                    className="font-display font-bold text-sm tracking-wide px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.03]"
+                    style={{ background: '#F5A623', color: '#080A0F' }}
+                  >
+                    Go to Dashboard →
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className="font-body text-sm transition-colors duration-200 hover:text-[#F5A623]"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="font-display font-bold text-sm tracking-wide px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.03]"
+                      style={{
+                        background: '#F5A623',
+                        color: '#080A0F',
+                        boxShadow: '0 0 24px rgba(245,166,35,0.3)',
+                      }}
+                    >
+                      Get Started →
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile controls */}
+              <div className="md:hidden flex items-center gap-1">
+                {mounted && (
+                  <button
+                    onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-200"
+                    style={{ color: 'var(--text-secondary)' }}
+                    aria-label={resolvedTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                  >
+                    {resolvedTheme === 'light' ? <IconMoon className="w-4 h-4" /> : <IconSun className="w-4 h-4" />}
+                  </button>
+                )}
+                <button
+                  className="w-11 h-11 flex items-center justify-center rounded-lg"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onClick={() => setMobileMenuOpen(true)}
+                  aria-label="Open navigation menu"
+                >
+                  <IconMenu className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
           </div>
+        </nav>
 
-          {/* Auth CTAs */}
-          <div className="flex items-center gap-2">
-
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-              className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 active:scale-90 shrink-0"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
-                color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.55)',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.1)';
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.35)';
-                (e.currentTarget as HTMLElement).style.color = '#F5A623';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-                (e.currentTarget as HTMLElement).style.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)';
-                (e.currentTarget as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.55)';
-              }}
-              aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-              title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-            >
-              {resolvedTheme === 'dark' ? (
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                  <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                </svg>
-              ) : (
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-            </button>
-
-            <Link href="/auth/login"
-              className="hidden sm:block text-[13px] font-display font-semibold px-3 py-2 rounded-lg transition-all duration-200"
-              style={{ color: isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = pageText; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)'; }}
-            >Sign in</Link>
-            <Link href="/auth/register"
-              className="hidden xs:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-display font-bold uppercase tracking-[0.07em] transition-all duration-200 active:scale-95"
-              style={{
-                background: 'rgba(245,166,35,0.12)',
-                border: '1px solid rgba(245,166,35,0.35)',
-                color: '#F5A623',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.2)';
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.6)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.12)';
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.35)';
-              }}
-            >Get started</Link>
-
-            {/* Mobile Hamburger */}
-            <button
-              className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 active:scale-90"
-              onClick={() => setMobileMenuOpen((v) => !v)}
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
-                color: isDark ? 'rgba(240,244,255,0.7)' : 'rgba(14,17,24,0.6)',
-              }}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {mobileMenuOpen ? (
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="2" y1="2" x2="14" y2="14" />
-                  <line x1="14" y1="2" x2="2" y2="14" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="2" y1="4" x2="14" y2="4" />
-                  <line x1="2" y1="8" x2="11" y2="8" />
-                  <line x1="2" y1="12" x2="14" y2="12" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
+        {/* ── MOBILE DRAWER ────────────────────────────────────────────── */}
         {mobileMenuOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <div
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 flex flex-col pt-6 px-6"
+              style={{
+                background: 'var(--bg-elevated)',
+                borderLeft: '1px solid var(--border-subtle)',
+                animation: 'lp-drawerIn 280ms cubic-bezier(0.16,1,0.3,1) both',
+              }}
+            >
+              <div className="flex items-center justify-between mb-8">
+                <span className="font-display font-bold text-lg tracking-widest uppercase" style={{ color: 'var(--text-primary)' }}>
+                  Menu
+                </span>
+                <div className="flex items-center gap-1">
+                  {mounted && (
+                    <button
+                      onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200"
+                      style={{ color: 'var(--text-secondary)' }}
+                      aria-label={resolvedTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                    >
+                      {resolvedTheme === 'light' ? <IconMoon className="w-4 h-4" /> : <IconSun className="w-4 h-4" />}
+                    </button>
+                  )}
+                  <button
+                    className="w-10 h-10 flex items-center justify-center rounded-lg"
+                    style={{ color: 'var(--text-secondary)' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Close menu"
+                  >
+                    <IconX className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 flex-1">
+                {[
+                  { label: 'Features', id: 'features' },
+                  { label: 'How it Works', id: 'how-it-works' },
+                  { label: 'Pricing', id: 'pricing' },
+                ].map(({ label, id }) => (
+                  <button
+                    key={id}
+                    onClick={() => scrollTo(id)}
+                    className="text-left px-4 py-3 rounded-xl font-body text-base transition-colors duration-200 hover:bg-[#1A2035]"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-col gap-3 pb-8">
+                {isLoggedIn ? (
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="font-display font-bold text-sm tracking-wide px-5 py-3.5 rounded-xl text-center"
+                    style={{ background: '#F5A623', color: '#080A0F' }}
+                  >
+                    Go to Dashboard →
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-body text-sm py-3.5 text-center rounded-xl border transition-colors duration-200"
+                      style={{
+                        color: 'var(--text-secondary)',
+                        borderColor: 'var(--border-subtle)',
+                        background: 'transparent',
+                      }}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-display font-bold text-sm tracking-wide px-5 py-3.5 rounded-xl text-center"
+                      style={{ background: '#F5A623', color: '#080A0F' }}
+                    >
+                      Get Started →
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ── HERO ───────────────────────────────────────────────────────── */}
+        <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+          {/* Background image with gradient overlay */}
           <div
-            className="md:hidden absolute top-full inset-x-0"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              background: navBgSolid,
-              backdropFilter: 'blur(24px) saturate(180%)',
-              borderBottom: `1px solid ${navBorderSolid}`,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+              backgroundImage: 'url(https://images.unsplash.com/photo-1547347298-4074ad3086f0?w=1800&auto=format&fit=crop&q=70)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 40%',
+              filter: 'brightness(0.18) saturate(0.6)',
             }}
-          >
-            <div className="flex flex-col px-4 py-4 gap-1">
-              {[['Features', '#features'], ['Analytics', '#analytics'], ['AI Coach', '#ai-coach'], ['How it works', '#how']].map(([label, href]) => (
-                <a
-                  key={label}
-                  href={href}
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-3 py-3 rounded-xl text-[14px] font-display font-semibold uppercase tracking-[0.07em] transition-colors duration-150 active:scale-[0.98]"
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(6,8,16,0.7) 0%, rgba(8,12,28,0.4) 40%, rgba(6,8,16,0.85) 100%)',
+            }}
+          />
+          {/* Scan line animation */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.025]">
+            <div className="absolute inset-x-0 h-px bg-[#F5A623]" style={{ top: '30%', animation: 'lp-scanH 8s linear infinite' }} />
+          </div>
+          {/* Ambient glows */}
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              width: '80vw', height: '80vw', maxWidth: '900px', maxHeight: '900px',
+              background: 'radial-gradient(circle at 30% 50%, rgba(245,166,35,0.09) 0%, transparent 60%)',
+              top: '-10%', left: '-10%',
+            }}
+          />
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              width: '60vw', height: '60vw', maxWidth: '700px', maxHeight: '700px',
+              background: 'radial-gradient(circle at 70% 60%, rgba(79,195,247,0.07) 0%, transparent 60%)',
+              top: '10%', right: '-5%',
+            }}
+          />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 lg:py-24">
+            <div className="grid lg:grid-cols-[55%_45%] gap-12 lg:gap-8 items-center">
+
+              {/* Left column */}
+              <div style={{ animation: 'lp-heroFadeUp 700ms cubic-bezier(0.16,1,0.3,1) both' }}>
+                {/* Pill badge */}
+                <div
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6"
                   style={{
-                    color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.6)',
+                    background: 'rgba(245,166,35,0.08)',
+                    border: '1px solid rgba(245,166,35,0.25)',
                   }}
                 >
-                  {label}
-                </a>
-              ))}
-              <div className="h-px my-1" style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
-              <Link
-                href="/auth/login"
-                onClick={closeMobileMenu}
-                className="flex items-center px-3 py-3 rounded-xl text-[14px] font-display font-semibold transition-colors duration-150"
-                style={{ color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.6)' }}
-              >Sign in</Link>
-              <Link
-                href="/auth/register"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-center gap-2 mx-0 px-4 py-3 rounded-xl text-[13px] font-display font-bold uppercase tracking-[0.08em] transition-all duration-200 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #F5A623 0%, #E8961A 100%)',
-                  color: '#060810',
-                  boxShadow: '0 0 24px rgba(245,166,35,0.25)',
-                }}
-              >Get started free</Link>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* ── HERO ─────────────────────────────────────────────────────────────── */}
-      <HeroSection />
-
-      {/* ── Stats strip ─────────────────────────────────────────────────────── */}
-      <StatsStrip />
-
-      {/* ── Features ────────────────────────────────────────────────────────── */}
-      <FeaturesSection />
-
-      {/* ── Roles ───────────────────────────────────────────────────────────── */}
-      <RolesSection />
-
-      {/* ── Analytics showcase ──────────────────────────────────────────────── */}
-      <AnalyticsShowcase />
-
-      {/* ── AI Coach ────────────────────────────────────────────────────────── */}
-      <AICoachSection />
-
-      {/* ── How it works ────────────────────────────────────────────────────── */}
-      <HowItWorksSection />
-
-      {/* ── Final CTA ───────────────────────────────────────────────────────── */}
-      <CTASection />
-
-      {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <Footer />
-
-    </div>
-    </PageTheme.Provider>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// HERO SECTION
-// GitHub-aurora aesthetic: deep void + shifting colour orbs + product window
-// ═════════════════════════════════════════════════════════════════════════════
-
-const HERO_PARTICLES = [
-  { x: 12, y: 18, s: 3, c: '#F5A623', d: '0s',   dur: '6s'   },
-  { x: 28, y: 72, s: 2, c: '#4FC3F7', d: '1.2s', dur: '8s'   },
-  { x: 45, y: 35, s: 2, c: '#00E5A0', d: '2.4s', dur: '7s'   },
-  { x: 62, y: 58, s: 3, c: '#F5A623', d: '0.6s', dur: '9s'   },
-  { x: 78, y: 22, s: 2, c: '#4FC3F7', d: '3.1s', dur: '6.5s' },
-  { x: 88, y: 80, s: 2, c: '#00E5A0', d: '1.8s', dur: '7.5s' },
-  { x: 8,  y: 55, s: 2, c: '#F5A623', d: '4.0s', dur: '8.5s' },
-  { x: 35, y: 90, s: 3, c: '#4FC3F7', d: '2.0s', dur: '6s'   },
-  { x: 55, y: 12, s: 2, c: '#F5A623', d: '1.5s', dur: '9.5s' },
-  { x: 72, y: 45, s: 2, c: '#00E5A0', d: '3.6s', dur: '7s'   },
-  { x: 18, y: 40, s: 2, c: '#4FC3F7', d: '0.9s', dur: '8s'   },
-  { x: 92, y: 38, s: 3, c: '#F5A623', d: '2.7s', dur: '6.5s' },
-  { x: 40, y: 65, s: 2, c: '#00E5A0', d: '4.5s', dur: '9s'   },
-  { x: 68, y: 88, s: 2, c: '#4FC3F7', d: '1.1s', dur: '7.5s' },
-  { x: 25, y: 8,  s: 2, c: '#F5A623', d: '3.3s', dur: '8s'   },
-  { x: 82, y: 62, s: 3, c: '#00E5A0', d: '0.4s', dur: '6s'   },
-  { x: 52, y: 78, s: 2, c: '#4FC3F7', d: '2.2s', dur: '9s'   },
-  { x: 15, y: 85, s: 2, c: '#F5A623', d: '4.8s', dur: '7s'   },
-  { x: 75, y: 10, s: 2, c: '#00E5A0', d: '1.7s', dur: '8.5s' },
-  { x: 38, y: 50, s: 3, c: '#4FC3F7', d: '3.9s', dur: '6s'   },
-];
-
-function HeroSection() {
-  const isDark = usePageTheme();
-  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
-  const textMut  = isDark ? 'rgba(240,244,255,0.55)'  : 'rgba(14,17,24,0.6)';
-  const textDim  = isDark ? 'rgba(240,244,255,0.4)'   : 'rgba(14,17,24,0.45)';
-  const dotGrid  = isDark ? 'rgba(255,255,255,0.06)'  : 'rgba(0,0,0,0.05)';
-  const scrollBd = isDark ? 'rgba(255,255,255,0.15)'  : 'rgba(0,0,0,0.15)';
-  const secBtnBg = isDark ? 'rgba(240,244,255,0.04)'  : 'rgba(0,0,0,0.04)';
-  const secBtnBd = isDark ? 'rgba(240,244,255,0.1)'   : 'rgba(0,0,0,0.1)';
-  const secBtnTx = isDark ? 'rgba(240,244,255,0.6)'   : 'rgba(14,17,24,0.6)';
-
-  return (
-    <section
-      className="relative flex flex-col items-center justify-center overflow-hidden"
-      style={{ minHeight: '100dvh', paddingTop: 64 }}
-    >
-      {/* ── Aurora background ─── */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-
-        {/* Dot grid */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
-        }} />
-
-        {/* Primary aurora — amber/gold */}
-        <div className="absolute" style={{
-          top: '5%', left: '50%', transform: 'translateX(-50%)',
-          width: '900px', height: '600px',
-          background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.13) 0%, rgba(245,166,35,0.05) 35%, transparent 65%)',
-          filter: 'blur(40px)',
-          animation: 'breathe 8s ease-in-out infinite',
-        }} />
-
-        {/* Secondary aurora — blue */}
-        <div className="absolute" style={{
-          bottom: '10%', right: '5%',
-          width: '600px', height: '500px',
-          background: 'radial-gradient(ellipse, rgba(79,195,247,0.08) 0%, transparent 60%)',
-          filter: 'blur(50px)',
-          animation: 'breathe 11s ease-in-out 3s infinite',
-        }} />
-
-        {/* Tertiary aurora — green */}
-        <div className="absolute" style={{
-          top: '30%', left: '-5%',
-          width: '500px', height: '400px',
-          background: 'radial-gradient(ellipse, rgba(0,229,160,0.06) 0%, transparent 60%)',
-          filter: 'blur(60px)',
-          animation: 'breathe 14s ease-in-out 6s infinite',
-        }} />
-
-        {/* Horizontal scan line */}
-        <div className="absolute inset-x-0 top-0 h-px" style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.3) 30%, rgba(79,195,247,0.2) 60%, transparent 100%)',
-          top: 64,
-        }} />
-
-        {/* Floating particles */}
-        {HERO_PARTICLES.map((p, i) => (
-          <div key={i} className="absolute rounded-full pointer-events-none" style={{
-            left: `${p.x}%`, top: `${p.y}%`,
-            width: p.s, height: p.s,
-            background: p.c,
-            opacity: 0.45,
-            boxShadow: `0 0 ${p.s * 3}px ${p.c}80`,
-            animation: `floatY ${p.dur} ease-in-out ${p.d} infinite`,
-          }} />
-        ))}
-
-        {/* Radar ping rings */}
-        <div className="absolute pointer-events-none" style={{
-          bottom: '15%', right: '25%',
-          width: 200, height: 200,
-          borderRadius: '50%',
-          border: '1px solid rgba(245,166,35,0.15)',
-          animation: 'radarPing 3s cubic-bezier(0,0,0.2,1) infinite',
-        }} />
-        <div className="absolute pointer-events-none" style={{
-          bottom: '15%', right: '25%',
-          width: 200, height: 200,
-          borderRadius: '50%',
-          border: '1px solid rgba(79,195,247,0.12)',
-          animation: 'radarPing 3s cubic-bezier(0,0,0.2,1) 1.5s infinite',
-        }} />
-
-        {/* Moving scan line sweep */}
-        <div className="absolute inset-x-0 h-px pointer-events-none" style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(245,166,35,0.4) 50%, transparent 100%)',
-          animation: 'scanLine 8s linear infinite',
-          opacity: 0.6,
-        }} />
-      </div>
-
-      {/* ── Main content ─── */}
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-20">
-        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-8 lg:gap-16 items-center">
-
-          {/* ── Left: text ── */}
-          <div>
-            {/* Trust badge */}
-            <div
-              className="inline-flex items-center gap-2.5 mb-7 px-3.5 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(245,166,35,0.08)',
-                border: '1px solid rgba(245,166,35,0.22)',
-                animation: 'fadeIn 500ms both',
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F5A623' }} />
-              <span className="text-[11px] font-display font-bold uppercase tracking-[0.15em]" style={{ color: '#F5A623' }}>
-                Trusted by 12 national teams
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h1
-              className="font-display font-black leading-[1.08] tracking-[-0.01em] mb-5"
-              style={{ fontSize: 'clamp(2.1rem, 5.5vw, 4.2rem)', animation: 'slideUp 600ms 80ms both' }}
-            >
-              The performance<br />
-              platform built for{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #F5A623 0%, #FFD580 40%, #F5A623 100%)',
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  animation: 'gradientFlow 4s linear infinite',
-                }}
-              >
-                elite shooters.
-              </span>
-            </h1>
-
-            {/* Subtext */}
-            <p
-              className="text-base sm:text-[17px] leading-[1.7] mb-9 max-w-[500px]"
-              style={{ color: textMut, animation: 'slideUp 600ms 160ms both' }}
-            >
-              Track every shot with millimetre precision. Detect technique flaws automatically.
-              Receive structured coaching from Claude Opus 4.6 — after every single session.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 mb-8" style={{ animation: 'slideUp 600ms 240ms both' }}>
-              <Link
-                href="/auth/register"
-                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-display font-black text-[13px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
-                style={{ background: 'linear-gradient(135deg, #F5A623 0%, #E8961A 100%)', color: '#060810', boxShadow: '0 0 40px rgba(245,166,35,0.25), 0 4px 16px rgba(245,166,35,0.3)' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 60px rgba(245,166,35,0.4), 0 6px 24px rgba(245,166,35,0.4)'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 40px rgba(245,166,35,0.25), 0 4px 16px rgba(245,166,35,0.3)'; }}
-              >
-                Start for free <ArrowRightIcon />
-              </Link>
-              <Link
-                href="/auth/login"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-display font-semibold text-[13px] transition-all duration-200"
-                style={{ background: secBtnBg, border: `1px solid ${secBtnBd}`, color: secBtnTx }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = isDark ? 'rgba(240,244,255,0.08)' : 'rgba(0,0,0,0.08)';
-                  (e.currentTarget as HTMLElement).style.color = textPri;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = secBtnBg;
-                  (e.currentTarget as HTMLElement).style.color = secBtnTx;
-                }}
-              >
-                Sign in to dashboard
-              </Link>
-            </div>
-
-            {/* Live stat pills */}
-            <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3" style={{ animation: 'slideUp 600ms 320ms both' }}>
-              {[
-                { val: '10.9', label: 'World Record', color: '#F5A623', glowColor: 'rgba(245,166,35,0.1)' },
-                { val: '2,847', label: 'Shooters tracked', color: '#4FC3F7', glowColor: 'rgba(79,195,247,0.08)' },
-                { val: '98.4%', label: 'AI accuracy', color: '#00E5A0', glowColor: 'rgba(0,229,160,0.08)' },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                  style={{ background: s.glowColor, border: `1px solid ${s.color}20` }}
-                >
-                  <span className="font-data font-black text-[15px]" style={{ color: s.color }}>{s.val}</span>
-                  <span className="text-[10px] font-display uppercase tracking-[0.07em]" style={{ color: textDim }}>
-                    {s.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Right: product window (hidden on sm, shown from md up) ── */}
-          <div className="hidden md:block" style={{ animation: 'slideUp 700ms 120ms both' }}>
-            <HeroProductWindow />
-          </div>
-
-        </div>
-      </div>
-
-      {/* Scroll hint */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        style={{ animation: 'fadeIn 1s 1.5s both', opacity: 0 }}>
-        <div className="w-5 h-8 rounded-full border flex items-start justify-center pt-1.5"
-          style={{ borderColor: scrollBd }}>
-          <div className="w-1 h-1.5 rounded-full" style={{ background: 'rgba(245,166,35,0.6)', animation: 'scrollDot 1.8s ease-in-out infinite' }} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Hero Product Window ───────────────────────────────────────────────────────
-
-function HeroProductWindow() {
-  const [shots, setShots] = useState(0);
-  const SIZE = 260;
-  const rings = [115, 98, 80, 62, 46, 30, 18, 10];
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      let n = 0;
-      const id = setInterval(() => {
-        n++;
-        setShots(n);
-        if (n >= HERO_SHOTS.length) clearInterval(id);
-      }, 280);
-      return () => clearInterval(id);
-    }, 900);
-    return () => clearTimeout(t);
-  }, []);
-
-  const lastShot = HERO_SHOTS[shots - 1];
-  const avg = shots > 0
-    ? (HERO_SHOTS.slice(0, shots).reduce((a, s) => a + s.score, 0) / shots).toFixed(2)
-    : null;
-
-  return (
-    <div className="relative overflow-x-auto">
-      {/* Outer glow */}
-      <div className="absolute -inset-8 rounded-3xl pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.07) 0%, transparent 65%)',
-      }} />
-
-      {/* Window frame - min width to keep the layout intact, scrollable on small screens */}
-      <div
-        className="relative rounded-2xl overflow-hidden"
-        style={{
-          minWidth: 480,
-          background: 'rgba(13,17,28,0.95)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,166,35,0.06), inset 0 1px 0 rgba(255,255,255,0.05)',
-        }}
-      >
-        {/* Title bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,77,109,0.7)' }} />
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(245,166,35,0.7)' }} />
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(0,229,160,0.7)' }} />
-          </div>
-          <div className="flex-1 text-center">
-            <span className="text-[11px] font-display uppercase tracking-[0.12em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
-              10m Air Rifle · Session #2847
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
-            <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Live</span>
-          </div>
-        </div>
-
-        {/* Content: target + stats side by side */}
-        <div className="flex gap-0">
-
-          {/* Target panel */}
-          <div className="flex-shrink-0 flex items-center justify-center p-6"
-            style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: 'rgba(6,8,16,0.5)' }}>
-            <div className="relative" style={{ width: SIZE, height: SIZE }}>
-              <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} className="w-full h-full">
-                {/* Ring fill */}
-                <circle cx={130} cy={130} r={SIZE / 2 - 1} fill="rgba(245,166,35,0.015)" />
-                <circle cx={130} cy={130} r={22}           fill="rgba(245,166,35,0.05)" />
-
-                {/* Rings */}
-                {rings.map((r, i) => {
-                  const circ = 2 * Math.PI * r;
-                  const isGold = i >= 6;
-                  return (
-                    <circle key={r} cx={130} cy={130} r={r}
-                      fill="none"
-                      stroke={isGold ? 'rgba(245,166,35,0.9)' : 'rgba(255,255,255,0.1)'}
-                      strokeWidth={isGold ? 1.5 : 0.6}
-                      strokeDasharray={circ} strokeDashoffset={circ}
-                      style={{ animation: `dashDraw 1.2s cubic-bezier(0.16,1,0.3,1) ${i * 100}ms forwards` }}
-                    />
-                  );
-                })}
-
-                {/* Crosshair */}
-                {[[130, 5, 130, 105], [130, 155, 130, SIZE - 5], [5, 130, 105, 130], [155, 130, SIZE - 5, 130]].map(([x1, y1, x2, y2], i) => (
-                  <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke="rgba(245,166,35,0.5)" strokeWidth="0.8" strokeLinecap="round"
-                    strokeDasharray="200" strokeDashoffset="200"
-                    style={{ animation: `dashDraw 0.6s ease ${900 + i * 50}ms forwards` }}
+                  <span
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: '#F5A623', boxShadow: '0 0 6px #F5A623' }}
                   />
-                ))}
-
-                {/* Center */}
-                <circle cx={130} cy={130} r={3} fill="#F5A623"
-                  style={{ animation: 'fadeIn 200ms 1400ms both' }} />
-
-                {/* Shot dots */}
-                {HERO_SHOTS.slice(0, shots).map((s, i) => {
-                  const px = (s.cx / 100) * SIZE;
-                  const py = (s.cy / 100) * SIZE;
-                  return (
-                    <g key={i}>
-                      <circle cx={px} cy={py} r={4.5} fill={s.r} opacity={0.92}
-                        style={{ filter: `drop-shadow(0 0 4px ${s.r}80)`, animation: 'shotPop 280ms cubic-bezier(0.16,1,0.3,1) both' }} />
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-          </div>
-
-          {/* Stats panel */}
-          <div className="flex-1 flex flex-col justify-between p-4 min-w-[160px]">
-            {/* Live score badge */}
-            {lastShot ? (
-              <div>
-                <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(240,244,255,0.35)' }}>Last shot</p>
-                <p className="font-data font-black text-4xl leading-none mb-0.5"
-                  style={{ color: lastShot.r, filter: `drop-shadow(0 0 12px ${lastShot.r}60)` }}>
-                  {lastShot.score.toFixed(1)}
-                </p>
-                <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.3)' }}>
-                  {lastShot.score >= 10.5 ? 'X-Ring' : lastShot.score >= 10.0 ? '10-Ring' : '9-Ring'}
-                </p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-1" style={{ color: 'rgba(240,244,255,0.35)' }}>Session</p>
-                <p className="font-data font-black text-4xl leading-none mb-0.5" style={{ color: 'rgba(240,244,255,0.15)' }}>—</p>
-                <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.2)' }}>Waiting</p>
-              </div>
-            )}
-
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
-
-            {/* Quick stats grid */}
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: 'Avg', value: avg ?? '—', color: '#F5A623' },
-                { label: 'Shots', value: shots > 0 ? String(shots) : '0', color: '#4FC3F7' },
-                { label: 'X-Ring', value: String(HERO_SHOTS.slice(0, shots).filter(s => s.score >= 10.5).length), color: '#F5A623' },
-                { label: 'Series', value: shots > 0 ? 'S1' : '—', color: '#00E5A0' },
-              ].map((s) => (
-                <div key={s.label} className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  <p className="text-[9px] font-display uppercase tracking-[0.12em] mb-0.5" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.label}</p>
-                  <p className="font-data font-bold text-base" style={{ color: s.color }}>{s.value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
-
-            {/* AI indicator */}
-            <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg" style={{ background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.12)' }}>
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F5A623' }} />
-              <span className="text-[10px] font-display uppercase tracking-[0.12em]" style={{ color: 'rgba(245,166,35,0.7)' }}>
-                AI analysis ready
-              </span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Bottom bar */}
-        <div className="flex items-center justify-between px-4 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
-          <div className="flex items-center gap-4">
-            {['Session', 'Performance', 'AI Coach'].map((t, i) => (
-              <button key={t} className="text-[10px] font-display uppercase tracking-[0.1em] transition-colors"
-                style={{ color: i === 0 ? '#F5A623' : 'rgba(240,244,255,0.25)', borderBottom: i === 0 ? '1px solid #F5A623' : '1px solid transparent', paddingBottom: 2 }}>
-                {t}
-              </button>
-            ))}
-          </div>
-          <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.2)' }}>
-            10m · 40 shots
-          </span>
-        </div>
-      </div>
-
-      {/* Floating badges */}
-      <div
-        className="absolute -top-4 -right-4 flex items-center gap-2 px-3.5 py-2.5 rounded-xl"
-        style={{
-          background: 'rgba(13,17,28,0.95)',
-          border: '1px solid rgba(0,229,160,0.25)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-          animation: 'floatY 5s ease-in-out infinite',
-        }}
-      >
-        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,229,160,0.12)' }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="1,8 3.5,5.5 6,6.5 9,3 11,4.5" />
-          </svg>
-        </div>
-        <div>
-          <p className="font-data font-bold text-sm leading-none" style={{ color: '#00E5A0' }}>+18%</p>
-          <p className="text-[9px] font-display uppercase tracking-widest mt-0.5" style={{ color: 'rgba(240,244,255,0.35)' }}>Group radius</p>
-        </div>
-      </div>
-
-      <div
-        className="absolute -bottom-4 -left-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl"
-        style={{
-          background: 'rgba(13,17,28,0.95)',
-          border: '1px solid rgba(245,166,35,0.25)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-          animation: 'floatY 6s ease-in-out 2s infinite',
-        }}
-      >
-        <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(245,166,35,0.12)' }}>
-          <span className="text-[11px]" style={{ color: '#F5A623' }}>✦</span>
-        </div>
-        <div>
-          <p className="font-display font-bold text-[11px] leading-tight" style={{ color: '#F5A623' }}>AI Coach</p>
-          <p className="text-[9px] font-display mt-0.5" style={{ color: 'rgba(240,244,255,0.35)' }}>3 actions identified</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// ROLES SECTION  — "Your role. Your platform."
-// ═════════════════════════════════════════════════════════════════════════════
-
-const SHOOTER_FEATURES = [
-  'Shot-by-shot placement on interactive target',
-  'AI coaching feedback after every session',
-  'Biometric overlay — HR, SpO₂, fatigue zones',
-  'Series comparison & consistency scoring',
-  'Competition goal tracking & training plans',
-];
-const COACH_FEATURES = [
-  'Full dashboard across all connected shooters',
-  'Team heatmaps & group radius trends',
-  'Add session feedback with drill recommendations',
-  'Progress tracking toward competition peaks',
-  'Multi-discipline & multi-weapon support',
-];
-
-function RolesSection() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal(0.08);
-
-  const cardBg   = isDark ? 'rgba(13,17,28,0.85)' : 'rgba(255,255,255,0.92)';
-  const cardBord = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
-  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
-  const textMut  = isDark ? 'rgba(240,244,255,0.5)' : 'rgba(14,17,24,0.55)';
-  const textDim  = isDark ? 'rgba(240,244,255,0.3)' : 'rgba(14,17,24,0.38)';
-  const chipBg   = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-
-  const roles = [
-    {
-      role: 'Shooter',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#F5A623" strokeWidth="1.6" strokeLinecap="round">
-          <circle cx="11" cy="11" r="9.5" />
-          <circle cx="11" cy="11" r="5.5" />
-          <circle cx="11" cy="11" r="2" fill="#F5A623" stroke="none" />
-          <line x1="11" y1="1.5" x2="11" y2="5.5" />
-          <line x1="11" y1="16.5" x2="11" y2="20.5" />
-          <line x1="1.5" y1="11" x2="5.5" y2="11" />
-          <line x1="16.5" y1="11" x2="20.5" y2="11" />
-        </svg>
-      ),
-      headline: 'The Competitor',
-      sub: 'Every shot mapped. Every session analysed. Compete with precision data behind every decision.',
-      features: SHOOTER_FEATURES,
-      accent: '#F5A623',
-      glow: 'rgba(245,166,35,0.12)',
-      border: 'rgba(245,166,35,0.28)',
-      hoverShadow: '0 0 60px rgba(245,166,35,0.08), 0 20px 50px rgba(0,0,0,0.35)',
-      cta: 'Start as Shooter',
-      href: '/auth/register',
-      tag: 'For Athletes',
-    },
-    {
-      role: 'Coach',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#4FC3F7" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M11 2L13.09 8.26L20 9.27L15 14.14L16.18 21.02L11 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L11 2Z" />
-        </svg>
-      ),
-      headline: 'The Coach',
-      sub: 'Monitor your full squad in one view. Deliver structured feedback that drives measurable improvement.',
-      features: COACH_FEATURES,
-      accent: '#4FC3F7',
-      glow: 'rgba(79,195,247,0.10)',
-      border: 'rgba(79,195,247,0.28)',
-      hoverShadow: '0 0 60px rgba(79,195,247,0.08), 0 20px 50px rgba(0,0,0,0.35)',
-      cta: 'Set up Coach Account',
-      href: '/auth/register',
-      tag: 'For Coaches',
-    },
-  ];
-
-  return (
-    <section
-      ref={ref}
-      className="relative py-16 sm:py-24 lg:py-36 overflow-hidden"
-      style={{
-        background: isDark ? 'rgba(8,10,18,0.6)' : 'rgba(243,246,252,0.7)',
-        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-      }}
-    >
-      {/* Aurora accent */}
-      {isDark && (
-        <div className="absolute inset-0 pointer-events-none" aria-hidden>
-          <div className="absolute" style={{
-            top: '30%', left: '20%', width: '50vw', height: '40vw',
-            background: 'radial-gradient(ellipse, rgba(245,166,35,0.04) 0%, transparent 60%)',
-            filter: 'blur(60px)',
-          }} />
-          <div className="absolute" style={{
-            top: '20%', right: '10%', width: '40vw', height: '35vw',
-            background: 'radial-gradient(ellipse, rgba(79,195,247,0.04) 0%, transparent 60%)',
-            filter: 'blur(60px)',
-          }} />
-        </div>
-      )}
-
-      <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-8">
-
-        {/* Header */}
-        <div className={`text-center max-w-2xl mx-auto mb-10 sm:mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>
-            Built For You
-          </p>
-          <h2
-            className="font-display font-black leading-[1.06] mb-5"
-            style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', color: textPri }}
-          >
-            Your role.{' '}
-            <span style={{
-              background: 'linear-gradient(135deg, #F5A623 0%, #4FC3F7 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-            }}>Your platform.</span>
-          </h2>
-          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
-            Marksman is designed for two perspectives that work better together.
-            A shooter improves with data. A coach leads with insight.
-          </p>
-        </div>
-
-        {/* Role cards */}
-        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-          {roles.map((r, i) => (
-            <div
-              key={r.role}
-              className={`group relative rounded-2xl p-7 sm:p-9 transition-all duration-700 cursor-default flex flex-col ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{
-                background: cardBg,
-                border: `1px solid ${cardBord}`,
-                transitionDelay: `${i * 120}ms`,
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = r.border;
-                el.style.boxShadow = r.hoverShadow;
-                el.style.transform = 'translateY(-3px)';
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = cardBord;
-                el.style.boxShadow = 'none';
-                el.style.transform = 'translateY(0)';
-              }}
-            >
-              {/* Subtle top accent bar */}
-              <div
-                className="absolute top-0 inset-x-0 h-px rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: `linear-gradient(90deg, transparent 5%, ${r.accent} 50%, transparent 95%)` }}
-              />
-
-              {/* Tag + icon row */}
-              <div className="flex items-center justify-between mb-7">
-                <div
-                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-full"
-                  style={{ background: r.glow, border: `1px solid ${r.border}` }}
-                >
-                  {r.icon}
-                  <span className="text-[11px] font-display font-bold uppercase tracking-[0.14em]" style={{ color: r.accent }}>
-                    {r.tag}
+                  <span
+                    className="font-display font-bold text-[11px] tracking-widest uppercase"
+                    style={{ color: '#F5A623' }}
+                  >
+                    Precision Analytics · Elite Performance
                   </span>
                 </div>
-                {/* Animated ring indicator */}
-                <div className="relative w-10 h-10 flex items-center justify-center" style={{ animation: 'breathe 3s ease-in-out infinite', animationDelay: `${i * 1.5}s` }}>
-                  <div className="w-6 h-6 rounded-full" style={{ background: r.glow, border: `1.5px solid ${r.accent}40` }} />
-                  <div className="absolute w-10 h-10 rounded-full" style={{ border: `1px solid ${r.accent}18` }} />
+
+                {/* H1 */}
+                <h1
+                  className="font-display font-bold text-4xl lg:text-6xl mb-6"
+                  style={{ color: 'var(--text-primary)', lineHeight: '1.12' }}
+                >
+                  The performance<br />
+                  platform built for<br />
+                  <span className="gradient-text" style={{ backgroundSize: '200%' }}>
+                    elite shooters.
+                  </span>
+                </h1>
+
+                {/* Subheadline */}
+                <p
+                  className="font-body text-[15px] leading-loose mb-8 max-w-xl"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  Track every shot with millimetre precision. Detect technique flaws automatically.
+                  Receive structured, elite-level coaching powered by Advanced AI — after every single session.
+                </p>
+
+                {/* Primary CTA */}
+                <div className="flex flex-wrap items-center gap-4 mb-8">
+                  <Link
+                    href="/auth/register"
+                    className="inline-flex items-center font-display font-bold tracking-wide text-base px-8 py-4 rounded-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+                    style={{
+                      background: '#F5A623',
+                      color: '#080A0F',
+                      boxShadow: '0 0 40px rgba(245,166,35,0.35), 0 4px 16px rgba(0,0,0,0.4)',
+                    }}
+                  >
+                    START FOR FREE →
+                  </Link>
                 </div>
+
+                {/* Stat chips */}
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div
+                    className="flex items-center gap-2 rounded-full px-3 py-1.5"
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <IconTrophy className="w-3.5 h-3.5 text-[#F5A623]" />
+                    <span className="font-data text-xs font-bold" style={{ color: '#F5A623' }}>10.9</span>
+                    <span className="font-data text-xs" style={{ color: 'var(--text-muted)' }}>WORLD RECORD · AIR RIFLE</span>
+                  </div>
+                  <div
+                    className="flex items-center gap-2 rounded-full px-3 py-1.5"
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <IconUsers className="w-3.5 h-3.5 text-[#4FC3F7]" />
+                    <span className="font-data text-xs font-bold" style={{ color: '#4FC3F7' }}>2,847</span>
+                    <span className="font-data text-xs" style={{ color: 'var(--text-muted)' }}>SHOOTERS TRACKED</span>
+                  </div>
+                </div>
+
+                {/* Social proof */}
+                <p className="font-body text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Join{' '}
+                  <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                    2,847 elite shooters
+                  </span>{' '}
+                  already training smarter
+                </p>
               </div>
 
-              {/* Headline */}
-              <h3
-                className="font-display font-black mb-3 leading-tight"
-                style={{ fontSize: 'clamp(1.7rem, 3vw, 2.2rem)', color: r.accent }}
-              >
-                {r.headline}
-              </h3>
-              <p className="text-[14px] sm:text-[15px] leading-relaxed mb-8" style={{ color: textMut }}>
-                {r.sub}
-              </p>
+              {/* Right column — Dashboard mockup */}
+              <div style={{ animation: 'lp-heroFadeUpDelay 900ms cubic-bezier(0.16,1,0.3,1) both' }}>
+                <DashboardMockup isDark={isDark} />
+              </div>
+            </div>
+          </div>
+        </section>
 
-              {/* Feature list */}
-              <ul className="flex flex-col gap-3 mb-10 flex-1">
-                {r.features.map((f, fi) => (
-                  <li
-                    key={f}
-                    className={`flex items-start gap-3 text-[13px] sm:text-[14px] leading-snug transition-all duration-500 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                    style={{ transitionDelay: `${i * 120 + fi * 60 + 300}ms`, color: textMut }}
+        {/* ── TRUST BAR ──────────────────────────────────────────────────── */}
+        <div
+          className="py-5"
+          style={{
+            background: 'var(--bg-surface)',
+            borderTop: '1px solid var(--border-subtle)',
+            borderBottom: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 mb-4">
+            <p
+              className="font-display font-bold text-[11px] tracking-widest text-center uppercase"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Trusted by 12 National Teams &amp; ISSF Federations
+            </p>
+          </div>
+          <TrustMarquee />
+        </div>
+
+        {/* ── STATS ──────────────────────────────────────────────────────── */}
+        <StatsSection />
+
+        {/* ── FEATURES (BENTO) ───────────────────────────────────────────── */}
+        <BentoFeaturesSection />
+
+        {/* ── APP PREVIEW ────────────────────────────────────────────────── */}
+        <AppPreviewSection isDark={isDark} />
+
+        {/* ── HOW IT WORKS ───────────────────────────────────────────────── */}
+        <section id="how-it-works" className="py-24 lg:py-32" style={{ background: 'var(--bg-surface)' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <p
+                className="font-display font-bold text-[11px] tracking-widest uppercase mb-3"
+                style={{ color: '#F5A623' }}
+              >
+                How It Works
+              </p>
+              <h2
+                className="font-display font-bold text-3xl lg:text-5xl"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                Three steps to elite insight
+              </h2>
+            </div>
+            <div className="max-w-2xl mx-auto flex flex-col gap-12">
+              <StepItem
+                number="01"
+                title="Upload Your Session"
+                description="Import CSV/PDF shot data or connect directly from compatible devices. We handle the rest."
+              />
+              <div
+                className="w-px h-8 self-start"
+                style={{
+                  marginLeft: '28px',
+                  background: 'linear-gradient(to bottom, var(--border-subtle), transparent)',
+                }}
+              />
+              <StepItem
+                number="02"
+                title="Instant Analysis"
+                description="AI analyses groupings, MPI, score trends, and technique indicators automatically the moment your data is uploaded."
+              />
+              <div
+                className="w-px h-8 self-start"
+                style={{
+                  marginLeft: '28px',
+                  background: 'linear-gradient(to bottom, var(--border-subtle), transparent)',
+                }}
+              />
+              <StepItem
+                number="03"
+                title="Receive Your Coaching"
+                description="Structured feedback and personalised training recommendations appear immediately after every session."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ── TESTIMONIALS ───────────────────────────────────────────────── */}
+        <TestimonialsSection />
+
+        {/* ── FINAL CTA ──────────────────────────────────────────────────── */}
+        <section id="pricing" className="py-24 lg:py-32 relative overflow-hidden">
+          {/* Background dots grid */}
+          <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.03 }}>
+            <svg width="100%" height="100%"><defs><pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="currentColor" /></pattern></defs><rect width="100%" height="100%" fill="url(#dots)" /></svg>
+          </div>
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(245,166,35,0.09) 0%, transparent 70%)',
+            }}
+          />
+          {/* Ambient orbs */}
+          <div className="absolute left-1/4 top-1/4 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.06)', animation: 'lp-orbFloat 10s ease-in-out infinite' }} />
+          <div className="absolute right-1/4 bottom-1/4 w-48 h-48 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(79,195,247,0.05)', animation: 'lp-orbFloat 14s ease-in-out infinite reverse' }} />
+
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+            <p
+              className="font-display font-bold text-[11px] tracking-widest uppercase mb-4"
+              style={{ color: '#F5A623' }}
+            >
+              Get Started Today — Free
+            </p>
+            <h2
+              className="font-display font-bold text-3xl lg:text-6xl mb-6 gradient-text"
+              style={{ lineHeight: '1.1', backgroundSize: '200%' }}
+            >
+              Train like an elite.<br />Score like a champion.
+            </h2>
+            <p
+              className="font-body text-base leading-relaxed mb-10 mx-auto max-w-lg"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Join thousands of competitive shooters who use Marksman to track, analyse, and sharpen
+              their performance — one shot at a time.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center font-display font-bold tracking-wide text-base px-10 py-4 rounded-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+                style={{
+                  background: '#F5A623',
+                  color: '#080A0F',
+                  boxShadow: '0 0 50px rgba(245,166,35,0.4), 0 4px 20px rgba(0,0,0,0.5)',
+                }}
+              >
+                START FOR FREE →
+              </Link>
+              <Link
+                href="/auth/login"
+                className="inline-flex items-center font-display font-bold tracking-wide text-base px-8 py-4 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                style={{
+                  background: 'transparent',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                }}
+              >
+                Already have an account →
+              </Link>
+            </div>
+            <p
+              className="font-body text-xs mt-5"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              No credit card required. Free forever for individual athletes.
+            </p>
+          </div>
+        </section>
+
+        {/* ── FOOTER ─────────────────────────────────────────────────────── */}
+        <footer
+          className="py-12"
+          style={{
+            background: 'var(--bg-surface)',
+            borderTop: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-3 gap-10 mb-10">
+              {/* Brand */}
+              <div>
+                <Link href="/" className="inline-flex items-center gap-2.5 mb-3">
+                  <div className="w-7 h-7 text-[#F5A623]">
+                    <IconCrosshair className="w-full h-full" />
+                  </div>
+                  <span className="font-display font-bold text-lg tracking-widest text-[#F0F4FF] uppercase">
+                    Marksman
+                  </span>
+                </Link>
+                <p
+                  className="font-body text-sm leading-relaxed max-w-xs"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Elite shooting analytics — precision data, structured coaching, and measurable improvement.
+                </p>
+              </div>
+
+              {/* Quick links */}
+              <div>
+                <p
+                  className="font-display font-bold text-xs tracking-widest uppercase mb-4"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Quick Links
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    { label: 'Features', type: 'scroll', id: 'features' },
+                    { label: 'How It Works', type: 'scroll', id: 'how-it-works' },
+                    { label: 'Pricing', type: 'scroll', id: 'pricing' },
+                  ].map(({ label, id }) => (
+                    <li key={id}>
+                      <button
+                        onClick={() => scrollTo(id)}
+                        className="font-body text-sm transition-colors duration-200 hover:text-[#F5A623]"
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        {label}
+                      </button>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      href="/auth/login"
+                      className="font-body text-sm transition-colors duration-200 hover:text-[#F5A623]"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      Sign In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/auth/register"
+                      className="font-body text-sm transition-colors duration-200 hover:text-[#F5A623]"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      Get Started
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Legal / status */}
+              <div className="md:text-right">
+                <p className="font-body text-sm" style={{ color: 'var(--text-muted)' }}>
+                  © 2026 Marksman.
+                </p>
+                <p className="font-body text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                  Built for precision.
+                </p>
+                <div className="flex md:justify-end gap-4 mt-4">
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+                    style={{
+                      background: 'rgba(0,229,160,0.08)',
+                      border: '1px solid rgba(0,229,160,0.2)',
+                    }}
                   >
                     <span
-                      className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
-                      style={{ background: r.glow, border: `1px solid ${r.border}` }}
-                    >
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke={r.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="1.5,4 3,5.5 6.5,2" />
-                      </svg>
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              {/* CTA */}
-              <Link
-                href={r.href}
-                className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-display font-bold text-[13px] uppercase tracking-[0.08em] transition-all duration-200 active:scale-95"
-                style={{
-                  background: r.glow,
-                  border: `1px solid ${r.border}`,
-                  color: r.accent,
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = isDark ? `${r.accent}18` : `${r.accent}15`;
-                  (e.currentTarget as HTMLElement).style.borderColor = r.accent;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = r.glow;
-                  (e.currentTarget as HTMLElement).style.borderColor = r.border;
-                }}
-              >
-                {r.cta} <ArrowRightIcon />
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom connector hint */}
-        <div className={`mt-10 text-center transition-all duration-700 delay-300 ${vis ? 'opacity-100' : 'opacity-0'}`}>
-          <p className="text-[12px] font-display" style={{ color: textDim }}>
-            Shooter and Coach accounts can be linked — coaches see their athletes&apos; live sessions.
-          </p>
-        </div>
-
-      </div>
-    </section>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// STATS STRIP
-// ═════════════════════════════════════════════════════════════════════════════
-
-function StatsStrip() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal();
-  const n1 = useCounter(12, vis, 800);
-  const n2 = useCounter(2847, vis, 1600);
-  const n3 = useCounter(1200, vis, 1800);
-  const n4 = useCounter(98, vis, 1200);
-
-  const stripBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
-  const textLabel   = isDark ? 'rgba(240,244,255,0.7)' : 'rgba(14,17,24,0.7)';
-  const textSub     = isDark ? 'rgba(240,244,255,0.3)' : 'rgba(14,17,24,0.38)';
-
-  return (
-    <div
-      ref={ref}
-      className="relative py-14"
-      style={{ borderTop: `1px solid ${stripBorder}`, borderBottom: `1px solid ${stripBorder}` }}
-    >
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, rgba(245,166,35,0.02) 0%, transparent 50%, rgba(79,195,247,0.02) 100%)' }} />
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-4">
-          {[
-            { val: `${n1}+`, label: 'National Teams', sub: 'across 4 continents', c: '#F5A623' },
-            { val: n2.toLocaleString(), label: 'Active Shooters', sub: 'on the platform', c: '#4FC3F7' },
-            { val: `${n3}K+`, label: 'Sessions Logged', sub: 'and counting', c: '#00E5A0' },
-            { val: `${n4}%+`, label: 'AI Accuracy', sub: 'prediction reliability', c: '#F5A623' },
-          ].map((s, i) => (
-            <div
-              key={s.label}
-              className={`text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <p className="font-data font-black mb-1.5" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', color: s.c }}>{s.val}</p>
-              <p className="font-display font-bold text-sm uppercase tracking-[0.08em]" style={{ color: textLabel }}>{s.label}</p>
-              <p className="text-[11px] font-display mt-0.5" style={{ color: textSub }}>{s.sub}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// FEATURES SECTION
-// ═════════════════════════════════════════════════════════════════════════════
-
-const FEATURES = [
-  { icon: <TargetIcon />, title: 'Shot-by-Shot Analytics', desc: 'Visualise exact placement on an interactive target. Track MPI, group radius, standard deviation, and scoring patterns across every session and series.', c: '#F5A623', tag: 'Core' },
-  { icon: <AISparkIcon />, title: 'AI Coaching (Claude Opus 4.6)', desc: 'Receive expert feedback after every session. Trigger control, breathing patterns, positioning, and fatigue — all analysed and prioritised automatically.', c: '#4FC3F7', tag: 'AI' },
-  { icon: <HeartIcon />, title: 'Biometric Integration', desc: 'Overlay heart rate and SpO₂ data from Apple Watch, Garmin, or Polar onto your shot timeline. Identify optimal shooting windows precisely.', c: '#00E5A0', tag: 'Health' },
-  { icon: <CalendarIcon />, title: 'AI Training Plans', desc: 'Periodised training programmes generated from your discipline, competition schedule, and session performance history. Adapts as you improve.', c: '#F5A623', tag: 'Planning' },
-  { icon: <DownloadIcon />, title: 'Universal Import', desc: 'Import from Sius, Megalink, and ISSF systems. Log manually via interactive target, file upload, or photo capture from paper targets.', c: '#4FC3F7', tag: 'Import' },
-  { icon: <TeamIcon />, title: 'Coach & Team Portal', desc: 'Full dashboard for coaches: monitor multiple shooters, review heatmaps, add feedback, and track progress toward competition targets.', c: '#00E5A0', tag: 'Teams' },
-];
-
-function FeaturesSection() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal();
-
-  const textPri  = isDark ? '#F0F4FF' : '#0E1118';
-  const textMut  = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.55)';
-  const textBody = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
-  const cardBg   = isDark ? 'rgba(13,17,28,0.7)'     : 'rgba(255,255,255,0.85)';
-  const cardBord = isDark ? 'rgba(255,255,255,0.06)'  : 'rgba(0,0,0,0.07)';
-  const cardBgHover  = isDark ? 'rgba(13,17,28,0.95)' : 'rgba(255,255,255,1)';
-  const cardShadHov  = isDark
-    ? (c: string) => `0 0 40px ${c}08, 0 8px 32px rgba(0,0,0,0.4)`
-    : (c: string) => `0 0 30px ${c}12, 0 8px 24px rgba(0,0,0,0.08)`;
-
-  return (
-    <section id="features" ref={ref} className="py-28 sm:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className={`max-w-2xl mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>Platform</p>
-          <h2 className="font-display font-black leading-[1.08] mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: textPri }}>
-            Everything a competitive<br />shooter needs.
-          </h2>
-          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
-            Built with national team coaches across 10m Air Rifle, Pistol, 50m Prone, and shotgun disciplines.
-            One platform. Every metric that matters.
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.title}
-              className={`group rounded-2xl p-6 transition-all duration-700 cursor-default ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ background: cardBg, border: `1px solid ${cardBord}`, transitionDelay: `${i * 70}ms` }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = cardBgHover;
-                el.style.borderColor = `${f.c}30`;
-                el.style.boxShadow = cardShadHov(f.c);
-                el.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = cardBg;
-                el.style.borderColor = cardBord;
-                el.style.boxShadow = 'none';
-                el.style.transform = 'translateY(0)';
-              }}
-            >
-              <div className="flex items-start justify-between mb-5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: `${f.c}12`, color: f.c, border: `1px solid ${f.c}20` }}>
-                  {f.icon}
-                </div>
-                <span className="text-[9px] font-display font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-lg"
-                  style={{ background: `${f.c}10`, color: f.c }}>
-                  {f.tag}
-                </span>
-              </div>
-              <h3 className="font-display font-bold text-[15px] mb-2.5" style={{ color: textPri }}>{f.title}</h3>
-              <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// ANALYTICS SHOWCASE
-// "Understand every shot. Not just your total."
-// ═════════════════════════════════════════════════════════════════════════════
-
-function AnalyticsShowcase() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal(0.08);
-
-  const sectionBg = isDark ? 'rgba(10,13,22,0.5)' : 'rgba(243,246,252,0.7)';
-  const secBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
-  const dotGrid   = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-  const textPri   = isDark ? '#F0F4FF' : '#0E1118';
-  const textMut   = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.55)';
-  const textDim   = isDark ? 'rgba(240,244,255,0.35)' : 'rgba(14,17,24,0.4)';
-  const textBody  = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
-
-  return (
-    <section
-      id="analytics"
-      ref={ref}
-      className="relative py-28 sm:py-36 overflow-hidden"
-      style={{ background: sectionBg, borderTop: `1px solid ${secBorder}`, borderBottom: `1px solid ${secBorder}` }}
-    >
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {isDark && (
-          <div className="absolute" style={{
-            top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-            width: '80vw', height: '60vw',
-            background: 'radial-gradient(ellipse, rgba(79,195,247,0.05) 0%, transparent 55%)',
-            filter: 'blur(60px)',
-          }} />
-        )}
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
-          opacity: 0.4,
-        }} />
-        <div className="absolute top-0 inset-x-0 h-px" style={{
-          background: 'linear-gradient(90deg, transparent 10%, rgba(79,195,247,0.25) 40%, rgba(245,166,35,0.2) 60%, transparent 90%)',
-        }} />
-      </div>
-
-      <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#4FC3F7' }}>Session Analytics</p>
-          <h2 className="font-display font-black leading-[1.06] mb-5" style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', color: textPri }}>
-            Understand every shot.
-            <br />
-            <span style={{ color: textDim }}>Not just your total.</span>
-          </h2>
-          <p className="text-base sm:text-[17px] leading-relaxed" style={{ color: textMut }}>
-            Every shot has a story — placement, direction, timing. Marksman reads it for you.
-            Track MPI, group radius, series fatigue, and technique bias across every session.
-          </p>
-        </div>
-
-        <div
-          className={`transition-all duration-1000 overflow-x-auto ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}
-          style={{ transitionDelay: '150ms' }}
-        >
-          <AnalyticsProductWindow />
-        </div>
-
-        <div
-          className={`grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-          style={{ transitionDelay: '300ms' }}
-        >
-          {[
-            { title: 'Mean Point of Impact', desc: 'Detect systematic aim error — is your group centred on the bullseye?', color: '#4FC3F7' },
-            { title: 'Group Radius & σ', desc: 'Measure shot-to-shot consistency with standard deviation across each series.', color: '#00E5A0' },
-            { title: 'Series Fatigue Curve', desc: 'Spot performance drop-off across series. Know when fatigue starts affecting your score.', color: '#F5A623' },
-            { title: 'Directional Bias', desc: 'Identify left/right, top/bottom tendencies by series, weapon, or session condition.', color: '#4FC3F7' },
-          ].map((item) => (
-            <div key={item.title} className="flex flex-col gap-2">
-              <div className="w-6 h-0.5 rounded-full" style={{ background: item.color }} />
-              <h4 className="font-display font-bold text-[14px]" style={{ color: textPri }}>{item.title}</h4>
-              <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-      </div>
-    </section>
-  );
-}
-
-// ── Analytics Product Window ──────────────────────────────────────────────────
-
-function AnalyticsProductWindow() {
-  const SIZE = 200;
-  const miniRings = [88, 74, 60, 44, 30, 18, 10];
-
-  return (
-    <div
-      className="rounded-2xl overflow-hidden w-full"
-      style={{
-        background: 'rgba(11,14,24,0.98)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(79,195,247,0.05), inset 0 1px 0 rgba(255,255,255,0.04)',
-      }}
-    >
-      {/* Chrome bar */}
-      <div
-        className="flex items-center gap-3 px-5 py-3.5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}
-      >
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(255,77,109,0.6)' }} />
-          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(245,166,35,0.6)' }} />
-          <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(0,229,160,0.6)' }} />
-        </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#F5A623' }} />
-            <span className="text-[11px] font-display uppercase tracking-[0.1em]" style={{ color: 'rgba(240,244,255,0.35)' }}>
-              marksman.app / sessions / 2847 — 10m Air Rifle
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
-          <span className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Live</span>
-        </div>
-      </div>
-
-      {/* App layout */}
-      <div className="flex divide-x" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-
-        {/* Sidebar nav */}
-        <div className="w-14 flex flex-col items-center py-4 gap-4 shrink-0" style={{ background: 'rgba(6,8,16,0.6)' }}>
-          {[
-            { icon: '⌂', active: false },
-            { icon: '◎', active: true },
-            { icon: '≈', active: false },
-            { icon: '✦', active: false },
-          ].map((item, i) => (
-            <div key={i}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px]"
-              style={{
-                background: item.active ? 'rgba(245,166,35,0.12)' : 'transparent',
-                color: item.active ? '#F5A623' : 'rgba(240,244,255,0.2)',
-                border: item.active ? '1px solid rgba(245,166,35,0.2)' : '1px solid transparent',
-              }}>
-              {item.icon}
-            </div>
-          ))}
-        </div>
-
-        {/* Target panel */}
-        <div className="flex flex-col items-center justify-center p-6 shrink-0"
-          style={{ background: 'rgba(6,8,16,0.4)', width: SIZE + 48 }}>
-          <p className="text-[10px] font-display uppercase tracking-[0.15em] mb-3 self-start" style={{ color: 'rgba(240,244,255,0.3)' }}>
-            Shot Placement
-          </p>
-          <div className="relative" style={{ width: SIZE, height: SIZE }}>
-            <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE}>
-              <circle cx={100} cy={100} r={SIZE / 2 - 1} fill="rgba(245,166,35,0.015)" />
-              {miniRings.map((r, i) => (
-                <circle key={r} cx={100} cy={100} r={r}
-                  fill="none"
-                  stroke={i >= 5 ? 'rgba(245,166,35,0.7)' : 'rgba(255,255,255,0.08)'}
-                  strokeWidth={i >= 5 ? 1 : 0.5}
-                />
-              ))}
-              {[[100, 4, 100, 84], [100, 116, 100, SIZE - 4], [4, 100, 84, 100], [116, 100, SIZE - 4, 100]].map(([x1, y1, x2, y2], i) => (
-                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke="rgba(245,166,35,0.3)" strokeWidth="0.6" strokeLinecap="round" />
-              ))}
-              <circle cx={100} cy={100} r={2.5} fill="#F5A623" />
-              {TABLE_SHOTS.map((s, i) => {
-                const dx = s.x * 8;
-                const dy = -s.y * 8;
-                const color = s.score >= 10.5 ? '#F5A623' : s.score >= 10.0 ? '#4FC3F7' : '#00E5A0';
-                return (
-                  <g key={i}>
-                    <circle cx={100 + dx} cy={100 + dy} r={4} fill={color} opacity={0.85}
-                      style={{ filter: `drop-shadow(0 0 3px ${color}70)` }} />
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-          {/* MPI indicator */}
-          <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg w-full justify-center"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.3)' }}>MPI</span>
-            <span className="font-data text-xs" style={{ color: '#4FC3F7' }}>x: +0.3 · y: -0.2</span>
-          </div>
-        </div>
-
-        {/* Center: session stats + sparkline */}
-        <div className="flex flex-col gap-4 p-5" style={{ minWidth: 180, maxWidth: 220 }}>
-          <p className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
-            Session Summary
-          </p>
-
-          {/* Big avg */}
-          <div>
-            <p className="font-data font-black text-4xl leading-none" style={{ color: '#F5A623' }}>10.51</p>
-            <p className="text-[10px] font-display uppercase tracking-widest mt-1" style={{ color: 'rgba(240,244,255,0.3)' }}>Session average</p>
-          </div>
-
-          {/* Stats grid */}
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { l: 'Best', v: '10.9', c: '#F5A623' },
-              { l: 'Shots', v: '40', c: '#4FC3F7' },
-              { l: 'X-Ring', v: '12', c: '#F5A623' },
-              { l: 'Grp Ø', v: '3.2mm', c: '#00E5A0' },
-            ].map((s) => (
-              <div key={s.l} className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                <p className="text-[8px] font-display uppercase tracking-[0.12em] mb-1" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.l}</p>
-                <p className="font-data font-bold text-sm" style={{ color: s.c }}>{s.v}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Mini sparkline */}
-          <div>
-            <p className="text-[9px] font-display uppercase tracking-widest mb-2" style={{ color: 'rgba(240,244,255,0.25)' }}>Score trend</p>
-            <svg viewBox="0 0 160 40" width="100%" className="w-full">
-              <defs>
-                <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F5A623" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#F5A623" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {/* Band */}
-              <path d="M0,22 L20,18 L40,20 L60,12 L80,16 L100,10 L120,14 L140,8 L160,12 L160,40 L0,40 Z"
-                fill="url(#sg)" opacity="0.5" />
-              {/* Line */}
-              <polyline
-                points="0,22 20,18 40,20 60,12 80,16 100,10 120,14 140,8 160,12"
-                fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-              />
-              {/* Dots */}
-              {[[0,22],[20,18],[40,20],[60,12],[80,16],[100,10],[120,14],[140,8],[160,12]].map(([x,y],i) => (
-                <circle key={i} cx={x} cy={y} r={i === 7 ? 3 : 1.5} fill="#F5A623"
-                  style={i === 7 ? { filter: 'drop-shadow(0 0 3px rgba(245,166,35,0.8))' } : {}} />
-              ))}
-            </svg>
-          </div>
-        </div>
-
-        {/* Right: shot table */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <p className="text-[10px] font-display uppercase tracking-[0.15em]" style={{ color: 'rgba(240,244,255,0.3)' }}>
-              Shot Log
-            </p>
-            <span className="text-[9px] font-data" style={{ color: 'rgba(240,244,255,0.2)' }}>Series 1 · 8 shots</span>
-          </div>
-          <div className="overflow-auto flex-1">
-            <table className="w-full">
-              <thead>
-                <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  {['#', 'Ring', 'Score', 'X', 'Y', 'Δ'].map((h) => (
-                    <th key={h} className="text-left py-2 px-3 text-[9px] font-display font-bold uppercase tracking-[0.12em]"
-                      style={{ color: 'rgba(240,244,255,0.25)' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {TABLE_SHOTS.map((s, i) => {
-                  const color = s.score >= 10.5 ? '#F5A623' : s.score >= 10.0 ? '#4FC3F7' : '#00E5A0';
-                  const ring  = s.score >= 10.5 ? 'X' : s.score >= 10.0 ? '10' : '9';
-                  const prev  = i > 0 ? TABLE_SHOTS[i - 1].score : null;
-                  return (
-                    <tr key={s.n}
-                      className="transition-colors duration-100"
-                      style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                    >
-                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: 'rgba(240,244,255,0.3)' }}>{s.n}</td>
-                      <td className="py-2 px-3">
-                        <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded"
-                          style={{ color, background: `${color}18` }}>{ring}</span>
-                      </td>
-                      <td className="py-2 px-3 font-data font-bold text-sm" style={{ color }}>{s.score.toFixed(1)}</td>
-                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: s.x < 0 ? '#FF4D6D' : '#4FC3F7' }}>
-                        {s.x > 0 ? '+' : ''}{s.x.toFixed(1)}
-                      </td>
-                      <td className="py-2 px-3 font-data text-[11px]" style={{ color: s.y < 0 ? '#FF4D6D' : '#00E5A0' }}>
-                        {s.y > 0 ? '+' : ''}{s.y.toFixed(1)}
-                      </td>
-                      <td className="py-2 px-3 text-center text-[11px] font-bold">
-                        {prev === null ? <span style={{ color: 'rgba(240,244,255,0.2)' }}>—</span>
-                          : s.score > prev
-                            ? <span style={{ color: '#00E5A0' }}>↑</span>
-                            : <span style={{ color: '#FF4D6D' }}>↓</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          {/* Table footer */}
-          <div className="flex items-center gap-4 px-4 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.01)' }}>
-            {[
-              { l: 'Avg', v: '10.5', c: '#F5A623' },
-              { l: 'Std dev', v: '0.27', c: '#4FC3F7' },
-              { l: 'Grp Ø', v: '3.2mm', c: '#00E5A0' },
-            ].map((s) => (
-              <div key={s.l} className="flex items-center gap-1.5">
-                <span className="text-[9px] font-display uppercase tracking-widest" style={{ color: 'rgba(240,244,255,0.25)' }}>{s.l}</span>
-                <span className="font-data font-bold text-[11px]" style={{ color: s.c }}>{s.v}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// AI COACH SECTION
-// ═════════════════════════════════════════════════════════════════════════════
-
-const AI_FINDINGS = [
-  { sev: 'critical', cat: 'Trigger', title: 'Premature release detected on shots 4, 7 & 10', obs: 'X-axis deviation beyond ±1.5mm consistent with early finger movement. Occurs under fatigue in final third of each series.', c: '#FF4D6D', bg: 'rgba(255,77,109,0.05)', border: 'rgba(255,77,109,0.18)' },
-  { sev: 'moderate', cat: 'Breathing', title: 'Group centre drifting upward across series 2–4', obs: 'MPI shifted +2.1mm vertically. Suggests breath hold is shortening as fatigue builds. Common pattern in long sessions.', c: '#F5A623', bg: 'rgba(245,166,35,0.05)', border: 'rgba(245,166,35,0.18)' },
-  { sev: 'positive', cat: 'Consistency', title: 'Group radius improved 18% vs last session', obs: 'Standard deviation reduced from 2.8mm to 2.3mm. Consistent follow-through is measurably improving your tight group performance.', c: '#00E5A0', bg: 'rgba(0,229,160,0.05)', border: 'rgba(0,229,160,0.18)' },
-];
-
-function AICoachSection() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal();
-
-  const cardBg    = isDark ? 'rgba(11,14,24,0.98)'    : 'rgba(255,255,255,0.95)';
-  const cardBord  = isDark ? 'rgba(245,166,35,0.12)'  : 'rgba(245,166,35,0.25)';
-  const cardShadow= isDark ? '0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(245,166,35,0.04)' : '0 20px 60px rgba(0,0,0,0.1), 0 0 40px rgba(245,166,35,0.06)';
-  const headerBg  = isDark ? 'rgba(245,166,35,0.03)'  : 'rgba(245,166,35,0.04)';
-  const headerBord= isDark ? 'rgba(245,166,35,0.1)'   : 'rgba(245,166,35,0.15)';
-  const divider   = isDark ? 'rgba(255,255,255,0.04)'  : 'rgba(0,0,0,0.05)';
-  const textPri   = isDark ? '#F0F4FF'                 : '#0E1118';
-  const textMut   = isDark ? 'rgba(240,244,255,0.5)'   : 'rgba(14,17,24,0.55)';
-  const textBody  = isDark ? 'rgba(240,244,255,0.45)'  : 'rgba(14,17,24,0.5)';
-  const textDim   = isDark ? 'rgba(240,244,255,0.3)'   : 'rgba(14,17,24,0.35)';
-  const textDim2  = isDark ? 'rgba(240,244,255,0.4)'   : 'rgba(14,17,24,0.45)';
-  const textDim3  = isDark ? 'rgba(240,244,255,0.35)'  : 'rgba(14,17,24,0.4)';
-  const checkBg   = isDark ? 'rgba(245,166,35,0.1)'    : 'rgba(245,166,35,0.08)';
-
-  return (
-    <section id="ai-coach" ref={ref} className="py-28 sm:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-          {/* Left: mock AI card */}
-          <div className={`transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="rounded-2xl overflow-hidden" style={{ background: cardBg, border: `1px solid ${cardBord}`, boxShadow: cardShadow }}>
-              <div className="relative px-5 py-4" style={{ borderBottom: `1px solid ${headerBord}`, background: headerBg }}>
-                <div className="absolute top-0 inset-x-0 h-px"
-                  style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.5), transparent)' }} />
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.25)' }}>
-                    <AISparkIcon size={14} color="#F5A623" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-display font-bold text-[13px]" style={{ color: textPri }}>Coach Assessment</p>
-                    <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Powered by Claude Opus 4.6</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-data font-black text-2xl" style={{ color: '#F5A623' }}>8.4</p>
-                    <p className="text-[9px] font-display" style={{ color: textDim }}>/10</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-5 py-4" style={{ borderBottom: `1px solid ${divider}` }}>
-                <p className="text-[13px] leading-relaxed" style={{ color: textMut }}>
-                  Strong technical base with improving group consistency. Primary concern is trigger release
-                  under fatigue — particularly in the final shots of each series. Address trigger discipline
-                  before increasing session volume.
-                </p>
-              </div>
-
-              <div className="p-4 space-y-2.5">
-                {AI_FINDINGS.map((f, i) => (
-                  <div key={i} className="rounded-xl p-4" style={{ background: f.bg, border: `1px solid ${f.border}` }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[9px] font-display font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded"
-                        style={{ color: f.c, background: `${f.c}12` }}>{f.cat}</span>
-                      <span className="text-[9px] font-display font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded"
-                        style={{ color: f.c, border: `1px solid ${f.border}` }}>{f.sev}</span>
-                    </div>
-                    <p className="font-display font-semibold text-[13px] mb-1" style={{ color: textPri }}>{f.title}</p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: textDim2 }}>{f.obs}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="px-5 py-3.5" style={{ borderTop: `1px solid ${divider}` }}>
-                <div className="py-2 rounded-xl text-center text-[11px] font-display font-bold uppercase tracking-[0.12em]"
-                  style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.2)', color: '#F5A623' }}>
-                  3 Priority Actions · 5 Total Findings
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: text + shooter visual */}
-          <div className={`transition-all duration-700 delay-150 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
-
-            {/* Shooter silhouette card */}
-            <div className="relative mb-7 rounded-2xl overflow-hidden flex items-end justify-center"
-              style={{
-                height: 180,
-                background: isDark ? 'rgba(11,14,24,0.6)' : 'rgba(245,166,35,0.04)',
-                border: `1px solid ${isDark ? 'rgba(245,166,35,0.1)' : 'rgba(245,166,35,0.2)'}`,
-              }}>
-              {/* Radar rings behind shooter */}
-              <div className="absolute pointer-events-none" style={{
-                bottom: 0, left: '50%', transform: 'translateX(-50%)',
-                width: 160, height: 160, borderRadius: '50%',
-                border: '1px solid rgba(245,166,35,0.12)',
-                animation: 'radarPing 3s ease-out infinite',
-              }} />
-              <div className="absolute pointer-events-none" style={{
-                bottom: 0, left: '50%', transform: 'translateX(-50%)',
-                width: 160, height: 160, borderRadius: '50%',
-                border: '1px solid rgba(245,166,35,0.08)',
-                animation: 'radarPing 3s ease-out 1.5s infinite',
-              }} />
-              {/* Ground line */}
-              <div className="absolute bottom-0 inset-x-0 h-px" style={{ background: 'rgba(245,166,35,0.2)' }} />
-              {/* Shooter SVG silhouette — standing rifle position */}
-              <svg width="120" height="160" viewBox="0 0 120 160" fill="none" className="relative z-10"
-                style={{ filter: 'drop-shadow(0 0 12px rgba(245,166,35,0.4))' }}>
-                <circle cx="62" cy="18" r="10" fill="rgba(245,166,35,0.85)" />
-                <path d="M55 28 L50 75 L58 75 L60 50 L65 75 L73 75 L67 28 Z" fill="rgba(245,166,35,0.7)" />
-                <path d="M55 38 L20 48 L22 52 L58 44 Z" fill="rgba(245,166,35,0.65)" />
-                <path d="M67 36 L80 40 L79 44 L66 40 Z" fill="rgba(245,166,35,0.65)" />
-                <rect x="8" y="47" width="75" height="4" rx="2" fill="rgba(245,166,35,0.9)" />
-                <path d="M80 43 L95 50 L90 58 L78 50 Z" fill="rgba(245,166,35,0.75)" />
-                <rect x="35" y="43" width="18" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
-                <path d="M52 75 L48 120 L56 120 L58 85 Z" fill="rgba(245,166,35,0.65)" />
-                <path d="M66 75 L62 85 L64 120 L72 120 Z" fill="rgba(245,166,35,0.65)" />
-                <rect x="44" y="118" width="14" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
-                <rect x="61" y="118" width="14" height="5" rx="2" fill="rgba(245,166,35,0.5)" />
-                <circle cx="6" cy="49" r="2.5" fill="#F5A623" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
-              </svg>
-              {/* Score badge */}
-              <div className="absolute top-4 right-4 text-right">
-                <p className="font-data font-black text-3xl leading-none" style={{ color: '#F5A623', filter: 'drop-shadow(0 0 8px rgba(245,166,35,0.6))' }}>+18%</p>
-                <p className="text-[9px] font-display uppercase tracking-[0.14em] mt-0.5" style={{ color: isDark ? 'rgba(240,244,255,0.4)' : 'rgba(14,17,24,0.4)' }}>group radius</p>
-              </div>
-              {/* Session counter */}
-              <div className="absolute top-4 left-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
-                  <p className="text-[10px] font-display uppercase tracking-widest" style={{ color: '#00E5A0' }}>Session 24</p>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>AI Coaching</p>
-            <h2 className="font-display font-black leading-[1.08] mb-5"
-              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: textPri }}>
-              Expert coaching,<br />
-              <span style={{ color: '#F5A623' }}>after every session.</span>
-            </h2>
-            <p className="text-[15px] sm:text-[17px] leading-relaxed mb-6" style={{ color: textMut }}>
-              Claude Opus 4.6 analyses your shot data and delivers structured feedback categorised
-              by technique area and severity — like having a national team coach review every session.
-            </p>
-
-            {/* Score trend sparkline */}
-            <div className="mb-8 rounded-xl p-4 flex items-center gap-4"
-              style={{ background: isDark ? 'rgba(245,166,35,0.04)' : 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.12)' }}>
-              <div className="shrink-0">
-                <p className="text-[10px] font-display uppercase tracking-widest mb-0.5" style={{ color: 'rgba(245,166,35,0.6)' }}>Score Trend</p>
-                <p className="font-data font-black text-2xl leading-none" style={{ color: '#F5A623' }}>+2.1</p>
-                <p className="text-[9px] font-display" style={{ color: textDim }}>pts over 6 sessions</p>
-              </div>
-              <svg width="120" height="40" viewBox="0 0 120 40" fill="none" style={{ flex: 1 }}>
-                <polyline
-                  points="0,32 24,28 48,22 72,18 96,12 120,6"
-                  stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                  fill="none"
-                  strokeDasharray="200"
-                  strokeDashoffset={vis ? '0' : '200'}
-                  style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s' }}
-                />
-                {([0,24,48,72,96,120] as number[]).map((x, i) => {
-                  const y = [32,28,22,18,12,6][i];
-                  return <circle key={i} cx={x} cy={y} r="3" fill="#F5A623"
-                    style={{ opacity: vis ? 1 : 0, transition: `opacity 0.3s ${0.3 + i*0.1}s` }} />;
-                })}
-              </svg>
-            </div>
-
-            <div className="space-y-4 mb-10">
-              {[
-                { l: 'Technique breakdown', d: 'Trigger, breathing, positioning, sight alignment — each assessed independently.' },
-                { l: 'Fatigue & consistency', d: 'Detect performance patterns across series and between sessions over time.' },
-                { l: 'Drill recommendations', d: 'Specific, actionable drills generated for each identified weakness.' },
-                { l: 'Session-to-session tracking', d: 'Measure how coaching feedback translates into measurable score improvement.' },
-              ].map((item) => (
-                <div key={item.l} className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 w-5 h-5 rounded-lg flex items-center justify-center"
-                    style={{ background: checkBg }}>
-                    <svg width="9" height="9" viewBox="0 0 9 9">
-                      <path d="M1.5 4.5l2 2 3.5-3.5" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </svg>
+                      className="w-1.5 h-1.5 rounded-full bg-[#00E5A0]"
+                      style={{ boxShadow: '0 0 4px #00E5A0' }}
+                    />
+                    <span className="font-data text-[10px] text-[#00E5A0]">All systems nominal</span>
                   </span>
-                  <div>
-                    <p className="text-[14px] font-semibold" style={{ color: textPri }}>{item.l}</p>
-                    <p className="text-[13px] leading-relaxed" style={{ color: textBody }}>{item.d}</p>
-                  </div>
                 </div>
-              ))}
-            </div>
-            <Link href="/auth/register"
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-display font-black text-[13px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
-              style={{
-                background: 'linear-gradient(135deg, #F5A623, #E8961A)',
-                color: '#060810',
-                boxShadow: '0 0 40px rgba(245,166,35,0.2)',
-              }}>
-              Try AI Coach <ArrowRightIcon />
-            </Link>
-          </div>
-
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// HOW IT WORKS
-// ═════════════════════════════════════════════════════════════════════════════
-
-function HowItWorksSection() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal();
-
-  const sectionBg = isDark ? 'rgba(10,13,22,0.5)' : 'rgba(243,246,252,0.7)';
-  const secBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
-  const cardBg    = isDark ? 'rgba(13,17,28,0.8)'    : 'rgba(255,255,255,0.9)';
-  const cardBord  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
-  const textPri   = isDark ? '#F0F4FF'                : '#0E1118';
-  const textMut   = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
-  const textDim   = isDark ? 'rgba(240,244,255,0.25)' : 'rgba(14,17,24,0.3)';
-  const chipBg    = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-  const chipBord  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)';
-  const chipText  = isDark ? 'rgba(240,244,255,0.5)'  : 'rgba(14,17,24,0.5)';
-
-  return (
-    <section
-      id="how"
-      ref={ref}
-      className="py-28 sm:py-36 relative"
-      style={{ background: sectionBg, borderTop: `1px solid ${secBorder}` }}
-    >
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className={`text-center max-w-xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#00E5A0' }}>Getting Started</p>
-          <h2 className="font-display font-black leading-[1.08] mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: textPri }}>
-            From first session<br />to peak performance.
-          </h2>
-          <p className="text-[15px] leading-relaxed" style={{ color: textMut }}>
-            Set up in under 5 minutes. See actionable insights from your very first session.
-          </p>
-        </div>
-
-        {/* Desktop: horizontal connected timeline */}
-        <div className="hidden lg:block relative mb-12">
-          {/* Base connector line */}
-          <div className="absolute h-px" style={{
-            top: 24, left: '12.5%', right: '12.5%',
-            background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
-          }} />
-          {/* Animated fill line */}
-          <div className="absolute h-px transition-all duration-[2000ms] ease-out" style={{
-            top: 24,
-            left: '12.5%',
-            right: vis ? '12.5%' : '87.5%',
-            background: 'linear-gradient(90deg, #F5A623, #4FC3F7, #00E5A0, #F5A623)',
-            transitionDelay: '200ms',
-          }} />
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { n: '01', title: 'Create your profile', desc: 'Select discipline, weapon, and competition goals. Connect a coach for team-based training.', c: '#F5A623',
-                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5"><circle cx="9" cy="6" r="3.5"/><circle cx="9" cy="9" r="7.5" strokeDasharray="3 2"/></svg> },
-              { n: '02', title: 'Log your sessions', desc: 'Import from scoring systems, log manually on an interactive target, or capture paper targets with your camera.', c: '#4FC3F7',
-                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="8" width="12" height="8" rx="1.5"/><path d="M9 2v8M6 5l3-3 3 3"/></svg> },
-              { n: '03', title: 'Receive AI feedback', desc: 'After each session, get structured coaching from Claude Opus 4.6 with prioritised drills and technique flags.', c: '#00E5A0',
-                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7l-4 3V4a1 1 0 0 1 1-1z"/><circle cx="9" cy="7.5" r="1" fill="#00E5A0" stroke="none"/></svg> },
-              { n: '04', title: 'Track your progress', desc: 'Monitor scoring trends, consistency metrics, and training plan adherence toward competition peak.', c: '#F5A623',
-                icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2,14 6,10 10,12 16,5"/><polyline points="12,5 16,5 16,9"/></svg> },
-            ].map((s, i) => (
-              <div key={s.n}
-                className={`flex flex-col items-center text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-                style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 relative z-10"
-                  style={{
-                    background: isDark ? 'rgba(13,17,28,1)' : 'rgba(255,255,255,1)',
-                    border: `2px solid ${s.c}`,
-                    boxShadow: `0 0 16px ${s.c}30`,
-                  }}>
-                  {s.icon}
-                </div>
-                <p className="font-data font-black text-[11px] uppercase tracking-[0.2em] mb-1.5" style={{ color: s.c }}>{s.n}</p>
-                <h3 className="font-display font-bold text-[14px] mb-2" style={{ color: textPri }}>{s.title}</h3>
-                <p className="text-[12px] leading-relaxed" style={{ color: textMut }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile: vertical timeline */}
-        <div className="lg:hidden space-y-0 mb-12">
-          {[
-            { n: '01', title: 'Create your profile', desc: 'Select discipline, weapon, and competition goals. Connect a coach for team-based training.', c: '#F5A623',
-              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5"><circle cx="9" cy="6" r="3.5"/><circle cx="9" cy="9" r="7.5" strokeDasharray="3 2"/></svg> },
-            { n: '02', title: 'Log your sessions', desc: 'Import from scoring systems, log manually on an interactive target, or capture paper targets with your camera.', c: '#4FC3F7',
-              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="8" width="12" height="8" rx="1.5"/><path d="M9 2v8M6 5l3-3 3 3"/></svg> },
-            { n: '03', title: 'Receive AI feedback', desc: 'After each session, get structured coaching from Claude Opus 4.6 with prioritised drills and technique flags.', c: '#00E5A0',
-              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#00E5A0" strokeWidth="1.5" strokeLinecap="round"><path d="M3 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7l-4 3V4a1 1 0 0 1 1-1z"/><circle cx="9" cy="7.5" r="1" fill="#00E5A0" stroke="none"/></svg> },
-            { n: '04', title: 'Track your progress', desc: 'Monitor scoring trends, consistency metrics, and training plan adherence toward competition peak.', c: '#F5A623',
-              icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2,14 6,10 10,12 16,5"/><polyline points="12,5 16,5 16,9"/></svg> },
-          ].map((s, i) => (
-            <div key={s.n}
-              className={`flex gap-4 transition-all duration-700 ${vis ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}
-              style={{ transitionDelay: `${i * 120}ms` }}>
-              <div className="flex flex-col items-center shrink-0">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{
-                    background: isDark ? 'rgba(13,17,28,1)' : '#fff',
-                    border: `2px solid ${s.c}`,
-                    boxShadow: `0 0 12px ${s.c}25`,
-                  }}>
-                  {s.icon}
-                </div>
-                {i < 3 && <div className="w-px flex-1 my-1" style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', minHeight: 32 }} />}
-              </div>
-              <div className="pb-8">
-                <p className="font-data font-bold text-[10px] uppercase tracking-[0.18em] mb-0.5" style={{ color: s.c }}>{s.n}</p>
-                <h3 className="font-display font-bold text-[15px] mb-1.5" style={{ color: textPri }}>{s.title}</h3>
-                <p className="text-[13px] leading-relaxed" style={{ color: textMut }}>{s.desc}</p>
               </div>
             </div>
-          ))}
-        </div>
 
-        <div
-          className={`rounded-2xl p-6 sm:p-8 transition-all duration-700 delay-300 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-          style={{ background: cardBg, border: `1px solid ${cardBord}` }}
-        >
-          <p className="text-[10px] font-display font-bold uppercase tracking-[0.18em] mb-5" style={{ color: textDim }}>Supported Disciplines</p>
-          <div className="flex flex-wrap gap-2.5">
-            {['10m Air Rifle', '10m Air Pistol', '25m Rapid Fire Pistol', '50m Rifle 3×40', '50m Rifle Prone', '50m Pistol', 'Trap', 'Skeet', 'Double Trap'].map((d) => (
-              <span key={d} className="px-3.5 py-1.5 rounded-xl text-[12px] font-display font-semibold"
-                style={{ background: chipBg, border: `1px solid ${chipBord}`, color: chipText }}>
-                {d}
-              </span>
-            ))}
+            <div className="pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <p
+                className="font-data text-[11px] text-center"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                MARKSMAN · PRECISION ANALYTICS PLATFORM · EST. 2026
+              </p>
+            </div>
           </div>
-        </div>
+        </footer>
       </div>
-    </section>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// CTA
-// ═════════════════════════════════════════════════════════════════════════════
-
-function CTASection() {
-  const isDark = usePageTheme();
-  const [ref, vis] = useSectionReveal();
-
-  const textPri   = isDark ? '#F0F4FF' : '#0E1118';
-  const textMut   = isDark ? 'rgba(240,244,255,0.45)' : 'rgba(14,17,24,0.5)';
-  const dotGrid   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
-  const secBtnBg  = isDark ? 'rgba(240,244,255,0.04)' : 'rgba(0,0,0,0.04)';
-  const secBtnBord= isDark ? 'rgba(240,244,255,0.1)'  : 'rgba(0,0,0,0.1)';
-  const secBtnTxt = isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.6)';
-
-  return (
-    <section ref={ref} className="relative py-28 sm:py-36 overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(245,166,35,0.07) 0%, transparent 60%)' }} />
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, ${dotGrid} 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
-        }} />
-        <div className="absolute top-0 inset-x-0 h-px" style={{
-          background: 'linear-gradient(90deg, transparent 20%, rgba(245,166,35,0.2) 50%, transparent 80%)',
-        }} />
-      </div>
-
-      <div className={`relative z-10 max-w-2xl mx-auto px-5 sm:px-8 text-center transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full mb-8"
-          style={{ background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.2)' }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00E5A0' }} />
-          <span className="text-[11px] font-display font-bold uppercase tracking-[0.15em]" style={{ color: '#00E5A0' }}>
-            Free to start · No credit card needed
-          </span>
-        </div>
-
-        <h2 className="font-display font-black leading-[1.04] mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', color: textPri }}>
-          Start training with<br />
-          <span style={{
-            background: 'linear-gradient(135deg, #F5A623, #FFD580)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-          }}>data on your side.</span>
-        </h2>
-
-        <p className="text-base sm:text-[17px] mb-10" style={{ color: textMut }}>
-          Join 2,847 shooters who use Marksman to train smarter and compete at their best.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/auth/register"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl font-display font-black text-[14px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #F5A623, #E8961A)', color: '#060810', boxShadow: '0 0 60px rgba(245,166,35,0.3)' }}>
-            Create free account <ArrowRightIcon />
-          </Link>
-          <Link href="/auth/login"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-display font-semibold text-[14px] transition-all duration-200"
-            style={{ background: secBtnBg, border: `1px solid ${secBtnBord}`, color: secBtnTxt }}>
-            Sign in to dashboard
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// FOOTER
-// ═════════════════════════════════════════════════════════════════════════════
-
-function Footer() {
-  const isDark = usePageTheme();
-  const border  = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
-  const logoCl  = isDark ? 'rgba(240,244,255,0.4)'  : 'rgba(14,17,24,0.4)';
-  const caption = isDark ? 'rgba(240,244,255,0.2)'  : 'rgba(14,17,24,0.3)';
-  const linkCl  = isDark ? 'rgba(240,244,255,0.25)' : 'rgba(14,17,24,0.3)';
-  const linkHov = isDark ? 'rgba(240,244,255,0.6)'  : 'rgba(14,17,24,0.7)';
-
-  return (
-    <footer className="py-10" style={{ borderTop: `1px solid ${border}` }}>
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div className="flex items-center gap-2.5">
-            <CrosshairLogo size={18} />
-            <span className="font-display font-black text-[14px] tracking-[0.18em] uppercase" style={{ color: logoCl }}>
-              Marksman
-            </span>
-          </div>
-          <p className="text-[12px] font-display text-center" style={{ color: caption }}>
-            Precision analytics for competitive shooters. Built for athletes, by athletes.
-          </p>
-          <div className="flex items-center gap-6">
-            {['Privacy', 'Terms', 'Contact'].map((l) => (
-              <a key={l} href="#"
-                className="text-[12px] font-display transition-colors duration-200"
-                style={{ color: linkCl }}
-                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = linkHov; }}
-                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = linkCl; }}>
-                {l}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// PAGE LOADER
-// ═════════════════════════════════════════════════════════════════════════════
-
-function PageLoader() {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#060810' }}>
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-t-[#F5A623] border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-          <div className="absolute inset-2 rounded-full border border-t-transparent border-r-[#4FC3F7] border-b-transparent border-l-transparent animate-spin"
-            style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full" style={{ background: '#F5A623' }} />
-          </div>
-        </div>
-        <p className="text-[11px] font-display uppercase tracking-widest animate-pulse" style={{ color: 'rgba(240,244,255,0.3)' }}>
-          Loading
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// SHARED ICONS
-// ═════════════════════════════════════════════════════════════════════════════
-
-function CrosshairLogo({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true"
-      style={{ filter: 'drop-shadow(0 0 4px rgba(245,166,35,0.5))' }}>
-      <circle cx="16" cy="16" r="13" stroke="#F5A623" strokeWidth="1" opacity="0.45" />
-      <circle cx="16" cy="16" r="9"  stroke="#F5A623" strokeWidth="1" opacity="0.75" />
-      <circle cx="16" cy="16" r="4"  stroke="#F5A623" strokeWidth="1.2" />
-      <circle cx="16" cy="16" r="1.5" fill="#F5A623" />
-      <line x1="16" y1="2"  x2="16" y2="10" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="16" y1="22" x2="16" y2="30" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="2"  y1="16" x2="10" y2="16" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="22" y1="16" x2="30" y2="16" stroke="#F5A623" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="2" y1="6.5" x2="11" y2="6.5" />
-      <polyline points="7.5,3 11,6.5 7.5,10" />
-    </svg>
-  );
-}
-
-function TargetIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <circle cx="9" cy="9" r="7.5" /><circle cx="9" cy="9" r="4.5" /><circle cx="9" cy="9" r="1.8" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function AISparkIcon({ size = 18, color }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" stroke={color ?? 'currentColor'} strokeWidth="1.5" strokeLinecap="round">
-      <path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1l1.1-1.1M13 5l1.1-1.1" />
-      <circle cx="9" cy="9" r="2.8" fill={color ?? 'currentColor'} stroke="none" opacity="0.85" />
-    </svg>
-  );
-}
-
-function HeartIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="1,9 4,9 6,4 8,14 10,6 12,11 14,9 17,9" />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="14" height="13" rx="2" />
-      <line x1="2" y1="7" x2="16" y2="7" />
-      <line x1="6" y1="1" x2="6" y2="5" />
-      <line x1="12" y1="1" x2="12" y2="5" />
-    </svg>
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 2v9M5.5 7.5L9 11l3.5-3.5" /><path d="M3 13.5v1a1 1 0 001 1h10a1 1 0 001-1v-1" />
-    </svg>
-  );
-}
-
-function TeamIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="7" cy="6" r="2.8" /><path d="M1.5 15.5c0-3 2.5-5.5 5.5-5.5" />
-      <circle cx="13" cy="7" r="2.2" /><path d="M10.5 15.5c0-2.2 1.1-4 2.5-4s2.5 1.8 2.5 4" />
-    </svg>
+    </>
   );
 }
