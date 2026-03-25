@@ -17,6 +17,7 @@ import type {
   AdvancedBiometricInsights,
   AdvancedInsightItem,
 } from '@shooting-platform/shared-types';
+import { PerformanceSectionNav } from '../../../components/performance/PerformanceSectionNav';
 
 export default function BiometricsPage() {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ export default function BiometricsPage() {
   const [summary, setSummary] = useState<BiometricSummary | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<AiBiometricAnalysis | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [trendMode, setTrendMode] = useState<'live' | '1h' | '1d' | '7d' | '30d' | '90d'>('30d');
 
   // Advanced insights state
@@ -53,12 +55,15 @@ export default function BiometricsPage() {
   async function handleAiAnalysis() {
     if (!selectedSessionId) return;
     setAiLoading(true);
+    setAiError(null);
     try {
       const result = await apiFetch<AiBiometricAnalysis>(
         `/biometrics/session/${selectedSessionId}/ai-analysis`,
       );
       setAiAnalysis(result);
-    } catch {}
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'AI analysis failed. Please try again.');
+    }
     setAiLoading(false);
   }
 
@@ -79,8 +84,18 @@ export default function BiometricsPage() {
   if (!user) return null;
 
   return (
-    <AppShell title="Biometrics">
+    <AppShell title="Health">
       <div className="space-y-6 max-w-6xl mx-auto">
+
+        <div className="animate-slide-up">
+          <h1 className="font-display font-bold text-2xl text-text-primary">Performance</h1>
+          <p className="text-text-muted text-sm mt-1">
+            Heart rate, SpO₂, HRV, and physiological tracking
+          </p>
+        </div>
+
+        <PerformanceSectionNav />
+
         {/* Header with device management link */}
         <div className="flex items-center justify-between animate-slide-up">
           <div>
@@ -171,13 +186,18 @@ export default function BiometricsPage() {
             {/* AI Analysis */}
             <div className="mt-4">
               {!aiAnalysis ? (
-                <button
-                  onClick={handleAiAnalysis}
-                  disabled={aiLoading || !summary || summary.readingCount === 0}
-                  className="btn-primary px-4 py-2 text-sm disabled:opacity-40"
-                >
-                  {aiLoading ? 'Analysing...' : 'AI Biometric Analysis'}
-                </button>
+                <>
+                  <button
+                    onClick={handleAiAnalysis}
+                    disabled={aiLoading || !summary || summary.readingCount === 0}
+                    className="btn-primary px-4 py-2 text-sm disabled:opacity-40"
+                  >
+                    {aiLoading ? 'Analysing...' : 'AI Biometric Analysis'}
+                  </button>
+                  {aiError && (
+                    <p className="text-[#FF4D6D] text-xs mt-2">{aiError}</p>
+                  )}
+                </>
               ) : (
                 <div className="space-y-3 mt-2">
                   <div className="card p-4" style={{ border: '1px solid rgba(245,166,35,0.15)' }}>

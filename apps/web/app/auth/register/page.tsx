@@ -5,7 +5,7 @@
 // opposite direction. Role selector uses two large toggle cards — the
 // amber border on the selected state creates a strong selection affordance.
 
-import React, { useState, FormEvent, Suspense } from 'react';
+import React, { useState, FormEvent, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { register } from '../../../lib/auth';
@@ -16,8 +16,13 @@ import { GoogleSignInButton } from '../../../components/GoogleSignInButton';
 
 function RegisterPageInner() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { setUser, isLoggedIn, isLoading } = useAuth();
   const isMobile = useIsMobile();
+
+  // Redirect already-authenticated users
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) router.replace('/dashboard');
+  }, [isLoading, isLoggedIn, router]);
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   const searchParams = useSearchParams();

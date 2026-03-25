@@ -57,6 +57,8 @@ export default function ComparePage() {
   const [loadingList,  setLoadingList]  = useState(true);
   const [loadingLeft,  setLoadingLeft]  = useState(false);
   const [loadingRight, setLoadingRight] = useState(false);
+  const [leftError,  setLeftError]  = useState<string | null>(null);
+  const [rightError, setRightError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -76,7 +78,8 @@ export default function ComparePage() {
 
   async function loadSide(id: string, side: 'left' | 'right') {
     if (!id) return;
-    if (side === 'left') setLoadingLeft(true); else setLoadingRight(true);
+    if (side === 'left') { setLoadingLeft(true);  setLeftError(null);  }
+    else                  { setLoadingRight(true); setRightError(null); }
     try {
       const [session, analytics] = await Promise.all([
         apiFetch<Session>(`/sessions/${id}`),
@@ -84,7 +87,11 @@ export default function ComparePage() {
       ]);
       if (side === 'left') setLeftData({ session, analytics });
       else setRightData({ session, analytics });
-    } catch { /* ignore */ } finally {
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to load session';
+      if (side === 'left') setLeftError(msg);
+      else setRightError(msg);
+    } finally {
       if (side === 'left') setLoadingLeft(false); else setLoadingRight(false);
     }
   }
@@ -177,6 +184,28 @@ export default function ComparePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <SkeletonCard height={200} animationDelay={0} />
                 <SkeletonCard height={200} animationDelay={60} />
+              </div>
+            )}
+
+            {/* Per-side errors */}
+            {(leftError || rightError) && !loadingLeft && !loadingRight && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  {leftError && (
+                    <div className="rounded-lg px-4 py-3 text-sm text-[#FF4D6D]"
+                      style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.25)' }}>
+                      Session A: {leftError}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  {rightError && (
+                    <div className="rounded-lg px-4 py-3 text-sm text-[#FF4D6D]"
+                      style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.25)' }}>
+                      Session B: {rightError}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

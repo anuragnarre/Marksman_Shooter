@@ -143,7 +143,9 @@ function ShooterView() {
   const greeting = useGreeting();
   const [overview, setOverview] = useState<OverviewAnalytics | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [latestSessionDetail, setLatestSessionDetail] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -152,6 +154,13 @@ function ShooterView() {
     ]).then(([ov, sess]) => {
       setOverview(ov);
       setSessions(sess);
+      if (sess.length > 0) {
+        setLoadingDetail(true);
+        apiFetch<Session>(`/sessions/${sess[0].id}`)
+          .then(setLatestSessionDetail)
+          .catch(() => null)
+          .finally(() => setLoadingDetail(false));
+      }
     }).finally(() => setLoading(false));
   }, []);
 
@@ -190,7 +199,7 @@ function ShooterView() {
       bandLow: Math.max(0, t.avgScore - t.stdDev),
     }));
 
-    const latestShots = (sessions[0]?.shots ?? []) as Shot[];
+    const latestShots = (latestSessionDetail?.shots ?? []) as Shot[];
     const lastTrendPoint = trend[trend.length - 1] as SessionTrendPoint | undefined;
 
     const scores = trendChartData.map(d => d.avgScore).filter(Boolean);
@@ -205,7 +214,7 @@ function ShooterView() {
       latestShots, lastTrendPoint, trendMin,
       trendBySessionId,
     };
-  }, [overview, sessions]);
+  }, [overview, sessions, latestSessionDetail]);
 
   const last7Avgs = trend.slice(-7).map(t => t.avgScore);
 
@@ -432,7 +441,11 @@ function ShooterView() {
               )}
             </div>
 
-            {latestShots.length > 0 ? (
+            {loadingDetail ? (
+              <div className="flex justify-center items-center py-4">
+                <div className="w-[260px] h-[260px] skeleton rounded-full" />
+              </div>
+            ) : latestShots.length > 0 ? (
               <>
                 <div className="flex justify-center">
                   <TargetCanvas shots={latestShots} size={260} />

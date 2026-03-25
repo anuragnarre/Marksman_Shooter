@@ -15,7 +15,7 @@ export class AiCoachController {
 
   /** Analyse a session and return AI coaching feedback. */
   @Post('analyze')
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async analyzeSession(
     @CurrentUser() user: JwtPayload,
     @Body() dto: AnalyzeSessionDto,
@@ -25,7 +25,7 @@ export class AiCoachController {
 
   /** Comprehensive AI performance assistant — analyses entire shooting history. */
   @Post('performance-assistant')
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async performanceAssistant(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,

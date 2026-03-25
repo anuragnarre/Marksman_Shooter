@@ -154,7 +154,9 @@ export default function SessionsPage() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link
-              href="/sessions/compare"
+              href={isCoach && selectedShooterId
+                ? `/sessions/compare?shooterId=${encodeURIComponent(selectedShooterId)}`
+                : '/sessions/compare'}
               className="btn btn-ghost text-sm py-2.5 px-4"
             >
               Compare
@@ -289,6 +291,8 @@ export default function SessionsPage() {
                       onConfirm={() => setConfirmId(session.id)}
                       onCancel={() => setConfirmId(null)}
                       onDelete={() => void handleDelete(session.id)}
+                      isCoach={isCoach}
+                      shooterId={selectedShooterId}
                     />
                   ))}
                 </div>
@@ -311,6 +315,8 @@ function SessionRow({
   onConfirm,
   onCancel,
   onDelete,
+  isCoach,
+  shooterId,
 }: {
   session: Session;
   isLast: boolean;
@@ -319,6 +325,8 @@ function SessionRow({
   onConfirm: () => void;
   onCancel: () => void;
   onDelete: () => void;
+  isCoach?: boolean;
+  shooterId?: string | null;
 }) {
   const color = discColor(session.discipline);
   const date  = new Date(session.sessionDate);
@@ -412,7 +420,9 @@ function SessionRow({
             </button>
 
             <Link
-              href={`/sessions/${session.id}`}
+              href={isCoach && shooterId
+                ? `/sessions/${session.id}?shooterId=${encodeURIComponent(shooterId)}`
+                : `/sessions/${session.id}`}
               className="btn btn-ghost text-xs py-2 px-3 min-h-[36px] flex items-center"
             >
               View →

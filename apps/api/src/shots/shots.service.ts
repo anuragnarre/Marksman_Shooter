@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../gateway/events.gateway';
 import { parseFile } from './shots.parser';
 import { ManualShotsDto } from './dto/manual-shots.dto';
-import { Shot, ShotInput, UserRole } from '@shooting-platform/shared-types';
+import { Shot, ShotInput, UserRole, VisionShotResult } from '@shooting-platform/shared-types';
 
 @Injectable()
 export class ShotsService {
@@ -164,6 +164,97 @@ export class ShotsService {
     }));
 
     return this.createShots(sessionId, actorId, actorRole, shots, shooterIdHint);
+  }
+
+  // ── Method 3b: Photo Analysis — returns full vision data + persisted shots ──
+
+  async analyzePhotoFull(
+    sessionId: string,
+    actorId: string,
+    actorRole: UserRole,
+    file: Express.Multer.File,
+    targetType = 'air_rifle_10m',
+    shooterIdHint?: string,
+  ): Promise<{
+    shots: VisionShotResult[];
+    targetDetected: boolean;
+    processingTimeMs: number;
+    savedShots: Shot[];
+  }> {
+    const visionUrl = process.env.VISION_SERVICE_URL;
+    if (!visionUrl) {
+      throw new BadRequestException('Vision service URL is not configured');
+    }
+
+    const formData = new FormData();
+    const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
+    formData.append('file', blob, file.originalname);
+    formData.append('target_type', targetType);
+
+    let visionResponse: Response;
+    try {
+      visionResponse = await fetch(`${visionUrl}/analyze`, {
+        method: 'POST',
+        body: formData,
+      });
+    } catch {
+      throw new ServiceUnavailableException(
+        'Vision service is not running. Start it with: cd apps/vision && uvicorn main:app',
+      );
+    }
+
+    if (!visionResponse.ok) {
+      const errorText = await visionResponse.text();
+      throw new BadRequestException(`Vision service error: ${errorText}`);
+    }
+
+    const raw = await visionResponse.json() as {
+      shots: Array<{
+        shot_number: number;
+        score: number;
+        x: number;
+        y: number;
+        pixel_x: number;
+        pixel_y: number;
+        confidence: number;
+        is_inner_ten?: boolean;
+        dist_mm?: number;
+      }>;
+      target_detected: boolean;
+      processing_time_ms: number;
+    };
+
+    if (!Array.isArray(raw.shots)) {
+      throw new BadRequestException('Vision service returned unexpected format');
+    }
+
+    const visionShots: VisionShotResult[] = raw.shots.map((s) => ({
+      shotNumber: s.shot_number,
+      score:      s.score,
+      x:          s.x,
+      y:          s.y,
+      pixelX:     s.pixel_x,
+      pixelY:     s.pixel_y,
+      confidence: s.confidence,
+      isInnerTen: s.is_inner_ten ?? false,
+      distMm:     s.dist_mm ?? 0,
+    }));
+
+    const inputs: ShotInput[] = visionShots.map((s) => ({
+      shotNumber: s.shotNumber,
+      score:      s.score,
+      x:          s.x,
+      y:          s.y,
+    }));
+
+    const savedShots = await this.createShots(sessionId, actorId, actorRole, inputs, shooterIdHint);
+
+    return {
+      shots:            visionShots,
+      targetDetected:   raw.target_detected,
+      processingTimeMs: raw.processing_time_ms,
+      savedShots,
+    };
   }
 
   async findBySession(sessionId: string): Promise<Shot[]> {

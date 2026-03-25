@@ -2,7 +2,7 @@
 // Shared TypeScript interfaces mirroring every Prisma model.
 // Consumed by both /apps/web and /apps/api.
 
-export type UserRole = 'SHOOTER' | 'COACH' | 'SOLDIER';
+export type UserRole = 'SHOOTER' | 'COACH';
 export type ConnectionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface User {
@@ -11,6 +11,10 @@ export interface User {
   email: string;
   role: UserRole;
   googleId?: string | null;
+  /** Present only on /auth/me responses — indicates if the account has a password set */
+  hasPassword?: boolean;
+  /** Present only on /auth/me responses — indicates if the account is linked to Google */
+  hasGoogle?: boolean;
   createdAt: Date;
   shooterProfile?: ShooterProfile | null;
 }
@@ -300,6 +304,8 @@ export interface VisionShotResult {
   pixelX: number;
   pixelY: number;
   confidence: number;
+  isInnerTen: boolean;
+  distMm: number;
 }
 
 export interface VisionAnalysisResponse {

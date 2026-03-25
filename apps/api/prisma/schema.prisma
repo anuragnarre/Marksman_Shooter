@@ -13,7 +13,6 @@ datasource db {
 enum Role {
   SHOOTER
   COACH
-  SOLDIER
 }
 
 enum DeviceType {

@@ -9,7 +9,7 @@ import Groq from 'groq-sdk';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsService } from '../analytics/analytics.service';
-import { AiCoachAnalysis, AiCoachFinding, AiPerformanceAssistant } from '@shooting-platform/shared-types';
+import { AiCoachAnalysis, AiCoachFinding, AiPerformanceAssistant, UserRole } from '@shooting-platform/shared-types';
 
 // Free model — Llama 3.3 70B via Groq: 14,400 req/day, no billing required
 const MODEL = 'llama-3.3-70b-versatile';
@@ -193,7 +193,7 @@ export class AiCoachService {
   async analyzeSession(
     sessionId: string,
     requesterId: string,
-    requesterRole: 'SHOOTER' | 'COACH' | 'SOLDIER',
+    requesterRole: UserRole,
   ): Promise<AiCoachAnalysis> {
     // ── 1. Load session ──────────────────────────────────────────────────────
     const session = await this.prisma.session.findFirst({
@@ -207,7 +207,7 @@ export class AiCoachService {
     if (!session) throw new NotFoundException(`Session ${sessionId} not found`);
 
     // ── 2. Access control ────────────────────────────────────────────────────
-    if ((requesterRole === 'SHOOTER' || requesterRole === 'SOLDIER') && session.shooterId !== requesterId) {
+    if (requesterRole === 'SHOOTER' && session.shooterId !== requesterId) {
       throw new ForbiddenException('Cannot analyse another shooter\'s session');
     }
 
@@ -359,7 +359,7 @@ Please analyse this session and provide coaching feedback in the required JSON f
 
   async analyzePerformance(
     requesterId: string,
-    requesterRole: 'SHOOTER' | 'COACH' | 'SOLDIER',
+    requesterRole: UserRole,
     shooterId?: string,
   ): Promise<AiPerformanceAssistant> {
     // Resolve target shooter

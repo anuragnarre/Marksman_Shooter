@@ -1,11 +1,14 @@
 """
 Shot detection pipeline orchestrator.
 
-Multi-stage local CV pipeline (v4 — zone-aware direct detection):
+Multi-stage local CV pipeline (v5 — CLAHE + YOLO augmentation):
   1. Quality check (blur, glare, resolution)
   2. Target detection (Hough + gradient + contour cascade)
-  3. Perspective correction (ellipse → circle)
-  4. Zone-aware hole detection (bright-in-black + dark-in-cream)
+  3. Perspective correction (4-corner card warp or ellipse → circle fallback)
+  3.5 CLAHE enhancement (improve black-hole visibility on dark rings)
+  4a. CV hole detection (disc-convolution zone-aware, always runs)
+  4b. YOLO hole detection (YOLOv8-S via ONNX Runtime, if model loaded)
+  4c. NMS fusion (merge CV + YOLO candidates)
   5. ISSF decimal scoring
 """
 
@@ -20,7 +23,11 @@ from models import AnalysisResponse, ShotResult
 from pipeline.quality_check import check_quality
 from pipeline.target_detector import detect_target
 from pipeline.perspective import correct_perspective
+from pipeline.clahe import apply_clahe, apply_clahe_to_bullseye, bullseye_radius_from_calibration
+from pipeline.calibration_engine import get_mm_per_pixel, get_black_area_radius_mm
 from pipeline.hole_detector import detect_holes
+from pipeline.yolo_detector import detect_holes_yolo, _yolo_available
+from pipeline.nms import fuse_candidates
 from pipeline.scorer import score_holes
 from pipeline.target_specs import get_spec
 
@@ -49,16 +56,35 @@ def analyze_target_image(
     calibration = detect_target(gray, target_type)
 
     # Stage 3: Perspective correction
-    # Skip for extreme angles (ecc > 0.45 → a/b > 1.8): the affine warp amplifies
-    # JPEG artifacts and the ring boundaries become highly non-circular, producing
-    # many false positives. At these angles only centre-zone (black) shots are reliable.
-    if 0.05 < calibration.eccentricity < 0.45:
+    # 4-corner warp is attempted first (sets calibration.card_corners_found=True
+    # on success); ellipse warp is used as fallback for non-square angles.
+    # The eccentricity gate is bypassed when card corners were found.
+    if calibration.card_corners_found or (0.05 < calibration.eccentricity < 0.45):
         img_bgr, gray, calibration = correct_perspective(img_bgr, gray, calibration)
 
-    # Stage 4: Zone-aware hole detection (direct on grayscale)
+    # Stage 3.5a: Full-image CLAHE (baseline contrast pass)
+    gray = apply_clahe(gray)
+
+    # Stage 3.5b: Bullseye-specific CLAHE
+    # A stronger CLAHE is applied only inside the dark centre zone where black
+    # shot holes must be separated from black ring lines.  Outside the bullseye
+    # the image is unchanged so the cream zone is not over-amplified.
+    mm_per_px = get_mm_per_pixel(target_type)
+    black_r_mm = get_black_area_radius_mm(target_type)
+    bullseye_r_px = bullseye_radius_from_calibration(mm_per_px, black_r_mm)
+    if bullseye_r_px > 0:
+        gray = apply_clahe_to_bullseye(gray, calibration.center, bullseye_r_px)
+
+    # Stage 4a: CV hole detection (always runs)
     spec = get_spec(target_type)
-    holes = detect_holes(gray, calibration, spec.pellet_diameter_mm,
-                         dark_center_rings=spec.dark_center_rings)
+    cv_holes = detect_holes(gray, calibration, spec.pellet_diameter_mm,
+                            dark_center_rings=spec.dark_center_rings)
+
+    # Stage 4b: YOLO hole detection (runs only when model is loaded)
+    yolo_holes = detect_holes_yolo(gray, calibration, target_type) if _yolo_available else []
+
+    # Stage 4c: Fuse CV + YOLO with NMS
+    holes = fuse_candidates(cv_holes, yolo_holes)
 
     # Stage 5: ISSF decimal scoring
     shots_data = score_holes(holes, calibration, target_type)
@@ -73,6 +99,8 @@ def analyze_target_image(
             pixel_x=s["pixel_x"],
             pixel_y=s["pixel_y"],
             confidence=s["confidence"],
+            is_inner_ten=s.get("is_inner_ten", False),
+            dist_mm=s.get("dist_mm", 0.0),
         )
         for s in shots_data
     ]
@@ -110,11 +138,17 @@ def _draw_debug(img_bgr, calibration, holes, shots):
     else:
         cv2.circle(debug, (cx, cy), int(calibration.major_radius), (0, 200, 0), 2)
 
-    # Detected holes (red circles)
+    # Detected holes — colour by detection method
+    method_colors = {
+        "cv":    (0,   0,   255),   # red
+        "yolo":  (255, 128, 0  ),   # orange
+        "fused": (0,   255, 128),   # teal
+    }
     for hole in holes:
         hx, hy = int(round(hole.x)), int(round(hole.y))
         hr = max(4, int(round(hole.radius * 1.5)))
-        cv2.circle(debug, (hx, hy), hr, (0, 0, 255), 2)
+        color = method_colors.get(getattr(hole, "method", "cv"), (0, 0, 255))
+        cv2.circle(debug, (hx, hy), hr, color, 2)
 
     # Scores
     for shot in shots:

@@ -6,12 +6,14 @@ from typing import List, Optional
 class ShotResult(BaseModel):
     """A single detected bullet hole mapped to target coordinates."""
     shot_number: int = Field(..., description="1-based shot index")
-    score: float = Field(..., ge=0, le=10.9, description="Score based on ring distance")
+    score: float = Field(..., ge=0, le=10.9, description="ISSF decimal score (0.0–10.9)")
     x: float = Field(..., description="Target X coordinate (-10 to +10)")
     y: float = Field(..., description="Target Y coordinate (-10 to +10)")
     pixel_x: int = Field(..., description="Raw pixel X in original image")
     pixel_y: int = Field(..., description="Raw pixel Y in original image")
     confidence: float = Field(..., ge=0, le=1, description="Detection confidence (0–1)")
+    is_inner_ten: bool = Field(False, description="True when shot is inside the X-ring (inner 10)")
+    dist_mm: float = Field(0.0, description="Physical distance from target centre in mm")
 
 
 class AnalysisResponse(BaseModel):

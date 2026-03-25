@@ -14,6 +14,7 @@ import type {
   AiCoachCategory,
   AiCoachSeverity,
 } from '@shooting-platform/shared-types';
+import { PerformanceSectionNav } from '../../../components/performance/PerformanceSectionNav';
 
 // ── Category metadata ─────────────────────────────────────────────────────────
 
@@ -147,6 +148,15 @@ export default function AiCoachPage() {
   return (
     <AppShell title="AI Coach">
       <div className="space-y-8 max-w-4xl">
+
+        <div className="animate-slide-up">
+          <h1 className="font-display font-bold text-2xl text-text-primary">Performance</h1>
+          <p className="text-text-muted text-sm mt-1">
+            Session-level coaching insights powered by AI
+          </p>
+        </div>
+
+        <PerformanceSectionNav />
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="animate-slide-up">

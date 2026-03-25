@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { JwtPayload, Shot } from '@shooting-platform/shared-types';
+import { JwtPayload, Shot, VisionShotResult } from '@shooting-platform/shared-types';
 
 @Controller('shots')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,7 +29,7 @@ export class ShotsController {
    * multipart/form-data with field "file" (PDF | CSV | JSON) and query param sessionId
    */
   @Post('import')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
@@ -56,7 +56,7 @@ export class ShotsController {
    * JSON body with sessionId and shots array
    */
   @Post('manual')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async createManual(
     @CurrentUser() user: JwtPayload,
     @Body() dto: ManualShotsDto,
@@ -71,7 +71,7 @@ export class ShotsController {
    * multipart/form-data with field "file" (image) and query param sessionId
    */
   @Post('photo')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
@@ -97,5 +97,47 @@ export class ShotsController {
       throw new BadRequestException('sessionId query parameter is required');
     }
     return this.shotsService.analyzePhoto(sessionId, user.sub, user.role, file, shooterId);
+  }
+
+  /**
+   * Method 3b — Photo Analysis (full vision response)
+   * POST /shots/analyze-photo
+   * Returns VisionShotResult[] with pixel coords, plus targetDetected and processingTimeMs.
+   */
+  @Post('analyze-photo')
+  @Roles('SHOOTER', 'COACH')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 20 * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+          cb(new BadRequestException('Only image files are accepted'), false);
+          return;
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async analyzePhotoFull(
+    @CurrentUser() user: JwtPayload,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Query('sessionId') sessionId: string,
+    @Query('targetType') targetType: string | undefined,
+    @Query('shooterId') shooterId: string | undefined,
+  ): Promise<{ shots: VisionShotResult[]; targetDetected: boolean; processingTimeMs: number; savedShots: Shot[] }> {
+    if (!file) {
+      throw new BadRequestException('No image file uploaded');
+    }
+    if (!sessionId) {
+      throw new BadRequestException('sessionId query parameter is required');
+    }
+    return this.shotsService.analyzePhotoFull(
+      sessionId,
+      user.sub,
+      user.role,
+      file,
+      targetType ?? 'air_rifle_10m',
+      shooterId,
+    );
   }
 }

@@ -22,6 +22,6 @@ export class RegisterDto {
   @MaxLength(128)
   password!: string;
 
-  @IsEnum(['SHOOTER', 'COACH', 'SOLDIER'] as const)
+  @IsEnum(['SHOOTER', 'COACH'] as const)
   role!: UserRole;
 }

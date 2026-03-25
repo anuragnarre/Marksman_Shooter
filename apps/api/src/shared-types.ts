@@ -2,7 +2,7 @@
 // Shared TypeScript interfaces mirroring every Prisma model.
 // Consumed by both /apps/web and /apps/api.
 
-export type UserRole = 'SHOOTER' | 'COACH' | 'SOLDIER';
+export type UserRole = 'SHOOTER' | 'COACH';
 export type ConnectionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface User {
@@ -10,6 +10,11 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  googleId?: string | null;
+  /** Present only on /auth/me responses — indicates if the account has a password set */
+  hasPassword?: boolean;
+  /** Present only on /auth/me responses — indicates if the account is linked to Google */
+  hasGoogle?: boolean;
   createdAt: Date;
   shooterProfile?: ShooterProfile | null;
 }
@@ -51,39 +56,6 @@ export interface Session {
   shots?: Shot[];
   feedback?: CoachFeedback[];
 }
-
-// ── Army / Soldier constants ──────────────────────────────────────────────────
-
-export const ARMY_WEAPONS = [
-  'AK-203',
-  'Sig Sauer SIG716',
-  'Tavor X95',
-  'Dragunov (SVD)',
-  'Glock 17',
-  'Glock 19',
-  'Pistol Auto 9mm 1A',
-  'ASMI',
-  'Beretta Px4 Storm',
-  'INSAS',
-  'AK-47',
-  'Custom Gun',
-] as const;
-
-export const TRAINING_MODES = [
-  'Marksmanship',
-  'Rapid Fire',
-  'Field Exercise',
-  'Combat Simulation',
-  'Qualification',
-] as const;
-
-export const TRAINING_MODE_COLORS: Record<string, string> = {
-  Marksmanship:       '#4FC3F7',
-  'Rapid Fire':       '#FF4D6D',
-  'Field Exercise':   '#00E5A0',
-  'Combat Simulation':'#F5A623',
-  Qualification:      '#8892A4',
-};
 
 export interface WeaponPerformance {
   weaponType: string;
@@ -299,6 +271,8 @@ export interface VisionShotResult {
   pixelX: number;
   pixelY: number;
   confidence: number;
+  isInnerTen: boolean;
+  distMm: number;
 }
 
 export interface VisionAnalysisResponse {

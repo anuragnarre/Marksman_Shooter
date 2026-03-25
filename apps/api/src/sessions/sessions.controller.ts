@@ -26,7 +26,7 @@ export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
   @Post()
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async create(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,
@@ -39,7 +39,7 @@ export class SessionsController {
   }
 
   @Get()
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async findAll(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,
@@ -51,7 +51,7 @@ export class SessionsController {
   }
 
   @Get(':id')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async findOne(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -61,7 +61,7 @@ export class SessionsController {
   }
 
   @Delete(':id')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(
     @CurrentUser() user: JwtPayload,

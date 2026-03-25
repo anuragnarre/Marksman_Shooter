@@ -199,9 +199,12 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             </div>
 
             {/* ── User info ─────────────────────────────────────── */}
-            <div
-              className="flex items-center gap-3 px-4 py-3 shrink-0"
+            <button
+              onClick={() => router.push('/settings')}
+              className="flex items-center gap-3 px-4 py-3 shrink-0 w-full text-left
+                         transition-colors hover:bg-[rgba(255,255,255,0.03)] active:bg-[rgba(255,255,255,0.05)]"
               style={{ borderBottom: '1px solid var(--border-subtle)' }}
+              aria-label="Profile & Settings"
             >
               <div className="relative shrink-0">
                 <div
@@ -219,18 +222,22 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                   style={{ background: '#00E5A0', border: '2px solid var(--bg-void)', boxShadow: '0 0 5px rgba(0,229,160,0.6)' }}
                 />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-text-primary text-sm font-semibold truncate leading-tight">{user.name}</p>
                 <p className="text-[10px] font-display font-bold uppercase tracking-[0.12em] mt-0.5"
                   style={{ color: rs.text }}>
                   {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
                 </p>
               </div>
-            </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                strokeWidth="1.6" strokeLinecap="round" className="shrink-0 text-text-muted">
+                <polyline points="5,3 9,6 5,9" />
+              </svg>
+            </button>
 
             {/* ── Nav list (grouped) ────────────────────────────── */}
             <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 min-h-0">
-              {NAV_GROUPS.map((group) => {
+              {NAV_GROUPS.filter((g) => g.href !== '/connect' || user.role === 'SHOOTER').map((group) => {
                 const active   = isGroupActive(group);
                 const hasKids  = !!(group.children?.length);
                 const isOpen   = expanded.has(group.href);

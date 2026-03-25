@@ -7,6 +7,7 @@ import { AppShell } from '../../../components/AppShell';
 import { apiFetch } from '../../../lib/api';
 import { useCoachShooter } from '../../../lib/use-coach-shooter';
 import type { TrainingPlan, TrainingPlanWeek, TrainingPlanSession } from '@shooting-platform/shared-types';
+import { PlanningSectionNav } from '../../../components/planning/PlanningSectionNav';
 
 export default function TrainingPlanPage() {
   const {
@@ -74,10 +75,19 @@ export default function TrainingPlanPage() {
     <AppShell title="Training Plan">
       <div className="space-y-6">
 
+        <div className="animate-slide-up">
+          <h1 className="font-display font-bold text-2xl text-text-primary">Planning</h1>
+          <p className="text-text-muted text-sm mt-1">
+            Training schedule, goals, and personal records
+          </p>
+        </div>
+
+        <PlanningSectionNav />
+
         {/* Header */}
         <div className="flex items-start justify-between animate-slide-up">
           <div>
-            <h1 className="font-display font-bold text-2xl text-text-primary">Training Plan</h1>
+            <h2 className="font-display font-bold text-xl text-text-primary">AI Training Plan</h2>
             <p className="text-text-muted text-sm mt-1">
               {isCoach
                 ? `AI-generated programme for ${selectedShooter?.name ?? 'selected shooter'}`

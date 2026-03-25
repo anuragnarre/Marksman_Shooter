@@ -33,6 +33,7 @@ import {
 } from 'recharts';
 import { BiometricLiveCard } from '../../../components/BiometricLiveCard';
 import { BiometricSessionChart } from '../../../components/BiometricSessionChart';
+import ShotOverlayCanvas from '../../../components/ShotOverlayCanvas';
 import type {
   AnalyticsResult,
   Session,
@@ -41,6 +42,7 @@ import type {
   DeepAnalysis,
   SessionContextInput,
   BiometricSummary,
+  VisionShotResult,
 } from '@shooting-platform/shared-types';
 import { TRAINING_MODE_COLORS } from '@shooting-platform/shared-types';
 
@@ -60,6 +62,8 @@ function SessionDetailInner() {
   const [analytics,   setAnalytics]   = useState<AnalyticsResult | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading,     setLoading]     = useState(true);
+  const [loadError,   setLoadError]   = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isLive,      setIsLive]      = useState(false);
   const [pageTab,     setPageTab]     = useState<PageTab>('session');
   const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysis | null>(null);
@@ -86,7 +90,7 @@ function SessionDetailInner() {
         .then(setDeepAnalysis)
         .catch(() => setDeepAnalysisError(true));
     } catch {
-      // session 404 handled via empty state
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -133,6 +137,20 @@ function SessionDetailInner() {
     <AppShell title={title} isLive={isLive}>
       {loading ? (
         <LoadingState />
+      ) : loadError || !session ? (
+        <div className="card p-12 text-center max-w-md mx-auto mt-8">
+          <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+            style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.2)' }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FF4D6D" strokeWidth="1.6" strokeLinecap="round">
+              <circle cx="11" cy="11" r="9" />
+              <line x1="11" y1="7" x2="11" y2="12" />
+              <circle cx="11" cy="15.5" r="0.8" fill="#FF4D6D" stroke="none" />
+            </svg>
+          </div>
+          <p className="font-display font-semibold text-lg text-text-primary mb-2">Session not found</p>
+          <p className="text-text-muted text-sm mb-6">This session may have been deleted or you don&apos;t have access.</p>
+          <Link href="/sessions" className="btn btn-primary">← Back to Sessions</Link>
+        </div>
       ) : (
         <div className="space-y-6">
 
@@ -172,10 +190,10 @@ function SessionDetailInner() {
             </div>
             <div className="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
               <Link
-                href={shooterId ? `/connect` : '/sessions'}
+                href="/sessions"
                 className="btn btn-ghost text-xs py-2"
               >
-                {shooterId ? '← Shooter' : '← Sessions'}
+                ← Sessions
               </Link>
               {session && shots.length > 0 && (
                 <button
@@ -216,6 +234,13 @@ function SessionDetailInner() {
               )}
             </div>
           </div>
+
+          {deleteError && (
+            <div className="rounded-lg px-4 py-3 text-sm text-[#FF4D6D] animate-slide-down"
+              style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.25)' }}>
+              {deleteError}
+            </div>
+          )}
 
           {/* ── Page Tabs ───────────────────────────────────────────────── */}
           <div className="flex gap-1 animate-slide-up" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -392,9 +417,10 @@ function SessionDetailInner() {
           try {
             await apiFetch(`/sessions/${id}`, { method: 'DELETE' });
             router.push('/sessions');
-          } catch {
+          } catch (e) {
             setDeleting(false);
             setDeleteOpen(false);
+            setDeleteError(e instanceof Error ? e.message : 'Failed to delete session. Please try again.');
           }
         }}
         title="Delete Session"
@@ -445,8 +471,10 @@ function PerformanceTab({
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch {
-      // ignore
+    } catch (e) {
+      // Show save error in the saved indicator area
+      setSaved(false);
+      console.error('Failed to save context:', e);
     } finally {
       setSaving(false);
     }
@@ -1510,6 +1538,15 @@ function cameraErrorMessage(err: unknown): string {
   }
 }
 
+type TargetTypeOption = 'air_rifle_10m' | 'air_pistol_10m' | 'nr_50m' | 'nr_25m';
+
+const TARGET_TYPE_LABELS: Record<TargetTypeOption, string> = {
+  air_rifle_10m:  'Air Rifle 10m',
+  air_pistol_10m: 'Air Pistol 10m',
+  nr_50m:         'NR 50m',
+  nr_25m:         'NR 25m',
+};
+
 function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () => void }) {
   const [mode, setMode]             = useState<PhotoMode>('upload');
   const [state, setState]           = useState<PhotoState>('idle');
@@ -1518,6 +1555,9 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [capturing, setCapturing]   = useState(false);
+  const [targetType, setTargetType] = useState<TargetTypeOption>('air_rifle_10m');
+  const [overlayShots, setOverlayShots] = useState<VisionShotResult[] | null>(null);
+  const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef     = useRef<HTMLVideoElement>(null);
@@ -1540,6 +1580,14 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
+
+  // Revoke image object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Native Capacitor camera — opens system camera and returns a file. */
   async function launchNativeCamera() {
@@ -1675,28 +1723,57 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
   async function handleFile(file: File) {
     setState('uploading');
     setError(null);
+    // Revoke any previous object URL
+    if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+    const objUrl = URL.createObjectURL(file);
+    setImageObjectUrl(objUrl);
+    setOverlayShots(null);
 
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const shots = await apiFetch<Shot[]>(
-        `/shots/photo?sessionId=${sessionId}`,
+      const res = await apiFetch<{
+        shots: VisionShotResult[];
+        targetDetected: boolean;
+        processingTimeMs: number;
+        savedShots: Shot[];
+      }>(
+        `/shots/analyze-photo?sessionId=${sessionId}&targetType=${targetType}`,
         { method: 'POST', body: formData, headers: {} },
       );
-      setResult({ shots: shots.length });
+      setOverlayShots(res.shots);
+      setResult({ shots: res.savedShots.length });
       setState('done');
       void hapticSuccess();
-      setTimeout(() => { setResult(null); setState('idle'); onSuccess(); }, 1500);
+      setTimeout(() => { setState('idle'); onSuccess(); }, 4000);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Photo analysis failed');
       setState('error');
+      URL.revokeObjectURL(objUrl);
+      setImageObjectUrl(null);
       void hapticError();
     }
   }
 
   return (
     <div className="space-y-4">
+      {/* ── Target type selector ─────────────────────────────────────────── */}
+      {state === 'idle' && (
+        <div className="flex items-center gap-3">
+          <span className="text-text-muted text-xs font-display uppercase tracking-widest shrink-0">Target</span>
+          <select
+            value={targetType}
+            onChange={(e) => setTargetType(e.target.value as TargetTypeOption)}
+            className="field flex-1 text-xs py-1.5"
+          >
+            {(Object.keys(TARGET_TYPE_LABELS) as TargetTypeOption[]).map((k) => (
+              <option key={k} value={k}>{TARGET_TYPE_LABELS[k]}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* ── Native mode: show two large tap targets ──────────────────────── */}
       {isNative() && state === 'idle' && (
         <div className="grid grid-cols-2 gap-3">
@@ -1890,8 +1967,25 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
       )}
 
       {state === 'done' && result && (
-        <div className="px-4 py-3 rounded-lg bg-[rgba(0,229,160,0.1)] border border-[rgba(0,229,160,0.3)] text-[#00E5A0] text-sm">
-          ✓ Detected and imported {result.shots} shot{result.shots !== 1 ? 's' : ''}
+        <div className="space-y-4">
+          <div className="px-4 py-3 rounded-lg bg-[rgba(0,229,160,0.1)] border border-[rgba(0,229,160,0.3)] text-[#00E5A0] text-sm">
+            ✓ Detected and imported {result.shots} shot{result.shots !== 1 ? 's' : ''}
+          </div>
+          {overlayShots && imageObjectUrl && (
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-text-muted text-xs font-display uppercase tracking-widest self-start">
+                Shot Overlay
+              </p>
+              <ShotOverlayCanvas
+                imageUrl={imageObjectUrl}
+                shots={overlayShots}
+                displaySize={Math.min(320, window.innerWidth - 80)}
+                showScores
+                showNumbers
+                className="mx-auto"
+              />
+            </div>
+          )}
         </div>
       )}
 

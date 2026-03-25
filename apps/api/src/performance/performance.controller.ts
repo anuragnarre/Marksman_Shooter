@@ -23,7 +23,7 @@ export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
   @Get('deep-analysis/:sessionId')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   getDeepAnalysis(
     @Param('sessionId') sessionId: string,
     @CurrentUser() user: JwtPayload,
@@ -33,7 +33,7 @@ export class PerformanceController {
   }
 
   @Post('session-context/:sessionId')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   saveSessionContext(
     @Param('sessionId') sessionId: string,
     @Body() dto: SessionContextDto,
@@ -44,7 +44,7 @@ export class PerformanceController {
   }
 
   @Post('training-plan')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   generateTrainingPlan(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,
@@ -56,7 +56,7 @@ export class PerformanceController {
   }
 
   @Get('training-plans')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   getTrainingPlans(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,

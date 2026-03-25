@@ -61,6 +61,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        googleId: user.googleId ?? null,
         createdAt: user.createdAt,
       },
     };
@@ -95,6 +96,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        googleId: user.googleId ?? null,
         createdAt: user.createdAt,
       },
     };
@@ -154,6 +156,7 @@ export class AuthService {
           name: user.name,
           email: user.email,
           role: user.role,
+          googleId: user.googleId ?? null,
           createdAt: user.createdAt,
         },
       };

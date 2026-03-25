@@ -14,6 +14,7 @@ import type {
   PhysicalRecommendation,
   SmartAlert,
 } from '@shooting-platform/shared-types';
+import { PerformanceSectionNav } from '../../../components/performance/PerformanceSectionNav';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,15 @@ export default function AiAssistantPage() {
   return (
     <AppShell title="AI Performance Assistant">
       <div className="space-y-8 max-w-5xl">
+
+        <div className="animate-slide-up">
+          <h1 className="font-display font-bold text-2xl text-text-primary">Performance</h1>
+          <p className="text-text-muted text-sm mt-1">
+            Cross-session performance patterns and technique analysis
+          </p>
+        </div>
+
+        <PerformanceSectionNav />
 
         {/* ── Header ─────────────────────────────────────────────────── */}
         <div className="animate-slide-up">

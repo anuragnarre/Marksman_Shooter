@@ -13,7 +13,7 @@ export class SuggestionsController {
   constructor(private readonly suggestionsService: SuggestionsService) {}
 
   @Get('session/:id')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async getSessionSuggestions(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,

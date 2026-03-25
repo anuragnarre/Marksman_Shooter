@@ -7,6 +7,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import { apiFetch } from './api';
+import { persistUser } from './auth';
 import type { AuthResponse, User } from '@shooting-platform/shared-types';
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
@@ -84,6 +85,7 @@ export async function googleSignIn(
   if (typeof window !== 'undefined') {
     localStorage.setItem('access_token', res.access_token);
   }
+  persistUser(res.user);
   return res;
 }
 

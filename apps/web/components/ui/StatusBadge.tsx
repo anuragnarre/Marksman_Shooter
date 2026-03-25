@@ -3,19 +3,12 @@
 // Rajdhani uppercase gives it a technical, data-terminal feel.
 
 interface StatusBadgeProps {
-  variant: 'shooter' | 'coach' | 'soldier' | 'live' | 'pending' | 'approved' | 'discipline';
+  variant: 'shooter' | 'coach' | 'live' | 'pending' | 'approved' | 'discipline';
   label?: string;
   size?: 'sm' | 'md';
 }
 
 const VARIANT_CONFIG = {
-  soldier: {
-    dot:    'bg-[#00E5A0]',
-    border: 'border-[#00E5A0]/30',
-    text:   'text-[#00E5A0]',
-    bg:     'bg-[rgba(0,229,160,0.1)]',
-    label:  'Soldier',
-  },
   shooter: {
     dot:    'bg-accent',
     border: 'border-accent/30',

@@ -155,7 +155,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             )}
           </button>
         )}
-        {NAV_GROUPS.map((group) => {
+        {NAV_GROUPS.filter((g) => g.href !== '/connect' || user?.role === 'SHOOTER').map((group) => {
           const groupActive = (() => {
             if (group.href === '/dashboard') return pathname === '/dashboard';
             return pathname === group.href || pathname.startsWith(group.href + '/');
@@ -201,10 +201,15 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
         style={{ borderTop: '1px solid var(--glass-border)' }}
       >
         {user && (
-          <div
-            className={`flex items-center gap-3 rounded-xl px-2 py-2 transition-all duration-200
+          <button
+            onClick={() => router.push('/settings')}
+            className={`w-full flex items-center gap-3 rounded-xl px-2 py-2 transition-all duration-200
                         ${expanded ? '' : 'justify-center'}`}
             style={{ background: 'rgba(255,255,255,0.025)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.025)'; }}
+            aria-label="Open profile settings"
+            title={expanded ? 'Profile & Settings' : `${user.name} — Profile & Settings`}
           >
             {/* Avatar with ring */}
             <div className="relative shrink-0">
@@ -231,7 +236,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             </div>
 
             {expanded && (
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 text-left">
                 <p className="text-text-primary text-[12px] font-semibold truncate leading-tight">
                   {user.name}
                 </p>
@@ -243,7 +248,18 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
                 </p>
               </div>
             )}
-          </div>
+
+            {expanded && (
+              <svg
+                width="12" height="12" viewBox="0 0 12 12" fill="none"
+                stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"
+                className="shrink-0 text-text-muted"
+              >
+                <circle cx="6" cy="6" r="2" />
+                <path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.6 2.6l1.1 1.1M8.3 8.3l1.1 1.1M2.6 9.4l1.1-1.1M8.3 3.7l1.1-1.1" />
+              </svg>
+            )}
+          </button>
         )}
 
         {/* Toggle + Logout row */}

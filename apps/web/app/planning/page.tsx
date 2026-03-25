@@ -3,7 +3,8 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { AppShell } from '../../components/AppShell';
-import { TabBar, useTabParam } from '../../components/ui/TabBar';
+import { useTabParam } from '../../components/ui/TabBar';
+import { PlanningSectionNav } from '../../components/planning/PlanningSectionNav';
 
 const CalendarSection = dynamic(
   () => import('../../components/planning/CalendarSection'),
@@ -14,13 +15,8 @@ const GoalsSection = dynamic(
   { ssr: false },
 );
 
-const TABS = [
-  { id: 'schedule', label: 'Schedule' },
-  { id: 'goals', label: 'Goals & Records' },
-];
-
 function PlanningInner() {
-  const [tab, setTab] = useTabParam('schedule');
+  const [tab] = useTabParam('schedule');
 
   return (
     <div className="space-y-6">
@@ -31,7 +27,7 @@ function PlanningInner() {
         </p>
       </div>
 
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      <PlanningSectionNav />
 
       {tab === 'schedule' && <CalendarSection />}
       {tab === 'goals' && <GoalsSection />}
@@ -42,7 +38,7 @@ function PlanningInner() {
 export default function PlanningPage() {
   return (
     <AppShell title="Planning">
-      <Suspense>
+      <Suspense fallback={<div className="h-8 skeleton rounded-lg w-48" />}>
         <PlanningInner />
       </Suspense>
     </AppShell>

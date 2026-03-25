@@ -16,7 +16,7 @@ export class ScheduleRequestsController {
 
   /** Shooter submits a change request for an assigned event */
   @Post()
-  @Roles('SHOOTER', 'SOLDIER')
+  @Roles('SHOOTER')
   create(@CurrentUser() user: JwtPayload, @Body() dto: CreateScheduleRequestDto) {
     return this.service.createRequest(user.sub, dto);
   }
@@ -47,7 +47,7 @@ export class ScheduleRequestsController {
 
   /** Shooter: cancel a pending request */
   @Delete(':id')
-  @Roles('SHOOTER', 'SOLDIER')
+  @Roles('SHOOTER')
   cancel(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     return this.service.cancelRequest(user.sub, id);
   }

@@ -26,7 +26,7 @@ export class BiometricsController {
 
   @Post('devices')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async registerDevice(
     @CurrentUser() user: JwtPayload,
     @Body() dto: RegisterDeviceDto,
@@ -36,14 +36,14 @@ export class BiometricsController {
 
   @Get('devices')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async listDevices(@CurrentUser() user: JwtPayload) {
     return this.biometricsService.listDevices(user.sub);
   }
 
   @Patch('devices/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async toggleDevice(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -54,7 +54,7 @@ export class BiometricsController {
 
   @Delete('devices/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async deleteDevice(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -64,7 +64,7 @@ export class BiometricsController {
 
   @Get('devices/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getDeviceDetail(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -91,7 +91,7 @@ export class BiometricsController {
 
   @Post('health-connect/sync')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async syncHealthConnect(
     @CurrentUser() user: JwtPayload,
     @Body() dto: HealthConnectSyncDto,
@@ -103,7 +103,7 @@ export class BiometricsController {
 
   @Get('readings')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getReadings(
     @CurrentUser() user: JwtPayload,
     @Query('sessionId') sessionId?: string,
@@ -122,7 +122,7 @@ export class BiometricsController {
 
   @Get('session/:sessionId/summary')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getSessionSummary(
     @CurrentUser() user: JwtPayload,
     @Param('sessionId') sessionId: string,
@@ -134,7 +134,7 @@ export class BiometricsController {
 
   @Get('session/:sessionId/ai-analysis')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getAiAnalysis(
     @CurrentUser() user: JwtPayload,
     @Param('sessionId') sessionId: string,
@@ -146,7 +146,7 @@ export class BiometricsController {
 
   @Get('advanced-insights')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getAdvancedInsights(
     @CurrentUser() user: JwtPayload,
     @Query('days') days?: string,
@@ -161,7 +161,7 @@ export class BiometricsController {
 
   @Get('trends')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getTrends(
     @CurrentUser() user: JwtPayload,
     @Query('days') days?: string,
@@ -173,7 +173,7 @@ export class BiometricsController {
 
   @Get('live/:userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('SHOOTER', 'COACH', 'SOLDIER')
+  @Roles('SHOOTER', 'COACH')
   async getLatestReading(
     @CurrentUser() user: JwtPayload,
     @Param('userId') userId: string,

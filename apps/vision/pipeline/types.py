@@ -25,6 +25,7 @@ class TargetCalibration:
     ring_radii: List[float] = field(default_factory=list)
     confidence: float = 0.0
     mm_per_pixel: float = 0.0
+    card_corners_found: bool = False  # True when 4-corner warp succeeded
 
 
 @dataclass
@@ -46,3 +47,4 @@ class FusedHole:
     radius: float
     confidence: float
     methods_agreed: int = 1
+    method: str = "cv"  # "cv" | "yolo" | "fused"

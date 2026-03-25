@@ -6,7 +6,7 @@
 // on the left slowly shifts (8s loop) for a living-wallpaper feel.
 // Floating stat cards reinforce the platform's elite positioning.
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { login } from '../../../lib/auth';
@@ -16,7 +16,7 @@ import { GoogleSignInButton } from '../../../components/GoogleSignInButton';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { setUser, isLoggedIn, isLoading } = useAuth();
   const isMobile = useIsMobile();
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
@@ -26,6 +26,15 @@ export default function LoginPage() {
   const [error, setError]         = useState<string | null>(null);
   const [loading, setLoading]     = useState(false);
   const [hasError, setHasError]   = useState(false);
+
+  // Redirect already-authenticated users
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) router.replace('/dashboard');
+  }, [isLoading, isLoggedIn, router]);
+
+  function clearError() {
+    if (error) { setError(null); setHasError(false); }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -153,7 +162,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); clearError(); }}
                 className={`field ${hasError ? 'field-error' : ''}`}
                 placeholder="you@example.com"
                 aria-describedby={error ? 'auth-error' : undefined}
@@ -169,7 +178,7 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); clearError(); }}
                   className={`field pr-10 ${hasError ? 'field-error' : ''}`}
                   placeholder="Your password"
                 />

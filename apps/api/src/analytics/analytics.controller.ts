@@ -13,7 +13,7 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('overview')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async getOverview(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,
@@ -25,7 +25,7 @@ export class AnalyticsController {
   }
 
   @Get('session/:id')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async getSessionAnalytics(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -34,7 +34,7 @@ export class AnalyticsController {
   }
 
   @Get('weapons/summary')
-  @Roles('SHOOTER', 'SOLDIER', 'COACH')
+  @Roles('SHOOTER', 'COACH')
   async getWeaponSummary(
     @CurrentUser() user: JwtPayload,
     @Query('shooterId') shooterId: string | undefined,

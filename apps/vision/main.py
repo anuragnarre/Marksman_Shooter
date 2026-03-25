@@ -7,15 +7,16 @@ from typing import List
 from analyzer import analyze_target_image
 from models import AnalysisResponse
 from pipeline.target_specs import TargetType, TARGET_SPECS
+from pipeline.yolo_detector import load_yolo_model, _yolo_available
 
 app = FastAPI(
     title="Shooting Target Vision Service",
     description=(
         "Analyzes target photos and returns bullet hole positions with scores. "
-        "Zone-aware detection pipeline: finds bright holes in black zone, "
-        "dark holes in cream zone. ISSF decimal scoring."
+        "Pipeline v5: 4-corner warp, CLAHE enhancement, zone-aware CV detection "
+        "augmented by YOLOv8-S (when model loaded) with SAHI for 50m targets."
     ),
-    version="4.0.0",
+    version="5.0.0",
 )
 
 app.add_middleware(
@@ -28,12 +29,19 @@ app.add_middleware(
 SUPPORTED_TARGETS = {t.value: TARGET_SPECS[t].name for t in TargetType}
 
 
+@app.on_event("startup")
+async def startup() -> None:
+    """Load YOLO model on startup. Silent no-op if model file absent."""
+    load_yolo_model()
+
+
 @app.get("/health")
 def health() -> dict:
     return {
         "status": "ok",
-        "detector": "zone-aware-cv-v4",
-        "version": "4.0.0",
+        "detector": "cv-v5-yolo-augmented",
+        "version": "5.0.0",
+        "yolo_loaded": _yolo_available,
         "supported_targets": SUPPORTED_TARGETS,
     }
 

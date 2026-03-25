@@ -38,8 +38,8 @@ type PrismaConnection = {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   initiatedBy: string;
   createdAt: Date;
-  shooter?: { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH' | 'SOLDIER'; createdAt: Date };
-  coach?:   { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH' | 'SOLDIER'; createdAt: Date };
+  shooter?: { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH'; createdAt: Date };
+  coach?:   { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH'; createdAt: Date };
 };
 
 const USER_SELECT = {
@@ -860,7 +860,7 @@ export class CoachService {
     id: string;
     name: string;
     email: string;
-    role: 'SHOOTER' | 'COACH' | 'SOLDIER';
+    role: 'SHOOTER' | 'COACH';
     createdAt: Date;
     shooterProfile?: {
       id: string;

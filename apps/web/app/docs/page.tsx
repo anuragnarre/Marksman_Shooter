@@ -21,7 +21,6 @@ const SECTIONS = [
   { id: 'ai-coach',         label: 'AI Coach',               icon: <IcoSparkle /> },
   { id: 'coach-connect',    label: 'Coach Connection',       icon: <IcoLink /> },
   { id: 'for-coaches',      label: 'For Coaches',            icon: <IcoPeople /> },
-  { id: 'for-soldiers',     label: 'For Soldiers',           icon: <IcoStar /> },
   { id: 'technique',        label: 'Technique Guide',        icon: <IcoBook /> },
 ] as const;
 
@@ -222,14 +221,13 @@ function DocsContent() {
           <SectionHeading id="getting-started">Getting Started</SectionHeading>
 
           <p className="text-text-secondary text-[13px] leading-relaxed">
-            Marksman supports three roles — <strong className="text-text-primary">Shooter</strong>,{' '}
-            <strong className="text-text-primary">Coach</strong>, and{' '}
-            <strong className="text-text-primary">Soldier</strong>.
+            Marksman supports two roles — <strong className="text-text-primary">Shooter</strong> and{' '}
+            <strong className="text-text-primary">Coach</strong>.
             Choose the role that matches how you train.
           </p>
 
           {/* Role cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
             {[
               {
                 role: 'SHOOTER' as const,
@@ -264,8 +262,7 @@ function DocsContent() {
             Click <strong className="text-text-primary">Create account</strong> on the login screen, or navigate to <code className="text-[#4FC3F7] bg-elevated px-1.5 py-0.5 rounded text-xs">/auth/register</code>.
           </Step>
           <Step n={2} title="Select your role">
-            Choose <strong className="text-text-primary">Shooter</strong>, <strong className="text-text-primary">Coach</strong>, or <strong className="text-text-primary">Soldier</strong>.
-            If you select Soldier, you will also be asked to choose your primary weapon.
+            Choose <strong className="text-text-primary">Shooter</strong> or <strong className="text-text-primary">Coach</strong>.
           </Step>
           <Step n={3} title="Fill in your details">
             Enter your full name, email address, and a password (minimum 8 characters, must include uppercase, lowercase, and a number).
@@ -328,7 +325,7 @@ function DocsContent() {
           </div>
 
           <Note>
-            The sidebar on the left shows only the pages relevant to your role. Coaches see Shooters; Soldiers see Weapons and Field Analytics; Shooters see Connect.
+            The sidebar on the left shows only the pages relevant to your role. Coaches see Shooters; Shooters see Connect.
           </Note>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
@@ -347,7 +344,7 @@ function DocsContent() {
             Click <strong className="text-text-primary">New Session</strong> in the sidebar or on your dashboard.
           </Step>
           <Step n={2} title="Choose a quick preset (optional)">
-            Presets auto-fill the common fields. Shooters have Air Rifle and Pistol presets; Soldiers have AK-203, Glock 17, and Sig716 presets.
+            Presets auto-fill the common fields. Available presets include Air Rifle and Pistol.
           </Step>
           <Step n={3} title="Set session details">
             <ul className="mt-2 space-y-1">
@@ -357,7 +354,6 @@ function DocsContent() {
                 ['Weapon', 'Select from the list or choose Custom Gun and type your own'],
                 ['Number of Shots', 'How many shots you plan to fire'],
                 ['Date', 'The session date (defaults to today)'],
-                ['Training Mode', 'Soldiers only — select Marksmanship, Rapid Fire, Field Exercise, Combat Simulation, or Qualification'],
               ].map(([field, desc]) => (
                 <li key={field as string} className="flex gap-2">
                   <span className="text-[#F5A623] text-xs mt-0.5 shrink-0">›</span>
@@ -928,13 +924,6 @@ function IcoPeople() {
   );
 }
 
-function IcoStar() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="7,1 8.9,5 13,5.5 10,8.5 10.8,13 7,10.8 3.2,13 4,8.5 1,5.5 5.1,5"/>
-    </svg>
-  );
-}
 
 function IcoBook({ size = 14 }: { size?: number }) {
   return (
