@@ -72,7 +72,7 @@ export default function LoginPage() {
       {/* ── Mobile image banner (shown only on small screens) ────────── */}
       <div className="lg:hidden relative h-32 overflow-hidden flex-shrink-0">
         <img
-          src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80"
+          src="https://images.pexels.com/photos/6091606/pexels-photo-6091606.jpeg?auto=compress&cs=tinysrgb&w=800&h=300&dpr=1"
           className="w-full h-full object-cover"
           alt=""
           aria-hidden="true"
@@ -90,7 +90,7 @@ export default function LoginPage() {
         style={{
           backgroundImage: [
             'linear-gradient(135deg, rgba(6,8,16,0.82) 0%, rgba(8,12,28,0.60) 50%, rgba(6,8,16,0.90) 100%)',
-            'url(https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&auto=format&fit=crop&q=80)',
+            'url(https://images.pexels.com/photos/6091606/pexels-photo-6091606.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1600&dpr=1)',
           ].join(', '),
           backgroundSize: 'cover, cover',
           backgroundPosition: 'center, center',
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); clearError(); }}
                 className={`field ${hasError ? 'field-error' : ''}`}
-                placeholder="you@example.com"
+                placeholder="arjun@example.com"
                 aria-describedby={error ? 'auth-error' : undefined}
               />
             </div>

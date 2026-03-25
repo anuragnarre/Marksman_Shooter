@@ -732,18 +732,18 @@ const TESTIMONIALS = [
   },
   {
     quote: "I monitor all my athletes simultaneously in real-time. The AI coaching suggestions surface patterns I'd miss reviewing manually — it's a genuine force multiplier.",
-    name: 'M. Kovalenko',
-    role: 'Olympic Coach · UKR',
-    initials: 'MK',
+    name: 'Sanjeev Rajput',
+    role: 'Olympic Coach · IND',
+    initials: 'SR',
     score: '12',
     scoreLabel: 'Athletes Managed',
     color: '#4FC3F7',
   },
   {
     quote: "My average improved by 0.4 points in six weeks using the breathing sync analysis. The data doesn't lie — and now neither does my trigger hand.",
-    name: 'Seo Yu-jin',
-    role: 'World Championship Medallist · KOR',
-    initials: 'SY',
+    name: 'Manu Bhaker',
+    role: 'Olympic Medallist · IND',
+    initials: 'MB',
     score: '10.8',
     scoreLabel: 'Session Average',
     color: '#00E5A0',
@@ -1102,7 +1102,7 @@ export default function HomePage() {
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: 'url(https://images.unsplash.com/photo-1547347298-4074ad3086f0?w=1800&auto=format&fit=crop&q=70)',
+              backgroundImage: 'url(https://images.pexels.com/photos/6090912/pexels-photo-6090912.jpeg?auto=compress&cs=tinysrgb&w=1800&h=1000&dpr=1)',
               backgroundSize: 'cover',
               backgroundPosition: 'center 40%',
               filter: 'brightness(0.18) saturate(0.6)',

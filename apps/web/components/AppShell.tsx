@@ -51,7 +51,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
 
   // Track sidebar width dynamically via ResizeObserver
   useEffect(() => {
-    const aside = document.querySelector('aside');
+    const aside = document.querySelector('aside[data-sidebar]');
     if (!aside) return;
     const observer = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width;

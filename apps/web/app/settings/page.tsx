@@ -136,7 +136,7 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="field"
-                placeholder="Your name"
+                placeholder="Arjun Sharma"
               />
             </div>
 

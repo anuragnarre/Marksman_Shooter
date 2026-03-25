@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/auth-context';
 import { AppShell } from '../../components/AppShell';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { TargetCanvas } from '../../components/TargetCanvas';
+import { BiometricPulseWidget } from '../../components/BiometricPulseWidget';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { StaggerGrid, StaggerItem } from '../../components/StaggerGrid';
@@ -329,6 +330,9 @@ function ShooterView() {
           />
         </StaggerItem>
       </StaggerGrid>
+
+      {/* ── Marksman Pulse biometric widget ──────────────────────────────── */}
+      <BiometricPulseWidget />
 
       {/* ── Sessions empty state ──────────────────────────────────────────── */}
       {sessions.length === 0 && <EmptyState />}

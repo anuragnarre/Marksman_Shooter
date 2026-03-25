@@ -71,7 +71,7 @@ function RegisterPageInner() {
       {/* ── Mobile image banner ──────────────────────────────────────────── */}
       <div className="lg:hidden relative h-32 overflow-hidden flex-shrink-0">
         <img
-          src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=80"
+          src="https://images.pexels.com/photos/6090795/pexels-photo-6090795.jpeg?auto=compress&cs=tinysrgb&w=800&h=300&dpr=1"
           className="w-full h-full object-cover"
           alt=""
           aria-hidden="true"
@@ -89,7 +89,7 @@ function RegisterPageInner() {
         style={{
           backgroundImage: [
             'linear-gradient(135deg, rgba(6,8,16,0.80) 0%, rgba(8,20,16,0.55) 50%, rgba(6,8,16,0.90) 100%)',
-            'url(https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&auto=format&fit=crop&q=80)',
+            'url(https://images.pexels.com/photos/6090795/pexels-photo-6090795.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1600&dpr=1)',
           ].join(', '),
           backgroundSize: 'cover, cover',
           backgroundPosition: 'center, center',
@@ -136,7 +136,7 @@ function RegisterPageInner() {
               <input
                 id="name" type="text" required autoComplete="name"
                 value={name} onChange={(e) => setName(e.target.value)}
-                className="field" placeholder="Alex Marksman"
+                className="field" placeholder="Arjun Sharma"
               />
             </div>
 
@@ -145,7 +145,7 @@ function RegisterPageInner() {
               <input
                 id="email" type="email" required autoComplete="email"
                 value={email} onChange={(e) => setEmail(e.target.value)}
-                className="field" placeholder="you@example.com"
+                className="field" placeholder="arjun@example.com"
               />
             </div>
 

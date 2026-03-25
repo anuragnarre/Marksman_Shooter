@@ -2,8 +2,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { apiFetch } from '../lib/api';
-import { isAvailable as isHealthConnectAvailable, requestPermissions } from '../lib/health-connect';
+import {
+  isAvailable as isHealthConnectAvailable,
+  requestPermissions,
+  syncToBackend,
+} from '../lib/health-connect';
+import { HealthConnectSetup } from './HealthConnectSetup';
 import type { DeviceRegistration, BiometricReading } from '@shooting-platform/shared-types';
 
 interface Device {
@@ -38,6 +44,8 @@ export function DeviceManager() {
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [hcAvailable, setHcAvailable] = useState(false);
+  const [hcSyncing, setHcSyncing] = useState(false);
+  const [hcLastSync, setHcLastSync] = useState<Date | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<DeviceDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -142,9 +150,17 @@ export function DeviceManager() {
 
   async function handleHealthConnect() {
     const granted = await requestPermissions();
-    if (granted) {
-      alert('Health Connect permissions granted. Data will sync automatically during sessions.');
-    }
+    if (granted) loadDevices();
+  }
+
+  async function handleHcSync() {
+    setHcSyncing(true);
+    try {
+      await syncToBackend({ hoursBack: 24 });
+      setHcLastSync(new Date());
+      await loadDevices();
+    } catch {}
+    setHcSyncing(false);
   }
 
   function isOnline(lastSeen: string | null): boolean {
@@ -424,50 +440,150 @@ export function DeviceManager() {
         </button>
       )}
 
-      {/* ── Health Connect Section (always visible with explanation) ───── */}
-      <div className="card p-5">
-        <div className="flex items-start gap-3">
-          <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,229,160,0.1)' }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-text-primary">Health Connect (Android Wearables)</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-              Health Connect syncs data from smartwatches and fitness bands (Samsung Galaxy Watch, Pixel Watch, Fitbit, etc.) to this platform automatically.
-            </p>
-
-            {hcAvailable ? (
-              <button onClick={handleHealthConnect} className="btn-primary px-4 py-2 text-sm mt-3">
-                Connect Health Connect
-              </button>
-            ) : (
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center gap-2 text-xs" style={{ color: '#F5A623' }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                    <circle cx="7" cy="7" r="6" />
-                    <line x1="7" y1="4" x2="7" y2="7.5" />
-                    <circle cx="7" cy="10" r="0.5" fill="currentColor" stroke="none" />
-                  </svg>
-                  Health Connect is only available on the Android app
+      {/* ── Marksman Pulse / Health Connect ─────────────────────────────── */}
+      {(() => {
+        const hcDevice = devices.find(d => d.deviceType === 'HEALTH_CONNECT');
+        if (!hcAvailable && !hcDevice) {
+          // Web / iOS: show plain info card
+          return (
+            <div className="card p-5" style={{ border: '1px solid rgba(245,166,35,0.15)' }}>
+              <div className="flex items-start gap-3">
+                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(245,166,35,0.1)' }}>
+                  <PulseIconSvg />
                 </div>
-                <div className="text-xs space-y-1.5 pl-1" style={{ color: 'var(--text-muted)' }}>
-                  <p><strong style={{ color: 'var(--text-secondary)' }}>How it works:</strong></p>
-                  <p>1. Install the MarksmansProapp on your Android phone</p>
-                  <p>2. Make sure Health Connect app is installed (built into Android 14+, or download from Play Store for Android 9-13)</p>
-                  <p>3. Open MarksmansProon Android and tap "Connect Health Connect"</p>
-                  <p>4. Grant permissions for Heart Rate, Blood Oxygen, and Respiratory Rate</p>
-                  <p>5. Data from your wearable syncs automatically during shooting sessions</p>
-                </div>
-                <div className="text-xs mt-2 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', color: 'var(--text-secondary)' }}>
-                  <strong style={{ color: 'var(--text-primary)' }}>Supported wearables:</strong> Samsung Galaxy Watch, Google Pixel Watch, Fitbit, Garmin (with Health Connect sync), Xiaomi Mi Band, OnePlus Watch, and any device that syncs to Health Connect.
+                <div className="flex-1">
+                  <p className="text-sm font-bold font-display" style={{ color: '#F5A623' }}>MARKSMAN PULSE</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Syncs heart rate, SpO₂, HRV, breathing rate, steps and calories from Health Connect automatically.
+                  </p>
+                  <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round">
+                      <circle cx="7" cy="7" r="6" />
+                      <line x1="7" y1="4" x2="7" y2="7.5" />
+                      <circle cx="7" cy="10" r="0.5" fill="#F5A623" stroke="none" />
+                    </svg>
+                    Available on the Marksman Android app (Android 9+)
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
+          );
+        }
+
+        if (hcAvailable && !hcDevice) {
+          // Android, no device yet — show setup wizard
+          return (
+            <HealthConnectSetup onComplete={() => loadDevices()} />
+          );
+        }
+
+        if (hcDevice) {
+          // Registered — show branded card
+          const online = isOnline(hcDevice.lastSeenAt);
+          return (
+            <div
+              className="card p-5"
+              style={{
+                border: '1px solid rgba(245,166,35,0.2)',
+                background: 'rgba(245,166,35,0.02)',
+              }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <PulseIconSvg />
+                  <div>
+                    <p className="font-display font-bold text-sm tracking-wide" style={{ color: '#F5A623' }}>
+                      MARKSMAN PULSE
+                    </p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                      Health Connect Integration
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      background: online ? '#00E5A0' : '#4A5568',
+                      boxShadow: online ? '0 0 5px rgba(0,229,160,0.7)' : 'none',
+                    }}
+                  />
+                  <span
+                    className="text-[10px] font-display font-bold uppercase tracking-wider"
+                    style={{ color: online ? '#00E5A0' : '#4A5568' }}
+                  >
+                    {online ? 'Active' : 'Idle'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="px-3 py-2 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.025)' }}>
+                  <p className="font-data text-lg font-bold" style={{ color: '#F5A623' }}>
+                    {hcLastSync
+                      ? formatTimeAgoShort(hcLastSync)
+                      : hcDevice.lastSeenAt
+                        ? formatTimeAgoShort(new Date(hcDevice.lastSeenAt))
+                        : 'Never'}
+                  </p>
+                  <p className="text-[10px] font-display uppercase tracking-widest mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    Last Sync
+                  </p>
+                </div>
+                <div className="px-3 py-2 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.025)' }}>
+                  <p className="font-data text-lg font-bold" style={{ color: '#4FC3F7' }}>
+                    6
+                  </p>
+                  <p className="text-[10px] font-display uppercase tracking-widest mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    Metrics
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleHcSync}
+                  disabled={hcSyncing}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-bold uppercase tracking-wider transition-all"
+                  style={{
+                    background: hcSyncing ? 'rgba(245,166,35,0.06)' : 'rgba(245,166,35,0.12)',
+                    color: '#F5A623',
+                    border: '1px solid rgba(245,166,35,0.25)',
+                  }}
+                >
+                  {hcSyncing ? (
+                    <>
+                      <span className="w-3 h-3 border border-t-[#F5A623] border-[rgba(245,166,35,0.2)] rounded-full animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <SyncIconSvg />
+                      Sync Now
+                    </>
+                  )}
+                </button>
+                <Link
+                  href="/performance/health"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-display font-bold uppercase tracking-wider transition-all"
+                  style={{
+                    background: 'rgba(79,195,247,0.08)',
+                    color: '#4FC3F7',
+                    border: '1px solid rgba(79,195,247,0.2)',
+                  }}
+                >
+                  View Data
+                </Link>
+              </div>
+            </div>
+          );
+        }
+
+        return null;
+      })()}
 
       {/* ── Manual Entry Option ─────────────────────────────────────── */}
       <div className="card p-5">
@@ -501,6 +617,33 @@ function StatBox({ label, value, color }: { label: string; value: string; color:
       <p className="text-[10px] font-display font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--text-secondary)' }}>{label}</p>
       <p className="font-mono text-lg font-bold" style={{ color }}>{value}</p>
     </div>
+  );
+}
+
+function formatTimeAgoShort(date: Date): string {
+  const ms = Date.now() - date.getTime();
+  const s  = Math.floor(ms / 1000);
+  if (s < 60)  return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60)  return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  return `${h}h ago`;
+}
+
+function PulseIconSvg() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="2,12 6,12 8,5 10,19 12,10 14,14 16,12 22,12" />
+    </svg>
+  );
+}
+
+function SyncIconSvg() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1,4 1,10 7,10" />
+      <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+    </svg>
   );
 }
 

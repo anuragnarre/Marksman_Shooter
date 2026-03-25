@@ -98,7 +98,7 @@ export default function GuidanceSection() {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'url(https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=1400&q=80)',
+              'url(https://images.pexels.com/photos/6669403/pexels-photo-6669403.jpeg?auto=compress&cs=tinysrgb&w=1400&h=700&dpr=1)',
             backgroundSize: 'cover',
             backgroundPosition: 'center 30%',
             filter: 'brightness(0.3) saturate(0.8)',
@@ -200,8 +200,8 @@ export default function GuidanceSection() {
         >
           <div className="relative h-52 sm:h-64 overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1609825488888-3a766db05542?w=800&q=80"
-              alt="Shooter aiming down sights at a range"
+              src="https://images.pexels.com/photos/6091858/pexels-photo-6091858.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
+              alt="Shooter aiming pistol at indoor range"
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.6) saturate(0.9)' }}
               loading="lazy"
@@ -248,8 +248,8 @@ export default function GuidanceSection() {
         >
           <div className="relative h-52 sm:h-64 overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1584281722575-0340f7612e88?w=800&q=80"
-              alt="Precision rifle shooter in prone position"
+              src="https://images.pexels.com/photos/6090788/pexels-photo-6090788.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
+              alt="Shooter aiming rifle in competition stance"
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.55) saturate(0.9)' }}
               loading="lazy"
@@ -306,7 +306,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/Li0fRaGOvD4"
+            src="https://www.youtube.com/embed/HSPAxItV0TY"
             title="Marksmanship Fundamentals"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -324,7 +324,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-standing"
           title="Standing (Offhand)"
-          image="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=600&q=80"
+          image="https://images.pexels.com/photos/6091660/pexels-photo-6091660.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
           visible={visibleCards.has('card-standing')}
           points={[
             'Feet shoulder-width apart, perpendicular to target',
@@ -338,7 +338,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-kneeling"
           title="Kneeling"
-          image="https://images.unsplash.com/photo-1580566516148-244289535c05?w=600&q=80"
+          image="https://images.pexels.com/photos/6090798/pexels-photo-6090798.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
           visible={visibleCards.has('card-kneeling')}
           points={[
             'Strong-side knee on the ground with ankle flat',
@@ -352,7 +352,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-prone"
           title="Prone"
-          image="https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=600&q=80"
+          image="https://images.pexels.com/photos/6090912/pexels-photo-6090912.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
           visible={visibleCards.has('card-prone')}
           points={[
             'Body angled 15-25 degrees from line of fire',
@@ -384,7 +384,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/gIgk_YFPSgM"
+            src="https://www.youtube.com/embed/eo_uINlK0KA"
             title="Shooting Positions Masterclass"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -412,8 +412,8 @@ export default function GuidanceSection() {
           <h3 className="font-display font-bold text-text-primary text-base mb-4">The Respiratory Pause</h3>
           <div className="relative overflow-hidden rounded-xl mb-5" style={{ height: 180 }}>
             <img
-              src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&q=80"
-              alt="Calm focused breathing visualization"
+              src="https://images.pexels.com/photos/5202431/pexels-photo-5202431.jpeg?auto=compress&cs=tinysrgb&w=900&h=500&dpr=1"
+              alt="ISSF precision shooting target"
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.35) saturate(0.7) hue-rotate(180deg)' }}
               loading="lazy"
@@ -511,7 +511,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/YF12YhFVoKA"
+            src="https://www.youtube.com/embed/GvuWLZx3i64"
             title="Breathing for Shooters"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -538,8 +538,8 @@ export default function GuidanceSection() {
           <h3 className="font-display font-bold text-text-primary text-lg mb-4">Trigger Control</h3>
           <div className="relative rounded-xl overflow-hidden mb-5 h-48">
             <img
-              src="https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800&q=80"
-              alt="Close-up of trigger finger placement"
+              src="https://images.pexels.com/photos/5202428/pexels-photo-5202428.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
+              alt="Shooting target with firearm and magazines"
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.4) saturate(0.8)' }}
               loading="lazy"
@@ -628,7 +628,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/hpCiDFGjI50"
+            src="https://www.youtube.com/embed/CmbmIi2VGgg"
             title="Trigger Control Mastery"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -654,8 +654,8 @@ export default function GuidanceSection() {
         >
           <div className="relative h-56 overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80"
-              alt="Mental focus and meditation"
+              src="https://images.pexels.com/photos/6091854/pexels-photo-6091854.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
+              alt="Shooter focusing at indoor range"
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.35) saturate(0.8)' }}
               loading="lazy"
@@ -755,7 +755,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/Z5cDfAJnpOc"
+            src="https://www.youtube.com/embed/sX8nm21Hbwk"
             title="Mental Game Shooting"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -780,8 +780,8 @@ export default function GuidanceSection() {
       >
         <div className="relative rounded-xl overflow-hidden mb-6 h-52">
           <img
-            src="https://images.unsplash.com/photo-1584362917165-526a968579e8?w=1200&q=80"
-            alt="Safe firearm handling at range"
+            src="https://images.pexels.com/photos/6655483/pexels-photo-6655483.jpeg?auto=compress&cs=tinysrgb&w=1200&h=600&dpr=1"
+            alt="Shooting range targets"
             className="w-full h-full object-cover"
             style={{ filter: 'brightness(0.35) saturate(0.7)' }}
             loading="lazy"
@@ -898,7 +898,7 @@ export default function GuidanceSection() {
         </div>
         <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
           <iframe
-            src="https://www.youtube.com/embed/COaIaD_j4Yc"
+            src="https://www.youtube.com/embed/COvFyw-6Fqs"
             title="Range Safety"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../lib/api';
+import { syncToBackend, isAvailable as isHcAvailable } from '../lib/health-connect';
 import { useAuth } from '../contexts/auth-context';
 import type { BiometricReading, BiometricUpdateEvent } from '@shooting-platform/shared-types';
 
@@ -12,9 +13,29 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
   const { user } = useAuth();
-  const [reading, setReading] = useState<BiometricReading | null>(null);
+  const [reading, setReading]     = useState<BiometricReading | null>(null);
   const [connected, setConnected] = useState(false);
+  const [syncing, setSyncing]     = useState(false);
+  const [lastSync, setLastSync]   = useState<Date | null>(null);
+  const [hcAvail, setHcAvail]     = useState(false);
   const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    isHcAvailable().then(setHcAvail);
+  }, []);
+
+  async function handleSync() {
+    setSyncing(true);
+    try {
+      await syncToBackend({ hoursBack: 24 });
+      setLastSync(new Date());
+      if (user) {
+        const r = await apiFetch<BiometricReading | null>(`/biometrics/live/${user.id}`).catch(() => null);
+        if (r) setReading(r);
+      }
+    } catch {}
+    setSyncing(false);
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -44,12 +65,20 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
     return () => { socket.disconnect(); };
   }, [user]);
 
-  const hr = reading?.heartRate ?? null;
-  const spo2 = reading?.spo2 ?? null;
-  const lastSeen = reading?.timestamp
-    ? new Date(reading.timestamp)
-    : null;
+  const hr       = reading?.heartRate ?? null;
+  const spo2     = reading?.spo2 ?? null;
+  const rr       = reading?.respiratoryRate ?? null;
+  const hrv      = (reading as any)?.hrv ?? null;
+  const lastSeen = reading?.timestamp ? new Date(reading.timestamp) : null;
   const isRecent = lastSeen && (Date.now() - lastSeen.getTime()) < 5 * 60 * 1000;
+
+  function fmtAgo(d: Date) {
+    const s = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (s < 60) return `${s}s ago`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m ago`;
+    return `${Math.floor(m / 60)}h ago`;
+  }
 
   if (compact) {
     return (
@@ -95,21 +124,20 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="card p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <h3 className="font-display font-semibold text-base text-text-primary">Live Monitor</h3>
         <StatusDot active={!!isRecent} />
       </div>
 
-      <div className="flex items-center gap-8">
+      {/* Primary metrics: HR + SpO2 + RR */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
         {/* Heart Rate */}
         <div className="flex flex-col items-center">
-          <div className="relative mb-2">
-            <HeartIcon animate={!!isRecent} large />
-          </div>
-          <span className="font-mono text-3xl font-bold" style={{ color: '#FF4D6D' }}>
+          <HeartIcon animate={!!isRecent} large />
+          <span className="font-mono text-3xl font-bold mt-1" style={{ color: '#FF4D6D' }}>
             {hr ?? '--'}
           </span>
-          <span className="text-[10px] font-display font-bold uppercase tracking-wider mt-1"
+          <span className="text-[10px] font-display font-bold uppercase tracking-wider mt-0.5"
             style={{ color: 'var(--text-secondary)' }}>
             BPM
           </span>
@@ -117,9 +145,9 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
 
         {/* SpO2 */}
         <div className="flex flex-col items-center">
-          <div className="relative w-16 h-16 mb-2">
+          <div className="relative w-14 h-14">
             <svg viewBox="0 0 64 64" className="w-full h-full">
-              <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(79,195,247,0.15)" strokeWidth="4" />
+              <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(79,195,247,0.12)" strokeWidth="4" />
               <circle
                 cx="32" cy="32" r="28" fill="none"
                 stroke="#4FC3F7" strokeWidth="4"
@@ -129,34 +157,96 @@ export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
                 style={{ transition: 'stroke-dasharray 0.5s ease' }}
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-bold"
+            <span className="absolute inset-0 flex items-center justify-center font-mono text-xs font-bold"
               style={{ color: '#4FC3F7' }}>
               {spo2 ?? '--'}
             </span>
           </div>
-          <span className="text-[10px] font-display font-bold uppercase tracking-wider"
+          <span className="text-[10px] font-display font-bold uppercase tracking-wider mt-0.5"
             style={{ color: 'var(--text-secondary)' }}>
-            SpO2 %
+            SpO₂ %
+          </span>
+        </div>
+
+        {/* Respiratory Rate */}
+        <div className="flex flex-col items-center">
+          <div className="w-14 h-14 flex items-center justify-center rounded-full"
+            style={{ background: 'rgba(0,229,160,0.08)', border: '1px solid rgba(0,229,160,0.15)' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" strokeWidth="1.75" strokeLinecap="round">
+              <path d="M3 12h3l3-8 4 16 3-8h5" />
+            </svg>
+          </div>
+          <span className="font-mono text-2xl font-bold mt-1" style={{ color: '#00E5A0' }}>
+            {rr ?? '--'}
+          </span>
+          <span className="text-[10px] font-display font-bold uppercase tracking-wider mt-0.5"
+            style={{ color: 'var(--text-secondary)' }}>
+            /min
           </span>
         </div>
       </div>
 
-      {lastSeen ? (
-        <p className="text-[10px] mt-4" style={{ color: 'var(--text-muted)' }}>
-          Last reading: {lastSeen.toLocaleTimeString()}
-        </p>
-      ) : (
-        <div className="mt-4 flex items-center gap-3">
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No device connected.</p>
-          <Link
-            href="/settings"
-            className="text-xs font-display font-semibold px-3 py-1.5 rounded-lg transition-all"
-            style={{ color: '#F5A623', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)' }}
-          >
-            Register Device
-          </Link>
+      {/* Secondary: HRV + Stress indicator */}
+      {(hrv !== null || reading) && (
+        <div className="flex items-center gap-6 px-4 py-3 rounded-xl mb-4"
+          style={{ background: 'rgba(255,255,255,0.025)' }}>
+          {hrv !== null && (
+            <div>
+              <span className="font-mono text-lg font-bold" style={{ color: '#F5A623' }}>{hrv}</span>
+              <span className="text-[10px] ml-1" style={{ color: 'var(--text-muted)' }}>ms HRV</span>
+            </div>
+          )}
+          {hrv !== null && (
+            <div>
+              <span className="text-xs font-display font-semibold" style={{ color: hrv > 50 ? '#00E5A0' : hrv > 30 ? '#F5A623' : '#FF4D6D' }}>
+                {hrv > 50 ? 'Low Stress' : hrv > 30 ? 'Moderate' : 'High Stress'}
+              </span>
+              <span className="text-[10px] ml-1" style={{ color: 'var(--text-muted)' }}>readiness</span>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between">
+        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+          {lastSync
+            ? `Synced ${fmtAgo(lastSync)}`
+            : lastSeen
+              ? `Marksman Pulse · ${fmtAgo(lastSeen)}`
+              : 'No device connected'}
+          {!lastSeen && !lastSync && (
+            <Link
+              href="/settings"
+              className="ml-2 font-display font-semibold text-[10px] px-2 py-0.5 rounded transition-all"
+              style={{ color: '#F5A623', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)' }}
+            >
+              Register Device
+            </Link>
+          )}
+        </p>
+        {hcAvail && (
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-display font-semibold transition-all"
+            style={{
+              background: syncing ? 'rgba(245,166,35,0.06)' : 'rgba(245,166,35,0.1)',
+              color: '#F5A623',
+              border: '1px solid rgba(245,166,35,0.2)',
+            }}
+          >
+            {syncing ? (
+              <>
+                <span className="w-3 h-3 border border-t-[#F5A623] border-[rgba(245,166,35,0.2)] rounded-full animate-spin" />
+                Syncing
+              </>
+            ) : (
+              'Sync Now'
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
