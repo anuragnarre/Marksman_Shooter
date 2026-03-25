@@ -183,6 +183,8 @@ body {
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
+  /* Improve text rendering on all devices */
+  text-rendering: optimizeLegibility;
 }
 
 /* ── Capacitor / Hybrid WebView tweaks ───────────────────────────────────── */
@@ -206,6 +208,23 @@ input, textarea, select, button {
   -webkit-appearance: none;
   appearance: none;
   border-radius: 0;
+}
+
+/* Ensure select elements keep readability */
+select {
+  background-image: none;
+}
+
+/* Minimum touch target size per accessibility guidelines */
+button, [role="button"], a {
+  min-height: 36px;
+}
+
+/* Mobile: slightly larger touch targets */
+@media (max-width: 640px) {
+  button, [role="button"] {
+    min-height: 40px;
+  }
 }
 
 /* Momentum scrolling on scrollable containers */
@@ -676,6 +695,7 @@ input, textarea, select, button {
     box-shadow:
       0 0 0 3px rgba(245, 166, 35, 0.12),
       var(--field-shadow);
+    outline: none;
   }
 
   .field::placeholder { color: var(--text-muted); }
@@ -1078,6 +1098,10 @@ input, textarea, select, button {
     box-shadow: 0 4px 14px rgba(245,166,35,0.35);
   }
 
+  :root.light .btn-ghost {
+    color: var(--text-secondary);
+  }
+
   :root.light .btn-danger {
     border-color: rgba(255, 77, 109, 0.2);
   }
@@ -1086,6 +1110,25 @@ input, textarea, select, button {
     background: rgba(255, 77, 109, 0.06);
     border-color: rgba(255, 77, 109, 0.35);
     box-shadow: none;
+  }
+
+  :root.light .field {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.03);
+    border-color: #D8DCE8;
+  }
+
+  :root.light .field:focus {
+    border-color: rgba(220, 140, 15, 0.55);
+    background: #FFFFFF;
+  }
+
+  :root.light .field::placeholder {
+    color: #9CA3B8;
+  }
+
+  :root.light .label {
+    color: #6B7594;
   }
 
   :root.light .table-row-hover:hover {

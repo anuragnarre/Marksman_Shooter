@@ -5,14 +5,12 @@ const config: CapacitorConfig = {
   appName: 'Marksman',
   webDir: 'out',
 
-  // Points the Android/iOS WebView at the live Vercel deployment.
-  // Avoids a static export and keeps all Next.js dynamic routes working.
+  // Points the Android/iOS WebView at the live production deployment.
   server: {
-    url: 'https://shooting-web.vercel.app',
+    url: 'https://www.marksmanspro.com',
     cleartext: false,
     androidScheme: 'https',
-    // Allow the Vercel host to set cookies/tokens that persist in the WebView
-    allowNavigation: ['shooting-web.vercel.app'],
+    allowNavigation: ['www.marksmanspro.com', 'marksmanspro.com'],
   },
 
   android: {
@@ -54,6 +52,13 @@ const config: CapacitorConfig = {
       resize: 'body',
       style: 'dark',
       resizeOnFullScreen: true,
+    },
+    // Native Google Sign-In — serverClientId must be the Web OAuth Client ID
+    // so the returned ID token is verifiable by the backend (google-auth-library).
+    GoogleAuth: {
+      scopes: ['profile', 'email'],
+      serverClientId: '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com',
+      forceCodeForRefreshToken: false,
     },
   },
 };

@@ -62,6 +62,23 @@ class TargetSpec:
         cv2.line(img, (0, radius_pixels), (size - 1, radius_pixels), 128, line_thickness)
         cv2.line(img, (radius_pixels, 0), (radius_pixels, size - 1), 128, line_thickness)
 
+        # Ring numbers (small text near each ring boundary on the right side)
+        font_scale = max(0.25, radius_pixels / 600.0)
+        font_thickness = max(1, int(radius_pixels / 400))
+        for ring_num in range(1, self.num_rings + 1):
+            r_mm = self.ring_radius_mm(ring_num)
+            r_px = int(r_mm / mm_per_px)
+            text_x = center[0] + r_px + 2
+            text_y = center[1] + int(font_scale * 10)
+            if text_x < size - 20:
+                color = 255 if r_px < inner_zone_px else 0
+                cv2.putText(
+                    img, str(ring_num),
+                    (text_x, text_y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    font_scale, color, font_thickness,
+                )
+
         return img
 
 

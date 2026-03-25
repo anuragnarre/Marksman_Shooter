@@ -7,7 +7,6 @@ from typing import List
 from analyzer import analyze_target_image
 from models import AnalysisResponse
 from pipeline.target_specs import TargetType, TARGET_SPECS
-import pose_analyzer
 
 app = FastAPI(
     title="Shooting Target Vision Service",
@@ -81,27 +80,5 @@ async def analyze(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(exc)}") from exc
-
-    return result
-
-
-@app.post("/pose")
-async def analyze_pose_endpoint(file: UploadFile = File(...)) -> dict:
-    """Analyze shooting stance from an uploaded photo using MediaPipe Pose."""
-    allowed_types = {"image/jpeg", "image/png", "image/bmp"}
-    if file.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=415,
-            detail=f"Unsupported media type '{file.content_type}'. Accepted: JPEG, PNG, BMP",
-        )
-
-    image_bytes = await file.read()
-    if len(image_bytes) > 20 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="Image exceeds 20 MB size limit")
-
-    try:
-        result = pose_analyzer.analyze_pose(image_bytes)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Pose analysis failed: {str(exc)}") from exc
 
     return result

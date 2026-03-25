@@ -24,7 +24,7 @@ from pipeline.target_detector import detect_target
 from pipeline.perspective import correct_perspective
 from pipeline.hole_detector import detect_holes
 from pipeline.scorer import score_holes
-from pipeline.target_specs import get_spec
+from pipeline.target_specs import get_spec, TargetSpec
 
 
 def process_image(image_path: str, target_type: str = "air_rifle_10m"):
@@ -50,6 +50,12 @@ def process_image(image_path: str, target_type: str = "air_rifle_10m"):
     # Score
     shots = score_holes(holes, cal, target_type)
 
+    # Compute pellet radius in pixels for accurate circle drawing
+    mm_per_pixel = cal.mm_per_pixel
+    if mm_per_pixel < 0.005 or mm_per_pixel > 5.0:
+        mm_per_pixel = 22.75 / max(cal.major_radius, 1)
+    pellet_radius_px = max(5, int(round((spec.pellet_diameter_mm / 2.0) / mm_per_pixel)))
+
     # Draw annotations
     debug = img_bgr.copy()
     cx, cy = int(cal.center[0]), int(cal.center[1])
@@ -60,16 +66,16 @@ def process_image(image_path: str, target_type: str = "air_rifle_10m"):
     # Draw outer ring
     cv2.circle(debug, (cx, cy), int(cal.major_radius), (0, 200, 0), 1)
 
-    # Draw each detected hole
+    # Draw each detected hole at actual pellet size
     for hole in holes:
         hx, hy = int(round(hole.x)), int(round(hole.y))
-        hr = max(5, int(round(hole.radius * 2)))
-        cv2.circle(debug, (hx, hy), hr, (0, 0, 255), 2)
+        cv2.circle(debug, (hx, hy), pellet_radius_px, (0, 0, 255), 2)
+        cv2.drawMarker(debug, (hx, hy), (0, 128, 255), cv2.MARKER_CROSS, 7, 1)
 
     # Draw scores next to each shot
     for s in shots:
         label = f"{s['score']}"
-        cv2.putText(debug, label, (s['pixel_x'] + 8, s['pixel_y'] - 4),
+        cv2.putText(debug, label, (s['pixel_x'] + pellet_radius_px + 4, s['pixel_y'] - 4),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 255), 1)
 
     return debug, cal, shots

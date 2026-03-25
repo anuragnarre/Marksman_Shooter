@@ -1,10 +1,11 @@
 // apps/web/components/GoogleSignInButton.tsx
-// Renders the official Google Sign-In button using the GSI library.
-// Uses the ID token (credential) approach — no redirect, no OAuth code exchange.
+// Renders the official Google Sign-In button using the GSI library on web,
+// and a native Google Sign-In button via the Capacitor plugin on Android/iOS.
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { loadGoogleScript, googleSignIn } from '../lib/google-auth';
+import { Capacitor } from '@capacitor/core';
+import { loadGoogleScript, googleSignIn, nativeGoogleSignIn } from '../lib/google-auth';
 import type { User } from '@shooting-platform/shared-types';
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
@@ -22,10 +23,101 @@ export function GoogleSignInButton({
   text = 'continue_with',
   role,
 }: GoogleSignInButtonProps) {
+  // Native path — Capacitor Android/iOS
+  if (Capacitor.isNativePlatform()) {
+    return (
+      <NativeGoogleSignInButton
+        role={role}
+        onSuccess={onSuccess}
+        onError={onError}
+      />
+    );
+  }
+
+  // Web path — GSI library rendered button
+  return (
+    <WebGoogleSignInButton
+      text={text}
+      role={role}
+      onSuccess={onSuccess}
+      onError={onError}
+    />
+  );
+}
+
+// ── Native button (Android / iOS) ─────────────────────────────────────────────
+
+function NativeGoogleSignInButton({
+  role,
+  onSuccess,
+  onError,
+}: {
+  role?: 'SHOOTER' | 'COACH';
+  onSuccess: (user: User) => void;
+  onError: (message: string) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const roleRef = useRef(role);
+  roleRef.current = role;
+
+  async function handlePress() {
+    setLoading(true);
+    try {
+      const result = await nativeGoogleSignIn(roleRef.current);
+      onSuccess(result.user);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Google sign-in failed';
+      // User cancelled the picker — don't surface as an error
+      if (!msg.includes('cancel') && !msg.includes('Cancel') && !msg.includes('dismissed')) {
+        onError(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handlePress}
+      disabled={loading}
+      className="w-full flex items-center justify-center gap-3 rounded-[4px] h-[44px] transition-opacity disabled:opacity-60"
+      style={{ background: '#1F1F1F', border: '1px solid rgba(255,255,255,0.12)' }}
+    >
+      {loading ? (
+        <>
+          <span className="w-4 h-4 border-2 border-[rgba(255,255,255,0.2)] border-t-white rounded-full animate-spin" />
+          <span className="text-white text-sm font-medium">Signing in...</span>
+        </>
+      ) : (
+        <>
+          <GoogleIcon />
+          <span className="text-white text-sm font-medium">
+            {' '}Continue with Google
+          </span>
+        </>
+      )}
+    </button>
+  );
+}
+
+// ── Web button (GSI library) ───────────────────────────────────────────────────
+
+function WebGoogleSignInButton({
+  text,
+  role,
+  onSuccess,
+  onError,
+}: {
+  text: 'signin_with' | 'signup_with' | 'continue_with';
+  role?: 'SHOOTER' | 'COACH';
+  onSuccess: (user: User) => void;
+  onError: (message: string) => void;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const roleRef      = useRef(role);
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady]     = useState(false);
 
   // Keep ref in sync so the GSI callback always reads the latest role
   roleRef.current = role;
@@ -81,20 +173,18 @@ export function GoogleSignInButton({
         style={{ minHeight: 44, visibility: ready && !loading ? 'visible' : 'hidden' }}
       />
 
-      {/* Loading overlay — shown while verifying with backend */}
+      {/* Loading overlay */}
       {loading && (
         <div
           className="absolute inset-0 flex items-center justify-center rounded-[4px]"
           style={{ background: '#1F1F1F', border: '1px solid rgba(255,255,255,0.1)' }}
         >
-          <span
-            className="w-4 h-4 border-2 border-[rgba(255,255,255,0.2)] border-t-white rounded-full animate-spin"
-          />
+          <span className="w-4 h-4 border-2 border-[rgba(255,255,255,0.2)] border-t-white rounded-full animate-spin" />
           <span className="ml-2 text-white text-sm font-medium">Signing in...</span>
         </div>
       )}
 
-      {/* Skeleton shown while GSI script loads */}
+      {/* Skeleton while GSI script loads */}
       {!ready && !loading && (
         <div
           className="w-full rounded-[4px] flex items-center justify-center gap-3"

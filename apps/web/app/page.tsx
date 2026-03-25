@@ -4,7 +4,7 @@
 // Design base: GitHub 2026 aurora aesthetic — deep void, shifting colour orbs,
 // bold display type, glass product windows, premium spacing.
 
-import { useEffect, useRef, useState, createContext, useContext } from 'react';
+import { useEffect, useRef, useState, createContext, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
@@ -78,6 +78,7 @@ export default function HomePage() {
   const router    = useRouter();
   const [mounted, setMounted]     = useState(false);
   const [navSolid, setNavSolid]   = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { if (mounted && user) router.replace('/dashboard'); }, [user, mounted, router]);
@@ -86,6 +87,16 @@ export default function HomePage() {
     window.addEventListener('scroll', h, { passive: true });
     return () => window.removeEventListener('scroll', h);
   }, []);
+
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   if (!mounted || user) return <PageLoader />;
 
@@ -104,17 +115,17 @@ export default function HomePage() {
         className="fixed top-0 inset-x-0 z-50 transition-all duration-500"
         style={{
           height: 64,
-          background: navSolid ? navBgSolid : 'transparent',
-          backdropFilter: navSolid ? 'blur(20px) saturate(160%)' : 'none',
-          borderBottom: navSolid ? `1px solid ${navBorderSolid}` : '1px solid transparent',
+          background: navSolid || mobileMenuOpen ? navBgSolid : 'transparent',
+          backdropFilter: navSolid || mobileMenuOpen ? 'blur(20px) saturate(160%)' : 'none',
+          borderBottom: navSolid || mobileMenuOpen ? `1px solid ${navBorderSolid}` : '1px solid transparent',
         }}
       >
-        <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between px-5 sm:px-8 lg:px-12">
+        <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between px-4 sm:px-8 lg:px-12">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <CrosshairLogo size={26} />
-            <span className="font-display font-black text-[17px] tracking-[0.2em] uppercase" style={{ color: pageText }}>
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <CrosshairLogo size={24} />
+            <span className="font-display font-black text-[16px] tracking-[0.18em] uppercase" style={{ color: pageText }}>
               Marksman
             </span>
           </Link>
@@ -132,7 +143,7 @@ export default function HomePage() {
           </div>
 
           {/* Auth CTAs */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
 
             {/* Theme toggle */}
             <button
@@ -172,13 +183,13 @@ export default function HomePage() {
             </button>
 
             <Link href="/auth/login"
-              className="hidden sm:block text-[13px] font-display font-semibold px-4 py-2 rounded-lg transition-all duration-200"
+              className="hidden sm:block text-[13px] font-display font-semibold px-3 py-2 rounded-lg transition-all duration-200"
               style={{ color: isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)' }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = pageText; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = isDark ? 'rgba(240,244,255,0.55)' : 'rgba(14,17,24,0.55)'; }}
             >Sign in</Link>
             <Link href="/auth/register"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-display font-bold uppercase tracking-[0.07em] transition-all duration-200 active:scale-95"
+              className="hidden xs:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-display font-bold uppercase tracking-[0.07em] transition-all duration-200 active:scale-95"
               style={{
                 background: 'rgba(245,166,35,0.12)',
                 border: '1px solid rgba(245,166,35,0.35)',
@@ -193,8 +204,79 @@ export default function HomePage() {
                 (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.35)';
               }}
             >Get started</Link>
+
+            {/* Mobile Hamburger */}
+            <button
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 active:scale-90"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              style={{
+                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
+                color: isDark ? 'rgba(240,244,255,0.7)' : 'rgba(14,17,24,0.6)',
+              }}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {mobileMenuOpen ? (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="2" y1="2" x2="14" y2="14" />
+                  <line x1="14" y1="2" x2="2" y2="14" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="2" y1="4" x2="14" y2="4" />
+                  <line x1="2" y1="8" x2="11" y2="8" />
+                  <line x1="2" y1="12" x2="14" y2="12" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div
+            className="md:hidden absolute top-full inset-x-0"
+            style={{
+              background: navBgSolid,
+              backdropFilter: 'blur(24px) saturate(180%)',
+              borderBottom: `1px solid ${navBorderSolid}`,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            }}
+          >
+            <div className="flex flex-col px-4 py-4 gap-1">
+              {[['Features', '#features'], ['Analytics', '#analytics'], ['AI Coach', '#ai-coach'], ['How it works', '#how']].map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-3 py-3 rounded-xl text-[14px] font-display font-semibold uppercase tracking-[0.07em] transition-colors duration-150 active:scale-[0.98]"
+                  style={{
+                    color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.6)',
+                  }}
+                >
+                  {label}
+                </a>
+              ))}
+              <div className="h-px my-1" style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
+              <Link
+                href="/auth/login"
+                onClick={closeMobileMenu}
+                className="flex items-center px-3 py-3 rounded-xl text-[14px] font-display font-semibold transition-colors duration-150"
+                style={{ color: isDark ? 'rgba(240,244,255,0.6)' : 'rgba(14,17,24,0.6)' }}
+              >Sign in</Link>
+              <Link
+                href="/auth/register"
+                onClick={closeMobileMenu}
+                className="flex items-center justify-center gap-2 mx-0 px-4 py-3 rounded-xl text-[13px] font-display font-bold uppercase tracking-[0.08em] transition-all duration-200 active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #F5A623 0%, #E8961A 100%)',
+                  color: '#060810',
+                  boxShadow: '0 0 24px rgba(245,166,35,0.25)',
+                }}
+              >Get started free</Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
@@ -352,8 +434,8 @@ function HeroSection() {
       </div>
 
       {/* ── Main content ─── */}
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-20">
-        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-16 items-center">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-20">
+        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-8 lg:gap-16 items-center">
 
           {/* ── Left: text ── */}
           <div>
@@ -374,8 +456,8 @@ function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="font-display font-black leading-[1.03] tracking-[-0.015em] mb-6"
-              style={{ fontSize: 'clamp(2.6rem, 5.8vw, 4.2rem)', animation: 'slideUp 600ms 80ms both' }}
+              className="font-display font-black leading-[1.08] tracking-[-0.01em] mb-5"
+              style={{ fontSize: 'clamp(2.1rem, 5.5vw, 4.2rem)', animation: 'slideUp 600ms 80ms both' }}
             >
               The performance<br />
               platform built for{' '}
@@ -403,7 +485,7 @@ function HeroSection() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 mb-10" style={{ animation: 'slideUp 600ms 240ms both' }}>
+            <div className="flex flex-wrap items-center gap-3 mb-8" style={{ animation: 'slideUp 600ms 240ms both' }}>
               <Link
                 href="/auth/register"
                 className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-display font-black text-[13px] uppercase tracking-[0.1em] transition-all duration-200 active:scale-95"
@@ -431,19 +513,19 @@ function HeroSection() {
             </div>
 
             {/* Live stat pills */}
-            <div className="flex flex-wrap gap-3" style={{ animation: 'slideUp 600ms 320ms both' }}>
+            <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3" style={{ animation: 'slideUp 600ms 320ms both' }}>
               {[
-                { val: '10.9', label: 'World Record · Air Rifle', color: '#F5A623', glowColor: 'rgba(245,166,35,0.15)' },
-                { val: '2,847', label: 'Shooters tracked', color: '#4FC3F7', glowColor: 'rgba(79,195,247,0.12)' },
-                { val: '98.4%', label: 'AI accuracy', color: '#00E5A0', glowColor: 'rgba(0,229,160,0.12)' },
+                { val: '10.9', label: 'World Record', color: '#F5A623', glowColor: 'rgba(245,166,35,0.1)' },
+                { val: '2,847', label: 'Shooters tracked', color: '#4FC3F7', glowColor: 'rgba(79,195,247,0.08)' },
+                { val: '98.4%', label: 'AI accuracy', color: '#00E5A0', glowColor: 'rgba(0,229,160,0.08)' },
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl"
-                  style={{ background: s.glowColor, border: `1px solid ${s.color}22` }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                  style={{ background: s.glowColor, border: `1px solid ${s.color}20` }}
                 >
-                  <span className="font-data font-black text-base" style={{ color: s.color }}>{s.val}</span>
-                  <span className="text-[11px] font-display uppercase tracking-[0.08em]" style={{ color: textDim }}>
+                  <span className="font-data font-black text-[15px]" style={{ color: s.color }}>{s.val}</span>
+                  <span className="text-[10px] font-display uppercase tracking-[0.07em]" style={{ color: textDim }}>
                     {s.label}
                   </span>
                 </div>
@@ -451,8 +533,8 @@ function HeroSection() {
             </div>
           </div>
 
-          {/* ── Right: product window ── */}
-          <div style={{ animation: 'slideUp 700ms 120ms both' }}>
+          {/* ── Right: product window (hidden on sm, shown from md up) ── */}
+          <div className="hidden md:block" style={{ animation: 'slideUp 700ms 120ms both' }}>
             <HeroProductWindow />
           </div>
 
@@ -497,16 +579,17 @@ function HeroProductWindow() {
     : null;
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-auto">
       {/* Outer glow */}
       <div className="absolute -inset-8 rounded-3xl pointer-events-none" style={{
         background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.07) 0%, transparent 65%)',
       }} />
 
-      {/* Window frame */}
+      {/* Window frame - min width to keep the layout intact, scrollable on small screens */}
       <div
         className="relative rounded-2xl overflow-hidden"
         style={{
+          minWidth: 480,
           background: 'rgba(13,17,28,0.95)',
           border: '1px solid rgba(255,255,255,0.08)',
           boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,166,35,0.06), inset 0 1px 0 rgba(255,255,255,0.05)',
@@ -775,7 +858,7 @@ function RolesSection() {
   return (
     <section
       ref={ref}
-      className="relative py-28 sm:py-36 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-36 overflow-hidden"
       style={{
         background: isDark ? 'rgba(8,10,18,0.6)' : 'rgba(243,246,252,0.7)',
         borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
@@ -798,10 +881,10 @@ function RolesSection() {
         </div>
       )}
 
-      <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8">
+      <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-8">
 
         {/* Header */}
-        <div className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`text-center max-w-2xl mx-auto mb-10 sm:mb-16 transition-all duration-700 ${vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#F5A623' }}>
             Built For You
           </p>
