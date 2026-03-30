@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { isNative } from '../lib/capacitor';
+import { setOnline as setNetworkSingleton } from '../lib/network-state';
 
 export function useNetwork(): { online: boolean; connectionType: string } {
   const [online, setOnline]         = useState(true);
@@ -23,6 +24,7 @@ export function useNetwork(): { online: boolean; connectionType: string } {
 
           const handle = await Network.addListener('networkStatusChange', (s) => {
             setOnline(s.connected);
+            setNetworkSingleton(s.connected);
             setType(s.connectionType);
           });
           cleanupFn = () => void handle.remove();
@@ -30,9 +32,10 @@ export function useNetwork(): { online: boolean; connectionType: string } {
       })();
     } else {
       // Browser online/offline events
-      const handleOnline  = () => { setOnline(true);  setType('unknown'); };
-      const handleOffline = () => { setOnline(false); setType('none'); };
+      const handleOnline  = () => { setOnline(true);  setNetworkSingleton(true);  setType('unknown'); };
+      const handleOffline = () => { setOnline(false); setNetworkSingleton(false); setType('none'); };
       setOnline(navigator.onLine);
+      setNetworkSingleton(navigator.onLine);
       window.addEventListener('online',  handleOnline);
       window.addEventListener('offline', handleOffline);
       cleanupFn = () => {

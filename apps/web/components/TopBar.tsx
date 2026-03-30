@@ -7,6 +7,7 @@
 import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
 import { LiveIndicator } from './ui/LiveIndicator';
+import { SyncStatusIndicator } from './SyncStatusIndicator';
 
 interface TopBarProps {
   title: string;
@@ -202,6 +203,9 @@ export function TopBar({
             <span style={{ color: 'var(--text-muted)' }}>{SEARCH_ICON}</span>
           </button>
         )}
+
+        {/* Sync status chip — visible when offline or queue has items */}
+        <SyncStatusIndicator />
 
         {/* Live indicator — mobile */}
         {isLive && (

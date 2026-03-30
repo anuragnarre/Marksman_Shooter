@@ -6,6 +6,8 @@ import { AuthProvider } from '../contexts/auth-context';
 import { ThemeProvider } from '../contexts/theme-context';
 import { ToastProvider } from '../contexts/toast-context';
 import { CursorGlow } from '../components/CursorGlow';
+import { SwRegister } from './sw-register';
+import { ConflictToast } from '../components/ConflictToast';
 
 const THEME_INIT_SCRIPT = `
 (function(){
@@ -98,6 +100,8 @@ export default function RootLayout({
           </ThemeProvider>
         </AuthProvider>
         <CursorGlow />
+        <SwRegister />
+        <ConflictToast />
       </body>
     </html>
   );
