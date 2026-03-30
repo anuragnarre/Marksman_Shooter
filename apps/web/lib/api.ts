@@ -61,7 +61,7 @@ export async function apiFetch<T>(
         const { offlineWrite } = await import('./offline-api');
         return await offlineWrite<T>(path, {
           method,
-          body: fetchOptions.body ? JSON.parse(fetchOptions.body as string) : undefined,
+          body: typeof fetchOptions.body === 'string' ? JSON.parse(fetchOptions.body) : undefined,
         });
       } catch (err) {
         if (err instanceof ApiError) throw err;
