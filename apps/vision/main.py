@@ -1,5 +1,13 @@
 # apps/vision/main.py
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 from fastapi import FastAPI, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -8,15 +16,16 @@ from analyzer import analyze_target_image
 from models import AnalysisResponse
 from pipeline.target_specs import TargetType, TARGET_SPECS
 from pipeline.yolo_detector import load_yolo_model, _yolo_available
+from pipeline.mask_detector import load_mask_model, _mask_available
 
 app = FastAPI(
     title="Shooting Target Vision Service",
     description=(
         "Analyzes target photos and returns bullet hole positions with scores. "
-        "Pipeline v5: 4-corner warp, CLAHE enhancement, zone-aware CV detection "
-        "augmented by YOLOv8-S (when model loaded) with SAHI for 50m targets."
+        "Pipeline v6: 4-corner warp, CLAHE enhancement, zone-aware CV detection "
+        "augmented by YOLOv11-L (speed/accuracy) and Mask R-CNN (pixel precision)."
     ),
-    version="5.0.0",
+    version="6.0.0",
 )
 
 app.add_middleware(
@@ -31,17 +40,24 @@ SUPPORTED_TARGETS = {t.value: TARGET_SPECS[t].name for t in TargetType}
 
 @app.on_event("startup")
 async def startup() -> None:
-    """Load YOLO model on startup. Silent no-op if model file absent."""
+    """Load neural models on startup. Silent no-op if model files absent."""
     load_yolo_model()
+    load_mask_model()
+    logger.info(
+        "Vision service ready — yolo_loaded=%s mask_loaded=%s",
+        _yolo_available,
+        _mask_available,
+    )
 
 
 @app.get("/health")
 def health() -> dict:
     return {
         "status": "ok",
-        "detector": "cv-v5-yolo-augmented",
-        "version": "5.0.0",
+        "detector": "cv-v6-yolo11-maskrcnn",
+        "version": "6.0.0",
         "yolo_loaded": _yolo_available,
+        "mask_loaded": _mask_available,
         "supported_targets": SUPPORTED_TARGETS,
     }
 

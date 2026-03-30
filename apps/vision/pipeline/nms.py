@@ -16,6 +16,9 @@ from typing import List, Tuple
 from .types import FusedHole
 
 # Confidence thresholds for solo (unmatched) detections
+# CV lowered back to 0.35 — fill-ratio check in hole_detector is the correct
+# false-positive suppressor; NMS threshold at 0.42 was too aggressive for
+# compressed phone images where real holes have borderline response.
 CV_SOLO_THRESHOLD = 0.35
 YOLO_SOLO_THRESHOLD = 0.40
 PAIRED_THRESHOLD = 0.25
@@ -61,9 +64,10 @@ def fuse_candidates(
             dist = math.hypot(ch.x - yh.x, ch.y - yh.y)
             pair_dist = max(ch.radius, yh.radius) * PAIR_DISTANCE_FACTOR
             if dist <= pair_dist:
-                # Weighted centroid
-                w_cv = ch.confidence
-                w_yolo = yh.confidence
+                # Confidence²-weighted centroid: gives more influence to the
+                # higher-confidence detection (typically YOLO for centre accuracy).
+                w_cv = ch.confidence ** 2
+                w_yolo = yh.confidence ** 2
                 total_w = w_cv + w_yolo
                 if total_w == 0:
                     total_w = 1.0
@@ -71,7 +75,7 @@ def fuse_candidates(
                 merged_x = (ch.x * w_cv + yh.x * w_yolo) / total_w
                 merged_y = (ch.y * w_cv + yh.y * w_yolo) / total_w
                 merged_r = (ch.radius * w_cv + yh.radius * w_yolo) / total_w
-                merged_conf = min(1.0, (w_cv + w_yolo) / 2 + PAIR_CONFIDENCE_BOOST)
+                merged_conf = min(1.0, (ch.confidence + yh.confidence) / 2.0 + PAIR_CONFIDENCE_BOOST)
 
                 merged.append(FusedHole(
                     x=merged_x,

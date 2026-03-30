@@ -11,6 +11,7 @@ import { EventsGateway } from '../gateway/events.gateway';
 import { parseFile } from './shots.parser';
 import { ManualShotsDto } from './dto/manual-shots.dto';
 import { Shot, ShotInput, UserRole, VisionShotResult } from '@shooting-platform/shared-types';
+import { UpdateShotDto } from './dto/update-shot.dto';
 
 @Injectable()
 export class ShotsService {
@@ -175,6 +176,7 @@ export class ShotsService {
     file: Express.Multer.File,
     targetType = 'air_rifle_10m',
     shooterIdHint?: string,
+    persist = true,
   ): Promise<{
     shots: VisionShotResult[];
     targetDetected: boolean;
@@ -247,7 +249,9 @@ export class ShotsService {
       y:          s.y,
     }));
 
-    const savedShots = await this.createShots(sessionId, actorId, actorRole, inputs, shooterIdHint);
+    const savedShots = persist
+      ? await this.createShots(sessionId, actorId, actorRole, inputs, shooterIdHint)
+      : [];
 
     return {
       shots:            visionShots,
@@ -271,6 +275,96 @@ export class ShotsService {
       y: s.y,
       timestamp: s.timestamp,
     }));
+  }
+
+  async deleteShot(
+    shotId: string,
+    actorId: string,
+    actorRole: UserRole,
+  ): Promise<{ deleted: boolean }> {
+    const shot = await this.prisma.shot.findFirst({
+      where: { id: shotId },
+      select: { id: true, sessionId: true, session: { select: { shooterId: true } } },
+    });
+
+    if (!shot) {
+      throw new NotFoundException(`Shot ${shotId} not found`);
+    }
+
+    if (actorRole === 'COACH') {
+      await this.assertCoachCanAccessShooter(actorId, shot.session.shooterId);
+    } else if (shot.session.shooterId !== actorId) {
+      throw new ForbiddenException('You do not own this shot');
+    }
+
+    await this.prisma.shot.delete({ where: { id: shotId } });
+    const remainingCount = await this.prisma.shot.count({ where: { sessionId: shot.sessionId } });
+    this.eventsGateway.emitSessionUpdated(shot.sessionId, remainingCount);
+    return { deleted: true };
+  }
+
+  // RING_WIDTH_MM mirrors the client-side values in vision-service.ts
+  private static readonly RING_WIDTH_MM: Record<string, number> = {
+    air_pistol_10m: 8.0,
+    air_rifle_10m:  8.0,
+    nr_50m:         25.0,
+    nr_25m:         25.0,
+  };
+
+  async updateShot(
+    shotId: string,
+    actorId: string,
+    actorRole: UserRole,
+    dto: UpdateShotDto,
+  ): Promise<Shot> {
+    const shot = await this.prisma.shot.findFirst({
+      where: { id: shotId },
+      select: {
+        id: true,
+        sessionId: true,
+        x: true,
+        y: true,
+        shotNumber: true,
+        score: true,
+        timestamp: true,
+        session: { select: { shooterId: true, discipline: true } },
+      },
+    });
+
+    if (!shot) {
+      throw new NotFoundException(`Shot ${shotId} not found`);
+    }
+
+    if (actorRole === 'COACH') {
+      await this.assertCoachCanAccessShooter(actorId, shot.session.shooterId);
+    } else if (shot.session.shooterId !== actorId) {
+      throw new ForbiddenException('You do not own this shot');
+    }
+
+    const newX = dto.x ?? shot.x;
+    const newY = dto.y ?? shot.y;
+    const ringWidth = ShotsService.RING_WIDTH_MM[shot.session.discipline] ?? 8.0;
+    const distMm = Math.sqrt(newX ** 2 + newY ** 2);
+    const rawScore = 10.9 - distMm / ringWidth;
+    const newScore = Math.round(Math.max(0, Math.min(10.9, rawScore)) * 10) / 10;
+
+    const updated = await this.prisma.shot.update({
+      where: { id: shotId },
+      data: { x: newX, y: newY, score: newScore },
+    });
+
+    const shotCount = await this.prisma.shot.count({ where: { sessionId: shot.sessionId } });
+    this.eventsGateway.emitSessionUpdated(shot.sessionId, shotCount);
+
+    return {
+      id: updated.id,
+      sessionId: updated.sessionId,
+      shotNumber: updated.shotNumber,
+      score: updated.score,
+      x: updated.x,
+      y: updated.y,
+      timestamp: updated.timestamp,
+    };
   }
 
   private async assertCoachCanAccessShooter(coachId: string, shooterId: string): Promise<void> {

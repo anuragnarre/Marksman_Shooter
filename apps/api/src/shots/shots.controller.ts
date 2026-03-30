@@ -2,7 +2,10 @@
 import {
   Controller,
   Post,
+  Delete,
+  Patch,
   Body,
+  Param,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -12,6 +15,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ShotsService } from './shots.service';
 import { ManualShotsDto } from './dto/manual-shots.dto';
+import { UpdateShotDto } from './dto/update-shot.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -124,6 +128,7 @@ export class ShotsController {
     @Query('sessionId') sessionId: string,
     @Query('targetType') targetType: string | undefined,
     @Query('shooterId') shooterId: string | undefined,
+    @Query('save') save?: string,
   ): Promise<{ shots: VisionShotResult[]; targetDetected: boolean; processingTimeMs: number; savedShots: Shot[] }> {
     if (!file) {
       throw new BadRequestException('No image file uploaded');
@@ -138,6 +143,34 @@ export class ShotsController {
       file,
       targetType ?? 'air_rifle_10m',
       shooterId,
+      save !== 'false',
     );
+  }
+
+  /**
+   * DELETE /shots/:id
+   * Remove a single shot. Emits session.updated WebSocket event.
+   */
+  @Delete(':id')
+  @Roles('SHOOTER', 'COACH')
+  async deleteShot(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') shotId: string,
+  ): Promise<{ deleted: boolean }> {
+    return this.shotsService.deleteShot(shotId, user.sub, user.role);
+  }
+
+  /**
+   * PATCH /shots/:id
+   * Update x/y position (mm from center, ±15mm). Recalculates score server-side.
+   */
+  @Patch(':id')
+  @Roles('SHOOTER', 'COACH')
+  async updateShot(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') shotId: string,
+    @Body() dto: UpdateShotDto,
+  ): Promise<Shot> {
+    return this.shotsService.updateShot(shotId, user.sub, user.role, dto);
   }
 }

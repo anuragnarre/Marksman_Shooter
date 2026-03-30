@@ -34,6 +34,7 @@ import {
 import { BiometricLiveCard } from '../../../components/BiometricLiveCard';
 import { BiometricSessionChart } from '../../../components/BiometricSessionChart';
 import ShotOverlayCanvas from '../../../components/ShotOverlayCanvas';
+import ShotCorrectionCanvas from '../../../components/ShotCorrectionCanvas';
 import type {
   AnalyticsResult,
   Session,
@@ -1510,7 +1511,7 @@ function ManualTab({
 
 // ── Tab: Photo / Camera ───────────────────────────────────────────────────────
 
-type PhotoState  = 'idle' | 'uploading' | 'done' | 'error';
+type PhotoState  = 'idle' | 'uploading' | 'reviewing' | 'saving' | 'done' | 'error';
 type PhotoMode   = 'upload' | 'camera';
 
 /** Translate a getUserMedia DOMException into a human-readable message with fix hint. */
@@ -1558,6 +1559,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
   const [targetType, setTargetType] = useState<TargetTypeOption>('air_rifle_10m');
   const [overlayShots, setOverlayShots] = useState<VisionShotResult[] | null>(null);
   const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
+  const [pendingShots, setPendingShots] = useState<VisionShotResult[] | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef     = useRef<HTMLVideoElement>(null);
@@ -1723,11 +1725,11 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
   async function handleFile(file: File) {
     setState('uploading');
     setError(null);
-    // Revoke any previous object URL
     if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
     const objUrl = URL.createObjectURL(file);
     setImageObjectUrl(objUrl);
     setOverlayShots(null);
+    setPendingShots(null);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -1739,20 +1741,54 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         processingTimeMs: number;
         savedShots: Shot[];
       }>(
-        `/shots/analyze-photo?sessionId=${sessionId}&targetType=${targetType}`,
+        `/shots/analyze-photo?sessionId=${sessionId}&targetType=${targetType}&save=false`,
         { method: 'POST', body: formData, headers: {} },
       );
-      setOverlayShots(res.shots);
-      setResult({ shots: res.savedShots.length });
-      setState('done');
-      void hapticSuccess();
-      setTimeout(() => { setState('idle'); onSuccess(); }, 4000);
+
+      if (!res.targetDetected || res.shots.length === 0) {
+        setError('No target detected in this photo. Try again with a clearer shot.');
+        setState('error');
+        URL.revokeObjectURL(objUrl);
+        setImageObjectUrl(null);
+        return;
+      }
+
+      setPendingShots(res.shots);
+      setState('reviewing');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Photo analysis failed');
       setState('error');
       URL.revokeObjectURL(objUrl);
       setImageObjectUrl(null);
       void hapticError();
+    }
+  }
+
+  async function handleConfirm(correctedShots: VisionShotResult[]) {
+    setState('saving');
+    try {
+      const savedShots = await apiFetch<Shot[]>('/shots/manual', {
+        method: 'POST',
+        body: JSON.stringify({
+          sessionId,
+          shots: correctedShots.map((s, i) => ({
+            shotNumber: i + 1,
+            score: s.score,
+            x: s.x,
+            y: s.y,
+          })),
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setOverlayShots(correctedShots);
+      setResult({ shots: savedShots.length });
+      setState('done');
+      void hapticSuccess();
+      if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+      setTimeout(() => { setState('idle'); onSuccess(); }, 4000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to save shots');
+      setState('error');
     }
   }
 
@@ -1955,6 +1991,29 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Reviewing: interactive correction step ─────────────────────── */}
+      {state === 'reviewing' && pendingShots && imageObjectUrl && (
+        <ShotCorrectionCanvas
+          imageObjectUrl={imageObjectUrl}
+          shots={pendingShots}
+          targetType={targetType}
+          onConfirm={handleConfirm}
+          onCancel={() => {
+            if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+            setImageObjectUrl(null);
+            setPendingShots(null);
+            setState('idle');
+          }}
+        />
+      )}
+
+      {/* ── Saving ─────────────────────────────────────────────────────── */}
+      {state === 'saving' && (
+        <div className="space-y-4">
+          <p className="text-text-secondary text-xs font-display uppercase tracking-widest">Saving shots…</p>
         </div>
       )}
 
