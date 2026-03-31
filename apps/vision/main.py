@@ -52,13 +52,18 @@ async def startup() -> None:
 
 @app.get("/health")
 def health() -> dict:
+    from analyzer import MAX_INPUT_DIM, MAX_WORK_DIM
     return {
         "status": "ok",
         "detector": "cv-v6-yolo11-maskrcnn",
-        "version": "6.0.0",
+        "version": "6.1.0",
         "yolo_loaded": _yolo_available,
         "mask_loaded": _mask_available,
         "supported_targets": SUPPORTED_TARGETS,
+        # These fields confirm the resize-fix code is loaded.
+        # Old builds (<v6.1) will 500 or omit these fields.
+        "max_input_dim": MAX_INPUT_DIM,
+        "max_work_dim": MAX_WORK_DIM,
     }
 
 

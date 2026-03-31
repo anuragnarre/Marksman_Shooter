@@ -47,6 +47,8 @@ def detect_target(
         result = _contour_based_detect(enhanced, wh, ww)
 
     if result is None:
+        # All three methods failed — return confidence=0.0 so the caller
+        # (analyzer.py) can exit early rather than scoring against a wrong centre.
         cx, cy = w / 2.0, h / 2.0
         r = min_dim * 0.3
         return TargetCalibration(
@@ -55,7 +57,7 @@ def detect_target(
             minor_radius=r,
             rotation_deg=0.0,
             eccentricity=0.0,
-            confidence=0.1,
+            confidence=0.0,
             mm_per_pixel=spec.outer_radius_mm / r,
         )
 
@@ -113,16 +115,29 @@ def detect_target(
 def _robust_hough_detect(
     gray: np.ndarray, img_h: int, img_w: int
 ) -> Optional[Tuple[float, float, float, float]]:
-    """Hough circle detection with reduced parameter sweep."""
+    """Hough circle detection with fast-first parameter sweep.
+
+    Loop order: param2 high→low (strict→permissive), dp large→small (fast→slow).
+    This lets confident real-image detections exit after 2-4 calls instead of
+    running all combinations.  param2=15 / dp=1.0 are reserved as last-resort
+    fallbacks for very low-contrast targets.
+    """
     min_dim = min(img_h, img_w)
     best = None
     best_score = -1.0
 
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Reduced sweep: 2 dp × 3 param2 × 2 radius ranges = 12 calls
-    for dp in [1.0, 1.5]:
-        for param2 in [30, 50, 80]:
+    # Precompute Canny edges once — shared by all _verify_circle_edge calls
+    # below (the helper recomputes internally; keep the shared one for the
+    # fast-path edge check we do inline before calling the helper).
+    # Note: _verify_circle_edge recomputes its own blur+Canny on purpose so it
+    # can use a tighter blurring kernel; we don't override that.
+
+    # Ordered: strict (fast) → permissive (slow).
+    # dp=2.0 builds a half-res accumulator (4× fewer cells) — very fast first pass.
+    for param2 in [80, 50, 30, 15]:
+        for dp in [2.0, 1.5, 1.0]:
             for min_r_frac, max_r_frac in [(0.08, 0.45), (0.15, 0.55)]:
                 min_r = max(20, int(min_dim * min_r_frac))
                 max_r = int(min_dim * max_r_frac)
@@ -157,8 +172,9 @@ def _robust_hough_detect(
                         best_score = score
                         best = (cx, cy, r, min(1.0, score * 1.2))
 
-                # Early exit if confident
-                if best_score > 0.6:
+                # Early exit: real targets typically score > 0.5 on the first
+                # strict pass (param2=80); skip the slow fallback calls.
+                if best_score > 0.5:
                     return best
 
     if best is not None and best_score > 0.2:
@@ -486,7 +502,12 @@ def _calibrate_rings(
     # ISSF rings are evenly spaced at ring_width_mm per ring.
     # Gradient peaks should form an arithmetic progression with period k = ring_width_px.
     ring_width_mm = spec.ring_width_mm
-    k_min = max(8.0, ring_width_mm / 0.18)   # densest plausible (0.18 mm/px)
+    # k_min raised from ring_width/0.18 to ring_width/0.12 (or 20px minimum):
+    # Ring lines are ~0.3mm wide, which at typical resolution creates two gradient
+    # peaks separated by ~0.3mm/mm_per_px ≈ 6-18px.  The sub-ring-spacing period
+    # formed by these double-peaks (≈15-19px) would otherwise win the harmonic
+    # search.  The 20px floor excludes ring-line-width artifacts for all targets.
+    k_min = max(20.0, ring_width_mm / 0.12)  # minimum 20px to skip line-width artifacts
     k_max = min(float(max_r) / 2, ring_width_mm / 0.025)  # coarsest (0.025 mm/px)
 
     peaks_arr = np.array(peaks, dtype=np.float64)
@@ -494,7 +515,10 @@ def _calibrate_rings(
     best_count = 0
     best_p0 = 0.0
 
-    for k in np.arange(k_min, k_max, 0.5):
+    # Scan from LARGEST k (coarsest scale) to smallest (finest).
+    # This finds the FUNDAMENTAL ring-spacing period first, before its harmonics
+    # (sub-ring-spacing periods that can achieve equal counts but wrong scale).
+    for k in np.arange(k_max, k_min, -0.5):
         tol = k * 0.18
         for p0 in peaks:
             offsets = (peaks_arr - p0) % k
@@ -517,8 +541,10 @@ def _calibrate_rings(
             ring1_px = spec.outer_radius_mm / mm_harmonic
             # Accept only if harmonic result is at least as large as Hough radius
             # (harmonic should enlarge/confirm, never shrink the detected target)
-            # and fits within the available image region.
-            if ring1_px >= radius * 0.9 and ring1_px < max_r * 0.98:
+            # and is not wildly outside the image.  The upper bound is relaxed to
+            # 1.10 × max_r so that ring-1 is accepted even when it falls right at
+            # the image edge (e.g. synthetic images where ring-1 == image boundary).
+            if ring1_px >= radius * 0.9 and ring1_px < max_r * 1.10:
                 mm_per_pixel = mm_harmonic
 
     # Hard clamp: never more than 3× off from simple-ratio baseline

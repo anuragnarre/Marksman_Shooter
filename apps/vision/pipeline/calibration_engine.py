@@ -69,10 +69,10 @@ _ISSF_SPECS: Dict[TargetType, _ISSFSpec] = {
     ),
     TargetType.AIR_RIFLE_10M: _ISSFSpec(
         card_size_mm=170.0,
-        ring_width_radius_mm=8.0,
-        inner_ten_radius_mm=2.5,
-        ten_ring_radius_mm=5.75,
-        black_area_radius_mm=29.75,
+        ring_width_radius_mm=2.5,       # 10m Air Rifle: 2.5mm per ring (45.5mm / 10 rings / 2)
+        inner_ten_radius_mm=0.5,        # X-ring: 1.0mm diameter = 0.5mm radius
+        ten_ring_radius_mm=0.25,        # ring 10 outer: 0.5mm radius (outermost - 9*2.5mm = 0.25mm)
+        black_area_radius_mm=10.25,     # rings 6-10 are black: outer_radius(22.75) - 5×ring_width(2.5) = 10.25mm
     ),
     TargetType.NR_50M: _ISSFSpec(
         card_size_mm=550.0,

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shot Correction Canvas — Design</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #080A0F; color: #E2E8F0; font-family: 'DM Sans', system-ui, sans-serif; padding: 24px; }
+  h2 { font-size: 20px; font-weight: 600; color: #F5A623; margin-bottom: 6px; }
+  .subtitle { color: #6B7280; font-size: 13px; margin-bottom: 24px; }
+
+  .layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; max-width: 960px; }
+
+  /* Photo analysis card */
+  .card { background: #0E1118; border: 1px solid #1E2A3A; border-radius: 10px; overflow: hidden; }
+  .card-header { background: #161B26; border-bottom: 1px solid #1E2A3A; padding: 10px 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #CBD5E0; }
+  .tag { background: #F5A623; color: #080A0F; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: auto; }
+
+  /* Canvas area */
+  .canvas-area { position: relative; background: #0a0d14; }
+  .photo-mock { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, #111820 0%, #0d1520 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+
+  /* Target rings mock */
+  .target-mock { position: relative; width: 220px; height: 220px; }
+  .ring { position: absolute; border-radius: 50%; border: 1px solid rgba(200,200,200,0.15); transform: translate(-50%, -50%); left: 50%; top: 50%; }
+  .ring-1  { width: 220px; height: 220px; background: #d8d0b8; }
+  .ring-2  { width: 198px; height: 198px; background: #ccc4a8; border-color: rgba(0,0,0,0.2); }
+  .ring-3  { width: 176px; height: 176px; background: #c4bc98; border-color: rgba(0,0,0,0.2); }
+  .ring-4  { width: 154px; height: 154px; background: #bcb488; border-color: rgba(0,0,0,0.2); }
+  .ring-5  { width: 132px; height: 132px; background: #1a1a1a; border-color: rgba(255,255,255,0.15); }
+  .ring-6  { width: 110px; height: 110px; background: #1c1c1c; border-color: rgba(255,255,255,0.1); }
+  .ring-7  { width: 88px;  height: 88px;  background: #1e1e1e; border-color: rgba(255,255,255,0.1); }
+  .ring-8  { width: 66px;  height: 66px;  background: #202020; border-color: rgba(255,255,255,0.1); }
+  .ring-9  { width: 44px;  height: 44px;  background: #222; border-color: rgba(255,255,255,0.1); }
+  .ring-10 { width: 22px;  height: 22px;  background: #242424; border-color: rgba(255,255,255,0.1); }
+
+  /* Shot dots */
+  .shot { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); cursor: grab; transition: box-shadow 0.1s; z-index: 10; }
+  .shot:hover { box-shadow: 0 0 0 3px rgba(255,255,255,0.4) !important; }
+  .shot.selected { box-shadow: 0 0 0 2px white, 0 0 12px rgba(255,255,255,0.5) !important; cursor: grabbing; }
+  .shot-gold  { background: #F5A623; box-shadow: 0 0 8px rgba(245,166,35,0.5); }
+  .shot-blue  { background: #4FC3F7; box-shadow: 0 0 8px rgba(79,195,247,0.5); }
+  .shot-green { background: #00E5A0; box-shadow: 0 0 8px rgba(0,229,160,0.5); }
+  .shot-red   { background: #FF4D6D; box-shadow: 0 0 8px rgba(255,77,109,0.5); }
+  .shot-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 7px; font-weight: 700; color: rgba(0,0,0,0.8); pointer-events: none; }
+
+  /* Crosshair on selected */
+  .crosshair { position: absolute; pointer-events: none; z-index: 11; transform: translate(-50%, -50%); }
+  .ch-h, .ch-v { position: absolute; background: rgba(255,255,255,0.7); }
+  .ch-h { width: 20px; height: 1px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .ch-v { width: 1px; height: 20px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+  /* Toolbar overlay */
+  .toolbar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(14,17,24,0.92); border: 1px solid #2a3448; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(8px); z-index: 20; }
+  .tool-btn { background: #1e2533; border: 1px solid #2d3a4d; color: #CBD5E0; font-size: 11px; padding: 4px 10px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .tool-btn.active { background: #F5A623; color: #080A0F; border-color: #F5A623; font-weight: 600; }
+  .tool-btn.danger { border-color: #FF4D6D; color: #FF4D6D; }
+  .tool-btn.danger:hover { background: rgba(255,77,109,0.15); }
+  .tool-sep { width: 1px; height: 20px; background: #2a3448; }
+
+  /* Hint tooltip near shot */
+  .hint { position: absolute; background: rgba(14,17,24,0.9); border: 1px solid #2a3448; border-radius: 5px; padding: 3px 7px; font-size: 10px; color: #aaa; pointer-events: none; white-space: nowrap; z-index: 30; }
+
+  /* Right panel */
+  .panel { padding: 0; }
+  .panel-section { padding: 12px 14px; border-bottom: 1px solid #1E2A3A; }
+  .panel-section:last-child { border-bottom: none; }
+  .section-title { font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+  /* Shot list */
+  .shot-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #111820; }
+  .shot-row:last-child { border-bottom: none; }
+  .shot-dot-sm { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .shot-num-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6B7280; width: 18px; }
+  .shot-score { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; flex: 1; }
+  .shot-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.1s; }
+  .shot-row:hover .shot-actions { opacity: 1; }
+  .act-btn { background: none; border: 1px solid #2a3448; color: #6B7280; font-size: 10px; padding: 1px 5px; border-radius: 3px; cursor: pointer; }
+  .act-btn.del { border-color: #FF4D6D44; color: #FF4D6D; }
+  .modified { background: rgba(245,166,35,0.08); border-radius: 4px; }
+
+  /* Score badge */
+  .score-gold  { color: #F5A623; }
+  .score-blue  { color: #4FC3F7; }
+  .score-green { color: #00E5A0; }
+  .score-red   { color: #FF4D6D; }
+
+  /* Instruction banner */
+  .instructions { padding: 10px 14px; background: #0d1520; border-bottom: 1px solid #1E2A3A; }
+  .inst-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; color: #8B9AB0; }
+  .inst-row:last-child { margin-bottom: 0; }
+  .inst-icon { width: 18px; height: 18px; background: #161B26; border: 1px solid #2a3448; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+
+  /* Action bar */
+  .action-bar { padding: 12px 14px; display: flex; gap: 8px; }
+  .btn-primary { flex: 1; background: #F5A623; color: #080A0F; font-weight: 700; font-size: 12px; padding: 9px; border-radius: 6px; border: none; cursor: pointer; }
+  .btn-secondary { background: #161B26; color: #CBD5E0; font-size: 12px; padding: 9px 14px; border-radius: 6px; border: 1px solid #2a3448; cursor: pointer; }
+
+  /* Stats bar */
+  .stats { display: flex; gap: 12px; padding: 10px 14px; background: #0b0e15; border-bottom: 1px solid #1E2A3A; }
+  .stat { text-align: center; }
+  .stat-val { font-family: monospace; font-size: 16px; font-weight: 700; color: #00E5A0; }
+  .stat-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: #6B7280; margin-top: 1px; }
+
+  /* Modified badge */
+  .badge { display: inline-block; background: rgba(245,166,35,0.15); color: #F5A623; font-size: 9px; padding: 1px 5px; border-radius: 3px; border: 1px solid rgba(245,166,35,0.3); margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<h2>Shot Correction Canvas</h2>
+<p class="subtitle">After vision analysis — correct before saving to session</p>
+
+<div class="layout">
+
+  <!-- Left: Photo + interactive canvas -->
+  <div class="card">
+    <div class="card-header">
+      📷 Review Detections
+      <span style="color:#6B7280;font-size:11px;font-weight:400;margin-left:4px">10m Air Rifle · 10 shots found</span>
+      <span class="tag">REVIEW</span>
+    </div>
+
+    <div class="instructions">
+      <div class="inst-row"><div class="inst-icon">↕</div> Drag any dot to reposition</div>
+      <div class="inst-row"><div class="inst-icon">+</div> Click empty area to add missed shot</div>
+      <div class="inst-row"><div class="inst-icon">×</div> Right-click dot (or use list) to remove false detection</div>
+    </div>
+
+    <div class="canvas-area">
+      <div class="photo-mock">
+
+        <!-- Rings -->
+        <div class="target-mock">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="ring ring-3"></div>
+          <div class="ring ring-4"></div>
+          <div class="ring ring-5"></div>
+          <div class="ring ring-6"></div>
+          <div class="ring ring-7"></div>
+          <div class="ring ring-8"></div>
+          <div class="ring ring-9"></div>
+          <div class="ring ring-10"></div>
+
+          <!-- Shot 1 — selected/being dragged — gold -->
+          <div class="shot shot-gold selected" style="width:12px;height:12px;left:47%;top:43%">
+            <span class="shot-num">1</span>
+          </div>
+          <!-- Shot 1 crosshair -->
+          <div class="crosshair" style="left:47%;top:43%">
+            <div class="ch-h"></div><div class="ch-v"></div>
+          </div>
+          <!-- Tooltip near shot 1 -->
+          <div class="hint" style="left:52%;top:38%">10.7 ↕ dragging</div>
+
+          <!-- Shot 2 — blue -->
+          <div class="shot shot-blue" style="width:12px;height:12px;left:54%;top:55%">
+            <span class="shot-num">2</span>
+          </div>
+
+          <!-- Shot 3 — blue -->
+          <div class="shot shot-blue" style="width:12px;height:12px;left:44%;top:58%">
+            <span class="shot-num">3</span>
+          </div>
+
+          <!-- Shot 4 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:62%;top:47%">
+            <span class="shot-num">4</span>
+          </div>
+
+          <!-- Shot 5 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:39%;top:51%">
+            <span class="shot-num">5</span>
+          </div>
+
+          <!-- Shot 6 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:52%;top:41%">
+            <span class="shot-num">6</span>
+          </div>
+
+          <!-- Shot 7 — red (false positive, on ring boundary) -->
+          <div class="shot shot-red" style="width:12px;height:12px;left:30%;top:50%;opacity:0.7">
+            <span class="shot-num">7</span>
+          </div>
+
+          <!-- Shot 8 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:56%;top:62%">
+            <span class="shot-num">8</span>
+          </div>
+
+          <!-- Shot 9 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:48%;top:66%">
+            <span class="shot-num">9</span>
+          </div>
+
+          <!-- Shot 10 — green -->
+          <div class="shot shot-green" style="width:12px;height:12px;left:59%;top:37%">
+            <span class="shot-num">10</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom toolbar -->
+      <div class="toolbar">
+        <button class="tool-btn active">↕ Move</button>
+        <button class="tool-btn">＋ Add</button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn danger">× Remove selected</button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn" style="color:#6B7280">↩ Undo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="card panel">
+    <div class="stats">
+      <div class="stat"><div class="stat-val">10</div><div class="stat-lbl">Shots</div></div>
+      <div class="stat"><div class="stat-val score-blue">9.84</div><div class="stat-lbl">Avg</div></div>
+      <div class="stat"><div class="stat-val">98.4</div><div class="stat-lbl">Total</div></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">Detected Shots</div>
+      <div>
+
+        <div class="shot-row modified">
+          <div class="shot-dot-sm shot-gold"></div>
+          <span class="shot-num-label">1</span>
+          <span class="shot-score score-gold">10.7 <span class="badge">moved</span></span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-blue"></div>
+          <span class="shot-num-label">2</span>
+          <span class="shot-score score-blue">10.1</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-blue"></div>
+          <span class="shot-num-label">3</span>
+          <span class="shot-score score-blue">10.2</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">4</span>
+          <span class="shot-score score-green">9.7</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">5</span>
+          <span class="shot-score score-green">9.5</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">6</span>
+          <span class="shot-score score-green">9.8</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row" style="background:rgba(255,77,109,0.05);border-radius:4px;padding:4px">
+          <div class="shot-dot-sm shot-red"></div>
+          <span class="shot-num-label">7</span>
+          <span class="shot-score score-red">7.1 <span style="background:rgba(255,77,109,0.15);color:#FF4D6D;font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid rgba(255,77,109,0.3)">low conf</span></span>
+          <div class="shot-actions" style="opacity:1">
+            <button class="act-btn del" style="background:rgba(255,77,109,0.1)">× Remove</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">8</span>
+          <span class="shot-score score-green">9.6</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">9</span>
+          <span class="shot-score score-green">9.3</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+        <div class="shot-row">
+          <div class="shot-dot-sm shot-green"></div>
+          <span class="shot-num-label">10</span>
+          <span class="shot-score score-green">9.8</span>
+          <div class="shot-actions">
+            <button class="act-btn">↕</button>
+            <button class="act-btn del">×</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-secondary">↩ Re-analyse</button>
+      <button class="btn-primary">✓ Save to session</button>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:12px 14px;background:#0E1118;border:1px solid #1E2A3A;border-radius:8px;max-width:960px">
+  <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Key interactions</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;color:#8B9AB0">
+    <div><strong style="color:#F5A623">Drag shot:</strong> Real-time score update as you drag. Clamps to target boundary.</div>
+    <div><strong style="color:#4FC3F7">Click + Add:</strong> Switch to Add mode → click anywhere on photo → new shot placed and scored.</div>
+    <div><strong style="color:#FF4D6D">Remove:</strong> Right-click shot OR click × in list → removes from both canvas and list.</div>
+  </div>
+</div>
+
+</body>
+</html>

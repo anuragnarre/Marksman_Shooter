@@ -57,6 +57,11 @@ def _scale_calibration(cal: TargetCalibration, scale: float) -> TargetCalibratio
     )
 
 
+# Module-level constants (exported so main.py can confirm this version is loaded)
+MAX_INPUT_DIM = 1400   # cap input resolution before detect_target
+MAX_WORK_DIM  = 1000   # cap working resolution before detect_holes
+
+
 def analyze_target_image(
     image_bytes: bytes,
     target_type: str = "air_rifle_10m",
@@ -109,7 +114,6 @@ def analyze_target_image(
 
     # Pre-input resize: cap cost of target detection + perspective correction
     # on high-resolution originals (phone photos at 4032×3024+ take 6-28s without this).
-    MAX_INPUT_DIM = 1400
     pre_input_scale = 1.0
     if max(img_h, img_w) > MAX_INPUT_DIM:
         pre_input_scale = MAX_INPUT_DIM / max(img_h, img_w)
@@ -120,8 +124,9 @@ def analyze_target_image(
 
     # Stage 1: Quality check
     quality = check_quality(gray)
-    logger.debug("Stage 1 quality: is_blurry=%s has_glare=%s is_acceptable=%s",
-                 quality.is_blurry, quality.has_glare, quality.is_acceptable)
+    logger.debug("Stage 1 quality: blur=%.1f glare=%.1f%% dr=%d is_acceptable=%s warnings=%s",
+                 quality.blur_score, quality.glare_pct, quality.dynamic_range,
+                 quality.is_acceptable, quality.warnings)
 
     # Pre-detection CLAHE: enhance ring lines before target detection so Hough
     # and gradient methods work reliably under low-contrast / dark conditions.
@@ -165,7 +170,6 @@ def analyze_target_image(
     # take 50+ seconds. Downscale to MAX_WORK_DIM and adjust calibration.
     # MAX_WORK_DIM < MAX_INPUT_DIM (1400) so this always fires for non-warped
     # images that were resized to 1400px at the input stage.
-    MAX_WORK_DIM = 1000
     work_scale = 1.0
     if not calibration.card_corners_found:
         h_w, w_w = img_bgr.shape[:2]
@@ -212,11 +216,14 @@ def analyze_target_image(
         for h in mask_holes
     ]
     holes = fuse_candidates(cv_holes, all_neural)
-    logger.debug("Stage 4 fused holes: count=%d  cv=%d yolo=%d mask=%d",
-                 len(holes), len(cv_holes), len(yolo_holes), len(mask_holes))
+    logger.info("Stage 4 holes: cv=%d yolo=%d mask=%d fused=%d  cal=card:%s mm_per_px=%.4f major_r=%.1f",
+                len(cv_holes), len(yolo_holes), len(mask_holes), len(holes),
+                calibration.card_corners_found, calibration.mm_per_pixel, calibration.major_radius)
 
     # Stage 5: ISSF decimal scoring
     shots_data = score_holes(holes, calibration, target_type)
+    logger.info("Stage 5 scorer: %d holes -> %d shots  (filtered=%d)",
+                len(holes), len(shots_data), len(holes) - len(shots_data))
 
     # Build response
     shot_results = [

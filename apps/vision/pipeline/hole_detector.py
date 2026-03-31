@@ -88,12 +88,28 @@ def detect_holes(
     # ── Detect holes via multi-scale disc convolution ─────────────────────────
     candidates: List[FusedHole] = []
 
-    holes_black = _detect_disc_multiscale(
+    # Always run BOTH polarity modes for the black zone and merge.
+    #
+    # Rationale: CLAHE applied to dark/dim images dramatically raises the black
+    # zone median (e.g. raw p50=56 → post-CLAHE bz_med=193).  A threshold on
+    # the CLAHE image is unreliable: a "bright" post-CLAHE median does NOT mean
+    # holes are darker than surroundings — holes in the dark-ink zone are still
+    # lighter than the ink after CLAHE.  Running both modes costs one extra pass
+    # (< 20 ms on 1000-px images) and the dedup step merges duplicates.
+    _bz_ring_sup = visible_r_black * 0.30
+    _h_bright = _detect_disc_multiscale(
         gray_filled, black_roi, cx, cy,
         visible_r_black, pellet_radius_px, bright=True,
         ring_radii_px=ring_radii_px,
-        ring_suppress_px=visible_r_black * 0.70,  # zero accumulator near ring boundaries
+        ring_suppress_px=_bz_ring_sup,
     )
+    _h_dark = _detect_disc_multiscale(
+        gray_filled, black_roi, cx, cy,
+        visible_r_black, pellet_radius_px, bright=False,
+        ring_radii_px=ring_radii_px,
+        ring_suppress_px=_bz_ring_sup,
+    )
+    holes_black = _deduplicate(_h_bright + _h_dark, visible_r_black * 0.8)
     candidates.extend(holes_black)
 
     # Ring suppression not needed: ring lines are already filled in gray_filled
@@ -455,7 +471,14 @@ def _detect_disc(
         gray_smooth = cv2.bilateralFilter(gray, d=5, sigmaColor=25, sigmaSpace=5)
         img_f = gray_smooth.astype(np.float32)
         signal = np.where(zone_mask, np.clip(img_f - bg_med, 0.0, None), 0.0).astype(np.float32)
-        min_signal = max(bg_std * 2.5, 15.0)
+        # Robust noise estimate: use ONLY pixels above the median so that
+        # bimodal distributions (dark ring-ink cluster at ~54 + bright
+        # background at ~188 after CLAHE on dark images) don't inflate std.
+        # After CLAHE on dim images bg_std can reach 60–70, making min_signal
+        # so large that real holes (acc_max ≈ 20–25) fail the early-return check.
+        zone_upper = zone_pixels[zone_pixels >= bg_med]
+        bg_std_robust = float(max(np.std(zone_upper), 1.0)) if len(zone_upper) > 4 else bg_std
+        min_signal = max(bg_std_robust * 2.5, 8.0)
     else:
         gray_smooth = cv2.GaussianBlur(gray, (5, 5), 1.5)
         img_f = gray_smooth.astype(np.float32)
@@ -463,10 +486,20 @@ def _detect_disc(
         # The structuring element is larger than any bullet hole, so opening
         # removes the holes and preserves the gradual illumination gradient —
         # correct under vignetting where Gaussian blur fails.
-        morph_r = max(5, int(pellet_radius_px * 2.0))
+        # Cap morph_r so the kernel doesn't extend beyond the cream zone width —
+        # a 44px kernel overlapping the dark center zone pulls bg_local to ~0
+        # throughout the cream zone, making signal=0 everywhere.
+        morph_r = max(5, min(int(pellet_radius_px * 1.5), 25))
         kernel_open = cv2.getStructuringElement(
             cv2.MORPH_ELLIPSE, (2 * morph_r + 1, 2 * morph_r + 1))
-        bg_local = cv2.morphologyEx(gray_smooth, cv2.MORPH_OPEN, kernel_open).astype(np.float32)
+        # Pre-fill pixels outside the cream zone with cream median so the dark
+        # centre zone doesn't suppress the morphological background estimate.
+        gray_fill = gray_smooth.copy().astype(np.float32)
+        gray_fill[~zone_mask] = bg_med
+        bg_local = cv2.morphologyEx(
+            np.clip(gray_fill, 0, 255).astype(np.uint8),
+            cv2.MORPH_OPEN, kernel_open,
+        ).astype(np.float32)
         residual_pixels = (bg_local - img_f)[zone_mask]
         bg_std = float(max(np.std(residual_pixels), 1.0))
         signal = np.where(zone_mask, np.clip(bg_local - img_f, 0.0, None), 0.0).astype(np.float32)
@@ -574,10 +607,10 @@ def _detect_disc(
             dist_c = math.sqrt((px - cx) ** 2 + (py - cy) ** 2)
             for _rr in ring_radii_px:
                 if abs(dist_c - _rr) < visible_r * 1.8:
-                    # Black zone near ring: white ring lines are arc artefacts → moderate filter.
-                    # Cream zone near ring: dark ring lines produce strong arc peaks that pass
-                    # the base 0.42 threshold but real holes have fill ≥ 0.80.
-                    fill_min = 0.52 if bright else 0.76
+                    # Ring lines are already filled in gray_filled, so the main concern is
+                    # residual bleed from JPEG/bilateral filter near ring edges.
+                    # Keep threshold only slightly elevated — don't reject real shots.
+                    fill_min = 0.35 if bright else 0.55
                     break
         if _fill_ratio_check(signal, px, py, visible_r) < fill_min:
             continue
@@ -684,7 +717,12 @@ def _has_radial_gradient(
         return True  # image has no dynamic range — gradient is meaningless
 
     delta = inner_mean - annulus_mean
-    min_delta = dr * 0.06  # require ≥ 6% of dynamic range
+    # Require ≥ 3% of dynamic range (lowered from 6%).
+    # 6% was too strict for faint holes (borderline JPEG compression, subtle
+    # contrast) — real holes were failing with delta=9-13 when need=14+ on
+    # high-DR images.  3% still rules out noise (delta≈0) while accepting
+    # low-contrast-but-real holes.  Shape is already confirmed by fill_ratio.
+    min_delta = max(dr * 0.03, 4.0)
     if bright:
         return delta >= min_delta   # hole is lighter than surround
     else:

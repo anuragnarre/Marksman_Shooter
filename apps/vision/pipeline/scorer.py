@@ -7,14 +7,17 @@ implements the exact ISSF formula from the official target spec JSON:
     dist_mm  = hypot(shot_x - cx, shot_y - cy) * ratio
     score    = 10.9 - (dist_mm / ring_width_radius_mm)
 
-Scoring distance rule
----------------------
-- YOLO / fused detections  (method = "yolo" | "fused"):
-    Pure centre-to-centre — the YOLO bounding-box centre IS the hole centre,
-    so no pellet-radius offset is applied.
-- CV-only detections  (method = "cv"):
-    ISSF outer-edge rule: pellet radius subtracted before scoring so the
-    outer edge of the physical hole (not the centre) determines the score.
+Scoring distance rule (ISSF outer-edge rule — applied universally)
+---------------------------------------------------------------------------
+All detected hole centres (whether from CV, YOLO, or fused) represent the
+centre of the physical pellet mark.  ISSF Rule 7.10 states: a shot is scored
+by the ring whose inner boundary the OUTER EDGE of the hole touches or
+crosses.  This means the effective scoring distance is:
+
+    effective_dist_mm = centre_dist_mm − pellet_radius_mm
+
+This offset is now applied consistently for ALL detection methods to eliminate
+the score inflation that previously occurred for YOLO/fused detections.
 """
 
 import math
@@ -23,9 +26,6 @@ from typing import List
 from .calibration_engine import get_decimal_score, get_mm_per_pixel
 from .types import FusedHole, TargetCalibration
 from .target_specs import get_spec
-
-# Detection methods that score from the hole-centre directly
-_CENTRE_SCORE_METHODS = {"yolo", "fused"}
 
 
 # ---------------------------------------------------------------------------
@@ -105,35 +105,36 @@ def score_holes(
     spec = get_spec(target_type)
     cx, cy = calibration.center
 
-    # Determine the canvas size from the calibration geometry.
-    # For a card-corner-warped 1000 px output, major_radius ≈ 500.
-    if calibration.card_corners_found:
-        canvas_size = 1000
-    elif calibration.major_radius > 0:
-        canvas_size = int(round(calibration.major_radius * 2))
-    else:
-        canvas_size = 1000
-
-    canvas_cx = canvas_size / 2.0
-    canvas_cy = canvas_size / 2.0
+    # Always use calibration.mm_per_pixel for distance → mm conversion.
+    #
+    # calibration.mm_per_pixel is derived directly from the ring pattern by
+    # target_detector._calibrate_rings() and then adjusted by _scale_calibration()
+    # for any resizing. It is accurate regardless of warp type:
+    #
+    #   - True 4-corner card warp: mm_per_pixel ≈ 170/1000 = 0.17
+    #   - Ellipse warp (correct_perspective sets card_corners_found=True as a
+    #     side effect): mm_per_pixel ≈ ring_width_mm / ring_width_px (correct)
+    #   - No warp: same ring-pattern calibration
+    #
+    # The old card formula (get_decimal_score with canvas_size=1000) assumed
+    # canvas was exactly 1000px = card_size_mm. After an ellipse warp the canvas
+    # has major_r=806+ — the formula would give dist_mm ≈ 36mm for a hole 214px
+    # away → score = -3.6 → filtered. Using mm_per_pixel fixes this for all cases.
+    mm_per_px = calibration.mm_per_pixel
 
     shots = []
     for hole in holes:
-        # Translate so the detected target centre → canvas midpoint
-        tx = hole.x - cx + canvas_cx
-        ty = hole.y - cy + canvas_cy
+        dist_px = math.hypot(hole.x - cx, hole.y - cy)
+        dist_mm = dist_px * mm_per_px
 
-        result = get_decimal_score(target_type, tx, ty, canvas_size)
-
-        # Apply pellet-radius offset for CV-only detections
-        detection_method = getattr(hole, "method", "cv")
-        if detection_method not in _CENTRE_SCORE_METHODS:
-            pellet_r_mm = spec.pellet_diameter_mm / 2.0
-            adjusted_dist = max(0.0, result.dist_mm - pellet_r_mm)
-            raw = spec.max_score() - (adjusted_dist / spec.ring_width_mm)
-            final_score = round(max(0.0, min(spec.max_score(), raw)), 1)
-        else:
-            final_score = result.score
+        # Apply pellet-radius offset for ALL detection methods (ISSF outer-edge rule):
+        # a shot is scored by the ring whose inner boundary the OUTER EDGE of the
+        # hole touches — so effective distance = centre_dist − pellet_radius.
+        pellet_r_mm = spec.pellet_diameter_mm / 2.0
+        adjusted_dist = max(0.0, dist_mm - pellet_r_mm)
+        raw = spec.max_score() - (adjusted_dist / spec.ring_width_mm)
+        final_score = round(max(0.0, min(spec.max_score(), raw)), 1)
+        is_inner_ten = adjusted_dist <= (spec.inner_ten_diameter_mm / 2.0)
 
         if final_score < 1.0:
             continue
@@ -150,8 +151,8 @@ def score_holes(
         shots.append({
             "pixel_dist":    pixel_dist,
             "score":         final_score,
-            "is_inner_ten":  result.is_inner_ten,
-            "dist_mm":       result.dist_mm,
+            "is_inner_ten":  is_inner_ten,
+            "dist_mm":       round(dist_mm, 3),
             "x":             round(target_x, 3),
             "y":             round(target_y, 3),
             "pixel_x":       int(round(hole.x)),

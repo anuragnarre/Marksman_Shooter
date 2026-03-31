@@ -157,6 +157,10 @@ export class ShotsService {
       throw new BadRequestException('Vision service returned unexpected format');
     }
 
+    if (analysisResult.shots.length === 0) {
+      throw new BadRequestException('No bullet holes detected in this photo. Ensure the target is clearly visible and well-lit.');
+    }
+
     const shots: ShotInput[] = analysisResult.shots.map((s) => ({
       shotNumber: s.shotNumber,
       score: s.score,
@@ -248,6 +252,15 @@ export class ShotsService {
       x:          s.x,
       y:          s.y,
     }));
+
+    if (visionShots.length === 0) {
+      return {
+        shots:            [],
+        targetDetected:   raw.target_detected,
+        processingTimeMs: raw.processing_time_ms,
+        savedShots:       [],
+      };
+    }
 
     const savedShots = persist
       ? await this.createShots(sessionId, actorId, actorRole, inputs, shooterIdHint)
