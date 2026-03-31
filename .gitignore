@@ -19,10 +19,18 @@ apps/vision/.env
 # Python virtual environments
 apps/vision/.venv/
 apps/vision/.venv-linux/
+apps/vision/.venv-*/
 **/__pycache__/
 **/*.pyc
 **/*.pyo
 *.egg-info/
+
+# ML model weights (large binary files — store in cloud/DVC)
+*.pt
+*.onnx
+*.pth
+*.weights
+*.bin
 
 # Prisma generated client (regenerated on deploy)
 apps/api/node_modules/
