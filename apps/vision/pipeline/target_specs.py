@@ -40,10 +40,7 @@ class TargetSpec:
         center = (radius_pixels, radius_pixels)
         mm_per_px = self.outer_radius_mm / radius_pixels
 
-        # Black zone = innermost dark_center_rings rings (e.g. rings 6-10 for air rifle).
-        # Outer boundary = outer_radius_mm - dark_center_rings * ring_width_mm.
-        # (NOT dark_center_rings * ring_width_mm, which counts from the wrong end.)
-        inner_zone_radius_mm = self.outer_radius_mm - self.ring_width_mm * self.dark_center_rings
+        inner_zone_radius_mm = self.ring_width_mm * self.dark_center_rings
         inner_zone_px = int(inner_zone_radius_mm / mm_per_px)
         cv2.circle(img, center, inner_zone_px, 0, -1)
 
@@ -99,12 +96,12 @@ TARGET_SPECS: Dict[TargetType, TargetSpec] = {
         outer_ring1_diameter_mm=45.5,
         ring_width_mm=2.5,
         pellet_diameter_mm=4.5,
-        inner_ten_diameter_mm=1.0,  # ISSF: X-ring (inner ten) = 1.0mm diameter
+        inner_ten_diameter_mm=0.5,
         dark_center_rings=5,
     ),
     TargetType.AIR_PISTOL_10M: TargetSpec(
         name="10m Air Pistol",
-        outer_ring1_diameter_mm=155.5,  # Ring 1 outer diameter; 170mm is card size
+        outer_ring1_diameter_mm=170.0,
         ring_width_mm=8.0,
         pellet_diameter_mm=4.5,
         inner_ten_diameter_mm=5.0,

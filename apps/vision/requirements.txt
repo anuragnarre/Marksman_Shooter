@@ -1,9 +1,7 @@
 fastapi==0.115.6
-pytest>=8.0.0
 uvicorn==0.32.1
 opencv-python-headless==4.10.0.84
 numpy>=1.26.0,<2.2.0
-Pillow>=10.0.0
 pydantic>=2.5.0,<3.0.0
 python-multipart==0.0.20
 anyio>=4.0.0,<5.0.0
@@ -14,16 +12,16 @@ charset-normalizer==3.4.1
 # The pipeline falls back to CV-only mode if no model file is found at startup.
 onnxruntime>=1.18.0
 
-# ─── Neural model inference (optional — pipeline falls back to CV-only) ──────
-# YOLOv11-L native inference (backend A — requires ultralytics):
-# ultralytics>=8.3.0,<9.0.0
+# ─── Dev / training / export only ────────────────────────────────────────────
+# Install separately in CI or a local training environment:
 #
-# Mask R-CNN pixel-precise detection (requires torch + torchvision):
-# torch>=2.2.0,<3.0.0
-# torchvision>=0.17.0
-#
-# Install with:
 #   pip install ultralytics>=8.3.0 torch>=2.2.0 torchvision>=0.17.0
 #
 # For iOS CoreML export (macOS only):
 #   pip install coremltools>=7.0
+#
+# Uncomment below if you want them tracked in this file:
+# ultralytics>=8.3.0,<9.0.0
+# torch>=2.2.0,<3.0.0
+# torchvision>=0.17.0
+# coremltools>=7.0

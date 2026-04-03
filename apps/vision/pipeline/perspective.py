@@ -93,11 +93,10 @@ def _four_corner_warp(
         if not (0.5 <= aspect <= 2.0):
             continue
 
-        # Card center should be near the image center (within 45%); relaxed from
-        # 35% to accommodate slightly off-centre shots in the camera frame.
+        # Card center should be near the image center (within 35%)
         cx_card = pts[:, 0].mean()
         cy_card = pts[:, 1].mean()
-        if abs(cx_card - w / 2) > 0.45 * w or abs(cy_card - h / 2) > 0.45 * h:
+        if abs(cx_card - w / 2) > 0.35 * w or abs(cy_card - h / 2) > 0.35 * h:
             continue
 
         if area > best_area:
@@ -137,20 +136,10 @@ def _four_corner_warp(
     dst_c = cv2.perspectiveTransform(src_c, H)
     new_cx, new_cy = float(dst_c[0, 0, 0]), float(dst_c[0, 0, 1])
 
-    # Sanity check: mapped centre should land near the canvas centre (within 30%).
-    # If it ends up in a corner the homography is wrong (e.g. circle detected as quad).
-    margin_frac = 0.30
-    lo = OUTPUT_SIZE * margin_frac
-    hi = OUTPUT_SIZE * (1.0 - margin_frac)
-    if not (lo < new_cx < hi and lo < new_cy < hi):
-        return None
-
     # Map a ring radius point to estimate the new pixel scale.
-    # ring_radii[0] is ring 1 (outermost); ring_radii[-1] is ring 10 (innermost, ~0.25mm).
-    # Must use [0] — using [-1] would make new_major ≈ 1px and break mm_per_pixel.
     new_major = calibration.major_radius
     if calibration.ring_radii:
-        outer_r_px = calibration.ring_radii[0]
+        outer_r_px = calibration.ring_radii[-1]
         src_r_pt = np.array([[[orig_cx + outer_r_px, orig_cy]]], dtype=np.float32)
         dst_r_pt = cv2.perspectiveTransform(src_r_pt, H)
         new_major = float(np.linalg.norm(
