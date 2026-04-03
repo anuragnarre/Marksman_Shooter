@@ -16,6 +16,7 @@ export class RulesEngine {
     suggestions.push(...this.checkTriggerControl(analytics));
     suggestions.push(...this.checkEndurance(analytics));
     suggestions.push(...this.checkConsistency(analytics));
+    suggestions.push(...this.checkBreathingControl(analytics));
 
     return suggestions;
   }
@@ -78,6 +79,40 @@ export class RulesEngine {
         'High score variance — work on repeatable technique and stable position',
       ];
     }
+    return [];
+  }
+
+  /**
+   * Breathing control — two triggers:
+   *
+   * 1. Primary: MPI y offset > 0.4 (shots consistently high or low).
+   *    Vertical grouping drift is a classic sign of firing at the wrong
+   *    point in the breathing cycle — either on full inhale or full exhale.
+   *
+   * 2. Supplementary default: session has ≥ 10 shots but no other specific
+   *    rule fired.  Breathing control is the most common area for improvement
+   *    across all experience levels, so it is always relevant as a baseline tip.
+   */
+  private checkBreathingControl(analytics: AnalyticsResult): string[] {
+    const verticalDrift = Math.abs(analytics.mpi.y);
+
+    // Primary — detectable vertical bias
+    if (verticalDrift > 0.4) {
+      const direction = analytics.mpi.y > 0 ? 'high' : 'low';
+      return [
+        `Shots grouping ${direction} — review your breathing cycle and trigger timing. ` +
+        'Fire at the natural respiratory pause to reduce vertical dispersion.',
+      ];
+    }
+
+    // Supplementary — always surface as a general insight for meaningful sessions
+    if (analytics.totalShots >= 10) {
+      return [
+        'Breathing control needs improvement — practice triggering at the natural ' +
+        'respiratory pause (after a relaxed exhale) to stabilise your aim point.',
+      ];
+    }
+
     return [];
   }
 }

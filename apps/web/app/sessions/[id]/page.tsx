@@ -936,7 +936,10 @@ function disciplineToTargetType(discipline: string): string {
 
 // ── Tab: Interactive Target ───────────────────────────────────────────────────
 
-type PlacedShot = { x: number; y: number; score: number; shotNumber: number };
+type PlacedShot = { uid: string; x: number; y: number; score: number; shotNumber: number };
+
+let _uidCounter = 0;
+function nextUid(): string { return `ps-${Date.now()}-${++_uidCounter}`; }
 
 const TARGET_EXTENT  = 10;
 const CANVAS_SIZE    = 360;
@@ -1020,7 +1023,37 @@ function InteractiveTab({
     return [tx, ty];
   }
 
-  // Return index (last-placed wins) of the shot under the pointer, or -1
+  // Compute staggered canvas positions — mirrors the logic in drawCanvas.
+  // Must be kept in sync whenever DOT_STAGGER_PX or the bucketing logic changes.
+  function computeStaggeredPositions(): Array<{ px: number; py: number }> {
+    const DOT_STAGGER_PX = 14;
+    const rawPos = shots.map((s) => ({
+      px: cx + (s.x / TARGET_EXTENT) * drawR,
+      py: cy - (s.y / TARGET_EXTENT) * drawR,
+    }));
+    const buckets = new Map<string, number[]>();
+    rawPos.forEach(({ px, py }, i) => {
+      const key = `${Math.round(px)},${Math.round(py)}`;
+      if (!buckets.has(key)) buckets.set(key, []);
+      buckets.get(key)!.push(i);
+    });
+    const out = [...rawPos];
+    buckets.forEach((indices) => {
+      if (indices.length <= 1) return;
+      const { px: bx, py: by } = rawPos[indices[0]];
+      indices.forEach((idx, k) => {
+        const angle = (2 * Math.PI * k) / indices.length - Math.PI / 2;
+        out[idx] = {
+          px: bx + DOT_STAGGER_PX * Math.cos(angle),
+          py: by + DOT_STAGGER_PX * Math.sin(angle),
+        };
+      });
+    });
+    return out;
+  }
+
+  // Return index (last-placed wins) of the shot under the pointer, or -1.
+  // Uses staggered positions so hit-test matches what is drawn on canvas.
   function findShotAt(clientX: number, clientY: number): number {
     const canvas = canvasRef.current;
     if (!canvas) return -1;
@@ -1029,10 +1062,9 @@ function InteractiveTab({
     const sy = CANVAS_SIZE / rect.height;
     const mx = (clientX - rect.left) * sx;
     const my = (clientY - rect.top) * sy;
+    const positions = computeStaggeredPositions();
     for (let i = shots.length - 1; i >= 0; i--) {
-      const px = cx + (shots[i].x / TARGET_EXTENT) * drawR;
-      const py = cy - (shots[i].y / TARGET_EXTENT) * drawR;
-      if (Math.hypot(mx - px, my - py) <= HIT_RADIUS_PX) return i;
+      if (Math.hypot(mx - positions[i].px, my - positions[i].py) <= HIT_RADIUS_PX) return i;
     }
     return -1;
   }
@@ -1054,9 +1086,36 @@ function InteractiveTab({
     const darkZoneNorm    = Math.max(0, (10 * darkZoneOuterMm) / outerRadiusMm);
 
     // ── Interactive shot markers ───────────────────────────────────────────────
+    // Pre-compute canvas positions and apply a small radial stagger when shots
+    // share the same pixel, so every duplicate is independently visible.
+    const DOT_STAGGER_PX = 14; // radius of stagger circle for overlapping shots
+    const rawPositions = shots.map((shot) => ({
+      px: cx + (shot.x / TARGET_EXTENT) * drawR,
+      py: cy - (shot.y / TARGET_EXTENT) * drawR,
+    }));
+    // Group by pixel bucket (round to 1px) to detect overlaps
+    const buckets = new Map<string, number[]>();
+    rawPositions.forEach(({ px, py }, i) => {
+      const key = `${Math.round(px)},${Math.round(py)}`;
+      if (!buckets.has(key)) buckets.set(key, []);
+      buckets.get(key)!.push(i);
+    });
+    // Assign staggered positions for groups > 1
+    const finalPositions = [...rawPositions];
+    buckets.forEach((indices) => {
+      if (indices.length <= 1) return;
+      const { px: bx, py: by } = rawPositions[indices[0]];
+      indices.forEach((idx, k) => {
+        const angle = (2 * Math.PI * k) / indices.length - Math.PI / 2;
+        finalPositions[idx] = {
+          px: bx + DOT_STAGGER_PX * Math.cos(angle),
+          py: by + DOT_STAGGER_PX * Math.sin(angle),
+        };
+      });
+    });
+
     shots.forEach((shot, i) => {
-      const px      = cx + (shot.x / TARGET_EXTENT) * drawR;
-      const py      = cy - (shot.y / TARGET_EXTENT) * drawR;
+      const { px, py } = finalPositions[i];
       const color   = shotDotColor(shot.score);
       const isDrag  = draggingIndex === i;
       const isHover = hoverIndex === i && draggingIndex === null;
@@ -1199,7 +1258,7 @@ function InteractiveTab({
         const score  = scoreFromCoords(tx, ty, targetType);
         setShots((prev) => [
           ...prev,
-          { x: tx, y: ty, score, shotNumber: nextShotNumber + prev.length },
+          { uid: nextUid(), x: tx, y: ty, score, shotNumber: nextShotNumber + prev.length },
         ]);
         setSuccess(null);
         setError(null);
@@ -1310,7 +1369,7 @@ function InteractiveTab({
                     const dir = shotDirection(shot.x, shot.y);
                     return (
                       <tr
-                        key={shot.shotNumber}
+                        key={shot.uid}
                         className={`border-b border-border-subtle/40 transition-colors duration-100 ${
                           isDrag  ? 'bg-accent/8'
                           : isHover ? 'bg-white/[0.02]'
@@ -1485,7 +1544,10 @@ function ManualTab({
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => setRows((r) => [...r, { shotNumber: nextShotNumber + r.length, score: '', x: '0', y: '0' }])}
+          onClick={() => setRows((r) => {
+            const maxNum = r.reduce((m, row) => Math.max(m, row.shotNumber), 0);
+            return [...r, { shotNumber: maxNum + 1, score: '', x: '0', y: '0' }];
+          })}
           className="btn btn-ghost text-xs py-2"
         >
           + Add row

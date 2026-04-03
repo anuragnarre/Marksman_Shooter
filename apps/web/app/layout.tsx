@@ -124,7 +124,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body className="bg-void text-text-primary antialiased font-body">
+      <body suppressHydrationWarning className="bg-void text-text-primary antialiased font-body">
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider>{children}</ToastProvider>

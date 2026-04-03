@@ -64,7 +64,7 @@ function RegisterPageInner() {
 
   return (
     <div
-      className="min-h-screen flex flex-col lg:flex-row bg-void relative overflow-hidden"
+      className="h-screen flex flex-col lg:flex-row bg-void relative"
       style={{ paddingTop: safeTopInset }}
     >
       <div
@@ -118,8 +118,11 @@ function RegisterPageInner() {
       </div>
 
       {/* ── Right form panel ────────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto">
-        <div className="w-full max-w-sm animate-slide-up">
+      {/* min-h-0 overrides the flex default that prevents shrinking below content    */}
+      {/* height — without it overflow-y-auto never activates on a flex-1 child.     */}
+      {/* On desktop (lg) we restore flex centering because the form fits the panel. */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-10 lg:flex lg:items-center lg:justify-center">
+        <div className="w-full max-w-sm mx-auto animate-slide-up">
 
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
