@@ -16,9 +16,9 @@ adjust automatically for a different warp size.
 
 import math
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
-from .target_specs import TargetType
+from .target_specs import TargetType, get_spec as _get_target_spec
 
 # ---------------------------------------------------------------------------
 # ISSF physical dimensions (source: official ISSF target spec JSON)
@@ -70,8 +70,8 @@ _ISSF_SPECS: Dict[TargetType, _ISSFSpec] = {
     TargetType.AIR_RIFLE_10M: _ISSFSpec(
         card_size_mm=170.0,
         ring_width_radius_mm=2.5,       # 10m Air Rifle: 2.5mm per ring (45.5mm / 10 rings / 2)
-        inner_ten_radius_mm=0.5,        # X-ring: 1.0mm diameter = 0.5mm radius
-        ten_ring_radius_mm=0.25,        # ring 10 outer: 0.5mm radius (outermost - 9*2.5mm = 0.25mm)
+        inner_ten_radius_mm=0.25,       # X-ring: 0.5mm diameter / 2 = 0.25mm radius (must be < ten_ring_radius_mm)
+        ten_ring_radius_mm=0.25,        # ring 10 outer: outer_radius(22.75) - 9×ring_width(2.5) = 0.25mm radius
         black_area_radius_mm=10.25,     # rings 6-10 are black: outer_radius(22.75) - 5×ring_width(2.5) = 10.25mm
     ),
     TargetType.NR_50M: _ISSFSpec(
@@ -82,11 +82,11 @@ _ISSF_SPECS: Dict[TargetType, _ISSFSpec] = {
         black_area_radius_mm=100.0,   # 9-ring outer radius
     ),
     TargetType.NR_25M_PISTOL: _ISSFSpec(
-        card_size_mm=550.0,
+        card_size_mm=500.0,           # outer ring diameter (not card size) so card_size/warp_size mm/px matches scorer
         ring_width_radius_mm=25.0,
         inner_ten_radius_mm=12.5,
         ten_ring_radius_mm=25.0,
-        black_area_radius_mm=100.0,
+        black_area_radius_mm=100.0,   # ring 7 outer = outer_radius(250) - 6*ring_width(25) = 100mm
     ),
 }
 
@@ -115,6 +115,8 @@ def get_decimal_score(
     shot_x: float,
     shot_y: float,
     warp_size: int = 1000,
+    apply_pellet_offset: bool = True,
+    mm_per_pixel_override: Optional[float] = None,
 ) -> ScoreResult:
     """
     Calculate the ISSF decimal score for a detected shot on a warped canvas.
@@ -122,22 +124,31 @@ def get_decimal_score(
     Steps
     -----
     1. Look up the card_size_mm and ring dimensions for target_type.
-    2. Compute ratio  = card_size_mm / warp_size  (mm per pixel).
+    2. Compute ratio = card_size_mm / warp_size (mm per pixel), or use
+       mm_per_pixel_override when the ring-calibrated value is available.
     3. Compute pixel distance from (shot_x, shot_y) to the canvas centre
        (warp_size/2, warp_size/2).
     4. Convert to mm:  dist_mm = pixel_dist * ratio.
-    5. Score = 10.9 - (dist_mm / ring_width_radius_mm), clamped to [0.0, 10.9].
-    6. is_inner_ten = dist_mm <= inner_ten_radius_mm.
+    5. Optionally subtract pellet radius (ISSF outer-edge rule).
+    6. Score = 10.9 - (dist_mm / ring_width_radius_mm), clamped to [0.0, 10.9].
+    7. is_inner_ten = dist_mm <= inner_ten_radius_mm.
 
     Args:
-        target_type: One of "air_pistol_10m", "air_rifle_10m",
-                     "nr_50m", "nr_25m".  Unknown types default to
-                     "air_rifle_10m".
-        shot_x:      X pixel coordinate on the warped canvas.
-        shot_y:      Y pixel coordinate on the warped canvas.
-        warp_size:   Side length of the warped canvas in pixels.
-                     Must match the value used in perspective.OUTPUT_SIZE
-                     (default 1000).
+        target_type:          One of "air_pistol_10m", "air_rifle_10m",
+                              "nr_50m", "nr_25m".  Unknown types default to
+                              "air_rifle_10m".
+        shot_x:               X pixel coordinate on the warped canvas.
+        shot_y:               Y pixel coordinate on the warped canvas.
+        warp_size:            Side length of the warped canvas in pixels.
+                              Must match the value used in perspective.OUTPUT_SIZE
+                              (default 1000).
+        apply_pellet_offset:  If True, apply the ISSF outer-edge rule by
+                              subtracting the pellet radius from dist_mm before
+                              scoring (default True — ISSF-correct behaviour).
+        mm_per_pixel_override: When provided, use this as the mm/px ratio instead
+                              of computing it from card_size_mm / warp_size.
+                              Pass calibration.mm_per_pixel for accurate results
+                              when the card warp may not fill the full canvas.
 
     Returns:
         ScoreResult with score, is_inner_ten, dist_mm, dist_px.
@@ -154,8 +165,11 @@ def get_decimal_score(
     """
     spec = _get_spec(target_type)
 
-    # Step 1-2: mm per pixel from card physical size
-    ratio = spec.card_size_mm / warp_size  # mm / px
+    # Step 1-2: mm per pixel — prefer ring-calibrated override when available
+    if mm_per_pixel_override and mm_per_pixel_override > 0:
+        ratio = mm_per_pixel_override
+    else:
+        ratio = spec.card_size_mm / warp_size  # mm / px
 
     # Step 3: pixel distance to canvas centre
     centre = warp_size / 2.0
@@ -164,11 +178,17 @@ def get_decimal_score(
     # Step 4: convert to mm
     dist_mm = dist_px * ratio
 
-    # Step 5: decimal score
+    # Step 5: ISSF outer-edge rule (optional)
+    if apply_pellet_offset:
+        target_spec = _get_target_spec(target_type)
+        pellet_r_mm = target_spec.pellet_diameter_mm / 2.0
+        dist_mm = max(0.0, dist_mm - pellet_r_mm)
+
+    # Step 6: decimal score
     raw = spec.max_score - (dist_mm / spec.ring_width_radius_mm)
     score = round(max(0.0, min(spec.max_score, raw)), 1)
 
-    # Step 6: inner ten (X-ring) check
+    # Step 7: inner ten (X-ring) check
     # A shot touching the X-ring line from the inside counts; add a small
     # epsilon to guard against floating-point rounding at the exact boundary.
     is_inner_ten = dist_mm <= spec.inner_ten_radius_mm + 1e-9
@@ -278,7 +298,7 @@ def calculate_decimal_score(
     >>> calculate_decimal_score(547, 500, "air_pistol_10m").score  # ~8mm out
     9.9
     """
-    return get_decimal_score(target_type, x, y, warp_size)
+    return get_decimal_score(target_type, x, y, warp_size, apply_pellet_offset=True)
 
 
 def _get_spec(target_type: str) -> _ISSFSpec:

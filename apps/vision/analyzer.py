@@ -7,18 +7,24 @@ Multi-stage local CV pipeline (v5 — CLAHE + YOLO augmentation):
   3. Perspective correction (4-corner card warp or ellipse → circle fallback)
   3.5 CLAHE enhancement (improve black-hole visibility on dark rings)
   4a. CV hole detection (disc-convolution zone-aware, always runs)
-  4b. YOLO hole detection (YOLOv8-S via ONNX Runtime, if model loaded)
+  4b. YOLO hole detection (YOLO26-S via ONNX Runtime, if model loaded)
   4c. NMS fusion (merge CV + YOLO candidates)
   5. ISSF decimal scoring
 """
 
 import base64
+import io as _io
 import logging
 import time
 from typing import Optional
 
 import cv2
 import numpy as np
+
+# Fail loudly at import time if Pillow is missing — a silent failure at
+# EXIF-correction time causes all phone photos to arrive rotated, breaking
+# target detection.  Install with: pip install Pillow>=10.0.0
+from PIL import Image as _PILImage, ExifTags as _ExifTags
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +36,7 @@ from pipeline.perspective import correct_perspective
 from pipeline.clahe import apply_clahe, apply_clahe_to_bullseye, bullseye_radius_from_calibration
 from pipeline.calibration_engine import get_mm_per_pixel, get_black_area_radius_mm
 from pipeline.hole_detector import detect_holes
+from pipeline.differencer import compute_difference_image
 from pipeline.yolo_detector import detect_holes_yolo, _yolo_available
 from pipeline.mask_detector import detect_holes_mask, _mask_available
 from pipeline.nms import fuse_candidates
@@ -80,9 +87,10 @@ def analyze_target_image(
     # EXIF orientation fix — must run before any shape reads.
     # WhatsApp/phone photos commonly arrive at orientation 6 (90° CW),
     # causing the target to appear sideways and detection to fail entirely.
+    # Primary path: Pillow (fast, handles all EXIF types).
+    # Fallback: piexif (lighter, works when Pillow PIL EXIF API changes).
+    _exif_orientation = 1  # default: no rotation
     try:
-        import io as _io
-        from PIL import Image as _PILImage, ExifTags as _ExifTags
         _pil = _PILImage.open(_io.BytesIO(image_bytes))
         _exif = _pil._getexif()
         if _exif:
@@ -90,25 +98,32 @@ def analyze_target_image(
                 (k for k, v in _ExifTags.TAGS.items() if v == 'Orientation'), None
             )
             if _ori_key and _ori_key in _exif:
-                _o = _exif[_ori_key]
-                if _o == 3:
-                    img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_180)
-                elif _o == 6:
-                    img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_CLOCKWISE)
-                elif _o == 8:
-                    img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                elif _o == 2:
-                    img_bgr = cv2.flip(img_bgr, 1)
-                elif _o == 4:
-                    img_bgr = cv2.flip(img_bgr, 0)
-                elif _o == 5:
-                    img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_CLOCKWISE)
-                    img_bgr = cv2.flip(img_bgr, 1)
-                elif _o == 7:
-                    img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
-                    img_bgr = cv2.flip(img_bgr, 1)
+                _exif_orientation = _exif[_ori_key]
     except Exception:
-        pass  # Non-fatal: malformed EXIF or non-JPEG format
+        # Pillow path failed (malformed EXIF, non-JPEG, etc.) — try piexif fallback
+        try:
+            import piexif
+            _exif_dict = piexif.load(image_bytes)
+            _exif_orientation = _exif_dict.get("0th", {}).get(piexif.ImageIFD.Orientation, 1)
+        except Exception:
+            pass  # Both parsers failed — keep orientation=1 (no rotation)
+
+    if _exif_orientation == 3:
+        img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_180)
+    elif _exif_orientation == 6:
+        img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_CLOCKWISE)
+    elif _exif_orientation == 8:
+        img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    elif _exif_orientation == 2:
+        img_bgr = cv2.flip(img_bgr, 1)
+    elif _exif_orientation == 4:
+        img_bgr = cv2.flip(img_bgr, 0)
+    elif _exif_orientation == 5:
+        img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_CLOCKWISE)
+        img_bgr = cv2.flip(img_bgr, 1)
+    elif _exif_orientation == 7:
+        img_bgr = cv2.rotate(img_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        img_bgr = cv2.flip(img_bgr, 1)
 
     img_h, img_w = img_bgr.shape[:2]
 
@@ -153,6 +168,11 @@ def analyze_target_image(
             image_width=img_w,
             image_height=img_h,
             processing_time_ms=round(elapsed_ms, 2),
+            warp_center_x=500.0,
+            warp_center_y=500.0,
+            warp_width=1000,
+            warp_height=1000,
+            warp_mm_per_pixel=0.17,
         )
 
     # Stage 3: Perspective correction
@@ -194,12 +214,21 @@ def analyze_target_image(
     if bullseye_r_px > 0:
         gray = apply_clahe_to_bullseye(gray, calibration.center, bullseye_r_px)
 
+    # Stage 3.5c: Difference image (synthetic template subtraction)
+    diff_img = compute_difference_image(
+        gray, calibration,
+        target_type=target_type,
+        blur_score=quality.blur_score,
+    )
+
     # Stage 4a: CV hole detection (always runs)
     spec = get_spec(target_type)
     cv_holes = detect_holes(gray, calibration, spec.pellet_diameter_mm,
-                            dark_center_rings=spec.dark_center_rings)
+                            dark_center_rings=spec.dark_center_rings,
+                            target_type=target_type,
+                            diff_img=diff_img)
 
-    # Stage 4b: YOLOv11-L hole detection (runs only when model is loaded)
+    # Stage 4b: YOLO26-S hole detection (runs only when model is loaded)
     yolo_holes = detect_holes_yolo(gray, calibration, target_type) if _yolo_available else []
 
     # Stage 4c: Mask R-CNN pixel-precise detection / refinement
@@ -253,6 +282,11 @@ def analyze_target_image(
         image_width=img_w,
         image_height=img_h,
         processing_time_ms=round(elapsed_ms, 2),
+        warp_center_x=float(calibration.center[0]),
+        warp_center_y=float(calibration.center[1]),
+        warp_width=int(img_bgr.shape[1]),
+        warp_height=int(img_bgr.shape[0]),
+        warp_mm_per_pixel=float(calibration.mm_per_pixel),
     )
 
     if debug:

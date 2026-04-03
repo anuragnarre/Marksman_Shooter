@@ -24,3 +24,10 @@ class AnalysisResponse(BaseModel):
     image_height: int
     processing_time_ms: float
     debug_image: Optional[str] = Field(None, description="Base64-encoded annotated debug image (only when debug=true)")
+    # Warp-space metadata — tells the frontend exactly which coordinate system
+    # pixel_x/pixel_y live in so it can render shots at the correct position.
+    warp_center_x: float = Field(500.0, description="Target centre X in warped image space")
+    warp_center_y: float = Field(500.0, description="Target centre Y in warped image space")
+    warp_width: int = Field(1000, description="Width of warped working image in pixels")
+    warp_height: int = Field(1000, description="Height of warped working image in pixels")
+    warp_mm_per_pixel: float = Field(0.17, description="mm per pixel in warped image space")

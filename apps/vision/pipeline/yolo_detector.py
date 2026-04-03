@@ -1,4 +1,4 @@
-"""YOLOv8-S bullet-hole detector via ONNX Runtime.
+"""YOLO26-S bullet-hole detector via ONNX Runtime.
 
 At startup, call load_yolo_model() once.  If the model file is absent, the
 module sets _yolo_available = False and every call to detect_holes_yolo()
@@ -27,7 +27,7 @@ Inference backend
 -----------------
 Uses onnxruntime (CPU) at inference time — no torch required in production.
 Export the trained model once:
-    from models_export.export_tflite import export_yolov8s_to_tflite
+    from models_export.export_tflite import export_yolo26s_to_tflite
 """
 
 import logging
@@ -48,7 +48,16 @@ logger = logging.getLogger(__name__)
 _ort_session = None        # onnxruntime.InferenceSession when loaded
 _yolo_available: bool = False
 
-YOLO_INPUT_SIZE   = 640    # model native resolution (px)
+YOLO_INPUT_SIZE   = 1280   # model native resolution (px) — matches training imgsz
+
+# Ordered list of model paths tried by load_yolo_model() when no explicit path is given.
+# First file that exists and loads successfully wins.
+CANDIDATE_PATHS = [
+    "models/shot_detector_yolo26s.onnx",
+    "models/shot_detector_yolo26s.pt",
+    "models/shot_detector.onnx",
+    "models/shot_detector_yolo26s_yolo26s.onnx",
+]
 
 # 4-quadrant SAHI layout on a 1000×1000 canvas
 # Each tile is TILE_SIZE×TILE_SIZE; the overlap ensures boundary holes appear
@@ -67,40 +76,43 @@ SAHI_MERGE_IOU    = 0.45   # cross-tile NMS threshold
 # Public API
 # ---------------------------------------------------------------------------
 
-def load_yolo_model(model_path: str = "models/shot_detector.onnx") -> bool:
+def load_yolo_model(model_path: str = "") -> bool:
     """
     Load the ONNX shot-detector model.
 
-    Silent no-op (returns False) when the file does not exist.
-    Safe to call multiple times.
+    When model_path is empty, tries each path in CANDIDATE_PATHS in order
+    and loads the first one that exists.  Silent no-op (returns False) when
+    no candidate is found.  Safe to call multiple times.
 
     Returns:
-        True if the model loaded successfully, False otherwise.
+        True if a model loaded successfully, False otherwise.
     """
     global _ort_session, _yolo_available
 
-    if not os.path.exists(model_path):
-        logger.info("YOLO model not found at %s — running CV-only mode.", model_path)
-        _yolo_available = False
-        return False
+    candidates = [model_path] if model_path else CANDIDATE_PATHS
 
-    try:
-        import onnxruntime as ort
+    for path in candidates:
+        if not path or not os.path.exists(path):
+            continue
+        try:
+            import onnxruntime as ort
 
-        opts = ort.SessionOptions()
-        opts.log_severity_level = 3
-        _ort_session = ort.InferenceSession(
-            model_path,
-            sess_options=opts,
-            providers=["CPUExecutionProvider"],
-        )
-        _yolo_available = True
-        logger.info("YOLO model loaded from %s", model_path)
-        return True
-    except Exception as exc:
-        logger.warning("Failed to load YOLO model: %s", exc)
-        _yolo_available = False
-        return False
+            opts = ort.SessionOptions()
+            opts.log_severity_level = 3
+            _ort_session = ort.InferenceSession(
+                path,
+                sess_options=opts,
+                providers=["CPUExecutionProvider"],
+            )
+            _yolo_available = True
+            logger.info("YOLO model loaded from %s", path)
+            return True
+        except Exception as exc:
+            logger.warning("Failed to load YOLO model from %s: %s", path, exc)
+
+    logger.info("No YOLO model found in candidates — running CV-only mode.")
+    _yolo_available = False
+    return False
 
 
 def detect_holes_yolo(
@@ -110,7 +122,7 @@ def detect_holes_yolo(
     conf_threshold: float = 0.25,
 ) -> List[FusedHole]:
     """
-    Run YOLOv8-S inference on a warped grayscale image.
+    Run YOLO26-S inference on a warped grayscale image.
 
     Uses 4-quadrant SAHI to ensure tiny holes near tile boundaries are caught.
     Each detection's centroid is refined using pixel-intensity moments for
@@ -194,7 +206,7 @@ def _sahi_four_quadrant(
 
         tile_boxes = _run_inference(tile, conf_threshold)
 
-        # Map tile-space (640 model output) → full canvas space
+        # Map tile-space (YOLO_INPUT_SIZE model output) → full canvas space
         for cx_t, cy_t, bw_t, bh_t, conf in tile_boxes:
             # tile_space coords are in the range [0, YOLO_INPUT_SIZE]
             # First map back to tile pixel space, then to full canvas
@@ -291,7 +303,7 @@ def _run_inference(
     inp = cv2.resize(img_uint8, (YOLO_INPUT_SIZE, YOLO_INPUT_SIZE),
                      interpolation=cv2.INTER_LINEAR)
     inp_f = inp.astype(np.float32) / 255.0
-    inp_chw = np.expand_dims(inp_f.transpose(2, 0, 1), axis=0)  # (1,3,640,640)
+    inp_chw = np.expand_dims(inp_f.transpose(2, 0, 1), axis=0)  # (1,3,H,H)
 
     outputs = _ort_session.run(None, {"images": inp_chw})
     return _parse_yolov8_output(outputs[0], conf_threshold)
@@ -302,7 +314,7 @@ def _parse_yolov8_output(
     conf_threshold: float,
 ) -> List[Tuple[float, float, float, float, float]]:
     """
-    Parse YOLOv8 ONNX output → (cx, cy, w, h, conf) list.
+    Parse YOLO26 ONNX output → (cx, cy, w, h, conf) list.
 
     Handles both transposed formats:
         Format A: (1, num_anchors, 4+num_classes)

@@ -184,7 +184,7 @@ export function TopBar({
         {onCommandPalette && (
           <button
             onClick={onCommandPalette}
-            className="hidden md:flex lg:hidden items-center justify-center w-9 h-9 rounded-xl
+            className="flex lg:hidden items-center justify-center w-9 h-9 rounded-xl
                        transition-all duration-200 active:scale-90"
             style={{
               background: 'var(--chip-bg)',

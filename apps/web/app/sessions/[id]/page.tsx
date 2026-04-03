@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { isNative, getNativePhoto, requestCameraPermission, hapticSuccess, hapticError } from '../../../lib/capacitor';
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../../../lib/api';
-import { scoreFromCoords } from '../../../lib/draw-target';
+import { scoreFromCoords, drawTarget, ISSF_TARGET_SPECS } from '../../../lib/draw-target';
 import { formatSessionStart } from '../../../lib/session-time';
 import { AppShell } from '../../../components/AppShell';
 import { TargetCanvas } from '../../../components/TargetCanvas';
@@ -150,7 +150,12 @@ function SessionDetailInner() {
           </div>
           <p className="font-display font-semibold text-lg text-text-primary mb-2">Session not found</p>
           <p className="text-text-muted text-sm mb-6">This session may have been deleted or you don&apos;t have access.</p>
-          <Link href="/sessions" className="btn btn-primary">← Back to Sessions</Link>
+          <div className="flex items-center gap-3 justify-center">
+            <button onClick={() => { setLoadError(false); setLoading(true); void loadAll(); }} className="btn btn-ghost">
+              Retry
+            </button>
+            <Link href="/sessions" className="btn btn-primary">← Back to Sessions</Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
@@ -277,6 +282,7 @@ function SessionDetailInner() {
                   nextShotNumber={shots.length + 1}
                   onShotsAdded={loadAll}
                   shooterId={shooterId ?? undefined}
+                  targetType={session ? disciplineToTargetType(session.discipline) : 'air_rifle_10m'}
                 />
               )}
 
@@ -304,7 +310,8 @@ function SessionDetailInner() {
               <h3 className="font-display font-semibold text-base text-text-primary mb-4">
                 Target View
               </h3>
-              <TargetCanvas shots={shots} mpi={analytics?.mpi} size={isMobile ? 320 : 420} />
+              <TargetCanvas shots={shots} mpi={analytics?.mpi} size={isMobile ? 320 : 420}
+                targetType={session ? disciplineToTargetType(session.discipline) : 'air_rifle_10m'} />
             </div>
 
             {/* Right column — 5 cols */}
@@ -838,11 +845,13 @@ function AddShotsPanel({
   nextShotNumber,
   onShotsAdded,
   shooterId,
+  targetType = 'air_rifle_10m',
 }: {
   sessionId: string;
   nextShotNumber: number;
   onShotsAdded: () => void;
   shooterId?: string;
+  targetType?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [tab,  setTab]  = useState<AddShotsTab>('interactive');
@@ -897,7 +906,7 @@ function AddShotsPanel({
           {/* Tab content */}
           <div className="p-5">
             {tab === 'interactive' && (
-              <InteractiveTab sessionId={sessionId} nextShotNumber={nextShotNumber} onSuccess={onShotsAdded} />
+              <InteractiveTab sessionId={sessionId} nextShotNumber={nextShotNumber} onSuccess={onShotsAdded} targetType={targetType} />
             )}
             {tab === 'manual' && (
               <ManualTab sessionId={sessionId} nextShotNumber={nextShotNumber} onSuccess={onShotsAdded} />
@@ -913,6 +922,16 @@ function AddShotsPanel({
       )}
     </div>
   );
+}
+
+// ── Discipline → ISSF target type ────────────────────────────────────────────
+
+function disciplineToTargetType(discipline: string): string {
+  const d = discipline.toLowerCase();
+  if (d.includes('pistol'))                    return 'air_pistol_10m';
+  if (d.includes('50') || d.includes('free'))  return 'nr_50m';
+  if (d.includes('25') || d.includes('stand')) return 'nr_25m';
+  return 'air_rifle_10m';
 }
 
 // ── Tab: Interactive Target ───────────────────────────────────────────────────
@@ -951,25 +970,17 @@ function directionColor(dir: string): string {
   return '#8892A4';
 }
 
-function ringFill(n: number): string {
-  if (n <= 3) return '#1a1a2e';
-  if (n <= 6) return '#16213e';
-  if (n <= 8) return '#0f3460';
-  return '#f8f8f8';
-}
-
-function ringRadius(n: number, maxR: number): number {
-  return maxR * Math.pow((11 - n) / 10, 1.7);
-}
 
 function InteractiveTab({
   sessionId,
   nextShotNumber,
   onSuccess,
+  targetType = 'air_rifle_10m',
 }: {
   sessionId: string;
   nextShotNumber: number;
   onSuccess: () => void;
+  targetType?: string;
 }) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const [shots, setShots]             = useState<PlacedShot[]>([]);
@@ -1031,44 +1042,18 @@ function InteractiveTab({
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // Background radial gradient
-    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, CANVAS_SIZE * 0.7);
-    const cs = getComputedStyle(document.documentElement);
-    bg.addColorStop(0, cs.getPropertyValue('--bg-surface').trim() || '#0d1117');
-    bg.addColorStop(1, cs.getPropertyValue('--bg-void').trim() || '#080A0F');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    // Draw ISSF target base (rings, background) — no shots yet
+    drawTarget(ctx, { size: CANVAS_SIZE, shots: [], targetType, zoom: 1 });
 
-    // Scoring rings (1=outermost → 10=innermost)
-    for (let n = 1; n <= 10; n++) {
-      const r = ringRadius(n, drawR);
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = ringFill(n);
-      ctx.fill();
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth   = n === 10 ? 1.5 : 0.8;
-      ctx.stroke();
-    }
+    // Compute dark zone boundary in normalised ±10 space
+    const spec = ISSF_TARGET_SPECS[targetType] ?? ISSF_TARGET_SPECS['air_rifle_10m'];
+    const { outerRadiusMm, ringWidthMm, darkCenterRings } = spec;
+    const firstDarkRing   = 11 - darkCenterRings;
+    const darkZoneOuterMm = outerRadiusMm - (firstDarkRing - 1) * ringWidthMm;
+    const darkZoneNorm    = Math.max(0, (10 * darkZoneOuterMm) / outerRadiusMm);
 
-    // X-ring amber tint
-    const xR = ringRadius(10, drawR) * 0.35;
-    ctx.beginPath();
-    ctx.arc(cx, cy, xR, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(245,166,35,0.35)';
-    ctx.fill();
-
-    // Dashed crosshair
-    ctx.setLineDash([4, 6]);
-    ctx.strokeStyle = '#1E2D3D';
-    ctx.lineWidth   = 0.8;
-    ctx.beginPath(); ctx.moveTo(cx - drawR, cy); ctx.lineTo(cx + drawR, cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx, cy - drawR); ctx.lineTo(cx, cy + drawR); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // ── Shot markers ──────────────────────────────────────────────────────────
+    // ── Interactive shot markers ───────────────────────────────────────────────
     shots.forEach((shot, i) => {
       const px      = cx + (shot.x / TARGET_EXTENT) * drawR;
       const py      = cy - (shot.y / TARGET_EXTENT) * drawR;
@@ -1076,12 +1061,13 @@ function InteractiveTab({
       const isDrag  = draggingIndex === i;
       const isHover = hoverIndex === i && draggingIndex === null;
       const dotR    = isDrag ? 9 : isHover ? 7.5 : 6;
+      const inDark  = Math.sqrt(shot.x * shot.x + shot.y * shot.y) < darkZoneNorm;
 
-      // Outer selection ring — dashed for hover, solid for drag
+      // Selection ring (hover / drag)
       if (isDrag || isHover) {
-        const ringR = isDrag ? 17 : 13;
+        const selR = isDrag ? 17 : 13;
         ctx.beginPath();
-        ctx.arc(px, py, ringR, 0, Math.PI * 2);
+        ctx.arc(px, py, selR, 0, Math.PI * 2);
         ctx.strokeStyle = isDrag ? `${color}aa` : `${color}55`;
         ctx.lineWidth   = isDrag ? 2 : 1;
         if (isHover) ctx.setLineDash([2, 3]);
@@ -1089,28 +1075,35 @@ function InteractiveTab({
         ctx.setLineDash([]);
       }
 
-      // Glow shadow
+      // Glow
       ctx.shadowColor = color;
       ctx.shadowBlur  = isDrag ? 22 : isHover ? 14 : 8;
+
+      // Bullet hole (near-black)
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
-      ctx.fillStyle = color;
+      ctx.fillStyle = '#111111';
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // White outline
+      // Score-colour ring
       ctx.beginPath();
-      ctx.arc(px, py, dotR + 1.2, 0, Math.PI * 2);
-      ctx.strokeStyle = isDrag
-        ? 'rgba(255,255,255,0.95)'
-        : isHover
-        ? 'rgba(255,255,255,0.75)'
-        : 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = isDrag ? 2 : 1.5;
+      ctx.arc(px, py, dotR + 1.5, 0, Math.PI * 2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = 1.8;
       ctx.stroke();
 
-      // Shot number label
-      ctx.fillStyle    = '#080A0F';
+      // Contrast outer ring
+      ctx.beginPath();
+      ctx.arc(px, py, dotR + 2.8, 0, Math.PI * 2);
+      ctx.strokeStyle = inDark
+        ? (isDrag ? 'rgba(255,255,255,0.7)' : isHover ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.3)')
+        : (isDrag ? 'rgba(0,0,0,0.5)'       : isHover ? 'rgba(0,0,0,0.35)'      : 'rgba(0,0,0,0.2)');
+      ctx.lineWidth = isDrag ? 1.5 : 1;
+      ctx.stroke();
+
+      // Shot number label — always white because dot fill is always near-black (#111111)
+      ctx.fillStyle    = 'rgba(255,255,255,0.92)';
       ctx.font         = `bold ${dotR >= 9 ? 9 : 8}px monospace`;
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
@@ -1119,13 +1112,13 @@ function InteractiveTab({
 
     // Placement hint when canvas is empty
     if (shots.length === 0) {
-      ctx.fillStyle    = 'rgba(245,166,35,0.25)';
+      ctx.fillStyle    = 'rgba(245,166,35,0.5)';
       ctx.font         = '13px "Rajdhani", monospace';
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('Click anywhere to place a shot', cx, CANVAS_SIZE - 18);
     }
-  }, [shots, draggingIndex, hoverIndex, cx, cy, drawR]);
+  }, [shots, draggingIndex, hoverIndex, targetType, cx, cy, drawR]);
 
   useEffect(() => { drawCanvas(); }, [drawCanvas]);
 
@@ -1151,7 +1144,7 @@ function InteractiveTab({
       // ── Drag: reposition the grabbed shot in real time ──────────────────
       let [tx, ty] = pixelToTarget(e.clientX, e.clientY);
       [tx, ty]     = clampToTarget(tx, ty);
-      const score  = scoreFromCoords(tx, ty);
+      const score  = scoreFromCoords(tx, ty, targetType);
 
       setShots((prev) =>
         prev.map((s, i) => (i === draggingIndex ? { ...s, x: tx, y: ty, score } : s)),
@@ -1203,7 +1196,7 @@ function InteractiveTab({
       if (moved < DRAG_THRESHOLD) {
         let [tx, ty] = pixelToTarget(e.clientX, e.clientY);
         [tx, ty]     = clampToTarget(tx, ty);
-        const score  = scoreFromCoords(tx, ty);
+        const score  = scoreFromCoords(tx, ty, targetType);
         setShots((prev) => [
           ...prev,
           { x: tx, y: ty, score, shotNumber: nextShotNumber + prev.length },
@@ -1560,6 +1553,7 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
   const [overlayShots, setOverlayShots] = useState<VisionShotResult[] | null>(null);
   const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
   const [pendingShots, setPendingShots] = useState<VisionShotResult[] | null>(null);
+  const [warpInfo, setWarpInfo] = useState<{ centerX: number; centerY: number; width: number; height: number; mmPerPixel: number }>({ centerX: 500, centerY: 500, width: 1000, height: 1000, mmPerPixel: 0.17 });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef     = useRef<HTMLVideoElement>(null);
@@ -1740,6 +1734,11 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         targetDetected: boolean;
         processingTimeMs: number;
         savedShots: Shot[];
+        warpCenterX?: number;
+        warpCenterY?: number;
+        warpWidth?: number;
+        warpHeight?: number;
+        warpMmPerPixel?: number;
       }>(
         `/shots/analyze-photo?sessionId=${sessionId}&targetType=${targetType}&save=false`,
         { method: 'POST', body: formData, headers: {} },
@@ -1753,6 +1752,13 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
         return;
       }
 
+      setWarpInfo({
+        centerX:    res.warpCenterX   ?? 500,
+        centerY:    res.warpCenterY   ?? 500,
+        width:      res.warpWidth     ?? 1000,
+        height:     res.warpHeight    ?? 1000,
+        mmPerPixel: res.warpMmPerPixel ?? 0.17,
+      });
       setPendingShots(res.shots);
       setState('reviewing');
     } catch (e) {
@@ -2000,6 +2006,11 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
           imageObjectUrl={imageObjectUrl}
           shots={pendingShots}
           targetType={targetType}
+          warpCenterX={warpInfo.centerX}
+          warpCenterY={warpInfo.centerY}
+          warpWidth={warpInfo.width}
+          warpHeight={warpInfo.height}
+          warpMmPerPixel={warpInfo.mmPerPixel}
           onConfirm={handleConfirm}
           onCancel={() => {
             if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
@@ -2031,17 +2042,22 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
             ✓ Detected and imported {result.shots} shot{result.shots !== 1 ? 's' : ''}
           </div>
           {overlayShots && imageObjectUrl && (
-            <div className="flex flex-col items-center gap-3">
-              <p className="text-text-muted text-xs font-display uppercase tracking-widest self-start">
+            <div className="flex flex-col gap-3">
+              <p className="text-text-muted text-xs font-display uppercase tracking-widest">
                 Shot Overlay
               </p>
               <ShotOverlayCanvas
                 imageUrl={imageObjectUrl}
                 shots={overlayShots}
-                displaySize={Math.min(320, window.innerWidth - 80)}
+                targetType={targetType}
+                warpCenterX={warpInfo.centerX}
+                warpCenterY={warpInfo.centerY}
+                warpWidth={warpInfo.width}
+                warpHeight={warpInfo.height}
+                warpMmPerPixel={warpInfo.mmPerPixel}
+                displaySize={400}
                 showScores
                 showNumbers
-                className="mx-auto"
               />
             </div>
           )}

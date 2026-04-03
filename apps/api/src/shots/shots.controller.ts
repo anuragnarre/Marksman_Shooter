@@ -129,7 +129,7 @@ export class ShotsController {
     @Query('targetType') targetType: string | undefined,
     @Query('shooterId') shooterId: string | undefined,
     @Query('save') save?: string,
-  ): Promise<{ shots: VisionShotResult[]; targetDetected: boolean; processingTimeMs: number; savedShots: Shot[] }> {
+  ): Promise<{ shots: VisionShotResult[]; targetDetected: boolean; processingTimeMs: number; savedShots: Shot[]; warpCenterX: number; warpCenterY: number; warpWidth: number; warpHeight: number; warpMmPerPixel: number }> {
     if (!file) {
       throw new BadRequestException('No image file uploaded');
     }

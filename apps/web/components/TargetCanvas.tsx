@@ -14,11 +14,12 @@ interface TargetCanvasProps {
   shots: Shot[];
   mpi?: MeanPointOfImpact;
   size?: number;
+  targetType?: string;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function TargetCanvas({ shots, mpi, size = 460 }: TargetCanvasProps) {
+export function TargetCanvas({ shots, mpi, size = 460, targetType = 'air_rifle_10m' }: TargetCanvasProps) {
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom]       = useState(1);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; text: string } | null>(null);
@@ -39,7 +40,7 @@ export function TargetCanvas({ shots, mpi, size = 460 }: TargetCanvasProps) {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      drawTarget(ctx, { size, zoom, shots, mpi, shotScales });
+      drawTarget(ctx, { size, zoom, shots, mpi, shotScales, targetType });
     },
     [shots, mpi, zoom, size],
   );

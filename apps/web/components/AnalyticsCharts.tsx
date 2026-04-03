@@ -25,7 +25,7 @@ import type { Shot } from '@shooting-platform/shared-types';
 
 // ── Shared chart theme ────────────────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 8, right: 8, bottom: 4, left: -20 };
+const CHART_MARGIN = { top: 8, right: 8, bottom: 4, left: 0 };
 
 const AXIS_STYLE = {
   tick: { fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-jetbrains)' },

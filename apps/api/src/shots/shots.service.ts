@@ -186,6 +186,11 @@ export class ShotsService {
     targetDetected: boolean;
     processingTimeMs: number;
     savedShots: Shot[];
+    warpCenterX: number;
+    warpCenterY: number;
+    warpWidth: number;
+    warpHeight: number;
+    warpMmPerPixel: number;
   }> {
     const visionUrl = process.env.VISION_SERVICE_URL;
     if (!visionUrl) {
@@ -228,6 +233,11 @@ export class ShotsService {
       }>;
       target_detected: boolean;
       processing_time_ms: number;
+      warp_center_x?: number;
+      warp_center_y?: number;
+      warp_width?: number;
+      warp_height?: number;
+      warp_mm_per_pixel?: number;
     };
 
     if (!Array.isArray(raw.shots)) {
@@ -253,12 +263,21 @@ export class ShotsService {
       y:          s.y,
     }));
 
+    const warpMeta = {
+      warpCenterX:   raw.warp_center_x   ?? 500,
+      warpCenterY:   raw.warp_center_y   ?? 500,
+      warpWidth:     raw.warp_width      ?? 1000,
+      warpHeight:    raw.warp_height     ?? 1000,
+      warpMmPerPixel: raw.warp_mm_per_pixel ?? 0.17,
+    };
+
     if (visionShots.length === 0) {
       return {
         shots:            [],
         targetDetected:   raw.target_detected,
         processingTimeMs: raw.processing_time_ms,
         savedShots:       [],
+        ...warpMeta,
       };
     }
 
@@ -271,6 +290,7 @@ export class ShotsService {
       targetDetected:   raw.target_detected,
       processingTimeMs: raw.processing_time_ms,
       savedShots,
+      ...warpMeta,
     };
   }
 

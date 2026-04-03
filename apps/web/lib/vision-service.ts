@@ -4,7 +4,7 @@
  * Capacitor-aware service that:
  *  1. Captures a high-resolution photo from the native camera (or gallery).
  *  2. Passes the image buffer to the NestJS API, which proxies it to the
- *     FastAPI vision service running the OpenCV + YOLOv8-S pipeline.
+ *     FastAPI vision service running the OpenCV + YOLO26-S pipeline.
  *  3. Returns typed VisionAnalysisResponse results ready for the UI.
  *
  * Camera quality is set to 95 (vs. 88 for thumbnails) so that tiny .22-cal
@@ -80,11 +80,19 @@ export function calculateDecimalScore(
   x: number,
   y: number,
   targetType: TargetType,
+  /** Warp canvas size in px (used when mmPerPixel not provided). Default 1000. */
   warpSize = 1000,
+  /** Actual target centre X in warp space. Defaults to warpSize/2. */
+  centerX?: number,
+  /** Actual target centre Y in warp space. Defaults to warpSize/2. */
+  centerY?: number,
+  /** mm per pixel in warp space — preferred over card formula when provided. */
+  mmPerPixel?: number,
 ): DecimalScoreResult {
-  const centre = warpSize / 2;
-  const distPx = Math.sqrt((x - centre) ** 2 + (y - centre) ** 2);
-  const ratio  = CARD_SIZE_MM[targetType] / warpSize;
+  const cx = centerX ?? warpSize / 2;
+  const cy = centerY ?? warpSize / 2;
+  const distPx = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+  const ratio  = mmPerPixel ?? (CARD_SIZE_MM[targetType] / warpSize);
   const distMm = distPx * ratio;
 
   const raw      = 10.9 - distMm / RING_WIDTH_MM[targetType];
@@ -149,6 +157,14 @@ export interface AnalysisOptions {
   debug?: boolean;
 }
 
+export interface WarpInfo {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+  mmPerPixel: number;
+}
+
 export interface AnalysisResult {
   /** Shots returned by the vision service, enriched with client-side scores. */
   shots: VisionShotResult[];
@@ -160,6 +176,8 @@ export interface AnalysisResult {
   debugImageBase64?: string;
   /** The image sent for analysis, as an object URL for overlay rendering. */
   imageObjectUrl: string | null;
+  /** Warp-space metadata: coordinate system that pixel_x/pixel_y live in. */
+  warpInfo: WarpInfo;
 }
 
 /**
@@ -202,6 +220,11 @@ export async function analyzeTarget(opts: AnalysisOptions): Promise<AnalysisResu
     target_detected: boolean;
     processing_time_ms: number;
     debug_image?: string;
+    warpCenterX?: number;
+    warpCenterY?: number;
+    warpWidth?: number;
+    warpHeight?: number;
+    warpMmPerPixel?: number;
   }>(`/shots/analyze-photo?sessionId=${opts.sessionId}`, {
     method: 'POST',
     body: form,
@@ -226,6 +249,13 @@ export async function analyzeTarget(opts: AnalysisOptions): Promise<AnalysisResu
     processingTimeMs: raw.processing_time_ms,
     debugImageBase64: raw.debug_image,
     imageObjectUrl,
+    warpInfo: {
+      centerX:    raw.warpCenterX   ?? 500,
+      centerY:    raw.warpCenterY   ?? 500,
+      width:      raw.warpWidth     ?? 1000,
+      height:     raw.warpHeight    ?? 1000,
+      mmPerPixel: raw.warpMmPerPixel ?? 0.17,
+    },
   };
 }
 

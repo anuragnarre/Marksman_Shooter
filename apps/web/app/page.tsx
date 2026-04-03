@@ -301,7 +301,7 @@ const TRUST_ITEMS = [
 function TrustMarquee() {
   const items = [...TRUST_ITEMS, ...TRUST_ITEMS];
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden group">
       <div
         className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to right, var(--bg-surface), transparent)' }}
@@ -310,10 +310,7 @@ function TrustMarquee() {
         className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to left, var(--bg-surface), transparent)' }}
       />
-      <div
-        className="flex gap-6 py-3"
-        style={{ animation: 'lp-marquee 32s linear infinite', width: 'max-content' }}
-      >
+      <div className="lp-ticker-animate flex gap-6 py-3">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-3 whitespace-nowrap">
             <span
@@ -536,6 +533,16 @@ function StatsSection() {
   );
 }
 
+// ─── Tier badge styles ────────────────────────────────────────────────────────
+const TIER_STYLES: Record<string, { bg: string; color: string; border: string }> = {
+  Core:   { bg: 'rgba(255,255,255,0.06)',  color: 'var(--text-secondary)', border: 'rgba(255,255,255,0.10)' },
+  Pro:    { bg: 'rgba(245,166,35,0.10)',   color: '#F5A623',               border: 'rgba(245,166,35,0.25)'  },
+  Teams:  { bg: 'rgba(79,195,247,0.10)',   color: '#4FC3F7',               border: 'rgba(79,195,247,0.25)'  },
+  AI:     { bg: 'rgba(0,229,160,0.10)',    color: '#00E5A0',               border: 'rgba(0,229,160,0.25)'   },
+  Vision: { bg: 'rgba(79,195,247,0.10)',   color: '#4FC3F7',               border: 'rgba(79,195,247,0.25)'  },
+  Export: { bg: 'rgba(255,255,255,0.06)',  color: 'var(--text-secondary)', border: 'rgba(255,255,255,0.10)' },
+};
+
 // ─── Bento Grid Features ──────────────────────────────────────────────────────
 const BENTO_FEATURES = [
   {
@@ -638,7 +645,14 @@ function BentoFeaturesSection() {
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${feat.color}16`, border: `1px solid ${feat.color}30`, color: feat.color }}>
                       {feat.icon}
                     </div>
-                    <span className="font-display font-bold text-[10px] tracking-widest uppercase px-2 py-0.5 rounded-full" style={{ background: `${feat.color}14`, border: `1px solid ${feat.color}30`, color: feat.color }}>
+                    <span
+                      className="font-mono text-[10px] tracking-widest uppercase px-2 py-0.5 rounded border"
+                      style={{
+                        background: TIER_STYLES[feat.tag]?.bg ?? 'rgba(255,255,255,0.06)',
+                        color: TIER_STYLES[feat.tag]?.color ?? 'var(--text-secondary)',
+                        border: `1px solid ${TIER_STYLES[feat.tag]?.border ?? 'rgba(255,255,255,0.10)'}`,
+                      }}
+                    >
                       {feat.tag}
                     </span>
                   </div>
@@ -799,6 +813,10 @@ function TestimonialsSection() {
             </div>
           ))}
         </div>
+        <p className="text-center font-body text-xs mt-10 max-w-lg mx-auto" style={{ color: 'var(--text-muted)' }}>
+          * Testimonials are representative examples. Performance results vary by athlete and training regimen.
+          Marksman is currently in beta.
+        </p>
       </div>
     </section>
   );
@@ -878,6 +896,8 @@ export default function HomePage() {
           from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(3px); }
           to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
+        .lp-ticker-animate { animation: lp-marquee 32s linear infinite; width: max-content; }
+        .group:hover .lp-ticker-animate { animation-play-state: paused; }
         @keyframes lp-borderPulse {
           0%, 100% { border-color: rgba(245,166,35,0.25); }
           50% { border-color: rgba(245,166,35,0.6); box-shadow: 0 0 24px rgba(245,166,35,0.15); }
@@ -1117,6 +1137,18 @@ export default function HomePage() {
           {/* Scan line animation */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.025]">
             <div className="absolute inset-x-0 h-px bg-[#F5A623]" style={{ top: '30%', animation: 'lp-scanH 8s linear infinite' }} />
+          </div>
+          {/* Target ring SVG — hero background */}
+          <div className="absolute inset-0 flex items-center justify-end pr-8 lg:pr-16 pointer-events-none select-none opacity-[0.055]">
+            <svg viewBox="0 0 600 600" className="w-[520px] h-[520px] lg:w-[680px] lg:h-[680px] flex-shrink-0">
+              {[280, 240, 200, 160, 120, 80, 40].map((r, i) => (
+                <circle key={r} cx="300" cy="300" r={r}
+                  fill="none" stroke="#F5A623"
+                  strokeWidth={i === 0 ? 1 : 0.5} />
+              ))}
+              <line x1="0"   y1="300" x2="600" y2="300" stroke="#F5A623" strokeWidth="0.5" />
+              <line x1="300" y1="0"   x2="300" y2="600" stroke="#F5A623" strokeWidth="0.5" />
+            </svg>
           </div>
           {/* Ambient glows */}
           <div

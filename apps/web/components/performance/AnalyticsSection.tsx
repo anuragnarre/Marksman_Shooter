@@ -675,7 +675,7 @@ export default function AnalyticsSection() {
                 bandHigh: s.avgScore + s.stdDev,
                 bandLow: Math.max(0, s.avgScore - s.stdDev),
               }))}
-              margin={{ top: 8, right: 12, bottom: 4, left: -18 }}
+              margin={{ top: 8, right: 12, bottom: 4, left: 0 }}
             >
               <defs>
                 <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
@@ -830,7 +830,7 @@ export default function AnalyticsSection() {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={chartH}>
-              <ScatterChart margin={{ top: 16, right: 20, bottom: 20, left: -8 }}>
+              <ScatterChart margin={{ top: 16, right: 20, bottom: 20, left: 0 }}>
                 <CartesianGrid stroke={C.border} strokeDasharray="3 3" />
                 <XAxis
                   type="number" dataKey="x" name="Horizontal (X)"
@@ -909,7 +909,7 @@ export default function AnalyticsSection() {
             Score Distribution
           </h2>
           <ResponsiveContainer width="100%" height={chartH}>
-            <BarChart data={scoreDistribution} margin={{ top: 8, right: 8, bottom: 4, left: -18 }}
+            <BarChart data={scoreDistribution} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}
               barCategoryGap="20%">
               <CartesianGrid stroke={C.border} strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="label" {...AXIS} />
@@ -948,7 +948,7 @@ export default function AnalyticsSection() {
             Consistency Trend
           </h2>
           <ResponsiveContainer width="100%" height={chartH}>
-            <ComposedChart data={consistencyTrend} margin={{ top: 8, right: 40, bottom: 4, left: -18 }}>
+            <ComposedChart data={consistencyTrend} margin={{ top: 8, right: 40, bottom: 4, left: 0 }}>
               <CartesianGrid stroke={C.border} strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="dateLabel" {...AXIS} />
               <YAxis yAxisId="left" {...AXIS} tickCount={5}
@@ -1004,7 +1004,7 @@ export default function AnalyticsSection() {
           <p className="text-sm py-8 text-center" style={{ color: C.muted }}>Not enough sessions.</p>
         ) : (
           <ResponsiveContainer width="100%" height={isMobile ? 220 : 280}>
-            <ComposedChart data={last8} margin={{ top: 8, right: 40, bottom: 4, left: -18 }}>
+            <ComposedChart data={last8} margin={{ top: 8, right: 40, bottom: 4, left: 0 }}>
               <CartesianGrid stroke={C.border} strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="dateLabel" {...AXIS} />
               <YAxis yAxisId="score" domain={[
@@ -1111,7 +1111,7 @@ export default function AnalyticsSection() {
 
           {/* Mini bar chart */}
           <ResponsiveContainer width="100%" height={100}>
-            <BarChart data={overview.ringDistribution} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}
+            <BarChart data={overview.ringDistribution} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}
               barCategoryGap="25%">
               <CartesianGrid stroke={C.border} strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="ring" {...AXIS} />
@@ -1140,7 +1140,7 @@ export default function AnalyticsSection() {
             </span>
           </div>
           <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
-            <AreaChart data={filtered} margin={{ top: 8, right: 12, bottom: 4, left: -18 }}>
+            <AreaChart data={filtered} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
               <defs>
                 <linearGradient id="grGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%"   stopColor={C.blue} stopOpacity={0.25} />

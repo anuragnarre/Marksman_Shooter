@@ -40,10 +40,23 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setHasError(false);
-    setLoading(true);
 
+    // Client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address');
+      setHasError(true);
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
+      setHasError(true);
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await login({ email, password });
+      const res = await login({ email: email.trim(), password });
       setUser(res.user);
       router.push('/dashboard');
     } catch (err) {

@@ -45,11 +45,42 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'MARKSMAN — Shooting Analytics',
-    template: '%s | MARKSMAN',
+    default: 'Marksman — Precision Shooting Analytics',
+    template: '%s | Marksman',
   },
   description:
-    'Precision training analytics for elite competitive shooters and coaches.',
+    'Track every shot with millimetre precision. AI coaching after every session. Built for competitive shooters, coaches, and national teams.',
+  keywords: [
+    'shooting analytics',
+    'air rifle training',
+    'ISSF',
+    'shot analysis',
+    'precision shooting',
+    'competitive shooting',
+    'biometric training',
+  ],
+  openGraph: {
+    title: 'Marksman — Precision Shooting Analytics',
+    description: 'Track every shot. Get AI coaching. Train smarter.',
+    url: 'https://www.marksmanspro.com',
+    siteName: 'Marksman',
+    images: [
+      {
+        url: 'https://www.marksmanspro.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Marksman — Precision Shooting Analytics',
+      },
+    ],
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Marksman — Precision Shooting Analytics',
+    description: 'Track every shot. Get AI coaching. Train smarter.',
+    images: ['https://www.marksmanspro.com/og-image.png'],
+  },
   icons: {
     icon: [
       { url: '/favicon.svg',      type: 'image/svg+xml' },

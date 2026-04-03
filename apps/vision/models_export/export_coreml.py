@@ -1,5 +1,5 @@
 """
-Export a trained YOLOv8-S model to CoreML format for iOS deployment.
+Export a trained YOLO26-S model to CoreML format for iOS deployment.
 
 Requirements (macOS + dev/CI only — not needed in production):
     pip install ultralytics>=8.3.0 coremltools>=7.0 torch>=2.2.0
@@ -32,13 +32,13 @@ import os
 import sys
 
 
-def export_yolov8s_to_coreml(
+def export_yolo26s_to_coreml(
     model_path: str,
     imgsz: int = 640,
     nms: bool = True,
 ) -> str:
     """
-    Export a YOLOv8-S .pt model to CoreML (.mlpackage) format.
+    Export a YOLO26-S .pt model to CoreML (.mlpackage) format.
 
     The Ultralytics export chain is:
         .pt  →  ONNX  →  CoreML .mlpackage
@@ -97,11 +97,11 @@ def export_yolov8s_to_coreml(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Export YOLOv8-S shot detector to CoreML for iOS."
+        description="Export YOLO26-S shot detector to CoreML for iOS."
     )
     parser.add_argument(
         "--model", required=True,
-        help="Path to trained YOLOv8-S .pt weights",
+        help="Path to trained YOLO26-S .pt weights",
     )
     parser.add_argument(
         "--imgsz", type=int, default=640,
@@ -118,7 +118,7 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
-        out = export_yolov8s_to_coreml(
+        out = export_yolo26s_to_coreml(
             model_path=args.model,
             imgsz=args.imgsz,
             nms=args.nms,

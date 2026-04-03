@@ -1,20 +1,27 @@
 # apps/vision/main.py
 
+import logging
+
 from fastapi import FastAPI, File, Query, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
+logger = logging.getLogger(__name__)
+
 from analyzer import analyze_target_image
 from models import AnalysisResponse
 from pipeline.target_specs import TargetType, TARGET_SPECS
-from pipeline.yolo_detector import load_yolo_model, _yolo_available
+from pipeline.yolo_detector import load_yolo_model
+from pipeline.mask_detector import load_mask_model
+import pipeline.yolo_detector as _yolo_mod
+import pipeline.mask_detector as _mask_mod
 
 app = FastAPI(
     title="Shooting Target Vision Service",
     description=(
         "Analyzes target photos and returns bullet hole positions with scores. "
         "Pipeline v5: 4-corner warp, CLAHE enhancement, zone-aware CV detection "
-        "augmented by YOLOv8-S (when model loaded) with SAHI for 50m targets."
+        "augmented by YOLO26-S (when model loaded) with SAHI for 50m targets."
     ),
     version="5.0.0",
 )
@@ -31,17 +38,40 @@ SUPPORTED_TARGETS = {t.value: TARGET_SPECS[t].name for t in TargetType}
 
 @app.on_event("startup")
 async def startup() -> None:
-    """Load YOLO model on startup. Silent no-op if model file absent."""
+    """Load neural models on startup. Warns loudly if neither is available."""
     load_yolo_model()
+    load_mask_model()
+    if not _yolo_mod._yolo_available:
+        logger.warning(
+            "No YOLO model loaded. Running CV-only mode. "
+            "Accuracy on real images may be reduced. "
+            "Train a model with: python scripts/train_yolo26s.py --real-images <path>"
+        )
+    if not _yolo_mod._yolo_available and not _mask_mod._mask_available:
+        import warnings
+        warnings.warn(
+            "WARNING: No neural models loaded. Running CV-only mode. "
+            "Accuracy will be significantly reduced for tight shot groups. "
+            "Run: python scripts/train_yolo26s.py --export to generate models.",
+            stacklevel=2,
+        )
+    logger.info(
+        "Vision service ready — yolo=%s mask=%s",
+        _yolo_mod._yolo_available, _mask_mod._mask_available,
+    )
 
 
 @app.get("/health")
 def health() -> dict:
+    neural_loaded = _yolo_mod._yolo_available or _mask_mod._mask_available
     return {
         "status": "ok",
         "detector": "cv-v5-yolo-augmented",
         "version": "5.0.0",
-        "yolo_loaded": _yolo_available,
+        "yolo_loaded": _yolo_mod._yolo_available,
+        "mask_loaded": _mask_mod._mask_available,
+        "neural_models_loaded": neural_loaded,
+        "accuracy_mode": "full" if neural_loaded else "cv_only_reduced_accuracy",
         "supported_targets": SUPPORTED_TARGETS,
     }
 

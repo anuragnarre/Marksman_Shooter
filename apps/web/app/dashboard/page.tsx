@@ -357,7 +357,7 @@ function ShooterView() {
             )}
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={trendChartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+            <AreaChart data={trendChartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%"   stopColor="#F5A623" stopOpacity={0.25} />
@@ -488,7 +488,7 @@ function ShooterView() {
             {ringDist.length > 0 ? (
               <>
                 <ResponsiveContainer width="100%" height={190}>
-                  <BarChart data={ringDist} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+                  <BarChart data={ringDist} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                     <CartesianGrid stroke="var(--border-subtle)" strokeDasharray="3 3" vertical={false} strokeOpacity={0.5} />
                     <XAxis
                       dataKey="ring"

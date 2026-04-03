@@ -1,5 +1,5 @@
 """
-Export a trained YOLOv8-S model to TFLite format for Android deployment.
+Export a trained YOLO26-S model to TFLite format for Android deployment.
 
 Requirements (dev/CI only — not needed in production):
     pip install ultralytics>=8.3.0 torch>=2.2.0
@@ -31,7 +31,7 @@ import os
 import sys
 
 
-def export_yolov8s_to_tflite(
+def export_yolo26s_to_tflite(
     model_path: str,
     imgsz: int = 640,
     fp16: bool = True,
@@ -39,7 +39,7 @@ def export_yolov8s_to_tflite(
     calibration_data: str = "",
 ) -> str:
     """
-    Export a YOLOv8-S .pt model to TFLite format via the Ultralytics API.
+    Export a YOLO26-S .pt model to TFLite format via the Ultralytics API.
 
     The Ultralytics export chain is:
         .pt  →  ONNX  →  TF SavedModel  →  TFLite
@@ -95,11 +95,11 @@ def export_yolov8s_to_tflite(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Export YOLOv8-S shot detector to TFLite for Android."
+        description="Export YOLO26-S shot detector to TFLite for Android."
     )
     parser.add_argument(
         "--model", required=True,
-        help="Path to trained YOLOv8-S .pt weights",
+        help="Path to trained YOLO26-S .pt weights",
     )
     parser.add_argument(
         "--output", default="",
@@ -124,7 +124,7 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
-        out = export_yolov8s_to_tflite(
+        out = export_yolo26s_to_tflite(
             model_path=args.model,
             imgsz=args.imgsz,
             fp16=args.fp16,

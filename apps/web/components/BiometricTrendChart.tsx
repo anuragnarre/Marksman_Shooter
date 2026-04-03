@@ -66,7 +66,7 @@ function AggregateChart({ days, height }: { days: number; height: number }) {
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <ComposedChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: -10 }}>
+      <ComposedChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
         <defs>
           <linearGradient id="hrBandGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#FF4D6D" stopOpacity={0.2} />
@@ -188,7 +188,7 @@ function RealtimeChart({ mode, height }: { mode: 'live' | '1h' | '1d'; height: n
         </div>
       )}
       <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -10 }}>
+        <ComposedChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
           <defs>
             <linearGradient id="hrLiveGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#FF4D6D" stopOpacity={0.3} />

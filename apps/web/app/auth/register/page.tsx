@@ -41,10 +41,18 @@ function RegisterPageInner() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
+    // Client-side validation
+    const trimmedName = name.trim();
+    if (!trimmedName) { setError('Full name is required'); return; }
+    if (trimmedName.length < 2) { setError('Name must be at least 2 characters'); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) { setError('Please enter a valid email address'); return; }
+    if (password.length < 8) { setError('Password must be at least 8 characters'); return; }
+
+    setLoading(true);
     try {
-      const res = await register({ name, email, password, role });
+      const res = await register({ name: trimmedName, email: email.trim(), password, role });
       setUser(res.user);
       router.push('/dashboard');
     } catch (err) {
@@ -130,12 +138,12 @@ function RegisterPageInner() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-describedby={error ? 'reg-error' : undefined}>
             <div>
               <label htmlFor="name" className="label">Full name</label>
               <input
                 id="name" type="text" required autoComplete="name"
-                value={name} onChange={(e) => setName(e.target.value)}
+                value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }}
                 className="field" placeholder="Arjun Sharma"
               />
             </div>
@@ -144,7 +152,7 @@ function RegisterPageInner() {
               <label htmlFor="email" className="label">Email address</label>
               <input
                 id="email" type="email" required autoComplete="email"
-                value={email} onChange={(e) => setEmail(e.target.value)}
+                value={email} onChange={(e) => { setEmail(e.target.value); if (error) setError(null); }}
                 className="field" placeholder="arjun@example.com"
               />
             </div>
@@ -159,7 +167,7 @@ function RegisterPageInner() {
                   minLength={8}
                   autoComplete="new-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); if (error) setError(null); }}
                   className="field pr-10"
                   placeholder="Min 8 characters"
                 />
@@ -199,7 +207,7 @@ function RegisterPageInner() {
             </div>
 
             {error && (
-              <div role="alert"
+              <div id="reg-error" role="alert"
                 className="flex items-center gap-2 px-4 py-3 bg-[rgba(255,77,109,0.08)]
                            border border-[rgba(255,77,109,0.3)] rounded-lg text-[#FF4D6D] text-sm">
                 <AlertIcon /> {error}

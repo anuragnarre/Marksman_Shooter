@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -14,36 +15,145 @@ import {
 } from '../lib/vision-service';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const WARP_SIZE = 1000;
-const HIT_RADIUS_PX = 14;
+const HIT_RADIUS_PX = 12;
 const DRAG_THRESHOLD = 5;
 const MAX_HISTORY = 50;
-const DOT_RADIUS = 9;
-const DOT_RADIUS_SELECTED = 12;
-const DOT_RADIUS_DRAGGING = 14;
+const DOT_RADIUS = 5;
+const DOT_RADIUS_SELECTED = 7;
+const DOT_RADIUS_DRAGGING = 8;
+const SHOT_COLOR = '#FF4D6D';
+
+// ── ISSF target specs for clean rendering ─────────────────────────────────────
+interface TargetRenderSpec {
+  outerRadiusMm: number;
+  ringWidthMm: number;
+  numRings: number;
+  darkCenterRings: number;
+  innerTenRadiusMm: number;
+}
+
+const TARGET_RENDER_SPECS: Record<string, TargetRenderSpec> = {
+  air_rifle_10m:  { outerRadiusMm: 22.75, ringWidthMm: 2.5,  numRings: 10, darkCenterRings: 5, innerTenRadiusMm: 0.25  },
+  air_pistol_10m: { outerRadiusMm: 85.0,  ringWidthMm: 8.0,  numRings: 10, darkCenterRings: 4, innerTenRadiusMm: 2.5   },
+  nr_50m:         { outerRadiusMm: 77.2,  ringWidthMm: 8.0,  numRings: 10, darkCenterRings: 5, innerTenRadiusMm: 2.5   },
+  nr_25m:         { outerRadiusMm: 250.0, ringWidthMm: 25.0, numRings: 10, darkCenterRings: 4, innerTenRadiusMm: 25.0  },
+};
+
+function getTargetSpec(targetType: string): TargetRenderSpec {
+  return TARGET_RENDER_SPECS[targetType] ?? TARGET_RENDER_SPECS['air_rifle_10m'];
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-interface ImgRect { w: number; h: number; top: number; left: number }
+interface ImgRect {
+  w: number; h: number; top: number; left: number;
+  contentW: number; contentH: number; contentLeft: number; contentTop: number;
+}
 
 export interface ShotCorrectionCanvasProps {
+  /** Raw camera image URL — kept as layout anchor (hidden behind the canvas). */
   imageObjectUrl: string;
   shots: VisionShotResult[];
   targetType: TargetType;
+  /** Warp-space metadata from vision service. */
+  warpCenterX?: number;
+  warpCenterY?: number;
+  warpWidth?: number;
+  warpHeight?: number;
+  warpMmPerPixel?: number;
   onConfirm: (shots: VisionShotResult[]) => void;
   onCancel: () => void;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-function shotColor(score: number): string {
-  if (score >= 10.5) return '#F5A623';
-  if (score >= 10.0) return '#4FC3F7';
-  if (score >= 9.0)  return '#00E5A0';
-  return '#FF4D6D';
-}
-
 function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
+}
+
+// ── Clean ISSF target renderer ─────────────────────────────────────────────────
+function drawISSFTarget(
+  ctx: CanvasRenderingContext2D,
+  spec: TargetRenderSpec,
+  cx: number,
+  cy: number,
+  mmPerPxWarp: number,
+  scaleX: number,
+  scaleY: number,
+  contentLeft: number,
+  contentTop: number,
+  contentW: number,
+  contentH: number,
+) {
+  // mm → display pixels: 1mm = (1/mmPerPxWarp) warp px * scaleX display px/warp px
+  const mmToDisplayPx = scaleX / mmPerPxWarp;
+
+  // Cream card background
+  ctx.fillStyle = '#F5F0DC';
+  ctx.fillRect(contentLeft, contentTop, contentW, contentH);
+
+  // Dark center zone
+  const darkZoneRDisplay = spec.darkCenterRings * spec.ringWidthMm * mmToDisplayPx;
+  ctx.beginPath();
+  ctx.arc(cx, cy, darkZoneRDisplay, 0, Math.PI * 2);
+  ctx.fillStyle = '#0A0A0A';
+  ctx.fill();
+
+  // Ring lines (from ring 1 outer edge inward)
+  for (let ring = 1; ring <= spec.numRings; ring++) {
+    const rMm = spec.outerRadiusMm - (ring - 1) * spec.ringWidthMm;
+    const rDisplay = rMm * mmToDisplayPx;
+    if (rDisplay < 0.5) continue;
+    const inDark = rDisplay <= darkZoneRDisplay + 0.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rDisplay, 0, Math.PI * 2);
+    ctx.strokeStyle = inDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.55)';
+    ctx.lineWidth = Math.max(0.5, 0.8 / mmToDisplayPx);
+    ctx.stroke();
+  }
+
+  // Ring number labels (cream zone only, 3 o'clock — ISSF standard position)
+  ctx.save();
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle    = 'rgba(0,0,0,0.65)';
+
+  for (let ring = 1; ring <= spec.numRings; ring++) {
+    const rMm      = spec.outerRadiusMm - (ring - 1) * spec.ringWidthMm;
+    const rDisplay = rMm * mmToDisplayPx;
+    const bandPx   = spec.ringWidthMm * mmToDisplayPx;
+    const inDark   = rDisplay <= darkZoneRDisplay + 0.5;
+    if (inDark) continue;
+    if (rDisplay < 12) continue;
+    const fontSize = Math.max(9, Math.min(14, bandPx * 0.55));
+    ctx.font       = `500 ${fontSize}px "JetBrains Mono", monospace`;
+    ctx.fillText(String(ring), cx + rDisplay - bandPx * 0.5, cy);
+  }
+  ctx.restore();
+
+  // Crosshair lines through center
+  const armMm = spec.outerRadiusMm;
+  const armDisplay = armMm * mmToDisplayPx;
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([3, 4]);
+  ctx.beginPath(); ctx.moveTo(cx - armDisplay, cy); ctx.lineTo(cx + armDisplay, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - armDisplay); ctx.lineTo(cx, cy + armDisplay); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Inner ten dot (X-ring)
+  const innerTenDisplay = spec.innerTenRadiusMm * mmToDisplayPx;
+  if (innerTenDisplay >= 1) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerTenDisplay, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fill();
+  }
+
+  // Outer border ring
+  const outerDisplay = spec.outerRadiusMm * mmToDisplayPx;
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerDisplay, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -52,6 +162,11 @@ export default function ShotCorrectionCanvas({
   imageObjectUrl,
   shots: initialShots,
   targetType,
+  warpCenterX = 500,
+  warpCenterY = 500,
+  warpWidth   = 1000,
+  warpHeight  = 1000,
+  warpMmPerPixel = 0.17,
   onConfirm,
   onCancel,
 }: ShotCorrectionCanvasProps) {
@@ -64,28 +179,38 @@ export default function ShotCorrectionCanvas({
   const [mode, setMode]         = useState<'move' | 'add'>('move');
   const [selected, setSelected] = useState<number | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
-  const [imgRect, setImgRect]   = useState<ImgRect>({ w: 1, h: 1, top: 0, left: 0 });
+  const [imgRect, setImgRect]   = useState<ImgRect>({ w: 1, h: 1, top: 0, left: 0, contentW: 1, contentH: 1, contentLeft: 0, contentTop: 0 });
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
 
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const didDrag = useRef(false);
 
+  // A transparent SVG placeholder sized to warpWidth × warpHeight.
+  // Used as the <img> source so ResizeObserver computes the correct content
+  // area for the coordinate transform — without displaying the raw camera photo.
+  const placeholderSrc = useMemo(
+    () => `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="${warpWidth}" height="${warpHeight}"/>`,
+    [warpWidth, warpHeight],
+  );
+
   // ── Coordinate transforms ──────────────────────────────────────────────────
+  // pixel_x/pixel_y from the vision service are in warpWidth×warpHeight space.
+  // Map them onto the rendered content area (letterbox-corrected).
 
   const warpToDisplay = useCallback(
     (px: number, py: number): [number, number] => [
-      px * (imgRect.w / WARP_SIZE),
-      py * (imgRect.h / WARP_SIZE),
+      imgRect.contentLeft + px * (imgRect.contentW / warpWidth),
+      imgRect.contentTop  + py * (imgRect.contentH / warpHeight),
     ],
-    [imgRect],
+    [imgRect, warpWidth, warpHeight],
   );
 
   const displayToWarp = useCallback(
     (dx: number, dy: number): [number, number] => [
-      dx * (WARP_SIZE / imgRect.w),
-      dy * (WARP_SIZE / imgRect.h),
+      (dx - imgRect.contentLeft) * (warpWidth  / imgRect.contentW),
+      (dy - imgRect.contentTop)  * (warpHeight / imgRect.contentH),
     ],
-    [imgRect],
+    [imgRect, warpWidth, warpHeight],
   );
 
   // ── History helpers ────────────────────────────────────────────────────────
@@ -111,7 +236,10 @@ export default function ShotCorrectionCanvas({
     warpX: number,
     warpY: number,
   ): VisionShotResult {
-    const { score, isInnerTen, distMm } = calculateDecimalScore(warpX, warpY, targetType);
+    const { score, isInnerTen, distMm } = calculateDecimalScore(
+      warpX, warpY, targetType,
+      warpWidth, warpCenterX, warpCenterY, warpMmPerPixel,
+    );
     return { ...shot, pixelX: Math.round(warpX), pixelY: Math.round(warpY), score, isInnerTen, distMm };
   }
 
@@ -135,14 +263,38 @@ export default function ShotCorrectionCanvas({
       if (!el || !wrapRef.current) return;
       const r  = el.getBoundingClientRect();
       const wr = wrapRef.current.getBoundingClientRect();
-      setImgRect({ w: r.width, h: r.height, top: r.top - wr.top, left: r.left - wr.left });
+      const elemW = r.width;
+      const elemH = r.height;
+      const natW = el.naturalWidth  || warpWidth;
+      const natH = el.naturalHeight || warpHeight;
+      const scale    = Math.min(elemW / natW, elemH / natH);
+      const contentW = natW * scale;
+      const contentH = natH * scale;
+      setImgRect({
+        w: elemW, h: elemH,
+        top:  r.top  - wr.top,
+        left: r.left - wr.left,
+        contentW,
+        contentH,
+        contentLeft: (elemW - contentW) / 2,
+        contentTop:  (elemH - contentH) / 2,
+      });
     }
 
-    update();
-    const ro = new ResizeObserver(update);
+    function safeUpdate() {
+      if (!el || el.naturalWidth === 0) return;
+      update();
+    }
+    // Fire immediately since SVG data URLs load synchronously
+    setTimeout(safeUpdate, 0);
+    el.addEventListener('load', safeUpdate);
+    const ro = new ResizeObserver(safeUpdate);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+    return () => {
+      ro.disconnect();
+      el.removeEventListener('load', safeUpdate);
+    };
+  }, [warpWidth, warpHeight]);
 
   // ── Canvas draw ────────────────────────────────────────────────────────────
 
@@ -160,15 +312,24 @@ export default function ShotCorrectionCanvas({
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, imgRect.w, imgRect.h);
 
-    // Centre crosshair
-    const [cx, cy] = warpToDisplay(500, 500);
-    ctx.save();
-    ctx.strokeStyle = 'rgba(245,166,35,0.25)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(cx - 12, cy); ctx.lineTo(cx + 12, cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx, cy - 12); ctx.lineTo(cx, cy + 12); ctx.stroke();
-    ctx.restore();
+    // ── Draw dark void background ──────────────────────────────────────────
+    ctx.fillStyle = '#080A0F';
+    ctx.fillRect(0, 0, imgRect.w, imgRect.h);
 
+    // ── Draw clean ISSF target ─────────────────────────────────────────────
+    const spec   = getTargetSpec(targetType);
+    const scaleX = imgRect.contentW / warpWidth;
+    const scaleY = imgRect.contentH / warpHeight;
+    const [cx, cy] = warpToDisplay(warpCenterX, warpCenterY);
+
+    drawISSFTarget(
+      ctx, spec, cx, cy,
+      warpMmPerPixel, scaleX, scaleY,
+      imgRect.contentLeft, imgRect.contentTop,
+      imgRect.contentW, imgRect.contentH,
+    );
+
+    // ── Draw shot dots ─────────────────────────────────────────────────────
     shots.forEach((shot, i) => {
       const [sx, sy] = warpToDisplay(shot.pixelX, shot.pixelY);
       const isDraggingThis = dragging === i;
@@ -177,62 +338,63 @@ export default function ShotCorrectionCanvas({
       const r = isDraggingThis ? DOT_RADIUS_DRAGGING : isSelectedThis ? DOT_RADIUS_SELECTED : DOT_RADIUS;
 
       ctx.save();
-      if (isDraggingThis) { ctx.shadowColor = shotColor(shot.score); ctx.shadowBlur = 16; }
+      if (isDraggingThis) { ctx.shadowColor = SHOT_COLOR; ctx.shadowBlur = 10; }
 
-      // White outline ring
+      // Thin white halo
       ctx.beginPath();
-      ctx.arc(sx, sy, r + 2, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.lineWidth = isSelectedThis ? 2.5 : 1.5;
+      ctx.arc(sx, sy, r + 1, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = 0.75;
       ctx.stroke();
 
-      // Selection ring
+      // Red ring
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      if (isLowConf) ctx.setLineDash([2, 2]);
+      ctx.strokeStyle = SHOT_COLOR;
+      ctx.lineWidth = isSelectedThis ? 2 : 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Selection pulse
       if (isSelectedThis && !isDraggingThis) {
         ctx.beginPath();
-        ctx.arc(sx, sy, r + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.arc(sx, sy, r + 4, 0, Math.PI * 2);
+        ctx.strokeStyle = `${SHOT_COLOR}55`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
 
-      // Dot fill
-      ctx.beginPath();
-      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      // Shot number label
+      ctx.font = 'bold 8px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      const numLabel = String(shot.shotNumber);
+      const tw = ctx.measureText(numLabel).width;
+      const lx = sx;
+      const ly = sy - r - 2;
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(lx - tw / 2 - 1, ly - 8, tw + 2, 9);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(numLabel, lx, ly);
 
       if (isLowConf) {
-        ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = shotColor(shot.score);
-        ctx.lineWidth = 2;
-        ctx.fillStyle = `${shotColor(shot.score)}55`;
-        ctx.fill();
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#F5A623';
-        ctx.font = `${Math.round(r * 0.9)}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('!', sx, sy);
-      } else {
-        ctx.fillStyle = shotColor(shot.score);
-        ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.font = `bold ${Math.round(r * 0.9)}px JetBrains Mono, monospace`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(String(shot.shotNumber), sx, sy);
+        ctx.font = '7px sans-serif';
+        ctx.fillStyle = SHOT_COLOR;
+        ctx.textBaseline = 'top';
+        ctx.fillText('?', sx + r + 2, sy - 3);
       }
 
-      // Live score tooltip while dragging
       if (isDraggingThis) {
         const label = shot.score.toFixed(1);
-        ctx.font = '11px JetBrains Mono, monospace';
-        const tw = ctx.measureText(label).width;
+        ctx.font = '10px "JetBrains Mono", monospace';
+        const scoreW = ctx.measureText(label).width;
         ctx.fillStyle = 'rgba(0,0,0,0.75)';
-        ctx.fillRect(sx + r + 4, sy - 10, tw + 8, 20);
-        ctx.fillStyle = shotColor(shot.score);
+        ctx.fillRect(sx + r + 3, sy - 9, scoreW + 6, 18);
+        ctx.fillStyle = SHOT_COLOR;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(label, sx + r + 8, sy);
+        ctx.fillText(label, sx + r + 6, sy);
       }
 
       ctx.restore();
@@ -248,7 +410,8 @@ export default function ShotCorrectionCanvas({
       ctx.beginPath(); ctx.moveTo(hoverPos.x, hoverPos.y - 14); ctx.lineTo(hoverPos.x, hoverPos.y + 14); ctx.stroke();
       ctx.restore();
     }
-  }, [shots, dragging, selected, imgRect, mode, hoverPos, warpToDisplay]);
+  }, [shots, dragging, selected, imgRect, mode, hoverPos, warpToDisplay,
+      targetType, warpCenterX, warpCenterY, warpWidth, warpHeight, warpMmPerPixel]);
 
   // ── Pointer handlers ───────────────────────────────────────────────────────
 
@@ -264,13 +427,12 @@ export default function ShotCorrectionCanvas({
 
     if (mode === 'add') {
       const [wx, wy] = displayToWarp(x, y);
-      const warpX = clamp(wx, 0, WARP_SIZE);
-      const warpY = clamp(wy, 0, WARP_SIZE);
+      const warpX = clamp(wx, 0, warpWidth);
+      const warpY = clamp(wy, 0, warpHeight);
       pushHistory(shots);
       const newShot: VisionShotResult = recalcShot(
         { shotNumber: shots.length + 1, score: 0, x: 0, y: 0, pixelX: Math.round(warpX), pixelY: Math.round(warpY), confidence: 1, isInnerTen: false, distMm: 0 },
-        warpX,
-        warpY,
+        warpX, warpY,
       );
       setShots((prev) => [...prev, newShot]);
       setSelected(shots.length);
@@ -304,8 +466,8 @@ export default function ShotCorrectionCanvas({
     didDrag.current = true;
 
     const [wx, wy] = displayToWarp(x, y);
-    const warpX = clamp(wx, 0, WARP_SIZE);
-    const warpY = clamp(wy, 0, WARP_SIZE);
+    const warpX = clamp(wx, 0, warpWidth);
+    const warpY = clamp(wy, 0, warpHeight);
 
     setShots((prev) => prev.map((s, i) => i === dragging ? recalcShot(s, warpX, warpY) : s));
   }
@@ -366,13 +528,16 @@ export default function ShotCorrectionCanvas({
 
       {/* Image + canvas overlay */}
       <div ref={wrapRef} className="relative w-full" style={{ lineHeight: 0 }}>
+        {/* Transparent placeholder with correct warp aspect ratio — hidden but
+            drives the ResizeObserver so the coordinate mapping is correct. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={imgRef}
-          src={imageObjectUrl}
-          alt="Target photo"
+          src={placeholderSrc}
+          alt=""
+          aria-hidden="true"
           className="w-full rounded-lg"
-          style={{ objectFit: 'contain', maxHeight: '60vh', display: 'block' }}
+          style={{ objectFit: 'contain', maxHeight: '60vh', display: 'block', visibility: 'hidden' }}
           draggable={false}
         />
         <canvas
@@ -381,6 +546,8 @@ export default function ShotCorrectionCanvas({
           style={{
             top: imgRect.top,
             left: imgRect.left,
+            width: imgRect.w > 1 ? `${imgRect.w}px` : '100%',
+            height: imgRect.h > 1 ? `${imgRect.h}px` : undefined,
             cursor: mode === 'add' ? 'crosshair' : dragging !== null ? 'grabbing' : 'default',
             touchAction: 'none',
           }}
@@ -449,7 +616,7 @@ export default function ShotCorrectionCanvas({
             <span className="text-text-muted text-xs font-display uppercase tracking-widest">
               {shots.length} shot{shots.length !== 1 ? 's' : ''}
             </span>
-            <span className="font-mono text-sm" style={{ color: shotColor(avgScore) }}>
+            <span className="font-mono text-sm" style={{ color: SHOT_COLOR }}>
               {avgScore.toFixed(1)} avg
             </span>
           </div>
@@ -464,7 +631,7 @@ export default function ShotCorrectionCanvas({
                     ? 'bg-[rgba(245,166,35,0.15)] border border-accent/40'
                     : 'hover:bg-bg-surface'}`}
               >
-                <span className="font-mono" style={{ color: shotColor(shot.score) }}>
+                <span className="font-mono" style={{ color: SHOT_COLOR }}>
                   #{shot.shotNumber} {shot.score.toFixed(1)}
                 </span>
                 {(shot.confidence ?? 1) < 0.6 && (

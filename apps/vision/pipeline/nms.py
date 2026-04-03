@@ -16,13 +16,13 @@ from typing import List, Tuple
 from .types import FusedHole
 
 # Confidence thresholds for solo (unmatched) detections
-CV_SOLO_THRESHOLD = 0.35
-YOLO_SOLO_THRESHOLD = 0.40
-PAIRED_THRESHOLD = 0.25
+CV_SOLO_THRESHOLD = 0.15      # was 0.35 — keep weaker CV detections
+YOLO_SOLO_THRESHOLD = 0.20    # was 0.40 — keep weaker YOLO detections
+PAIRED_THRESHOLD = 0.20
 PAIR_CONFIDENCE_BOOST = 0.08
 
 # Pair if center distance < max(r1, r2) * PAIR_DISTANCE_FACTOR
-PAIR_DISTANCE_FACTOR = 1.5
+PAIR_DISTANCE_FACTOR = 2.5    # was 1.5 — wider pairing window for tight groups
 
 
 def fuse_candidates(

@@ -28,8 +28,14 @@ export default function SettingsPage() {
     e.preventDefault();
     setProfileMsg(null);
     setProfileErr(null);
-    setProfileLoading(true);
 
+    const trimmedName = name.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      setProfileErr('Name must be at least 2 characters.');
+      return;
+    }
+
+    setProfileLoading(true);
     try {
       const updated = await apiFetch<{ id: string; name: string; email: string; role: string }>(
         '/auth/profile',

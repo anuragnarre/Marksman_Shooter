@@ -120,7 +120,7 @@ TARGET_SPECS: Dict[TargetType, TargetSpec] = {
         outer_ring1_diameter_mm=500.0,
         ring_width_mm=25.0,
         pellet_diameter_mm=9.65,
-        inner_ten_diameter_mm=25.0,
+        inner_ten_diameter_mm=50.0,   # 10-ring outer diameter: outer_radius(250) - 9×ring_width(25) = 25mm radius = 50mm diameter
         dark_center_rings=4,
     ),
 }

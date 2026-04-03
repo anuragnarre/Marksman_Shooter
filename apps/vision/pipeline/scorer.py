@@ -20,8 +20,11 @@ This offset is now applied consistently for ALL detection methods to eliminate
 the score inflation that previously occurred for YOLO/fused detections.
 """
 
+import logging
 import math
 from typing import List
+
+logger = logging.getLogger(__name__)
 
 from .calibration_engine import get_decimal_score, get_mm_per_pixel
 from .types import FusedHole, TargetCalibration
@@ -40,6 +43,7 @@ def calculate_score(
     target_type: str,
     canvas_size: int = 1000,
     use_pellet_offset: bool = False,
+    mm_per_pixel: float = None,
 ) -> float:
     """
     ISSF decimal score for a single pixel coordinate.
@@ -55,8 +59,11 @@ def calculate_score(
         center_y:          Y coordinate of target centre in the warped image.
         target_type:       Key from target_specs, e.g. "air_pistol_10m".
         canvas_size:       Side length of warped image in pixels (default 1000).
-        use_pellet_offset: Subtract pellet radius before scoring (CV / ISSF
+        use_pellet_offset: Subtract pellet radius before scoring (ISSF
                            outer-edge rule).  Default False.
+        mm_per_pixel:      Ring-calibrated mm/px ratio from TargetCalibration.
+                           When provided, overrides the card-formula ratio so
+                           both scoring paths use the same physical scale.
 
     Returns:
         ISSF decimal score in [1.0, 10.9].  0.0 = miss (outside all rings).
@@ -67,16 +74,11 @@ def calculate_score(
     translated_x = x_pixel - center_x + canvas_cx
     translated_y = y_pixel - center_y + canvas_cy
 
-    result = get_decimal_score(target_type, translated_x, translated_y, canvas_size)
-
-    if use_pellet_offset:
-        spec = get_spec(target_type)
-        mm_per_pixel = get_mm_per_pixel(target_type, canvas_size)
-        pellet_r_mm = spec.pellet_diameter_mm / 2.0
-        adjusted_dist_mm = max(0.0, result.dist_mm - pellet_r_mm)
-        adjusted_score_raw = 10.9 - (adjusted_dist_mm / spec.ring_width_mm)
-        return round(max(0.0, min(10.9, adjusted_score_raw)), 1)
-
+    result = get_decimal_score(
+        target_type, translated_x, translated_y, canvas_size,
+        apply_pellet_offset=use_pellet_offset,
+        mm_per_pixel_override=mm_per_pixel,
+    )
     return result.score if result.score >= 1.0 else 0.0
 
 
@@ -121,6 +123,10 @@ def score_holes(
     # has major_r=806+ — the formula would give dist_mm ≈ 36mm for a hole 214px
     # away → score = -3.6 → filtered. Using mm_per_pixel fixes this for all cases.
     mm_per_px = calibration.mm_per_pixel
+
+    if spec.ring_width_mm <= 0:
+        logger.warning("Degenerate spec for %s: ring_width_mm=%s — no shots scored", target_type, spec.ring_width_mm)
+        return []
 
     shots = []
     for hole in holes:

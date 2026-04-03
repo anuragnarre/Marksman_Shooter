@@ -253,9 +253,15 @@ export default function SessionsPage() {
         {/* ── Error ──────────────────────────────────────────────────────── */}
         {error && (
           <div role="alert"
-            className="px-4 py-3 bg-[rgba(255,77,109,0.1)] border border-[rgba(255,77,109,0.3)]
+            className="flex items-center justify-between gap-3 px-4 py-3 bg-[rgba(255,77,109,0.1)] border border-[rgba(255,77,109,0.3)]
                        rounded-lg text-[#FF4D6D] text-sm animate-slide-down">
-            {error}
+            <span>{error}</span>
+            <button
+              onClick={() => { setError(null); load(); }}
+              className="shrink-0 text-xs font-display font-semibold underline hover:no-underline transition-all"
+            >
+              Retry
+            </button>
           </div>
         )}
 

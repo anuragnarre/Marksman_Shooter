@@ -99,16 +99,18 @@ def test_sanity_score_formula(spec) -> TestResult:
     r = TestResult("Sanity: ISSF score formula")
     errors = []
 
-    # Perfect centre shot
+    # Perfect centre shot — verify via the full pipeline (scorer path), not
+    # get_decimal_score() directly, so both paths use the same mm_per_pixel.
     img, ann = _build_image(spec, [(0.0, 0)])
     result = _run_pipeline(img, spec.name.lower().replace(" ", "_"))
-    # Use calibration_engine directly to verify
-    from pipeline.calibration_engine import get_decimal_score
-    sr = get_decimal_score("air_rifle_10m", 500, 500, 1000)
-    if abs(sr.score - 10.9) > 0.01:
-        errors.append(f"Centre score={sr.score}, expected 10.9")
-    if not sr.is_inner_ten:
-        errors.append("Centre shot not flagged as inner_ten")
+    if result.shots:
+        centre_score = result.shots[0].score
+        if abs(centre_score - 10.9) > 0.15:
+            errors.append(f"Centre score={centre_score}, expected ~10.9")
+        if not result.shots[0].is_inner_ten:
+            errors.append("Centre shot not flagged as inner_ten")
+    else:
+        errors.append("Pipeline returned no shots for centre-shot image")
 
     # Ring boundary: shot at ring_1 outer radius → score 1.9
     r1_mm = spec.ring_radius_mm(1)

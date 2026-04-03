@@ -29,6 +29,7 @@ def detect_holes(
     pellet_diameter_mm: float = 4.5,
     diff_img: Optional[np.ndarray] = None,
     dark_center_rings: int = 5,
+    target_type: str = "air_rifle_10m",
 ) -> List[FusedHole]:
     """Detect bullet holes using disc-convolution matched filter."""
     cx, cy = calibration.center
@@ -43,7 +44,9 @@ def detect_holes(
     # ── Scale calibration ──────────────────────────────────────────────────────
     mm_per_pixel = calibration.mm_per_pixel
     if mm_per_pixel < 0.005 or mm_per_pixel > 5.0:
-        mm_per_pixel = 22.75 / max(radius, 1)
+        from .target_specs import get_spec as _get_spec_fallback
+        _fallback_spec = _get_spec_fallback(target_type)
+        mm_per_pixel = _fallback_spec.outer_radius_mm / max(radius, 1)
 
     pellet_radius_px = (pellet_diameter_mm / 2.0) / mm_per_pixel
     pellet_radius_px = max(4.0, pellet_radius_px)
@@ -54,18 +57,27 @@ def detect_holes(
     visible_r_black = max(4.0, pellet_radius_px * 0.45)
     visible_r_cream = max(4.0, pellet_radius_px * 0.30)
 
-    ring_width_px = 2.5 / mm_per_pixel  # ISSF ring width in pixels
+    from .target_specs import get_spec as _get_spec_hd
+    _spec_hd = _get_spec_hd(target_type)
+    ring_width_px = _spec_hd.ring_width_mm / mm_per_pixel
 
     # Ring boundary radii (for inpainting + filtering)
     ring_radii_px = list(calibration.ring_radii)
     if not ring_radii_px:
-        from .target_specs import get_spec
-        spec = get_spec("air_rifle_10m")
-        ring_radii_px = [spec.ring_radius_mm(n) / mm_per_pixel for n in range(1, spec.num_rings + 1)]
+        ring_radii_px = [_spec_hd.ring_radius_mm(n) / mm_per_pixel for n in range(1, _spec_hd.num_rings + 1)]
 
     # ── Find black centre zone ─────────────────────────────────────────────────
+    # Compute the expected black/cream boundary fraction from the spec so the
+    # fallback inside _find_black_zone is accurate for all target types.
+    # Formula: black zone radius = outer_radius - dark_center_rings * ring_width
+    # Fraction relative to outer_radius gives the hint for the pixel space fallback.
+    _hint_fraction = (
+        (_spec_hd.outer_radius_mm - _spec_hd.dark_center_rings * _spec_hd.ring_width_mm)
+        / _spec_hd.outer_radius_mm
+    )
     black_zone, black_radius = _find_black_zone(
-        gray, cx, cy, radius, target_mask, ring_width_px, dark_center_rings)
+        gray, cx, cy, radius, target_mask, ring_width_px, dark_center_rings,
+        hint_fraction=_hint_fraction)
     cream_zone = target_mask & ~black_zone
 
     # ── Erode zone edges to avoid ring-boundary contamination ─────────────────
@@ -102,12 +114,14 @@ def detect_holes(
         visible_r_black, pellet_radius_px, bright=True,
         ring_radii_px=ring_radii_px,
         ring_suppress_px=_bz_ring_sup,
+        diff_img=diff_img,
     )
     _h_dark = _detect_disc_multiscale(
         gray_filled, black_roi, cx, cy,
         visible_r_black, pellet_radius_px, bright=False,
         ring_radii_px=ring_radii_px,
         ring_suppress_px=_bz_ring_sup,
+        diff_img=diff_img,
     )
     holes_black = _deduplicate(_h_bright + _h_dark, visible_r_black * 0.8)
     candidates.extend(holes_black)
@@ -118,11 +132,12 @@ def detect_holes(
         visible_r_cream, pellet_radius_px, bright=False,
         ring_radii_px=ring_radii_px,
         ring_suppress_px=0.0,
+        diff_img=diff_img,
     )
     candidates.extend(holes_cream)
 
     # ── Centre exclusion (printed 10-ring dot) ─────────────────────────────────
-    centre_excl = max(visible_r_black * 0.6, black_radius * 0.02)
+    centre_excl = max(visible_r_black * 0.4, black_radius * 0.015)
     candidates = [
         c for c in candidates
         if math.sqrt((c.x - cx) ** 2 + (c.y - cy) ** 2) > centre_excl
@@ -165,6 +180,7 @@ def _find_black_zone(
     target_mask: np.ndarray,
     ring_width_px: float = 0.0,
     dark_center_rings: int = 5,
+    hint_fraction: float = 0.50,
 ) -> Tuple[np.ndarray, float]:
     """
     Locate the filled black centre zone.
@@ -208,7 +224,7 @@ def _find_black_zone(
     # Start at 0.38× so the real boundary at ~0.44× radius is not missed.
     s = max(1, int(max_r * 0.38))
     e = min(len(profile_s), int(max_r * 0.72))
-    black_r = radius * 0.50   # fallback (was 0.55 — too large, included cream zone)
+    black_r = radius * hint_fraction   # fallback: spec-derived black zone fraction
     if e > s:
         run = 0  # consecutive pixels above threshold
         for i in range(s, e):
@@ -449,9 +465,10 @@ def _detect_disc(
     visible_r: float,
     pellet_radius_px: float,
     bright: bool,
-    max_holes: int = 30,
+    max_holes: int = 50,
     ring_radii_px: Optional[List[float]] = None,
     ring_suppress_px: float = 0.0,
+    diff_img: Optional[np.ndarray] = None,
 ) -> List[FusedHole]:
     """
     Detect holes using disc-matched-filter convolution.
@@ -510,6 +527,20 @@ def _detect_disc(
     acc = cv2.filter2D(signal, cv2.CV_32F, kernel)
     acc = np.where(zone_mask, acc, 0.0).astype(np.float32)
 
+    # Blend with difference image when available (Bug 6 fix).
+    # diff_img highlights anomalies (holes) by subtracting a synthetic template,
+    # so it acts as a second independent evidence source.  Rescale to match the
+    # acc magnitude before blending: acc_combined = 0.7*acc + 0.3*diff_signal.
+    if diff_img is not None:
+        diff_f = diff_img.astype(np.float32) / 255.0
+        diff_signal = cv2.filter2D(diff_f, cv2.CV_32F, kernel)
+        diff_signal = np.where(zone_mask, diff_signal, 0.0).astype(np.float32)
+        acc_max_cur = float(acc.max()) + 1e-6
+        diff_max = float(diff_signal.max()) + 1e-6
+        diff_signal_scaled = diff_signal * (acc_max_cur / diff_max)
+        acc = (0.7 * acc + 0.3 * diff_signal_scaled).astype(np.float32)
+        acc = np.where(zone_mask, acc, 0.0).astype(np.float32)
+
     # Suppress accumulator near ring boundaries
     if ring_radii_px and ring_suppress_px > 0:
         acc = _suppress_ring_boundaries(acc, cx, cy, ring_radii_px, ring_suppress_px)
@@ -521,14 +552,13 @@ def _detect_disc(
     if bright:
         # Black zone: lower threshold so weaker shots in a tight group aren't cut off.
         # Smaller NMS separation so closely-spaced shots are found individually.
-        threshold = max(min_signal * 0.18, acc_max * 0.20)
-        nms_sep = visible_r * 1.0
+        threshold = max(min_signal * 0.12, acc_max * 0.15)
+        nms_sep = visible_r * 0.9
     else:
-        # Cream zone: higher threshold to suppress ring-arc / dirt false positives.
-        # NMS separation reduced from 2.5× to 1.8× to allow adjacent shots to be
-        # detected individually (2.5× was merging distinct shots in tight groups).
-        threshold = max(min_signal * 0.25, acc_max * 0.35)
-        nms_sep = visible_r * 1.8
+        # Cream zone: lower threshold (0.20 from 0.35) so weaker shots aren't cut off.
+        # NMS separation 1.5× (from 1.8×) allows tighter shot groups to be resolved.
+        threshold = max(min_signal * 0.18, acc_max * 0.20)
+        nms_sep = visible_r * 1.5
     peaks = _find_acc_peaks(acc, nms_sep, threshold)
 
     # Saddle-split disabled: pure-Python O(n×16×12) loops are slow (~300ms/call)
