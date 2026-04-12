@@ -10,6 +10,7 @@
   --bg-surface:     #0C0F1A;
   --bg-elevated:    #131826;
   --bg-subtle:      #1A2035;
+  --bg-overlay:     #1A2035;
 
   /* Accents */
   --accent-primary:  #F5A623;
@@ -104,6 +105,7 @@
   --bg-surface:     #FFFFFF;
   --bg-elevated:    #F0F1F5;
   --bg-subtle:      #E8EAF0;
+  --bg-overlay:     rgba(0,0,0,0.08);
 
   /* Accents — keep hues, adjust glows for light */
   --accent-glow:     rgba(245, 166, 35, 0.15);

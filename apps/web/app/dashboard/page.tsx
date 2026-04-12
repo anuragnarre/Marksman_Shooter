@@ -396,11 +396,10 @@ function ShooterView() {
                 type="monotone" dataKey="avgScore"
                 stroke="#F5A623" strokeWidth={2.5}
                 fill="url(#scoreGrad)"
-                dot={(props: { cx: number; cy: number; payload: { avgScore: number } }) => {
+                dot={(props: { cx: number; cy: number; index: number; payload: { avgScore: number } }) => {
                   const above = props.payload.avgScore >= (overview?.overallAverage ?? 0);
                   return (
                     <circle
-                      key={`dot-${props.cx}`}
                       cx={props.cx} cy={props.cy}
                       r={above ? 3.5 : 2.5}
                       fill="#F5A623"

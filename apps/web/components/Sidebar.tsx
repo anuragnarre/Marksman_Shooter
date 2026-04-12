@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
+import { FeedbackModal } from './FeedbackModal';
 
 interface NavGroup {
   href: string;
@@ -50,8 +51,9 @@ const ROLE_COLOR: Record<string, { color: string; bg: string; label: string }> =
 };
 
 export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } = {}) {
-  const [expanded, setExpanded] = useState(true);
-  const [mounted,  setMounted]  = useState(false);
+  const [expanded,      setExpanded]      = useState(true);
+  const [mounted,       setMounted]       = useState(false);
+  const [feedbackOpen,  setFeedbackOpen]  = useState(false);
   const pathname = usePathname();
   const router   = useRouter();
   const { user, logout } = useAuth();
@@ -74,6 +76,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
   const roleStyle = user?.role ? (ROLE_COLOR[user.role] ?? ROLE_COLOR.SHOOTER) : ROLE_COLOR.SHOOTER;
 
   return (
+    <>
     <aside
       data-sidebar
       className="fixed left-0 top-0 bottom-0 z-sidebar hidden lg:flex flex-col
@@ -193,6 +196,55 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             </div>
           );
         })}
+
+        {/* ── Feedback button ─────────────────────────────────────────── */}
+        <button
+          onClick={() => setFeedbackOpen(true)}
+          className="group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+                     transition-all duration-200 mt-0.5"
+          style={{
+            background: 'transparent',
+            border: '1px solid transparent',
+            color: 'var(--text-secondary)',
+            justifyContent: expanded ? 'flex-start' : 'center',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--btn-ghost-bg)';
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.transform = 'translateX(2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+            e.currentTarget.style.transform = 'translateX(0)';
+          }}
+          aria-label="Give feedback"
+        >
+          <span className="shrink-0 w-5 h-5 flex items-center justify-center">
+            <FeedbackIcon />
+          </span>
+          {expanded && (
+            <span className="font-display font-semibold text-[13px] tracking-wide whitespace-nowrap overflow-hidden">
+              Feedback
+            </span>
+          )}
+          {!expanded && (
+            <span
+              className="absolute left-full ml-3 px-3 py-1.5 rounded-lg text-xs font-display
+                         font-semibold text-text-primary whitespace-nowrap z-tooltip
+                         opacity-0 pointer-events-none group-hover:opacity-100
+                         transition-all duration-150 translate-x-1 group-hover:translate-x-0"
+              style={{
+                background: 'var(--glass-heavy-bg)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(245,166,35,0.2)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+              }}
+            >
+              Feedback
+            </span>
+          )}
+        </button>
       </nav>
 
       {/* ── User section ────────────────────────────────────────────────── */}
@@ -309,6 +361,10 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
         </div>
       </div>
     </aside>
+
+    {/* Feedback modal — rendered outside aside to avoid stacking-context clip */}
+    <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+    </>
   );
 }
 
@@ -573,6 +629,16 @@ function SettingsIcon() {
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="9" cy="9" r="2.5" />
       <path d="M14.7 11.1a1.2 1.2 0 00.2 1.3l.05.04a1.45 1.45 0 11-2.05 2.05l-.04-.05a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.73 1.1v.13a1.45 1.45 0 11-2.9 0v-.07a1.2 1.2 0 00-.79-1.1 1.2 1.2 0 00-1.3.2l-.04.05a1.45 1.45 0 11-2.05-2.05l.05-.04a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.73H3.45a1.45 1.45 0 110-2.9h.07a1.2 1.2 0 001.1-.79 1.2 1.2 0 00-.2-1.3l-.05-.04A1.45 1.45 0 116.42 3.3l.04.05a1.2 1.2 0 001.3.2h.06a1.2 1.2 0 00.73-1.1V2.45a1.45 1.45 0 112.9 0v.07a1.2 1.2 0 00.73 1.1 1.2 1.2 0 001.3-.2l.04-.05a1.45 1.45 0 112.05 2.05l-.05.04a1.2 1.2 0 00-.2 1.3v.06a1.2 1.2 0 001.1.73h.13a1.45 1.45 0 110 2.9h-.07a1.2 1.2 0 00-1.1.73z" />
+    </svg>
+  );
+}
+
+function FeedbackIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 2H2a1 1 0 00-1 1v8a1 1 0 001 1h4l3 3 3-3h4a1 1 0 001-1V3a1 1 0 00-1-1z"/>
+      <line x1="5.5" y1="6.5" x2="12.5" y2="6.5"/>
+      <line x1="5.5" y1="9.5" x2="9"    y2="9.5"/>
     </svg>
   );
 }

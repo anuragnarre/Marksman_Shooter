@@ -4,10 +4,15 @@
 // DESIGN NOTE: 2026 glass topbar with animated gradient border-bottom,
 // gradient page title, live indicator, expanded search bar on desktop, and role-coloured avatar ring.
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
 import { LiveIndicator } from './ui/LiveIndicator';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
+import { FeedbackModal } from './FeedbackModal';
+
+const ADMIN_EMAIL = 'ashwin.hingave123@gmail.com';
 
 interface TopBarProps {
   title: string;
@@ -58,10 +63,28 @@ export function TopBar({
   const { resolvedTheme, setTheme } = useTheme();
   const roleColor = user?.role ? (ROLE_COLOR[user.role] ?? '#F5A623') : '#F5A623';
 
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [shareToast,   setShareToast]   = useState(false);
+
+  async function handleShare() {
+    const url   = window.location.href;
+    const title = 'Marksman — Precision Shooting Analytics';
+    const text  = 'Track every shot with millimetre precision. AI coaching after every session.';
+    if (typeof navigator.share === 'function') {
+      try { await navigator.share({ title, text, url }); return; } catch { /* cancelled */ return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2200);
+    } catch { /* no clipboard access */ }
+  }
+
   return (
+    <>
     <header
       data-topbar
-      className="fixed top-0 right-0 z-topbar relative overflow-hidden flex items-center px-3 sm:px-5
+      className="fixed top-0 right-0 z-topbar flex items-center px-3 sm:px-5
                  transition-all duration-300 ease-spring"
       style={{
         left: sidebarWidth,
@@ -207,6 +230,65 @@ export function TopBar({
         {/* Sync status chip — visible when offline or queue has items */}
         <SyncStatusIndicator />
 
+        {/* Admin feedback inbox — only for admin user */}
+        {user?.email === ADMIN_EMAIL && (
+          <Link
+            href="/admin/feedback"
+            className="flex items-center justify-center w-9 h-9 rounded-xl
+                       transition-all duration-200 active:scale-90"
+            style={{
+              background: 'rgba(245,166,35,0.08)',
+              border: '1px solid rgba(245,166,35,0.25)',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.5)';
+              (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.14)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.25)';
+              (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.08)';
+            }}
+            aria-label="Feedback inbox"
+            title="Feedback Inbox"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623"
+              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </Link>
+        )}
+
+        {/* Feedback button */}
+        <button
+          onClick={() => setFeedbackOpen(true)}
+          className="flex items-center justify-center w-9 h-9 rounded-xl
+                     transition-all duration-200 active:scale-90"
+          style={{
+            background: 'var(--chip-bg)',
+            border: '1px solid var(--glass-border)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(245,166,35,0.3)';
+            e.currentTarget.style.background = 'rgba(245,166,35,0.06)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--glass-border)';
+            e.currentTarget.style.background = 'var(--chip-bg)';
+          }}
+          aria-label="Give feedback"
+          title="Feedback"
+        >
+          <span style={{ color: 'var(--text-muted)' }}>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor"
+              strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 1H2a1 1 0 00-1 1v7a1 1 0 001 1h3l2.5 2.5L10 10h3a1 1 0 001-1V2a1 1 0 00-1-1z"/>
+              <line x1="4.5" y1="4.5" x2="10.5" y2="4.5"/>
+              <line x1="4.5" y1="7"   x2="7.5"   y2="7"/>
+            </svg>
+          </span>
+        </button>
+
         {/* Live indicator — mobile */}
         {isLive && (
           <div className="lg:hidden mr-0.5">
@@ -219,6 +301,54 @@ export function TopBar({
           className="w-px h-5 mx-1 shrink-0"
           style={{ background: 'var(--border-subtle)' }}
         />
+
+        {/* Share button — desktop only, right side */}
+        <div className="relative hidden sm:block">
+          <button
+            onClick={handleShare}
+            className="flex items-center justify-center w-9 h-9 rounded-xl
+                       transition-all duration-200 active:scale-90"
+            style={{
+              background: 'var(--chip-bg)',
+              border: '1px solid var(--glass-border)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(245,166,35,0.3)';
+              e.currentTarget.style.background = 'rgba(245,166,35,0.06)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--glass-border)';
+              e.currentTarget.style.background = 'var(--chip-bg)';
+            }}
+            aria-label="Share this page"
+            title="Share"
+          >
+            <span style={{ color: 'var(--text-muted)' }}>
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor"
+                strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="2.5" r="1.5"/>
+                <circle cx="12" cy="12.5" r="1.5"/>
+                <circle cx="3"  cy="7.5"  r="1.5"/>
+                <line x1="4.4"  y1="6.8"  x2="10.6" y2="3.2"/>
+                <line x1="4.4"  y1="8.2"  x2="10.6" y2="11.8"/>
+              </svg>
+            </span>
+          </button>
+          {shareToast && (
+            <span
+              className="absolute top-full mt-2 right-0 whitespace-nowrap
+                         font-body text-[11px] px-3 py-1 rounded-lg pointer-events-none z-50"
+              style={{
+                background: 'var(--bg-overlay)',
+                border: '1px solid rgba(0,229,160,0.3)',
+                color: '#00E5A0',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+              }}
+            >
+              Link copied!
+            </span>
+          )}
+        </div>
 
         {/* Theme toggle */}
         <button
@@ -290,5 +420,8 @@ export function TopBar({
         )}
       </div>
     </header>
+
+    <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+    </>
   );
 }

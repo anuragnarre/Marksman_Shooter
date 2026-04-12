@@ -67,6 +67,7 @@ const config: Config = {
         display: ['var(--font-rajdhani)', 'sans-serif'],
         body:    ['var(--font-dm-sans)', 'sans-serif'],
         data:    ['var(--font-jetbrains)', 'monospace'],
+        mono:    ['var(--font-jetbrains)', 'monospace'],
       },
 
       // ── Keyframes ─────────────────────────────────────────────────────────

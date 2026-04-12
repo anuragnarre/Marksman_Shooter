@@ -881,8 +881,17 @@ function AddShotsPanel({
 
       {open && (
         <div className="border-t border-border-subtle animate-slide-down">
-          {/* Tab bar */}
-          <div className="flex border-b border-border-subtle overflow-x-auto">
+          {/* Tab bar — overflow-x-auto is intentional; touch-action + overscroll-behavior
+               prevent the horizontal swipe from escaping to the page on mobile */}
+          <div
+            className="flex border-b border-border-subtle overflow-x-auto"
+            style={{
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehaviorX: 'contain',
+              touchAction: 'pan-x',
+            }}
+          >
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -948,6 +957,7 @@ const TARGET_CY      = CANVAS_SIZE / 2;
 const TARGET_DRAW_R  = (CANVAS_SIZE / 2) * 0.92;
 const HIT_RADIUS_PX  = 12;   // canvas-pixel hit area for shot selection
 const DRAG_THRESHOLD = 5;    // pixels moved before a press becomes a drag
+const PENDING_IDX    = -2;   // sentinel: draggingIndex / findShotAt when pending shot is hit
 
 function shotDotColor(score: number): string {
   if (score >= 10.5) return '#F5A623';
@@ -985,18 +995,22 @@ function InteractiveTab({
   onSuccess: () => void;
   targetType?: string;
 }) {
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const [shots, setShots]             = useState<PlacedShot[]>([]);
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState<string | null>(null);
-  const [success, setSuccess]         = useState<string | null>(null);
-  const [tooltip, setTooltip]         = useState<{ x: number; y: number; text: string } | null>(null);
-  const [draggingIndex, setDragging]  = useState<number | null>(null);
-  const [hoverIndex, setHover]        = useState<number | null>(null);
-  const [cursor, setCursor]           = useState<'crosshair' | 'grab' | 'grabbing'>('crosshair');
+  const canvasRef     = useRef<HTMLCanvasElement>(null);
+  const inspCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [shots, setShots]               = useState<PlacedShot[]>([]);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [success, setSuccess]           = useState<string | null>(null);
+  const [tooltip, setTooltip]           = useState<{ x: number; y: number; text: string } | null>(null);
+  const [draggingIndex, setDragging]    = useState<number | null>(null);   // PENDING_IDX = pending shot drag
+  const [hoverIndex, setHover]          = useState<number | null>(null);    // PENDING_IDX = pending shot hover
+  const [cursor, setCursor]             = useState<'crosshair' | 'grab' | 'grabbing'>('crosshair');
+  const [pendingShot, setPendingShot]   = useState<{ x: number; y: number; score: number } | null>(null);
+  const [inspectedShot, setInspectedShot] = useState<PlacedShot | null>(null);
 
   // Track pointer-down position to distinguish click vs drag
-  const pointerDownRef = useRef<{ x: number; y: number; onShot: boolean } | null>(null);
+  const pointerDownRef = useRef<{ x: number; y: number; hitIdx: number } | null>(null);
 
   const cx    = TARGET_CX;
   const cy    = TARGET_CY;
@@ -1053,6 +1067,7 @@ function InteractiveTab({
   }
 
   // Return index (last-placed wins) of the shot under the pointer, or -1.
+  // Returns PENDING_IDX (-2) if the pending ghost shot is hit.
   // Uses staggered positions so hit-test matches what is drawn on canvas.
   function findShotAt(clientX: number, clientY: number): number {
     const canvas = canvasRef.current;
@@ -1062,6 +1077,14 @@ function InteractiveTab({
     const sy = CANVAS_SIZE / rect.height;
     const mx = (clientX - rect.left) * sx;
     const my = (clientY - rect.top) * sy;
+
+    // Pending shot takes priority (drawn on top)
+    if (pendingShot) {
+      const ppx = cx + (pendingShot.x / TARGET_EXTENT) * drawR;
+      const ppy = cy - (pendingShot.y / TARGET_EXTENT) * drawR;
+      if (Math.hypot(mx - ppx, my - ppy) <= HIT_RADIUS_PX) return PENDING_IDX;
+    }
+
     const positions = computeStaggeredPositions();
     for (let i = shots.length - 1; i >= 0; i--) {
       if (Math.hypot(mx - positions[i].px, my - positions[i].py) <= HIT_RADIUS_PX) return i;
@@ -1169,107 +1192,240 @@ function InteractiveTab({
       ctx.fillText(String(shot.shotNumber), px, py);
     });
 
-    // Placement hint when canvas is empty
-    if (shots.length === 0) {
+    // ── Pending shot ghost ─────────────────────────────────────────────────────
+    if (pendingShot) {
+      const ppx   = cx + (pendingShot.x / TARGET_EXTENT) * drawR;
+      const ppy   = cy - (pendingShot.y / TARGET_EXTENT) * drawR;
+      const pcolor = shotDotColor(pendingShot.score);
+      const isDragPending = draggingIndex === PENDING_IDX;
+      const isHoverPending = hoverIndex === PENDING_IDX && draggingIndex === null;
+      const pdotR = isDragPending ? 9 : 6;
+
+      // Dashed outer ring
+      ctx.beginPath();
+      ctx.arc(ppx, ppy, isDragPending ? 17 : 14, 0, Math.PI * 2);
+      ctx.strokeStyle = isDragPending ? `${pcolor}99` : `${pcolor}55`;
+      ctx.lineWidth   = isDragPending ? 2 : 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Glow
+      ctx.shadowColor = pcolor;
+      ctx.shadowBlur  = isDragPending ? 22 : isHoverPending ? 14 : 10;
+
+      // Ghost bullet hole (semi-transparent)
+      ctx.beginPath();
+      ctx.arc(ppx, ppy, pdotR, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(17,17,17,0.75)';
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Color ring (semi-transparent)
+      ctx.beginPath();
+      ctx.arc(ppx, ppy, pdotR + 1.5, 0, Math.PI * 2);
+      ctx.strokeStyle = `${pcolor}bb`;
+      ctx.lineWidth   = 1.8;
+      ctx.stroke();
+
+      // '?' label
+      ctx.fillStyle    = `${pcolor}dd`;
+      ctx.font         = `bold ${pdotR >= 9 ? 9 : 8}px monospace`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', ppx, ppy);
+    }
+
+    // Placement hint when canvas is empty and no pending shot
+    if (shots.length === 0 && !pendingShot) {
       ctx.fillStyle    = 'rgba(245,166,35,0.5)';
       ctx.font         = '13px "Rajdhani", monospace';
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('Click anywhere to place a shot', cx, CANVAS_SIZE - 18);
+      ctx.fillText('Click anywhere to preview a shot', cx, CANVAS_SIZE - 18);
     }
-  }, [shots, draggingIndex, hoverIndex, targetType, cx, cy, drawR]);
+  }, [shots, draggingIndex, hoverIndex, targetType, cx, cy, drawR, pendingShot]);
 
   useEffect(() => { drawCanvas(); }, [drawCanvas]);
 
+  // ── Inspection canvas — zoomed 4× view of the selected shot ───────────────
+  const INSP_SIZE = 240;
+  useEffect(() => {
+    const canvas = inspCanvasRef.current;
+    if (!canvas || !inspectedShot) return;
+    const ctx = canvas.getContext('2d')!;
+
+    // Render full target to an offscreen canvas
+    const off = document.createElement('canvas');
+    off.width  = CANVAS_SIZE;
+    off.height = CANVAS_SIZE;
+    drawTarget(off.getContext('2d')!, { size: CANVAS_SIZE, shots: [], targetType, zoom: 1 });
+
+    // Shot centre in full-canvas pixel coords
+    const shotPx = cx + (inspectedShot.x / TARGET_EXTENT) * drawR;
+    const shotPy = cy - (inspectedShot.y / TARGET_EXTENT) * drawR;
+
+    // Source window: 60px half-extent → 4× magnification into 240px display
+    const WIN_HALF = 60;
+    ctx.clearRect(0, 0, INSP_SIZE, INSP_SIZE);
+    ctx.drawImage(
+      off,
+      shotPx - WIN_HALF, shotPy - WIN_HALF, WIN_HALF * 2, WIN_HALF * 2,
+      0, 0, INSP_SIZE, INSP_SIZE,
+    );
+
+    // Overlay the shot marker at the centre of the inspection canvas
+    const dotX    = INSP_SIZE / 2;
+    const dotY    = INSP_SIZE / 2;
+    const color   = shotDotColor(inspectedShot.score);
+    const dotR    = 10;
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = 20;
+
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = '#111111';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, dotR + 2, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = 2.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, dotR + 4.5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    // Crosshair
+    const CH = 22;
+    ctx.strokeStyle = `${color}66`;
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(dotX - CH, dotY);          ctx.lineTo(dotX - dotR - 5, dotY);
+    ctx.moveTo(dotX + dotR + 5, dotY);    ctx.lineTo(dotX + CH, dotY);
+    ctx.moveTo(dotX, dotY - CH);          ctx.lineTo(dotX, dotY - dotR - 5);
+    ctx.moveTo(dotX, dotY + dotR + 5);    ctx.lineTo(dotX, dotY + CH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Shot number
+    ctx.fillStyle    = 'rgba(255,255,255,0.92)';
+    ctx.font         = 'bold 10px monospace';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(inspectedShot.shotNumber), dotX, dotY);
+  }, [inspectedShot, targetType, cx, cy, drawR]);
+
   // ── Pointer event handlers ─────────────────────────────────────────────────
+  // Flow:
+  //   click empty canvas  → create / reposition pending ghost shot
+  //   click pending shot  → no-op (already pending; drag to reposition)
+  //   click placed shot   → open inspection modal  (deferred — resolved in handlePointerUp)
+  //   drag pending shot   → reposition pending ghost in real-time
+  //   drag placed shot    → reposition placed shot in real-time
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     const hitIdx = findShotAt(e.clientX, e.clientY);
-    pointerDownRef.current = { x: e.clientX, y: e.clientY, onShot: hitIdx !== -1 };
+    pointerDownRef.current = { x: e.clientX, y: e.clientY, hitIdx };
 
     if (hitIdx !== -1) {
-      // Start dragging this shot
-      setDragging(hitIdx);
-      setHover(null);
-      setCursor('grabbing');
-      // Capture pointer so move events keep firing even outside the canvas
+      // Capture pointer so move/up fire even outside the canvas
       e.currentTarget.setPointerCapture(e.pointerId);
-      e.preventDefault();  // prevent scroll / tap-highlight on mobile
+      e.preventDefault();
+      // Don't start drag yet — wait for movement past DRAG_THRESHOLD
+      setCursor('grab');
     }
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
+    const down = pointerDownRef.current;
+
     if (draggingIndex !== null) {
-      // ── Drag: reposition the grabbed shot in real time ──────────────────
+      // ── Active drag ──────────────────────────────────────────────────────
       let [tx, ty] = pixelToTarget(e.clientX, e.clientY);
       [tx, ty]     = clampToTarget(tx, ty);
       const score  = scoreFromCoords(tx, ty, targetType);
+      const rect   = canvasRef.current?.getBoundingClientRect();
 
-      setShots((prev) =>
-        prev.map((s, i) => (i === draggingIndex ? { ...s, x: tx, y: ty, score } : s)),
-      );
-
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
-        setTooltip({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-          text: `#${shots[draggingIndex]?.shotNumber ?? '?'} · ${score.toFixed(1)}`,
-        });
-      }
-    } else {
-      // ── Hover: highlight nearest shot ───────────────────────────────────
-      const hitIdx = findShotAt(e.clientX, e.clientY);
-      if (hitIdx !== hoverIndex) {
-        setHover(hitIdx !== -1 ? hitIdx : null);
-        setCursor(hitIdx !== -1 ? 'grab' : 'crosshair');
-      }
-      if (hitIdx !== -1) {
-        const shot = shots[hitIdx];
-        const rect = canvasRef.current?.getBoundingClientRect();
-        if (rect) {
-          setTooltip({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-            text: `#${shot.shotNumber} · ${shot.score.toFixed(1)} — drag to adjust`,
-          });
-        }
+      if (draggingIndex === PENDING_IDX) {
+        setPendingShot({ x: tx, y: ty, score });
+        if (rect) setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: `Preview · ${score.toFixed(1)}` });
       } else {
-        setTooltip(null);
+        setShots((prev) => prev.map((s, i) => i === draggingIndex ? { ...s, x: tx, y: ty, score } : s));
+        if (rect) setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: `#${shots[draggingIndex]?.shotNumber ?? '?'} · ${score.toFixed(1)}` });
       }
+      return;
+    }
+
+    if (down && down.hitIdx !== -1) {
+      // ── Pointer down on a shot — start drag once past threshold ─────────
+      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+      if (moved >= DRAG_THRESHOLD) {
+        setDragging(down.hitIdx);
+        setHover(null);
+        setCursor('grabbing');
+      }
+      return;
+    }
+
+    // ── Hover: highlight nearest shot ────────────────────────────────────
+    const hitIdx = findShotAt(e.clientX, e.clientY);
+    const newHover = hitIdx !== -1 ? hitIdx : null;
+    if (newHover !== hoverIndex) {
+      setHover(newHover);
+      setCursor(hitIdx !== -1 ? 'grab' : 'crosshair');
+    }
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (hitIdx === PENDING_IDX && pendingShot && rect) {
+      setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: `Preview · ${pendingShot.score.toFixed(1)} — drag or confirm` });
+    } else if (hitIdx >= 0 && rect) {
+      const shot = shots[hitIdx];
+      setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: `#${shot.shotNumber} · ${shot.score.toFixed(1)} — click to inspect` });
+    } else {
+      setTooltip(null);
     }
   }
 
   function handlePointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
     const down = pointerDownRef.current;
+    pointerDownRef.current = null;
 
     if (draggingIndex !== null) {
-      // Finalize drag — just release
+      // Finalize drag — release
       setDragging(null);
       const postHit = findShotAt(e.clientX, e.clientY);
       setCursor(postHit !== -1 ? 'grab' : 'crosshair');
       setTooltip(null);
-    } else if (down && !down.onShot) {
-      // Place new shot only if the pointer barely moved (click, not pan/scroll)
-      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
-      if (moved < DRAG_THRESHOLD) {
-        let [tx, ty] = pixelToTarget(e.clientX, e.clientY);
-        [tx, ty]     = clampToTarget(tx, ty);
-        const score  = scoreFromCoords(tx, ty, targetType);
-        setShots((prev) => [
-          ...prev,
-          { uid: nextUid(), x: tx, y: ty, score, shotNumber: nextShotNumber + prev.length },
-        ]);
-        setSuccess(null);
-        setError(null);
-      }
+      return;
     }
 
-    pointerDownRef.current = null;
+    if (!down) return;
+    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+    if (moved >= DRAG_THRESHOLD) return; // was a pan, ignore
+
+    if (down.hitIdx >= 0) {
+      // Click on a placed shot → inspect
+      setInspectedShot(shots[down.hitIdx]);
+    } else if (down.hitIdx === PENDING_IDX) {
+      // Click on pending shot → no-op
+    } else {
+      // Click on empty canvas → create/reposition pending
+      let [tx, ty] = pixelToTarget(e.clientX, e.clientY);
+      [tx, ty]     = clampToTarget(tx, ty);
+      const score  = scoreFromCoords(tx, ty, targetType);
+      setPendingShot({ x: tx, y: ty, score });
+      setSuccess(null);
+      setError(null);
+    }
   }
 
   function handlePointerLeave() {
-    // Only reset hover/cursor if not mid-drag (drag uses pointer capture)
     if (draggingIndex === null) {
       setHover(null);
       setCursor('crosshair');
@@ -1277,8 +1433,31 @@ function InteractiveTab({
     }
   }
 
-  function undoLast() { setShots((prev) => prev.slice(0, -1)); }
-  function clearAll()  { setShots([]); }
+  function confirmPending() {
+    if (!pendingShot) return;
+    setShots((prev) => [
+      ...prev,
+      { uid: nextUid(), x: pendingShot.x, y: pendingShot.y, score: pendingShot.score, shotNumber: nextShotNumber + prev.length },
+    ]);
+    setPendingShot(null);
+    setSuccess(null);
+    setError(null);
+  }
+
+  function cancelPending() {
+    setPendingShot(null);
+  }
+
+  function undoLast() {
+    if (pendingShot) { setPendingShot(null); return; }
+    setShots((prev) => prev.slice(0, -1));
+  }
+
+  function clearAll() {
+    setShots([]);
+    setPendingShot(null);
+    setInspectedShot(null);
+  }
 
   async function submitShots() {
     if (shots.length === 0) return;
@@ -1309,9 +1488,18 @@ function InteractiveTab({
 
   return (
     <div className="space-y-4">
-      <p className="text-text-secondary text-xs">
-        Click to place a shot · Drag any marker to fine-tune its position · Score updates in real time
-      </p>
+      {/* Guidance */}
+      <div className="flex items-start gap-2 bg-bg-elevated/50 border border-border-subtle rounded-lg px-3 py-2">
+        <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 mt-0.5 shrink-0 text-text-muted" fill="currentColor">
+          <path fillRule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a.75.75 0 110 1.5A.75.75 0 018 4zm-.25 3h.5c.138 0 .25.112.25.25v3.5a.25.25 0 01-.25.25h-.5A.25.25 0 017.5 10.75v-3.5C7.5 7.112 7.612 7 7.75 7z" clipRule="evenodd"/>
+        </svg>
+        <span className="font-body text-xs text-text-secondary leading-relaxed">
+          Click the target to preview a shot &mdash; drag to position, then hit{' '}
+          <strong className="text-text-primary font-semibold">Place</strong> to confirm.
+          To add multiple shots at the same spot, confirm each one before placing the next.
+          Click any placed marker to inspect it in detail.
+        </span>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         {/* ── Interactive canvas ─────────────────────────────────────────── */}
@@ -1329,9 +1517,11 @@ function InteractiveTab({
             onPointerLeave={handlePointerLeave}
             className="w-full block select-none"
             style={{ cursor, touchAction: 'none' }}
-            aria-label="Interactive shooting target — click to place shots, drag markers to adjust position"
+            aria-label="Interactive shooting target — click to preview a shot, drag to position, click markers to inspect"
             role="button"
           />
+
+          {/* Tooltip */}
           {tooltip && (
             <div
               className="tooltip-glass absolute z-tooltip px-3 py-1.5 pointer-events-none"
@@ -1340,11 +1530,38 @@ function InteractiveTab({
               <span className="score-value text-accent text-sm">{tooltip.text}</span>
             </div>
           )}
+
+          {/* Pending shot confirm bar */}
+          {pendingShot && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2
+                            bg-bg-overlay/95 border border-accent/30 rounded-lg px-3 py-1.5
+                            shadow-accent backdrop-blur-sm pointer-events-auto">
+              <span className="font-mono text-sm font-bold" style={{ color: shotDotColor(pendingShot.score) }}>
+                {pendingShot.score.toFixed(1)}
+              </span>
+              <span className="font-body text-[10px] text-text-secondary">Preview</span>
+              <div className="w-px h-4 bg-border-default mx-0.5" />
+              <button
+                type="button"
+                onClick={confirmPending}
+                className="font-body text-xs font-semibold bg-accent hover:bg-accent-hover text-bg-void px-3 py-1 rounded transition-all active:scale-95"
+              >
+                Place
+              </button>
+              <button
+                type="button"
+                onClick={cancelPending}
+                className="font-body text-xs text-text-muted hover:text-text-secondary transition-colors px-1 min-h-[28px]"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Shot list ─────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col gap-3">
-          {shots.length === 0 ? (
+          {shots.length === 0 && !pendingShot ? (
             <div className="flex-1 flex items-center justify-center border border-dashed border-border-subtle
                             rounded-xl py-8 text-center">
               <div>
@@ -1363,6 +1580,21 @@ function InteractiveTab({
                   </tr>
                 </thead>
                 <tbody>
+                  {/* Pending shot row */}
+                  {pendingShot && (
+                    <tr className="border-b border-accent/20 bg-accent/5">
+                      <td className="py-1.5 pr-2 font-mono text-text-muted">?</td>
+                      <td className="py-1.5">
+                        <span className="font-mono font-bold tabular-nums" style={{ color: shotDotColor(pendingShot.score) }}>
+                          {pendingShot.score.toFixed(1)}
+                        </span>
+                        <span className="ml-1.5 text-[10px] font-body text-accent uppercase tracking-wide">preview</span>
+                      </td>
+                      <td className="py-1.5 font-mono" style={{ color: directionColor(shotDirection(pendingShot.x, pendingShot.y)) }}>
+                        {shotDirection(pendingShot.x, pendingShot.y)}
+                      </td>
+                    </tr>
+                  )}
                   {shots.map((shot, i) => {
                     const isDrag  = draggingIndex === i;
                     const isHover = hoverIndex === i && !isDrag;
@@ -1370,27 +1602,23 @@ function InteractiveTab({
                     return (
                       <tr
                         key={shot.uid}
-                        className={`border-b border-border-subtle/40 transition-colors duration-100 ${
+                        className={`border-b border-border-subtle/40 transition-colors duration-100 cursor-pointer ${
                           isDrag  ? 'bg-accent/8'
                           : isHover ? 'bg-white/[0.02]'
-                          : ''
+                          : 'hover:bg-white/[0.015]'
                         }`}
+                        onClick={() => setInspectedShot(shot)}
                       >
                         <td className="py-1.5 pr-2 score-value text-text-muted">{shot.shotNumber}</td>
                         <td className="py-1.5">
-                          <span
-                            className="score-value font-bold tabular-nums"
-                            style={{ color: shotDotColor(shot.score) }}
-                          >
+                          <span className="score-value font-bold tabular-nums" style={{ color: shotDotColor(shot.score) }}>
                             {shot.score.toFixed(1)}
                           </span>
                           {isDrag && (
-                            <span className="ml-1.5 text-text-muted text-[10px] font-display uppercase tracking-wide">
-                              adjusting
-                            </span>
+                            <span className="ml-1.5 text-text-muted text-[10px] font-display uppercase tracking-wide">adjusting</span>
                           )}
                         </td>
-                        <td className={`py-1.5 score-value text-xs ${isDrag ? 'text-accent' : ''}`} style={{ color: isDrag ? undefined : directionColor(dir) }}>
+                        <td className="py-1.5 score-value text-xs" style={{ color: isDrag ? 'var(--accent-primary)' : directionColor(dir) }}>
                           {dir}
                         </td>
                       </tr>
@@ -1406,7 +1634,7 @@ function InteractiveTab({
             <button
               type="button"
               onClick={undoLast}
-              disabled={shots.length === 0}
+              disabled={shots.length === 0 && !pendingShot}
               className="btn btn-ghost text-xs py-1.5 px-3 disabled:opacity-40"
             >
               ↩ Undo
@@ -1414,7 +1642,7 @@ function InteractiveTab({
             <button
               type="button"
               onClick={clearAll}
-              disabled={shots.length === 0}
+              disabled={shots.length === 0 && !pendingShot}
               className="btn btn-ghost text-xs py-1.5 px-3 disabled:opacity-40"
             >
               Clear
@@ -1439,6 +1667,89 @@ function InteractiveTab({
       {error && (
         <div className="px-4 py-2 rounded-lg text-sm bg-[rgba(255,77,109,0.1)] border border-[rgba(255,77,109,0.3)] text-[#FF4D6D]">
           {error}
+        </div>
+      )}
+
+      {/* ── Shot Inspection Modal ─────────────────────────────────────────────── */}
+      {inspectedShot && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-bg-void/80 backdrop-blur-sm"
+          onClick={() => setInspectedShot(null)}
+        >
+          <div
+            className="bg-bg-surface border border-border-default rounded-2xl shadow-accent w-80 max-w-[90vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+              <div className="flex items-center gap-2">
+                <span className="font-body text-xs text-text-muted">Shot</span>
+                <span className="font-mono text-sm font-bold text-text-primary">#{inspectedShot.shotNumber}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInspectedShot(null)}
+                className="text-text-muted hover:text-text-secondary transition-colors p-1 min-h-[32px] min-w-[32px] flex items-center justify-center"
+              >
+                <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Zoomed canvas */}
+            <div className="px-4 pt-4">
+              <canvas
+                ref={inspCanvasRef}
+                width={INSP_SIZE}
+                height={INSP_SIZE}
+                className="w-full rounded-xl border border-border-subtle"
+                style={{ background: '#080A0F' }}
+              />
+            </div>
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-3 gap-2 px-4 py-3">
+              {[
+                { label: 'Score', value: inspectedShot.score.toFixed(1), color: shotDotColor(inspectedShot.score) },
+                { label: 'X', value: inspectedShot.x.toFixed(2), color: 'var(--text-primary)' },
+                { label: 'Y', value: inspectedShot.y.toFixed(2), color: 'var(--text-primary)' },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="bg-bg-elevated rounded-lg px-2 py-2 text-center">
+                  <p className="font-body text-[10px] text-text-muted uppercase tracking-wider mb-0.5">{label}</p>
+                  <p className="font-mono text-lg font-bold" style={{ color }}>{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Direction */}
+            <div className="px-4 pb-3">
+              <div className="bg-bg-elevated rounded-lg px-3 py-2 flex items-center justify-between">
+                <span className="font-body text-[10px] text-text-muted uppercase tracking-wider">Direction</span>
+                <span
+                  className="font-mono text-sm"
+                  style={{ color: directionColor(shotDirection(inspectedShot.x, inspectedShot.y)) }}
+                >
+                  {shotDirection(inspectedShot.x, inspectedShot.y)}
+                </span>
+              </div>
+            </div>
+
+            {/* Remove */}
+            <div className="px-4 pb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShots((prev) => prev.filter((s) => s.uid !== inspectedShot.uid));
+                  setInspectedShot(null);
+                }}
+                className="w-full font-body text-sm font-medium text-[#FF4D6D] border border-[rgba(255,77,109,0.3)]
+                           hover:bg-[rgba(255,77,109,0.08)] px-4 py-2 rounded-lg transition-colors min-h-[44px]"
+              >
+                Remove Shot
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1862,6 +2173,27 @@ function PhotoTab({ sessionId, onSuccess }: { sessionId: string; onSuccess: () =
 
   return (
     <div className="space-y-4">
+      {/* ── AI Beta notice ───────────────────────────────────────────────── */}
+      <div className="flex items-start gap-3 px-4 py-3 rounded-xl
+                      border border-[rgba(255,179,71,0.30)] bg-[rgba(255,179,71,0.06)]">
+        <svg viewBox="0 0 16 16" className="w-4 h-4 mt-0.5 shrink-0" fill="#FFB347" aria-hidden>
+          <path d="M8.982 1.566a1.13 1.13 0 00-1.96 0L.165 13.233c-.457.778.091 1.767.98
+                   1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0
+                   .954.462.9.995l-.35 3.507a.552.552 0 01-1.1 0L7.1
+                   5.995A.905.905 0 018 5zm.002 6a1 1 0 110 2 1 1 0 010-2z"/>
+        </svg>
+        <div>
+          <p className="font-display font-semibold text-[11px] tracking-widest uppercase text-[#FFB347] mb-0.5">
+            AI Shot Analysis — Beta
+          </p>
+          <p className="font-body text-xs text-text-secondary leading-relaxed">
+            This is the first beta version of the AI model. Detections may miss shots or
+            report incorrect scores. Always review results before saving.
+            We are continuously improving accuracy.
+          </p>
+        </div>
+      </div>
+
       {/* ── Target type selector ─────────────────────────────────────────── */}
       {state === 'idle' && (
         <div className="flex items-center gap-3">

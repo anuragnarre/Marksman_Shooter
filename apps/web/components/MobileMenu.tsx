@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { useAuth } from '../contexts/auth-context';
+import { FeedbackModal } from './FeedbackModal';
 
 interface NavChild {
   href: string;
@@ -68,7 +69,8 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const dragX = useMotionValue(0);
 
   // Track expanded groups (auto-expand active parent)
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const [expanded,     setExpanded]     = useState<Set<string>>(() => new Set());
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Auto-expand the active parent group when drawer opens
   useEffect(() => {
@@ -121,6 +123,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   }
 
   return (
+    <>
     <AnimatePresence>
       {open && (
         <>
@@ -351,6 +354,23 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               {/* Divider */}
               <div className="my-2 h-px mx-1" style={{ background: 'var(--border-subtle)' }} />
 
+              {/* Feedback */}
+              <button
+                onClick={() => { setFeedbackOpen(true); onClose(); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+                           text-text-secondary hover:text-text-primary transition-colors duration-150
+                           active:scale-[0.98] min-h-[44px]"
+                style={{ border: '1px solid transparent' }}
+              >
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor"
+                  strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                  <path d="M13 1H2a1 1 0 00-1 1v7a1 1 0 001 1h3l2.5 2.5L10 10h3a1 1 0 001-1V2a1 1 0 00-1-1z"/>
+                  <line x1="4.5" y1="4.5" x2="10.5" y2="4.5"/>
+                  <line x1="4.5" y1="7"   x2="7.5"   y2="7"/>
+                </svg>
+                <span className="font-display font-semibold text-[13px] tracking-wide">Feedback</span>
+              </button>
+
               {/* Sign out */}
               <button
                 onClick={handleLogout}
@@ -380,6 +400,9 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
         </>
       )}
     </AnimatePresence>
+
+    <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+    </>
   );
 }
 

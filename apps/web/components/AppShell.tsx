@@ -166,9 +166,10 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
       <main
         className="relative z-10 min-h-screen transition-all duration-300 ease-spring overflow-x-hidden"
         style={{
-          paddingTop:    topOffset,
-          paddingLeft:   isMobile ? 0 : sidebarW,
-          paddingBottom: isMobile ? bottomOffsetMobile : 0,
+          paddingTop:        topOffset,
+          paddingLeft:       isMobile ? 0 : sidebarW,
+          paddingBottom:     isMobile ? bottomOffsetMobile : 0,
+          overscrollBehavior: 'contain',
         }}
       >
         <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 lg:py-8">

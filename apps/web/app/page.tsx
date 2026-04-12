@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
+import { AppDownloadButton } from '../components/AppDownloadButton';
+import { LoadingScreen } from '../components/LoadingScreen';
 
 // ─── Shot data (deterministic) ────────────────────────────────────────────────
 const SHOTS = [
@@ -839,6 +841,103 @@ function VisionAISection() {
   );
 }
 
+// ─── Pricing Section ─────────────────────────────────────────────────────────
+const pricingPlans = [
+  {
+    name: 'Athlete',
+    price: 'Free',
+    period: 'forever',
+    description: 'For individual competitive shooters.',
+    features: ['Unlimited sessions', 'Shot-by-shot analysis', 'AI coaching feedback', 'PDF exports', '1 weapon profile'],
+    cta: 'Start Free',
+    href: '/auth/register',
+    highlight: false,
+  },
+  {
+    name: 'Pro',
+    price: '₹499',
+    period: 'per month',
+    description: 'For serious athletes and coaches.',
+    features: ['Everything in Athlete', 'Up to 10 athletes', 'Live biometric sync', 'Session comparison', 'Priority AI analysis', 'Custom training plans'],
+    cta: 'Start Pro Trial',
+    href: '/auth/register?plan=pro',
+    highlight: true,
+  },
+  {
+    name: 'Team',
+    price: '₹1,999',
+    period: 'per month',
+    description: 'For national teams and academies.',
+    features: ['Everything in Pro', 'Unlimited athletes', 'Team analytics', 'National team reports', 'Dedicated support', 'Custom integrations'],
+    cta: 'Contact Us',
+    href: 'mailto:team@marksmanspro.com',
+    highlight: false,
+  },
+];
+
+function PricingSection() {
+  return (
+    <section id="pricing" className="py-24" style={{ background: 'var(--bg-void)' }}>
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="text-center mb-14">
+          <p className="font-mono text-[10px] tracking-[0.22em] uppercase mb-4" style={{ color: '#F5A623' }}>Pricing</p>
+          <h2 className="font-display font-black mb-4" style={{ fontSize: 'clamp(28px, 4vw, 48px)', lineHeight: '1.06', color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+            Simple, transparent pricing
+          </h2>
+          <p className="font-body text-[15px] max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
+            Start free. Upgrade when your team grows.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {pricingPlans.map((plan) => (
+            <div key={plan.name}
+              className="rounded-2xl p-7 flex flex-col"
+              style={{
+                background: 'var(--lp-card-bg, var(--bg-surface))',
+                border: plan.highlight ? '1px solid rgba(245,166,35,0.40)' : '1px solid var(--border-subtle)',
+                boxShadow: plan.highlight ? '0 0 28px rgba(245,166,35,0.10)' : 'none',
+              }}>
+              {plan.highlight && (
+                <div className="mb-4">
+                  <span className="font-mono text-[9px] tracking-[0.18em] uppercase px-2.5 py-1 rounded-full"
+                    style={{ background: 'rgba(245,166,35,0.12)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.20)' }}>
+                    Most Popular
+                  </span>
+                </div>
+              )}
+              <p className="font-display font-bold text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{plan.name}</p>
+              <p className="font-body text-[13px] mb-5" style={{ color: 'var(--text-secondary)' }}>{plan.description}</p>
+              <div className="mb-6">
+                <span className="font-mono font-bold" style={{ fontSize: 'clamp(28px, 4vw, 36px)', color: plan.highlight ? '#F5A623' : 'var(--text-primary)' }}>{plan.price}</span>
+                <span className="font-body text-[12px] ml-1.5" style={{ color: 'var(--text-muted)' }}>{plan.period}</span>
+              </div>
+              <ul className="flex flex-col gap-2.5 mb-8 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5">
+                    <svg className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="7" stroke={plan.highlight ? '#F5A623' : 'rgba(255,255,255,0.15)'} strokeWidth="1" />
+                      <path d="M5 8l2 2 4-4" stroke={plan.highlight ? '#F5A623' : 'rgba(255,255,255,0.40)'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="font-body text-[13px]" style={{ color: 'var(--text-secondary)' }}>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href={plan.href}
+                className="flex items-center justify-center font-display font-bold text-[13px] py-3 rounded-[11px] transition-all duration-150 active:scale-[0.98]"
+                style={plan.highlight
+                  ? { background: 'linear-gradient(135deg, #F5A623 0%, #E18E0D 100%)', color: '#07090F', boxShadow: '0 0 18px rgba(245,166,35,0.18)' }
+                  : { background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>
+                {plan.cta}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { user }                            = useAuth();
@@ -847,6 +946,7 @@ export default function HomePage() {
   const [mounted, setMounted]               = useState(false);
   const [scrolled, setScrolled]             = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLoading, setShowLoading]       = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -898,6 +998,14 @@ export default function HomePage() {
       r.style.setProperty('--lp-card-bg',      '#FFFFFF');
       r.style.setProperty('--lp-card-border',  'rgba(0,0,0,0.08)');
     }
+    return () => {
+      // Remove all inline overrides so globals.css :root values are restored
+      // when navigating away from the homepage (e.g. to /dashboard)
+      const props = ['--bg-void','--bg-surface','--bg-elevated','--text-primary',
+        '--text-secondary','--text-muted','--border-subtle','--nav-glass-bg',
+        '--nav-glass-border','--nav-logo-color','--lp-card-bg','--lp-card-border'];
+      props.forEach((p) => r.style.removeProperty(p));
+    };
   }, [isDark]);
 
   const scrollTo = (id: string) => {
@@ -907,6 +1015,8 @@ export default function HomePage() {
 
   return (
     <>
+      {showLoading && <LoadingScreen onComplete={() => setShowLoading(false)} />}
+
       {/* ── Global Styles ─────────────────────────────────────────────────── */}
       <style>{`
         /* Fonts: Outfit (display) + JetBrains Mono (data/labels) */
@@ -996,6 +1106,7 @@ export default function HomePage() {
                     {resolvedTheme === 'light' ? <IconMoon className="w-3.5 h-3.5" /> : <IconSun className="w-3.5 h-3.5" />}
                   </button>
                 )}
+                <AppDownloadButton size="sm" />
                 {isLoggedIn ? (
                   <Link href="/dashboard" className="inline-flex items-center gap-1.5 font-display font-bold text-[13px] px-4 py-2 rounded-[10px]"
                     style={{ background: '#F5A623', color: '#07090F', boxShadow: '0 0 13px rgba(245,166,35,0.16)', transition: 'filter 200ms ease' }}
@@ -1060,7 +1171,8 @@ export default function HomePage() {
                     style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }} onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
                 )}
               </div>
-              <div className="pb-8 pt-4">
+              <div className="pb-8 pt-4 flex flex-col gap-3">
+                <AppDownloadButton size="md" className="w-full" />
                 <Link href={isLoggedIn ? '/dashboard' : '/auth/register'} onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 font-display font-bold text-[13px] w-full py-3.5 rounded-[12px]"
                   style={{ background: '#F5A623', color: '#07090F', boxShadow: '0 0 18px rgba(245,166,35,0.20)' }}>
@@ -1086,6 +1198,17 @@ export default function HomePage() {
             {/* Orbs — ~28% less opaque than original, refined */}
             <div className="absolute rounded-full" style={{ width: '660px', height: '660px', background: 'radial-gradient(circle, rgba(245,166,35,0.047) 0%, transparent 56%)', top: '-16%', right: '-10%', animation: 'lp-orbFloat 20s ease-in-out infinite' }} />
             <div className="absolute rounded-full" style={{ width: '460px', height: '460px', background: 'radial-gradient(circle, rgba(79,195,247,0.026) 0%, transparent 58%)', bottom: '2%', left: '-12%', animation: 'lp-orbFloat 24s ease-in-out infinite reverse' }} />
+            {/* Target ring SVG */}
+            <div className="absolute inset-0 flex items-center justify-end pr-12 pointer-events-none select-none" style={{ opacity: 0.055 }}>
+              <svg viewBox="0 0 600 600" className="w-[640px] h-[640px]">
+                {[280, 240, 200, 160, 120, 80, 40].map((r, i) => (
+                  <circle key={r} cx="300" cy="300" r={r}
+                    fill="none" stroke="#F5A623" strokeWidth={i === 0 ? 1 : 0.5} />
+                ))}
+                <line x1="0"   y1="300" x2="600" y2="300" stroke="#F5A623" strokeWidth="0.5"/>
+                <line x1="300" y1="0"   x2="300" y2="600" stroke="#F5A623" strokeWidth="0.5"/>
+              </svg>
+            </div>
           </div>
 
           <div className="relative max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pb-20 lg:py-0 w-full"
@@ -1133,6 +1256,7 @@ export default function HomePage() {
                     style={{ color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', background: 'transparent', transition: 'color 220ms ease' }}>
                     See how it works
                   </button>
+                  <AppDownloadButton size="md" />
                 </div>
 
                 {/* Stat chips */}
@@ -1196,10 +1320,11 @@ export default function HomePage() {
         <AppPreviewSection isDark={isDark} />
         <VisionAISection />
         <HowItWorksSection />
+        {/* <PricingSection /> */}
         <TestimonialsSection />
 
         {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
-        <section id="pricing" className="py-40 lg:py-52 relative overflow-hidden" style={{ background: 'var(--bg-void)' }}>
+        <section className="py-40 lg:py-52 relative overflow-hidden" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0" style={{
               backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.010) 1px, transparent 1px)',
@@ -1265,6 +1390,7 @@ export default function HomePage() {
                   {[{ label: 'Features', id: 'features' }, { label: 'How It Works', id: 'how-it-works' }, { label: 'Pricing', id: 'pricing' }].map(({ label, id }) => (
                     <li key={id}><button onClick={() => scrollTo(id)} className="font-body text-[13px] hover:text-[#F5A623]" style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }}>{label}</button></li>
                   ))}
+                  <li><AppDownloadButton size="sm" /></li>
                 </ul>
               </div>
               <div>
