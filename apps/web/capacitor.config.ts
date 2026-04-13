@@ -56,10 +56,12 @@ const config: CapacitorConfig = {
     CapacitorHealth: {
       // @capgo/capacitor-health — Health Connect (Android) + HealthKit (iOS)
     },
-    // Native Google Sign-In — serverClientId must be the Web OAuth Client ID
-    // so the returned ID token is verifiable by the backend (google-auth-library).
+    // Native Google Sign-In.
+    // The plugin's Android load() reads "androidClientId" then "clientId" (NOT "serverClientId").
+    // Both must be the Web OAuth Client ID so the returned ID token is verifiable by the backend.
     GoogleAuth: {
       scopes: ['profile', 'email'],
+      clientId: '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com',
       serverClientId: '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com',
       forceCodeForRefreshToken: false,
     },
