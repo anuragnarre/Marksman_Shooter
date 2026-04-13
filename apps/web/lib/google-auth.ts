@@ -89,17 +89,25 @@ export async function googleSignIn(
   return res;
 }
 
+const NATIVE_SERVER_CLIENT_ID = '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com';
+
 /**
  * Native Google Sign-In via @codetrix-studio/capacitor-google-auth.
  *
- * On native (Android/iOS), the plugin reads serverClientId directly from
- * capacitor.config.ts — initialize() must NOT be called on native as it
- * is only required for the web fallback path.
+ * initialize() must be called before signIn() on Android — without it the
+ * GoogleSignInClient is built without requestIdToken(serverClientId), causing
+ * DEVELOPER_ERROR (code 10).
  */
 export async function nativeGoogleSignIn(
   role?: 'SHOOTER' | 'COACH',
 ): Promise<{ access_token: string; user: User }> {
   const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
+
+  await GoogleAuth.initialize({
+    clientId: NATIVE_SERVER_CLIENT_ID,
+    scopes: ['profile', 'email'],
+    grantOfflineAccess: false,
+  });
 
   const googleUser = await GoogleAuth.signIn();
   const idToken = googleUser.authentication.idToken;
