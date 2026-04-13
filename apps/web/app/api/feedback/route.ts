@@ -1,11 +1,35 @@
 // app/api/feedback/route.ts
-// Feedback is logged to Vercel function logs (no database yet).
-// View submissions: Vercel Dashboard → Functions → /api/feedback → Logs
+// Stores feedback in Vercel Postgres (next_dec database).
 
 import { NextRequest, NextResponse } from 'next/server';
+import { sql } from '@vercel/postgres';
+
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS feedback (
+      id         TEXT PRIMARY KEY,
+      role       TEXT NOT NULL,
+      ratings    JSONB NOT NULL DEFAULT '{}',
+      texts      JSONB NOT NULL DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+}
 
 export async function GET() {
-  return NextResponse.json([]);
+  try {
+    await ensureTable();
+    const { rows } = await sql`
+      SELECT id, role, ratings, texts, created_at AS at
+      FROM feedback
+      ORDER BY created_at DESC
+      LIMIT 200
+    `;
+    return NextResponse.json(rows);
+  } catch (err) {
+    console.error('[FEEDBACK GET]', err);
+    return NextResponse.json([]);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -16,18 +40,22 @@ export async function POST(req: NextRequest) {
       texts: Record<string, string>;
     };
 
-    const entry = {
-      id:      `fb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      role:    body.role,
-      ratings: body.ratings,
-      texts:   body.texts,
-      at:      new Date().toISOString(),
-    };
+    const id = `fb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    console.log('[FEEDBACK]', JSON.stringify(entry));
+    await ensureTable();
+    await sql`
+      INSERT INTO feedback (id, role, ratings, texts)
+      VALUES (
+        ${id},
+        ${body.role},
+        ${JSON.stringify(body.ratings)},
+        ${JSON.stringify(body.texts)}
+      )
+    `;
 
     return NextResponse.json({ ok: true }, { status: 201 });
-  } catch {
-    return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
+  } catch (err) {
+    console.error('[FEEDBACK POST]', err);
+    return NextResponse.json({ message: 'Failed to save feedback' }, { status: 500 });
   }
 }
