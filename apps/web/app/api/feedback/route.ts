@@ -1,22 +1,11 @@
 // app/api/feedback/route.ts
-// Stores feedback in Vercel KV when configured, otherwise logs to function logs.
+// Feedback is logged to Vercel function logs (no database yet).
+// View submissions: Vercel Dashboard → Functions → /api/feedback → Logs
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const KV_LIST_KEY = 'feedback:entries';
-const KV_ENABLED  = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-
 export async function GET() {
-  if (!KV_ENABLED) {
-    return NextResponse.json([]);
-  }
-  try {
-    const { kv } = await import('@vercel/kv');
-    const entries = await kv.lrange(KV_LIST_KEY, 0, 199);
-    return NextResponse.json(entries);
-  } catch {
-    return NextResponse.json([]);
-  }
+  return NextResponse.json([]);
 }
 
 export async function POST(req: NextRequest) {
@@ -35,13 +24,7 @@ export async function POST(req: NextRequest) {
       at:      new Date().toISOString(),
     };
 
-    if (KV_ENABLED) {
-      const { kv } = await import('@vercel/kv');
-      await kv.lpush(KV_LIST_KEY, entry);
-      await kv.ltrim(KV_LIST_KEY, 0, 499);
-    } else {
-      console.log('[FEEDBACK]', JSON.stringify(entry));
-    }
+    console.log('[FEEDBACK]', JSON.stringify(entry));
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch {
