@@ -64,7 +64,7 @@ function RegisterPageInner() {
 
   return (
     <div
-      className="min-h-dvh flex flex-col lg:flex-row bg-void relative"
+      className="h-dvh flex flex-col lg:flex-row bg-void relative"
       style={{ paddingTop: safeTopInset }}
     >
       <div
