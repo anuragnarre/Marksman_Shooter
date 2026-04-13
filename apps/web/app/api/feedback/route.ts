@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET() {
   // Feedback is logged to Vercel function logs (not stored in DB yet).
   // View submissions in Vercel dashboard → Functions → /api/feedback → Logs.
-  return NextResponse.json({ message: 'Feedback is logged to Vercel function logs. Check the Functions tab in your Vercel dashboard.', entries: [] });
+  return NextResponse.json([]);
 }
 
 export async function POST(req: NextRequest) {

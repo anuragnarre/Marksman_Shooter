@@ -263,11 +263,24 @@ export default function FeedbackAdminPage() {
           <p className="font-body text-sm" style={{ color: '#FF4D6D' }}>{error}</p>
         )}
 
+        {/* Vercel logs note */}
+        <div
+          className="rounded-xl px-4 py-3 flex items-start gap-3"
+          style={{ background: 'rgba(79,195,247,0.06)', border: '1px solid rgba(79,195,247,0.2)' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 flex-shrink-0">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p className="font-body text-xs" style={{ color: 'var(--data-blue)' }}>
+            Feedback is stored in <strong>Vercel function logs</strong>. Go to Vercel dashboard → Functions → <code>/api/feedback</code> → Logs to view submissions. A database integration is needed to display entries here.
+          </p>
+        </div>
+
         {/* Entries */}
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="font-body text-sm" style={{ color: 'var(--text-muted)' }}>
-              No feedback submissions yet.
+              No entries to display — check Vercel function logs for submissions.
             </p>
           </div>
         ) : (
