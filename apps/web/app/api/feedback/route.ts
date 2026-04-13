@@ -1,25 +1,17 @@
 // app/api/feedback/route.ts
-// Stores feedback in Vercel KV (Redis). Falls back to console.log if KV is not configured.
+// Stores feedback in Vercel KV when configured, otherwise logs to function logs.
 
 import { NextRequest, NextResponse } from 'next/server';
 
 const KV_LIST_KEY = 'feedback:entries';
-
-async function getKv() {
-  try {
-    const { kv } = await import('@vercel/kv');
-    return kv;
-  } catch {
-    return null;
-  }
-}
+const KV_ENABLED  = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
 export async function GET() {
-  const kv = await getKv();
-  if (!kv) {
+  if (!KV_ENABLED) {
     return NextResponse.json([]);
   }
   try {
+    const { kv } = await import('@vercel/kv');
     const entries = await kv.lrange(KV_LIST_KEY, 0, 199);
     return NextResponse.json(entries);
   } catch {
@@ -43,13 +35,11 @@ export async function POST(req: NextRequest) {
       at:      new Date().toISOString(),
     };
 
-    const kv = await getKv();
-    if (kv) {
-      // Prepend so newest is first; keep last 500 entries
+    if (KV_ENABLED) {
+      const { kv } = await import('@vercel/kv');
       await kv.lpush(KV_LIST_KEY, entry);
       await kv.ltrim(KV_LIST_KEY, 0, 499);
     } else {
-      // Fallback: log to Vercel function logs if KV not configured
       console.log('[FEEDBACK]', JSON.stringify(entry));
     }
 
