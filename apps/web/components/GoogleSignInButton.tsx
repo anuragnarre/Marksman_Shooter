@@ -57,28 +57,22 @@ function NativeGoogleSignInButton({
       const result = await nativeGoogleSignIn(roleRef.current);
       onSuccess(result.user);
     } catch (err) {
-      // Capture full error details for diagnosis
-      let msg: string;
-      if (err instanceof Error) {
-        msg = err.message;
-      } else if (err && typeof err === 'object') {
-        // Capacitor plugin errors are often plain objects with a 'message' or 'code' field
-        const e = err as Record<string, unknown>;
-        msg = String(e.message ?? e.code ?? e.errorMessage ?? JSON.stringify(err));
-      } else {
-        msg = String(err);
-      }
-      console.error('[GoogleAuth] sign-in error:', JSON.stringify(err));
+      // Capture full error details — Capacitor errors are plain objects with message + code
+      const e = (err ?? {}) as Record<string, unknown>;
+      const message = String(e.message ?? err ?? 'unknown');
+      const code    = String(e.code ?? e.errorCode ?? '');
+      const full    = `msg=${message} code=${code}`;
+      console.error('[GoogleAuth] sign-in error raw:', JSON.stringify(err));
       // User dismissed the picker — not an error worth surfacing
       if (
-        msg.toLowerCase().includes('cancel') ||
-        msg.toLowerCase().includes('dismiss') ||
-        msg.toLowerCase().includes('closed') ||
-        msg.toLowerCase().includes('12501') // Google Sign-In cancel code
+        message.toLowerCase().includes('cancel') ||
+        message.toLowerCase().includes('dismiss') ||
+        message.toLowerCase().includes('closed') ||
+        code === '12501'
       ) {
         return;
       }
-      onError(`Google sign-in error: ${msg}`);
+      onError(`Google error [${code || '?'}]: ${message}`);
     } finally {
       setLoading(false);
     }
