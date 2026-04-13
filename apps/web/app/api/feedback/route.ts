@@ -1,13 +1,30 @@
 // app/api/feedback/route.ts
-// Receives role-aware feedback submissions and logs them to Vercel function logs.
-// (Vercel serverless filesystem is read-only, so file persistence is not possible.)
+// Stores feedback in Vercel KV (Redis). Falls back to console.log if KV is not configured.
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const KV_LIST_KEY = 'feedback:entries';
+
+async function getKv() {
+  try {
+    const { kv } = await import('@vercel/kv');
+    return kv;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
-  // Feedback is logged to Vercel function logs (not stored in DB yet).
-  // View submissions in Vercel dashboard → Functions → /api/feedback → Logs.
-  return NextResponse.json([]);
+  const kv = await getKv();
+  if (!kv) {
+    return NextResponse.json([]);
+  }
+  try {
+    const entries = await kv.lrange(KV_LIST_KEY, 0, 199);
+    return NextResponse.json(entries);
+  } catch {
+    return NextResponse.json([]);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -26,8 +43,15 @@ export async function POST(req: NextRequest) {
       at:      new Date().toISOString(),
     };
 
-    // Logs are visible in Vercel dashboard → Functions → /api/feedback → Logs
-    console.log('[FEEDBACK]', JSON.stringify(entry));
+    const kv = await getKv();
+    if (kv) {
+      // Prepend so newest is first; keep last 500 entries
+      await kv.lpush(KV_LIST_KEY, entry);
+      await kv.ltrim(KV_LIST_KEY, 0, 499);
+    } else {
+      // Fallback: log to Vercel function logs if KV not configured
+      console.log('[FEEDBACK]', JSON.stringify(entry));
+    }
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch {
