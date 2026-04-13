@@ -57,16 +57,28 @@ function NativeGoogleSignInButton({
       const result = await nativeGoogleSignIn(roleRef.current);
       onSuccess(result.user);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Google sign-in failed';
+      // Capture full error details for diagnosis
+      let msg: string;
+      if (err instanceof Error) {
+        msg = err.message;
+      } else if (err && typeof err === 'object') {
+        // Capacitor plugin errors are often plain objects with a 'message' or 'code' field
+        const e = err as Record<string, unknown>;
+        msg = String(e.message ?? e.code ?? e.errorMessage ?? JSON.stringify(err));
+      } else {
+        msg = String(err);
+      }
+      console.error('[GoogleAuth] sign-in error:', JSON.stringify(err));
       // User dismissed the picker — not an error worth surfacing
       if (
         msg.toLowerCase().includes('cancel') ||
         msg.toLowerCase().includes('dismiss') ||
-        msg.toLowerCase().includes('closed')
+        msg.toLowerCase().includes('closed') ||
+        msg.toLowerCase().includes('12501') // Google Sign-In cancel code
       ) {
         return;
       }
-      onError(msg);
+      onError(`Google sign-in error: ${msg}`);
     } finally {
       setLoading(false);
     }
