@@ -65,6 +65,17 @@ export function TopBar({
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [shareToast,   setShareToast]   = useState(false);
+  
+  // Notifications state
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications] = useState([
+    { id: 1, type: 'invite', title: 'Coach Sharma invited you to a session', time: '5m ago' },
+    { id: 2, type: 'general', title: 'Weekly analytics report is ready', time: '2h ago' },
+  ]);
+  const unreadCount = notifications.length;
+  const hasInvite = notifications.some(n => n.type === 'invite');
+  const hasGeneral = notifications.some(n => n.type === 'general');
+  const dotColor = hasInvite ? '#FF4D6D' : (hasGeneral ? '#F5A623' : 'transparent');
 
   async function handleShare() {
     const url   = window.location.href;
@@ -258,6 +269,82 @@ export function TopBar({
             </svg>
           </Link>
         )}
+
+        {/* Notification button */}
+        <div className="relative">
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="flex items-center justify-center w-9 h-9 rounded-xl
+                       transition-all duration-200 active:scale-90"
+            style={{
+              background: 'var(--chip-bg)',
+              border: '1px solid var(--glass-border)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(79,195,247,0.3)';
+              e.currentTarget.style.background = 'rgba(79,195,247,0.06)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--glass-border)';
+              e.currentTarget.style.background = 'var(--chip-bg)';
+            }}
+            aria-label="Notifications"
+            title="Notifications"
+          >
+            <span className="relative" style={{ color: 'var(--text-muted)' }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              {unreadCount > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full border border-[var(--bg-void)]"
+                  style={{ background: dotColor }}
+                />
+              )}
+            </span>
+          </button>
+          
+          {/* Notification slide-out panel */}
+          {notificationsOpen && (
+            <div
+              className="absolute top-[calc(100%+12px)] right-0 w-80 rounded-2xl p-4 shadow-2xl animate-slide-up"
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--glass-border)',
+                backdropFilter: 'blur(16px)',
+              }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-display font-bold text-sm text-text-primary">Notifications</h3>
+                <span className="text-[10px] uppercase font-display tracking-wider text-text-secondary">
+                  {unreadCount} New
+                </span>
+              </div>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="text-xs text-text-muted text-center py-4">No notifications</p>
+                ) : (
+                  notifications.map(n => (
+                    <div key={n.id} className="p-3 rounded-xl border border-border-subtle bg-[rgba(255,255,255,0.02)]">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <p className="text-xs font-semibold text-text-primary">{n.title}</p>
+                          <p className="text-[10px] text-text-muted mt-1">{n.time}</p>
+                        </div>
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0 mt-1"
+                          style={{ background: n.type === 'invite' ? '#FF4D6D' : '#F5A623' }}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Feedback button */}
         <button

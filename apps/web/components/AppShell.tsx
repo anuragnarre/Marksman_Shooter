@@ -171,7 +171,7 @@ export function AppShell({ children, title, isLive = false }: AppShellProps) {
           paddingBottom:     isMobile ? bottomOffsetMobile : 0,
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 lg:py-8">
+        <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 lg:py-8">
           <SwipeNavigator>
             <PageTransition>
               {children}

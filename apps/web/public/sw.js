@@ -15,7 +15,13 @@ const { routing, strategies, expiration } = workbox;
 // Take control immediately so the first load is served by this SW version.
 self.skipWaiting();
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => caches.delete(cacheName))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 // ── Static assets: Cache-First ────────────────────────────────────────────────

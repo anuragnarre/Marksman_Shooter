@@ -185,9 +185,11 @@ export class AiCoachService {
   ) {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY is not set in .env — get a free key at https://console.groq.com/keys');
+      console.warn('GROQ_API_KEY is not set in .env. AI Coach features will not work.');
+      this.groq = null as any; // Allow startup, fail on request
+    } else {
+      this.groq = new Groq({ apiKey });
     }
-    this.groq = new Groq({ apiKey });
   }
 
   async analyzeSession(

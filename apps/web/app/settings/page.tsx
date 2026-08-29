@@ -16,6 +16,9 @@ export default function SettingsPage() {
 
   // ── Profile ───────────────────────────────────────────────────────────────
   const [name, setName]                   = useState('');
+  const [bio, setBio]                     = useState('');
+  const [location, setLocation]           = useState('');
+  const [dob, setDob]                     = useState('');
   const [profileMsg, setProfileMsg]       = useState<string | null>(null);
   const [profileErr, setProfileErr]       = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -52,6 +55,7 @@ export default function SettingsPage() {
   }
 
   // ── Password ──────────────────────────────────────────────────────────────
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -125,7 +129,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell title="Settings">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
 
         {/* ── Profile ──────────────────────────────────────────────────────── */}
         <section className="card p-6 animate-slide-up" style={{ animationDelay: '0ms' }}>
@@ -144,6 +148,41 @@ export default function SettingsPage() {
                 className="field"
                 placeholder="Arjun Sharma"
               />
+            </div>
+
+            <div>
+              <label htmlFor="settings-bio" className="label">Bio (Optional)</label>
+              <textarea
+                id="settings-bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                className="field min-h-[80px]"
+                placeholder="Tell us a bit about your shooting journey"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="settings-location" className="label">Location (Optional)</label>
+                <input
+                  id="settings-location"
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="field"
+                  placeholder="e.g. London, UK"
+                />
+              </div>
+              <div>
+                <label htmlFor="settings-dob" className="label">Date of Birth (Optional)</label>
+                <input
+                  id="settings-dob"
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  className="field"
+                />
+              </div>
             </div>
 
             {profileMsg && <InlineSuccess message={profileMsg} />}
@@ -245,12 +284,23 @@ export default function SettingsPage() {
 
         {/* ── Change Password ──────────────────────────────────────────────── */}
         <section className="card p-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <h2 className="font-display font-bold text-xl text-text-primary mb-1">Change Password</h2>
+          <div className="flex justify-between items-start sm:items-center mb-1 flex-col sm:flex-row gap-2">
+            <h2 className="font-display font-bold text-xl text-text-primary">Change Password</h2>
+            <button 
+              type="button"
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="text-accent text-sm font-display uppercase tracking-widest font-semibold hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--accent-primary)' }}
+            >
+              {showPasswordForm ? 'Hide Form' : 'Change Password'}
+            </button>
+          </div>
           <p className="text-text-secondary text-sm mb-5">
             Use a strong password with at least 8 characters.
           </p>
 
-          <form onSubmit={handlePasswordChange} className="space-y-4">
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordChange} className="space-y-4 border-t border-border-subtle pt-5 mt-5">
             <div>
               <label htmlFor="settings-cur-pw" className="label">Current password</label>
               <input
@@ -305,6 +355,7 @@ export default function SettingsPage() {
               {pwLoading ? <SpinnerLabel text="Updating..." /> : 'Update password'}
             </button>
           </form>
+          )}
         </section>
 
         {/* ── Devices ─────────────────────────────────────────────────────── */}

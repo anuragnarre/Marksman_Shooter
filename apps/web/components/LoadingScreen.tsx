@@ -16,7 +16,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
   }, [onComplete])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ background: 'var(--bg-void)' }}>
+    <div className="fixed inset-0 bg-bg-void z-50 flex flex-col items-center justify-center">
       <svg viewBox="0 0 80 80" className="w-16 h-16 mb-6">
         {[36, 28, 20, 12].map((r, i) => (
           <circle key={r} cx="40" cy="40" r={r}
@@ -26,14 +26,12 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
         ))}
         <circle cx="40" cy="40" r="3" fill="#F5A623" />
       </svg>
-      <p className="font-display font-bold text-xl tracking-[0.3em] mb-8" style={{ color: 'var(--text-primary)' }}>
+      <p className="font-display font-bold text-xl text-text-primary tracking-[0.3em] mb-8">
         MARKSMAN
       </p>
-      <div className="w-48 h-px overflow-hidden" style={{ background: 'var(--border-subtle)' }}>
-        <div
-          className="h-full transition-all duration-100 ease-linear"
-          style={{ width: `${progress}%`, background: 'var(--accent-primary)' }}
-        />
+      <div className="w-48 h-px bg-border-subtle overflow-hidden">
+        <div className="h-full bg-accent transition-all duration-100 ease-linear"
+          style={{ width: `${progress}%` }} />
       </div>
     </div>
   )

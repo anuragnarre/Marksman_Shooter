@@ -407,18 +407,18 @@ export function DeviceManager() {
           </div>
           <p className="text-sm font-semibold text-text-primary mb-1">No Devices Registered</p>
           <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-            Connect an Arduino pulse sensor or Android wearable to start tracking biometrics during sessions.
+            Connect a custom sensor/device or Android wearable to start tracking biometrics during sessions.
           </p>
         </div>
       )}
 
-      {/* Register Arduino / Custom Sensor */}
+      {/* Register Custom Sensor/Device */}
       {showForm ? (
         <div className="card p-5 space-y-4">
           <div>
-            <p className="font-display font-semibold text-sm text-text-primary">Register Arduino Sensor</p>
+            <p className="font-display font-semibold text-sm text-text-primary">Register Custom Sensor/Device</p>
             <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-              Give your device a name. You'll get a unique API key to put in the Arduino firmware.
+              Give your device a name. You'll get a unique API key to connect your sensor/device to the platform.
             </p>
           </div>
           <input
@@ -436,7 +436,7 @@ export function DeviceManager() {
         </div>
       ) : (
         <button onClick={() => { setShowForm(true); setNewType('CUSTOM_SENSOR'); }} className="btn-primary px-4 py-2 text-sm w-full">
-          + Register Arduino Sensor
+          + Register Custom Sensor/Device
         </button>
       )}
 

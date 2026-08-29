@@ -1,9 +1,9 @@
-// apps/api/src/shots/shots.controller.ts
 import {
   Controller,
   Post,
   Delete,
   Patch,
+  Get,
   Body,
   Param,
   UseGuards,
@@ -11,6 +11,8 @@ import {
   UploadedFile,
   BadRequestException,
   Query,
+  Headers,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ShotsService } from './shots.service';
@@ -172,5 +174,55 @@ export class ShotsController {
     @Body() dto: UpdateShotDto,
   ): Promise<Shot> {
     return this.shotsService.updateShot(shotId, user.sub, user.role, dto);
+  }
+
+  /**
+   * Method 4 — Live Frame from Range Engine
+   * POST /shots/live-frame
+   * Called by the standalone range engine (engine/start.py).
+   * No JWT auth — authenticated by X-Engine-Key header (matches ENGINE_API_KEY env var).
+   * If ENGINE_API_KEY is not set, this endpoint is open (local dev only).
+   */
+  @Post('live-frame')
+  async liveFrame(
+    @Body() body: {
+      rangeId: string;
+      sessionId?: string;
+      x: number;
+      y: number;
+      score: number;
+      pixelX?: number;
+      pixelY?: number;
+      targetType?: string;
+      confidence?: number;
+      timestamp?: number;
+    },
+    @Headers('x-engine-key') engineKey?: string,
+  ): Promise<{ saved: boolean; shot: Partial<Shot> }> {
+    // Optional API key gate — set ENGINE_API_KEY in .env to enable
+    const requiredKey = process.env.ENGINE_API_KEY;
+    if (requiredKey && engineKey !== requiredKey) {
+      throw new UnauthorizedException('Invalid engine API key');
+    }
+
+    if (!body.rangeId) {
+      throw new BadRequestException('rangeId is required');
+    }
+    if (typeof body.x !== 'number' || typeof body.y !== 'number' || typeof body.score !== 'number') {
+      throw new BadRequestException('x, y, score are required numbers');
+    }
+
+    return this.shotsService.processLiveFrame({
+      rangeId:    body.rangeId,
+      sessionId:  body.sessionId,
+      x:          body.x,
+      y:          body.y,
+      score:      body.score,
+      pixelX:     body.pixelX ?? 500,
+      pixelY:     body.pixelY ?? 500,
+      targetType: body.targetType ?? 'air_rifle_10m',
+      confidence: body.confidence,
+      timestamp:  body.timestamp,
+    });
   }
 }

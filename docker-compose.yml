@@ -1,7 +1,8 @@
 services:
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
-    container_name: shooting-db
+    container_name: marksman-db
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
@@ -11,6 +12,47 @@ services:
       - "5433:5432"
     volumes:
       - shooting_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Vision Service (FastAPI) ──────────────────────────────────────────────────
+  vision:
+    build:
+      context: ./apps/vision
+      dockerfile: Dockerfile
+    container_name: marksman-vision
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    profiles: ["full"]        # only started with: docker compose --profile full up
+
+  # ── NestJS API ───────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: marksman-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/shooting_platform
+      JWT_SECRET: local-dev-secret-change-in-production
+      JWT_EXPIRES_IN: "7d"
+      PORT: 3001
+      CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      VISION_SERVICE_URL: http://vision:8000
+      GOOGLE_CLIENT_ID: dummy
+      GROQ_API_KEY: dummy
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["full"]
 
 volumes:
   shooting_db_data:

@@ -83,7 +83,24 @@ def compute_difference_image(
     synthetic = cv2.GaussianBlur(synthetic, (ksize, ksize), sigma)
 
     # Step 4: Apply bilateral filter to real image to suppress JPEG artifacts
-    real_smooth = cv2.bilateralFilter(gray, d=5, sigmaColor=30, sigmaSpace=30)
+    # Adapt bilateral filter strength to image blurriness (blur_score)
+    if blur_score > 0 and blur_score < 150:
+        # Blurry image (e.g. ESP32 or old Android) -> stronger smoothing to kill noise
+        d_val = 7
+        sig_color = 45
+        sig_space = 45
+    elif blur_score > 300:
+        # Sharp image -> lighter smoothing to preserve crisp hole edges
+        d_val = 5
+        sig_color = 20
+        sig_space = 20
+    else:
+        # Default moderate smoothing
+        d_val = 5
+        sig_color = 30
+        sig_space = 30
+        
+    real_smooth = cv2.bilateralFilter(gray, d=d_val, sigmaColor=sig_color, sigmaSpace=sig_space)
 
     # Step 5: Normalize both to [0, 1] and compute difference
     real_f = real_smooth.astype(np.float32) / 255.0

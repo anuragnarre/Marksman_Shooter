@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/auth-context';
-import { FeedbackModal } from './FeedbackModal';
+
 
 interface NavGroup {
   href: string;
@@ -22,14 +22,19 @@ const NAV_GROUPS: NavGroup[] = [
   {
     href: '/sessions', label: 'Sessions', icon: <TargetIcon />,
     children: [
-      { href: '/sessions/new', label: 'New Session', icon: <PlusIcon /> },
-      { href: '/sessions/compare', label: 'Compare', icon: <CompareIcon /> },
+      { href: '/sessions/new',    label: 'New Session',  icon: <PlusIcon /> },
+      { href: '/sessions/live',   label: 'Live Session', icon: <PulseIcon /> },
+      { href: '/sessions/compare',label: 'Compare',      icon: <CompareIcon /> },
     ],
   },
+  { href: '/ballistics', label: 'Ballistics', icon: <TargetIcon /> },
+  { href: '/ranges', label: 'Ranges', icon: <GridIcon /> },
+  { href: '/equipment', label: 'Equipment', icon: <ToolIcon /> },
   {
     href: '/planning', label: 'Planning', icon: <CalendarIcon />,
     children: [
       { href: '/planning/training-plan', label: 'Training Plan', icon: <PlanIcon /> },
+      { href: '/planning/drills', label: 'Drills', icon: <TargetIcon /> },
     ],
   },
   {
@@ -38,6 +43,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/performance/ai-coach', label: 'AI Coach', icon: <SparkleIcon /> },
       { href: '/performance/ai-assistant', label: 'AI Assistant', icon: <BrainIcon /> },
       { href: '/performance/health', label: 'Health', icon: <HeartPulseIcon /> },
+      { href: '/performance/competitions', label: 'Competitions', icon: <GoalIcon /> },
     ],
   },
   { href: '/docs', label: 'Docs & Guides', icon: <DocsIcon /> },
@@ -53,7 +59,7 @@ const ROLE_COLOR: Record<string, { color: string; bg: string; label: string }> =
 export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } = {}) {
   const [expanded,      setExpanded]      = useState(true);
   const [mounted,       setMounted]       = useState(false);
-  const [feedbackOpen,  setFeedbackOpen]  = useState(false);
+
   const pathname = usePathname();
   const router   = useRouter();
   const { user, logout } = useAuth();
@@ -72,7 +78,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
     router.push('/auth/login');
   }
 
-  const W = expanded ? 244 : 72;
+  const W = expanded ? 260 : 72;
   const roleStyle = user?.role ? (ROLE_COLOR[user.role] ?? ROLE_COLOR.SHOOTER) : ROLE_COLOR.SHOOTER;
 
   return (
@@ -131,7 +137,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
       </div>
 
       {/* ── Nav items ───────────────────────────────────────────────────── */}
-      <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden space-y-0.5 px-2" role="menubar">
+      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden space-y-1.5 px-3" role="menubar">
         {/* ⌘K Command palette trigger */}
         {onCommandPalette && (
           <button
@@ -176,7 +182,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
                 expanded={expanded}
               />
               {expanded && group.children && groupActive && (
-                <div className="ml-6 mt-0.5 space-y-0.5">
+                <div className="ml-6 mt-1 space-y-1">
                   {group.children.map((child) => {
                     const isChildActive = pathname === child.href || pathname.startsWith(child.href + '/');
                     return (
@@ -196,55 +202,6 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
             </div>
           );
         })}
-
-        {/* ── Feedback button ─────────────────────────────────────────── */}
-        <button
-          onClick={() => setFeedbackOpen(true)}
-          className="group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-                     transition-all duration-200 mt-0.5"
-          style={{
-            background: 'transparent',
-            border: '1px solid transparent',
-            color: 'var(--text-secondary)',
-            justifyContent: expanded ? 'flex-start' : 'center',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--btn-ghost-bg)';
-            e.currentTarget.style.color = 'var(--text-primary)';
-            e.currentTarget.style.transform = 'translateX(2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'var(--text-secondary)';
-            e.currentTarget.style.transform = 'translateX(0)';
-          }}
-          aria-label="Give feedback"
-        >
-          <span className="shrink-0 w-5 h-5 flex items-center justify-center">
-            <FeedbackIcon />
-          </span>
-          {expanded && (
-            <span className="font-display font-semibold text-[13px] tracking-wide whitespace-nowrap overflow-hidden">
-              Feedback
-            </span>
-          )}
-          {!expanded && (
-            <span
-              className="absolute left-full ml-3 px-3 py-1.5 rounded-lg text-xs font-display
-                         font-semibold text-text-primary whitespace-nowrap z-tooltip
-                         opacity-0 pointer-events-none group-hover:opacity-100
-                         transition-all duration-150 translate-x-1 group-hover:translate-x-0"
-              style={{
-                background: 'var(--glass-heavy-bg)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(245,166,35,0.2)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-              }}
-            >
-              Feedback
-            </span>
-          )}
-        </button>
       </nav>
 
       {/* ── User section ────────────────────────────────────────────────── */}
@@ -362,8 +319,7 @@ export function Sidebar({ onCommandPalette }: { onCommandPalette?: () => void } 
       </div>
     </aside>
 
-    {/* Feedback modal — rendered outside aside to avoid stacking-context clip */}
-    <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+    {/* Mobile menu handled in MobileMenu.tsx */}
     </>
   );
 }
@@ -652,6 +608,17 @@ function CalendarIcon() {
       <line x1="12" y1="1" x2="12" y2="5" />
       <rect x="5" y="10" width="2.5" height="2.5" rx="0.5" fill="currentColor" stroke="none" />
       <rect x="10" y="10" width="2.5" height="2.5" rx="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function ToolIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.5 7.5l5-5a1.414 1.414 0 0 0-2-2l-5 5" />
+      <path d="M2.5 15.5l3.5-3.5" />
+      <circle cx="5" cy="13" r="3" />
+      <circle cx="13" cy="5" r="3" />
     </svg>
   );
 }

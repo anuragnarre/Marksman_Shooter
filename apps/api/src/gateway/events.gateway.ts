@@ -20,7 +20,10 @@ import {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+    ],
     credentials: true,
   },
   namespace: '/',
@@ -78,6 +81,39 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ): void {
     void client.leave(`user:${userId}`);
+  }
+
+  // ── Live Range events ───────────────────────────────────────────────────
+
+  @SubscribeMessage('joinLiveRange')
+  handleJoinLiveRange(
+    @MessageBody() rangeId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!rangeId || typeof rangeId !== 'string') return;
+    void client.join(`live_range:${rangeId}`);
+    client.emit('joinedLiveRange', { rangeId });
+  }
+
+  @SubscribeMessage('leaveLiveRange')
+  handleLeaveLiveRange(
+    @MessageBody() rangeId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    void client.leave(`live_range:${rangeId}`);
+  }
+
+  emitShotDetected(rangeId: string, payload: {
+    x: number;
+    y: number;
+    score?: number;
+    pixelX?: number;
+    pixelY?: number;
+    targetType?: string;
+    confidence?: number;
+    timestamp?: number;
+  }): void {
+    this.server.to(`live_range:${rangeId}`).emit('shot_detected', payload);
   }
 
   // ── Session events ────────────────────────────────────────────────────────

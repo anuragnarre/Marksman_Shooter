@@ -145,7 +145,7 @@ export default function LoginPage() {
 
       {/* ── Right form panel ────────────────────────────────────────────── */}
       <div className="flex-1 min-h-0 overflow-y-auto px-6 py-10 lg:flex lg:items-center lg:justify-center">
-        <div className="w-full max-w-sm mx-auto animate-slide-up">
+        <div className="w-full max-w-md mx-auto animate-slide-up">
 
           {/* Logo */}
           <div className="flex items-center gap-3 mb-10">

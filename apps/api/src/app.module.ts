@@ -18,7 +18,7 @@ import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', 'apps/api/.env'] }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '../../apps/api/.env', 'apps/api/.env'] }),
     PrismaModule,
     AuthModule,
     SessionsModule,

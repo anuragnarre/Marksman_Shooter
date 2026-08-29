@@ -1,4 +1,4 @@
-"""ISSF and Indian-standard target dimension specifications."""
+"""ISSF, NRA, and Field Target dimension specifications."""
 
 from dataclasses import dataclass
 from enum import Enum
@@ -62,7 +62,6 @@ class TargetSpec:
         cv2.line(img, (0, radius_pixels), (size - 1, radius_pixels), 128, line_thickness)
         cv2.line(img, (radius_pixels, 0), (radius_pixels, size - 1), 128, line_thickness)
 
-        # Ring numbers (small text near each ring boundary on the right side)
         font_scale = max(0.25, radius_pixels / 600.0)
         font_thickness = max(1, int(radius_pixels / 400))
         for ring_num in range(1, self.num_rings + 1):
@@ -83,16 +82,28 @@ class TargetSpec:
 
 
 class TargetType(str, Enum):
-    AIR_RIFLE_10M = "air_rifle_10m"
-    AIR_PISTOL_10M = "air_pistol_10m"
-    # Indian standard targets
-    NR_50M = "nr_50m"           # 50m Rifle (NR pattern)
-    NR_25M_PISTOL = "nr_25m"   # 25m Pistol
+    # ── ISSF Air / 10m ──────────────────────────────────────────────────────
+    AIR_RIFLE_10M     = "air_rifle_10m"
+    AIR_PISTOL_10M    = "air_pistol_10m"
+    # ── ISSF 50m ────────────────────────────────────────────────────────────
+    AIR_RIFLE_50M     = "air_rifle_50m"      # Olympic 50m Air Rifle
+    NR_50M            = "nr_50m"             # Indian NR 50m Rifle
+    # ── ISSF 25m ────────────────────────────────────────────────────────────
+    NR_25M_PISTOL     = "nr_25m"             # Indian 25m Pistol
+    # ── ISSF 300m ───────────────────────────────────────────────────────────
+    ISSF_300M_RIFLE   = "issf_300m_rifle"    # Full-bore 300m Rifle
+    # ── NRA (US Standard) ───────────────────────────────────────────────────
+    NRA_B8_25YD       = "nra_b8_25yd"        # NRA B-8 25-yard Pistol
+    # ── Airgun Range ────────────────────────────────────────────────────────
+    AIRGUN_MULTI_BULL = "airgun_multi_bull"  # Multi-bull 10m indoor range
+    # ── Field Target ────────────────────────────────────────────────────────
+    FIELD_TARGET_FT   = "field_target_ft"    # FT silhouette (kill-zone scoring)
 
 
 TARGET_SPECS: Dict[TargetType, TargetSpec] = {
+    # ── 10m Air ─────────────────────────────────────────────────────────────
     TargetType.AIR_RIFLE_10M: TargetSpec(
-        name="10m Air Rifle",
+        name="10m Air Rifle (ISSF)",
         outer_ring1_diameter_mm=45.5,
         ring_width_mm=2.5,
         pellet_diameter_mm=4.5,
@@ -100,28 +111,77 @@ TARGET_SPECS: Dict[TargetType, TargetSpec] = {
         dark_center_rings=5,
     ),
     TargetType.AIR_PISTOL_10M: TargetSpec(
-        name="10m Air Pistol",
+        name="10m Air Pistol (ISSF)",
         outer_ring1_diameter_mm=170.0,
         ring_width_mm=8.0,
         pellet_diameter_mm=4.5,
         inner_ten_diameter_mm=5.0,
         dark_center_rings=4,
     ),
+    # ── 50m ─────────────────────────────────────────────────────────────────
+    TargetType.AIR_RIFLE_50M: TargetSpec(
+        name="50m Air Rifle Olympic (ISSF)",
+        outer_ring1_diameter_mm=154.4,
+        ring_width_mm=8.0,
+        pellet_diameter_mm=4.5,
+        inner_ten_diameter_mm=5.0,
+        dark_center_rings=5,
+    ),
     TargetType.NR_50M: TargetSpec(
-        name="50m Rifle",
+        name="50m Rifle (NR Pattern)",
         outer_ring1_diameter_mm=154.4,
         ring_width_mm=8.0,
         pellet_diameter_mm=5.6,
         inner_ten_diameter_mm=5.0,
         dark_center_rings=5,
     ),
+    # ── 25m ─────────────────────────────────────────────────────────────────
     TargetType.NR_25M_PISTOL: TargetSpec(
-        name="25m Pistol",
+        name="25m Pistol (NR Pattern)",
         outer_ring1_diameter_mm=500.0,
         ring_width_mm=25.0,
         pellet_diameter_mm=9.65,
-        inner_ten_diameter_mm=50.0,   # 10-ring outer diameter: outer_radius(250) - 9×ring_width(25) = 25mm radius = 50mm diameter
+        inner_ten_diameter_mm=50.0,
         dark_center_rings=4,
+    ),
+    # ── 300m ────────────────────────────────────────────────────────────────
+    TargetType.ISSF_300M_RIFLE: TargetSpec(
+        name="300m Rifle (ISSF)",
+        outer_ring1_diameter_mm=1000.0,
+        ring_width_mm=50.0,
+        pellet_diameter_mm=8.0,
+        inner_ten_diameter_mm=100.0,
+        dark_center_rings=5,
+    ),
+    # ── NRA B-8 ─────────────────────────────────────────────────────────────
+    TargetType.NRA_B8_25YD: TargetSpec(
+        name="NRA B-8 25-Yard Pistol",
+        outer_ring1_diameter_mm=406.4,    # 16 inches outer ring
+        ring_width_mm=25.4,               # 1-inch rings
+        pellet_diameter_mm=9.0,
+        num_rings=10,
+        inner_ten_diameter_mm=25.4,
+        dark_center_rings=4,
+    ),
+    # ── Airgun Multi-Bull ───────────────────────────────────────────────────
+    TargetType.AIRGUN_MULTI_BULL: TargetSpec(
+        name="10m Multi-Bull Airgun (Indoor)",
+        outer_ring1_diameter_mm=45.5,
+        ring_width_mm=2.5,
+        pellet_diameter_mm=4.5,
+        inner_ten_diameter_mm=0.5,
+        dark_center_rings=5,
+    ),
+    # ── Field Target ────────────────────────────────────────────────────────
+    # 2-ring model: outer silhouette (score=1 miss) + kill zone (score=2 hit)
+    TargetType.FIELD_TARGET_FT: TargetSpec(
+        name="Field Target Silhouette (FT/HFT)",
+        outer_ring1_diameter_mm=150.0,
+        ring_width_mm=40.0,
+        pellet_diameter_mm=4.5,
+        num_rings=2,
+        inner_ten_diameter_mm=30.0,
+        dark_center_rings=1,
     ),
 }
 

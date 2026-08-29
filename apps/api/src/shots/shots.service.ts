@@ -336,13 +336,89 @@ export class ShotsService {
     return { deleted: true };
   }
 
-  // RING_WIDTH_MM mirrors the client-side values in vision-service.ts
+  // RING_WIDTH_MM mirrors all supported target types
   private static readonly RING_WIDTH_MM: Record<string, number> = {
-    air_pistol_10m: 8.0,
-    air_rifle_10m:  8.0,
-    nr_50m:         25.0,
-    nr_25m:         25.0,
+    air_rifle_10m:    2.5,
+    air_pistol_10m:   8.0,
+    air_rifle_50m:    8.0,
+    nr_50m:           8.0,
+    nr_25m:          25.0,
+    issf_300m_rifle: 50.0,
+    nra_b8_25yd:     25.4,
+    airgun_multi_bull: 2.5,
+    field_target_ft: 40.0,
   };
+
+  // ── Method 4: Live Frame from Range Engine ─────────────────────────────────
+
+  /**
+   * Called by the range engine (engine/vision_engine.py) or directly by the
+   * web app for live-range sessions.  Receives a pre-analysed shot result from
+   * the vision service, optionally persists it to the DB, and emits a
+   * shot_detected WebSocket event to all clients watching this range.
+   */
+  async processLiveFrame(payload: {
+    rangeId: string;
+    sessionId?: string;
+    x: number;
+    y: number;
+    score: number;
+    pixelX: number;
+    pixelY: number;
+    targetType: string;
+    confidence?: number;
+    timestamp?: number;
+  }): Promise<{ saved: boolean; shot: Partial<Shot> }> {
+    const shot: Partial<Shot> = {
+      score: payload.score,
+      x: payload.x,
+      y: payload.y,
+    };
+
+    // Persist to DB if session is provided
+    if (payload.sessionId) {
+      try {
+        const session = await this.prisma.session.findFirst({
+          where: { id: payload.sessionId, deletedAt: null },
+          select: { id: true, shooterId: true },
+        });
+        if (session) {
+          const count = await this.prisma.shot.count({ where: { sessionId: payload.sessionId } });
+          const created = await this.prisma.shot.create({
+            data: {
+              sessionId: payload.sessionId,
+              shotNumber: count + 1,
+              score: payload.score,
+              x: payload.x,
+              y: payload.y,
+            },
+          });
+          shot.id = created.id;
+          shot.sessionId = created.sessionId;
+          shot.shotNumber = created.shotNumber;
+          shot.timestamp = created.timestamp;
+          this.eventsGateway.emitSessionUpdated(payload.sessionId, count + 1);
+        }
+      } catch (err) {
+        // Non-fatal: still emit WS event even if DB save fails
+        console.error('[shots] DB save failed for live frame:', err);
+      }
+    }
+
+    // Always emit shot_detected to the live range room
+    this.eventsGateway.emitShotDetected(payload.rangeId, {
+      x: payload.x,
+      y: payload.y,
+      score: payload.score,
+      pixelX: payload.pixelX,
+      pixelY: payload.pixelY,
+      targetType: payload.targetType,
+      confidence: payload.confidence ?? 1.0,
+      timestamp: payload.timestamp ?? Date.now(),
+    } as any);
+
+    return { saved: !!shot.id, shot };
+  }
 
   async updateShot(
     shotId: string,

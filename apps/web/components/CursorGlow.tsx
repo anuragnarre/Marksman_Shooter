@@ -4,7 +4,7 @@
 // A warm amber radial gradient that smoothly follows the cursor.
 // Disabled on touch devices and in light mode. Kept deliberately subtle.
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../contexts/theme-context';
 
 export function CursorGlow() {
@@ -13,6 +13,11 @@ export function CursorGlow() {
   const cur = useRef({ x: -400, y: -400 });
   const raf = useRef<number>(0);
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // Only run on pointer devices in dark mode
@@ -42,7 +47,7 @@ export function CursorGlow() {
     };
   }, [resolvedTheme]);
 
-  if (resolvedTheme === 'light') return null;
+  if (!mounted || resolvedTheme === 'light') return null;
 
   return (
     <div

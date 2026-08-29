@@ -42,6 +42,7 @@ from pipeline.mask_detector import detect_holes_mask, _mask_available
 from pipeline.nms import fuse_candidates
 from pipeline.scorer import score_holes
 from pipeline.target_specs import get_spec
+from pipeline.camera_calibration import calibrate_and_undistort, get_default_esp32_intrinsics, get_generic_android_intrinsics
 
 
 def _scale_calibration(cal: TargetCalibration, scale: float) -> TargetCalibration:
@@ -73,6 +74,8 @@ def analyze_target_image(
     image_bytes: bytes,
     target_type: str = "air_rifle_10m",
     debug: bool = False,
+    baseline_bytes: Optional[bytes] = None,
+    camera_type: str = "esp32",
 ) -> AnalysisResponse:
     """Full analysis pipeline."""
     start = time.perf_counter()
@@ -135,19 +138,61 @@ def analyze_target_image(
         img_bgr = cv2.resize(img_bgr, None, fx=pre_input_scale, fy=pre_input_scale,
                              interpolation=cv2.INTER_AREA)
 
-    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    # Decode baseline if provided
+    baseline_bgr = None
+    if baseline_bytes:
+        b_arr = np.frombuffer(baseline_bytes, dtype=np.uint8)
+        baseline_bgr = cv2.imdecode(b_arr, cv2.IMREAD_COLOR)
+        if baseline_bgr is not None and pre_input_scale != 1.0:
+            baseline_bgr = cv2.resize(baseline_bgr, None, fx=pre_input_scale, fy=pre_input_scale, interpolation=cv2.INTER_AREA)
 
-    # Stage 1: Quality check
+    # Lens Distortion Correction 
+    if camera_type in ("esp32", "android"):
+        if camera_type == "android":
+            cam_mat, dist_coeff = get_generic_android_intrinsics(img_bgr.shape[1], img_bgr.shape[0])
+        else:
+            cam_mat, dist_coeff = get_default_esp32_intrinsics(img_bgr.shape[1], img_bgr.shape[0])
+            
+        img_bgr = calibrate_and_undistort(img_bgr, cam_mat, dist_coeff)
+        if baseline_bgr is not None:
+            baseline_bgr = calibrate_and_undistort(baseline_bgr, cam_mat, dist_coeff)
+
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    
+    # Stage 1: Quality check (run before denoising so we know the raw blur_score)
     quality = check_quality(gray)
     logger.debug("Stage 1 quality: blur=%.1f glare=%.1f%% dr=%d is_acceptable=%s warnings=%s",
                  quality.blur_score, quality.glare_pct, quality.dynamic_range,
                  quality.is_acceptable, quality.warnings)
 
+    # Adaptive noise filtering and sharpening (JPEG artifacts / old Android / ESP32)
+    if baseline_bgr is not None:
+        gray = cv2.fastNlMeansDenoising(gray, h=5)
+    else:
+        # Single-image low-end fallback
+        if quality.blur_score > 0 and quality.blur_score < 150:
+            # Very blurry - apply unsharp mask to pronounce hole edges
+            blurred = cv2.GaussianBlur(gray, (0, 0), 2)
+            gray = cv2.addWeighted(gray, 1.5, blurred, -0.5, 0)
+            gray = cv2.fastNlMeansDenoising(gray, h=3)
+        elif quality.dynamic_range < 50:
+            # Low contrast noise
+            gray = cv2.fastNlMeansDenoising(gray, h=4)
+
+
     # Pre-detection CLAHE: enhance ring lines before target detection so Hough
     # and gradient methods work reliably under low-contrast / dark conditions.
     # clipLimit is adaptive: darker / lower-DR images get stronger enhancement.
     dr = int(gray.max()) - int(gray.min())
-    pre_clip = 2.0 if dr >= 80 else (3.5 if dr >= 50 else 5.0)
+    var = np.var(gray)
+    
+    if dr < 50 or var < 400:
+        pre_clip = 5.0
+    elif dr < 80 or var < 800:
+        pre_clip = 3.5
+    else:
+        pre_clip = 2.0
+        
     gray_for_detect = apply_clahe(gray, clip_limit=pre_clip)
 
     # Stage 2: Target detection
@@ -183,6 +228,12 @@ def analyze_target_image(
     # negligible distortion that doesn't warrant correction.
     if calibration.card_corners_found or (0.08 < calibration.eccentricity < 0.45):
         img_bgr, gray, calibration = correct_perspective(img_bgr, gray, calibration)
+        if baseline_bgr is not None:
+            # Warp the baseline image using the EXACT same perspective transform as the current image
+            baseline_gray = cv2.cvtColor(baseline_bgr, cv2.COLOR_BGR2GRAY)
+            if baseline_gray is not None:
+                _, baseline_warped, _ = correct_perspective(baseline_bgr, baseline_gray, calibration)
+                baseline_bgr = baseline_warped
 
     # Stage 3.1: Resize to cap hole-detection cost on high-resolution originals.
     # Card-warped images are already 1000×1000 (fast). For non-warped images
@@ -214,12 +265,28 @@ def analyze_target_image(
     if bullseye_r_px > 0:
         gray = apply_clahe_to_bullseye(gray, calibration.center, bullseye_r_px)
 
-    # Stage 3.5c: Difference image (synthetic template subtraction)
-    diff_img = compute_difference_image(
-        gray, calibration,
-        target_type=target_type,
-        blur_score=quality.blur_score,
-    )
+    # Stage 3.5c: Difference image
+    if baseline_bgr is not None:
+        # True Temporal Differencing: Subtract the empty baseline from the current shot
+        baseline_gray = cv2.cvtColor(baseline_bgr, cv2.COLOR_BGR2GRAY)
+        if work_scale != 1.0:
+             baseline_gray = cv2.resize(baseline_gray, None, fx=work_scale, fy=work_scale, interpolation=cv2.INTER_AREA)
+        # Apply the exact same CLAHE steps to the baseline
+        baseline_gray = apply_clahe(baseline_gray)
+        if bullseye_r_px > 0:
+            baseline_gray = apply_clahe_to_bullseye(baseline_gray, calibration.center, bullseye_r_px)
+        
+        # Absolute difference reveals new bullet holes
+        diff_img = cv2.absdiff(gray, baseline_gray)
+        # Threshold out noise
+        _, diff_img = cv2.threshold(diff_img, 30, 255, cv2.THRESH_BINARY)
+    else:
+        # Synthetic template subtraction
+        diff_img = compute_difference_image(
+            gray, calibration,
+            target_type=target_type,
+            blur_score=quality.blur_score,
+        )
 
     # Stage 4a: CV hole detection (always runs)
     spec = get_spec(target_type)

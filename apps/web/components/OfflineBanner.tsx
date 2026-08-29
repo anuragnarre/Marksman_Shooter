@@ -22,15 +22,14 @@ export function OfflineBanner() {
     <AnimatePresence>
       {isOffline && (
         <motion.div
-          initial={{ y: -56, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -56, opacity: 0 }}
+          initial={{ y: 56, opacity: 0, x: '-50%' }}
+          animate={{ y: 0, opacity: 1, x: '-50%' }}
+          exit={{ y: 56, opacity: 0, x: '-50%' }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-0 inset-x-0 z-[9999] flex items-center justify-center gap-2 px-4 py-2.5"
+          className="fixed bottom-24 left-1/2 z-[9999] flex items-center justify-center gap-2 px-4 py-2 rounded-full shadow-lg"
           style={{
             background: 'rgba(255,77,109,0.92)',
             backdropFilter: 'blur(12px)',
-            paddingTop: 'max(env(safe-area-inset-top, 10px), 10px)',
           }}
           role="alert"
           aria-live="assertive"

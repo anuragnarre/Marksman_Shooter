@@ -33,13 +33,14 @@ export function MetricCard({
   color = 'accent', sparklineData, isPB = false,
   decimals = 1, icon, animationDelay = 0, className = '',
 }: MetricCardProps) {
-  const animatedValue = useCountUp(value, 1400);
+  const { count: animatedValue, ref } = useCountUp(value, 1400);
   const c = COLOR_MAP[color];
   const hasDelta = delta !== undefined;
   const deltaUp  = (delta ?? 0) >= 0;
 
   return (
     <div
+      ref={ref}
       className={`relative rounded-2xl overflow-hidden flex flex-col gap-2 p-5
                   animate-slide-up transition-all duration-300 group ${className}`}
       style={{
@@ -132,7 +133,7 @@ export function MetricCard({
             animationDelay: `${animationDelay + 100}ms`,
           }}
         >
-          {animatedValue.toFixed(decimals)}
+          {Number(animatedValue || 0).toFixed(decimals)}
         </span>
         {suffix && (
           <span className="text-sm mb-1 font-display font-semibold" style={{ color: 'var(--text-muted)' }}>

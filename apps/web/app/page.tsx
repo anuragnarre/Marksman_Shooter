@@ -6,6 +6,9 @@ import { useAuth } from '../contexts/auth-context';
 import { useTheme } from '../contexts/theme-context';
 import { AppDownloadButton } from '../components/AppDownloadButton';
 import { LoadingScreen } from '../components/LoadingScreen';
+import { MarketingNav } from '../components/MarketingNav';
+import { MiniTargetCanvas } from '../components/MiniTargetCanvas';
+import { useCountUp } from '../hooks/useCountUp';
 
 // ─── Shot data (deterministic) ────────────────────────────────────────────────
 const SHOTS = [
@@ -169,24 +172,38 @@ function useReveal(threshold = 0.1) {
 }
 
 // ─── Animated Counter ─────────────────────────────────────────────────────────
-function AnimatedCounter({ end, suffix = '', duration = 2000 }: {
-  end: number; suffix?: string; duration?: number;
-}) {
-  const { ref, visible } = useReveal(0.3);
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!visible) return;
-    const steps = 70;
-    let step = 0;
-    const id = setInterval(() => {
-      step++;
-      const eased = 1 - Math.pow(1 - Math.min(step / steps, 1), 4);
-      setCount(Math.round(end * eased));
-      if (step >= steps) clearInterval(id);
-    }, duration / steps);
-    return () => clearInterval(id);
-  }, [visible, end, duration]);
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+function StatItem({ stat, index, visible }: { stat: any; index: number; visible: boolean }) {
+  const { count, ref } = useCountUp(visible ? stat.end : 0, 2000);
+  
+  return (
+    <div
+      ref={ref}
+      className="relative flex flex-col px-8 py-8 rounded-[16px]"
+      style={{
+        background: 'var(--lp-card-bg)',
+        border: '1px solid var(--lp-card-border)',
+        opacity:   visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(18px)',
+        transition: `opacity 640ms ${index * 85}ms cubic-bezier(0.16,1,0.3,1), transform 640ms ${index * 85}ms cubic-bezier(0.16,1,0.3,1)`,
+      }}
+    >
+      <div className="absolute top-0 inset-x-0 h-px rounded-t-[16px]"
+        style={{ background: `linear-gradient(90deg, transparent 10%, ${stat.color}2A 50%, transparent 90%)` }} />
+
+      <div className="w-9 h-9 rounded-[2px] flex items-center justify-center mb-5"
+        style={{ background: `${stat.color}0C`, border: `1px solid ${stat.color}16`, color: stat.color }}>
+        {stat.icon}
+      </div>
+
+      <div className="font-mono font-black leading-none mb-2.5"
+        style={{ fontSize: 'clamp(28px, 3vw, 40px)', color: stat.color, letterSpacing: '-0.025em' }}>
+        <span>{Math.round(count).toLocaleString()}{stat.suffix}</span>
+      </div>
+
+      <div className="font-display font-semibold text-[13px] tracking-tight" style={{ color: 'var(--text-primary)' }}>{stat.label}</div>
+      <div className="font-mono text-[9px] tracking-[0.16em] uppercase mt-1.5" style={{ color: 'var(--text-muted)' }}>{stat.sub}</div>
+    </div>
+  );
 }
 
 // ─── Section Eyebrow ──────────────────────────────────────────────────────────
@@ -253,14 +270,14 @@ function DashboardMockup({ isDark }: { isDark: boolean }) {
   const dimCol     = isDark ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.14)';
 
   return (
-    <div className="relative w-full max-w-[400px] mx-auto" style={{ animation: 'lp-floatY 8s ease-in-out infinite' }}>
+    <div className="relative w-full max-w-[400px] lg:max-w-[480px] xl:max-w-[540px] mx-auto" style={{ animation: 'lp-floatY 8s ease-in-out infinite' }}>
       {/* Ambient halo — glow reduced ~28% */}
       <div className="absolute -inset-10 pointer-events-none" style={{
         background: 'radial-gradient(ellipse 72% 52% at 55% 48%, rgba(245,166,35,0.040) 0%, rgba(79,195,247,0.016) 55%, transparent 80%)',
       }} />
 
       <div
-        className="relative rounded-[20px] overflow-hidden"
+        className="relative rounded-sm overflow-hidden"
         style={{
           background: glass,
           border: `1px solid ${bdr}`,
@@ -276,7 +293,7 @@ function DashboardMockup({ isDark }: { isDark: boolean }) {
           <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
-          <div className="flex-1 mx-3 rounded-md px-3 py-0.5 text-center" style={{ background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+          <div className="flex-1 mx-3 rounded-md px-3 py-0.5 text-center" style={{ backgroundColor: "var(--bg-elevated)" }}>
             <span className="font-mono text-[9px]" style={{ color: labelCol }}>app.marksman.pro / session / 047</span>
           </div>
         </div>
@@ -295,22 +312,22 @@ function DashboardMockup({ isDark }: { isDark: boolean }) {
 
         {/* Target */}
         <div className="px-5 pb-3">
-          <div className="relative w-full aspect-square rounded-[14px] overflow-hidden" style={{ border: `1px solid ${bdr}` }}>
-            <TargetMockup />
-            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[14px]">
+          <div className="relative w-full aspect-square rounded-[4px] overflow-hidden bg-void flex items-center justify-center" style={{ border: `1px solid ${bdr}` }}>
+            <MiniTargetCanvas />
+            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px]">
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg,transparent 0%,rgba(34,211,238,0.26) 50%,transparent 100%)', animation: 'lp-scanH 4s linear infinite' }} />
             </div>
           </div>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2 px-5 pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 px-5 pb-4">
           {[
             { label: 'AVG',  value: '10.45', color: '#F5A623' },
             { label: 'LAST', value: '9.9',   color: '#4FC3F7' },
             { label: 'MPI',  value: '0.8mm', color: '#00D48A' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="rounded-[10px] py-2.5 text-center" style={{ background: innerBg, border: `1px solid ${bdr}` }}>
+            <div key={label} className="rounded-[2px] py-2.5 text-center" style={{ background: innerBg, border: `1px solid ${bdr}` }}>
               <p className="font-mono font-bold text-[13px] leading-none" style={{ color }}>{value}</p>
               <p className="font-mono text-[8px] mt-1.5 tracking-[0.12em] uppercase" style={{ color: dimCol }}>{label}</p>
             </div>
@@ -323,7 +340,7 @@ function DashboardMockup({ isDark }: { isDark: boolean }) {
             const color = shotColor(shot.score);
             const badge = shot.score >= 10.5 ? 'GOLD' : shot.score >= 10.0 ? 'BLUE' : 'GRN';
             return (
-              <div key={i} className="flex items-center justify-between rounded-[8px] px-3 py-1.5"
+              <div key={i} className="flex items-center justify-between rounded-[2px] px-3 py-1.5"
                 style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', border: `1px solid ${bdr}` }}>
                 <div className="flex items-center gap-2.5">
                   <span className="font-mono text-[9px]" style={{ color: dimCol }}>#{String(i + 1).padStart(2, '0')}</span>
@@ -373,10 +390,10 @@ function TrustMarquee() {
     <div className="relative overflow-hidden group">
       <div className="absolute left-0 top-0 bottom-0 w-20 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--bg-surface), transparent)' }} />
       <div className="absolute right-0 top-0 bottom-0 w-20 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--bg-surface), transparent)' }} />
-      <div className="lp-ticker-animate flex gap-6 py-1.5">
+      <div className="animate-ticker flex gap-6 py-1.5 group-hover:[animation-play-state:paused]">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-5 whitespace-nowrap">
-            <span className="inline-flex items-center justify-center rounded-[6px] font-mono font-semibold text-[10px] tracking-[0.12em] px-2.5 py-1"
+            <span className="inline-flex items-center justify-center rounded-[2px] font-mono font-semibold text-[10px] tracking-[0.12em] px-2.5 py-1"
               style={{ background: `${item.color}0E`, border: `1px solid ${item.color}28`, color: item.color }}>
               {item.code}
             </span>
@@ -402,39 +419,10 @@ function StatsSection() {
   return (
     <section ref={ref} className="py-24 lg:py-28"
       style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {STATS.map((stat, i) => (
-            <div
-              key={stat.label}
-              className="relative flex flex-col px-8 py-8 rounded-[16px]"
-              style={{
-                background: 'var(--lp-card-bg)',
-                border: '1px solid var(--lp-card-border)',
-                opacity:   visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(18px)',
-                transition: `opacity 640ms ${i * 85}ms cubic-bezier(0.16,1,0.3,1), transform 640ms ${i * 85}ms cubic-bezier(0.16,1,0.3,1)`,
-              }}
-            >
-              {/* Top hairline accent — subtle */}
-              <div className="absolute top-0 inset-x-0 h-px rounded-t-[16px]"
-                style={{ background: `linear-gradient(90deg, transparent 10%, ${stat.color}2A 50%, transparent 90%)` }} />
-
-              {/* Icon chip */}
-              <div className="w-9 h-9 rounded-[10px] flex items-center justify-center mb-5"
-                style={{ background: `${stat.color}0C`, border: `1px solid ${stat.color}16`, color: stat.color }}>
-                {stat.icon}
-              </div>
-
-              {/* Number */}
-              <div className="font-mono font-black leading-none mb-2.5"
-                style={{ fontSize: 'clamp(28px, 3vw, 40px)', color: stat.color, letterSpacing: '-0.025em' }}>
-                {visible ? <AnimatedCounter end={stat.end} suffix={stat.suffix} /> : '0'}
-              </div>
-
-              <div className="font-display font-semibold text-[13px] tracking-tight" style={{ color: 'var(--text-primary)' }}>{stat.label}</div>
-              <div className="font-mono text-[9px] tracking-[0.16em] uppercase mt-1.5" style={{ color: 'var(--text-muted)' }}>{stat.sub}</div>
-            </div>
+            <StatItem key={stat.label} stat={stat} index={i} visible={visible} />
           ))}
         </div>
       </div>
@@ -443,13 +431,13 @@ function StatsSection() {
 }
 
 // ─── Bento Features ───────────────────────────────────────────────────────────
-const TIER: Record<string, { bg: string; color: string; border: string }> = {
-  Core:   { bg: 'rgba(255,255,255,0.04)',  color: 'rgba(255,255,255,0.36)', border: 'rgba(255,255,255,0.08)'  },
-  Pro:    { bg: 'rgba(245,166,35,0.08)',   color: '#F5A623',                border: 'rgba(245,166,35,0.18)'   },
-  Teams:  { bg: 'rgba(79,195,247,0.08)',   color: '#4FC3F7',                border: 'rgba(79,195,247,0.18)'   },
-  AI:     { bg: 'rgba(167,139,250,0.08)',  color: '#A78BFA',                border: 'rgba(167,139,250,0.18)'  },
-  Vision: { bg: 'rgba(255,77,109,0.08)',   color: '#FF4D6D',                border: 'rgba(255,77,109,0.18)'   },
-  Export: { bg: 'rgba(0,212,138,0.08)',    color: '#00D48A',                border: 'rgba(0,212,138,0.18)'    },
+const tierStyles: Record<string, string> = {
+  Core:   'bg-border-subtle text-text-secondary border-border-default',
+  Pro:    'bg-accent/10 text-accent border-accent/20',
+  Teams:  'bg-data-blue/10 text-data-blue border-data-blue/20',
+  AI:     'bg-emerald-data/10 text-emerald-data border-emerald-data/20',
+  Vision: 'bg-data-blue/10 text-data-blue border-data-blue/20',
+  Export: 'bg-border-subtle text-text-secondary border-border-default',
 };
 
 const FEATURES = [
@@ -464,24 +452,24 @@ const FEATURES = [
 function BentoFeaturesSection() {
   const { ref, visible } = useReveal(0.05);
   return (
-    <section id="features" ref={ref} className="py-32 lg:py-44" style={{ background: 'var(--bg-void)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section id="features" ref={ref} className="py-20 md:py-32 lg:py-44" style={{ background: 'var(--bg-void)' }}>
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="text-center mb-16">
           <Eyebrow>Platform Capabilities</Eyebrow>
-          <h2 className="font-display font-bold mb-5"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--text-primary)', lineHeight: '1.06', letterSpacing: '-0.028em' }}>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-5"
+            style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Built for precision at every level
           </h2>
-          <p className="font-body text-[15px] max-w-md mx-auto" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
+          <p className="font-body text-[15px] w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
             Six capabilities working in concert to give you an unfair analytical edge.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {FEATURES.map((feat, i) => (
             <div
               key={feat.title}
-              className={`group relative rounded-[20px] p-8 overflow-hidden cursor-default ${feat.span}`}
+              className={`group relative rounded-sm p-5 sm:p-6 md:pl-8 md:pr-12 overflow-hidden cursor-default ${feat.span}`}
               style={{
                 background: 'var(--lp-card-bg)',
                 border: '1px solid var(--lp-card-border)',
@@ -513,8 +501,7 @@ function BentoFeaturesSection() {
                     style={{ background: `${feat.color}0C`, border: `1px solid ${feat.color}18`, color: feat.color }}>
                     {feat.icon}
                   </div>
-                  <span className="font-mono text-[9px] tracking-[0.12em] uppercase px-2 py-1 rounded-[5px]"
-                    style={{ background: TIER[feat.tag]?.bg, color: TIER[feat.tag]?.color, border: `1px solid ${TIER[feat.tag]?.border}` }}>
+                  <span className={`font-mono text-[9px] tracking-[0.12em] uppercase px-2 py-1 rounded-[2px] border ${tierStyles[feat.tag]}`}>
                     {feat.tag}
                   </span>
                 </div>
@@ -534,13 +521,13 @@ function BentoFeaturesSection() {
 function AppPreviewSection({ isDark }: { isDark: boolean }) {
   const { ref, visible } = useReveal(0.08);
   return (
-    <section ref={ref} className="py-32 lg:py-44 overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section ref={ref} className="py-20 md:py-32 lg:py-44 overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-28 items-center">
           <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateX(0)' : 'translateX(-22px)', transition: 'opacity 680ms cubic-bezier(0.16,1,0.3,1), transform 680ms cubic-bezier(0.16,1,0.3,1)' }}>
             <Eyebrow>See It In Action</Eyebrow>
-            <h2 className="font-display font-bold mb-6"
-              style={{ fontSize: 'clamp(26px, 3.5vw, 44px)', color: 'var(--text-primary)', lineHeight: '1.06', letterSpacing: '-0.028em' }}>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-6"
+              style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
               Your entire session,<br />in one intelligent view.
             </h2>
             <p className="font-body text-[15px] leading-[1.76] mb-9" style={{ color: 'var(--text-secondary)' }}>
@@ -592,24 +579,24 @@ const HIW = [
 function HowItWorksSection() {
   const { ref, visible } = useReveal(0.08);
   return (
-    <section id="how-it-works" ref={ref} className="py-32 lg:py-44" style={{ background: 'var(--bg-void)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section id="how-it-works" ref={ref} className="py-20 md:py-32 lg:py-44" style={{ background: 'var(--bg-void)' }}>
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="text-center mb-16">
           <Eyebrow>Simple Process</Eyebrow>
-          <h2 className="font-display font-bold"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--text-primary)', lineHeight: '1.06', letterSpacing: '-0.028em' }}>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide"
+            style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Three steps to elite insight
           </h2>
-          <p className="font-body text-[15px] mt-5 max-w-xs mx-auto" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
+          <p className="font-body text-[15px] mt-5 w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
             From range to refined analysis in under three minutes.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {HIW.map((step, i) => (
             <div
               key={step.num}
-              className="relative p-10 flex flex-col rounded-[20px]"
+              className="relative p-5 sm:p-6 md:pl-8 md:pr-12 md:pl-10 md:pr-16 flex flex-col rounded-sm"
               style={{
                 background: 'var(--lp-card-bg)',
                 border: '1px solid var(--lp-card-border)',
@@ -636,7 +623,7 @@ function HowItWorksSection() {
                 >
                   {step.num}
                 </span>
-                <div className="w-9 h-9 rounded-[10px] flex items-center justify-center mt-2"
+                <div className="w-9 h-9 rounded-[2px] flex items-center justify-center mt-2"
                   style={{ background: `${step.color}0C`, border: `1px solid ${step.color}18`, color: step.color }}>
                   {step.icon}
                 </div>
@@ -664,21 +651,21 @@ const TESTIMONIALS = [
 function TestimonialsSection() {
   const { ref, visible } = useReveal(0.08);
   return (
-    <section ref={ref} className="py-32 lg:py-44" style={{ background: 'var(--bg-surface)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section ref={ref} className="py-20 md:py-32 lg:py-44" style={{ background: 'var(--bg-surface)' }}>
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="text-center mb-16">
           <Eyebrow>Social Proof</Eyebrow>
-          <h2 className="font-display font-bold"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--text-primary)', lineHeight: '1.06', letterSpacing: '-0.028em' }}>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide"
+            style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Trusted by elite athletes
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {TESTIMONIALS.map((t, i) => (
             <div
               key={t.name}
-              className="group relative rounded-[20px] p-10 flex flex-col"
+              className="group relative rounded-sm p-5 sm:p-6 md:pl-8 md:pr-12 md:pl-10 md:pr-16 flex flex-col"
               style={{
                 background: 'var(--lp-card-bg)',
                 border: '1px solid var(--lp-card-border)',
@@ -730,14 +717,19 @@ function TestimonialsSection() {
 // Strong identity preserved. Glow reduced ~28%. More breathing space.
 function VisionAISection() {
   const { ref, visible } = useReveal(0.08);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = !mounted || resolvedTheme !== 'light';
+  
   return (
-    <section ref={ref} className="py-32 lg:py-44 overflow-hidden" style={{ background: 'var(--bg-void)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section ref={ref} className="py-20 md:py-32 lg:py-44 overflow-hidden" style={{ background: 'var(--bg-void)' }}>
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-28 items-center">
           <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateX(0)' : 'translateX(-22px)', transition: 'opacity 680ms cubic-bezier(0.16,1,0.3,1), transform 680ms cubic-bezier(0.16,1,0.3,1)' }}>
             <Eyebrow color="#FF4D6D">Computer Vision</Eyebrow>
-            <h2 className="font-display font-bold mb-6"
-              style={{ fontSize: 'clamp(26px, 3.5vw, 44px)', color: 'var(--text-primary)', lineHeight: '1.06', letterSpacing: '-0.028em' }}>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-6"
+              style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
               Target detection with{' '}
               <span style={{ background: 'linear-gradient(135deg, #FF4D6D 0%, #F5A623 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 97.8% accuracy.
@@ -780,7 +772,7 @@ function VisionAISection() {
             <div className="relative">
               {/* Target — glow reduced ~28% from original */}
               <div className="relative w-full max-w-[380px] mx-auto aspect-square rounded-full overflow-hidden"
-                style={{ background: '#060810', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 0 40px rgba(255,77,109,0.047), 0 0 72px rgba(245,166,35,0.026), inset 0 0 36px rgba(0,0,0,0.52)' }}>
+                style={{ background: isDark ? '#060810' : '#FFFFFF', border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.1)'}`, boxShadow: `0 0 40px rgba(255,77,109,0.047), 0 0 72px rgba(245,166,35,0.026), inset 0 0 36px ${isDark ? 'rgba(0,0,0,0.52)' : 'rgba(0,0,0,0.1)'}` }}>
                 <svg viewBox="0 0 100 100" className="w-full h-full" aria-label="CV target detection">
                   <defs>
                     <radialGradient id="vis-bg" cx="50%" cy="50%" r="50%">
@@ -878,21 +870,21 @@ const pricingPlans = [
 function PricingSection() {
   return (
     <section id="pricing" className="py-24" style={{ background: 'var(--bg-void)' }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+      <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
         <div className="text-center mb-14">
           <p className="font-mono text-[10px] tracking-[0.22em] uppercase mb-4" style={{ color: '#F5A623' }}>Pricing</p>
-          <h2 className="font-display font-black mb-4" style={{ fontSize: 'clamp(28px, 4vw, 48px)', lineHeight: '1.06', color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-4" style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Simple, transparent pricing
           </h2>
-          <p className="font-body text-[15px] max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
+          <p className="font-body text-[15px] w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)' }}>
             Start free. Upgrade when your team grows.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {pricingPlans.map((plan) => (
             <div key={plan.name}
-              className="rounded-2xl p-7 flex flex-col"
+              className="rounded-sm p-7 flex flex-col"
               style={{
                 background: 'var(--lp-card-bg, var(--bg-surface))',
                 border: plan.highlight ? '1px solid rgba(245,166,35,0.40)' : '1px solid var(--border-subtle)',
@@ -1060,129 +1052,7 @@ export default function HomePage() {
       <div className="min-h-screen font-body" style={{ background: 'var(--bg-void)', color: 'var(--text-primary)' }}>
 
         {/* ── NAVBAR ──────────────────────────────────────────────────────── */}
-        <nav
-          className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-          style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-            ...(scrolled ? {
-              backdropFilter: 'blur(22px) saturate(148%)',
-              WebkitBackdropFilter: 'blur(22px) saturate(148%)',
-              background: 'var(--nav-glass-bg)',
-              borderBottom: '1px solid var(--nav-glass-border)',
-              boxShadow: isDark
-                ? '0 1px 0 rgba(255,255,255,0.034), 0 4px 16px rgba(0,0,0,0.20)'
-                : '0 1px 0 rgba(0,0,0,0.06),       0 4px 12px rgba(0,0,0,0.04)',
-            } : {}),
-          }}
-        >
-          <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo */}
-              <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-                <div className="w-6 h-6 transition-transform duration-200 group-hover:rotate-[15deg]" style={{ color: '#F5A623' }}>
-                  <IconCrosshair className="w-full h-full" />
-                </div>
-                <span className="font-display font-bold text-[15px] tracking-[0.09em] uppercase" style={{ color: 'var(--nav-logo-color)' }}>Marksman</span>
-              </Link>
-
-              {/* Desktop nav */}
-              <div className="hidden md:flex items-center gap-7">
-                {[{ label: 'Features', id: 'features' }, { label: 'How it Works', id: 'how-it-works' }, { label: 'Pricing', id: 'pricing' }].map(({ label, id }) => (
-                  <button key={id} onClick={() => scrollTo(id)}
-                    className="font-body text-[13px] font-medium hover:text-[#F5A623] relative group/link"
-                    style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }}>
-                    {label}
-                    <span className="absolute -bottom-0.5 left-0 right-0 h-px rounded-full origin-left scale-x-0 group-hover/link:scale-x-100 transition-transform duration-200" style={{ background: '#F5A623' }} />
-                  </button>
-                ))}
-              </div>
-
-              {/* Desktop right */}
-              <div className="hidden md:flex items-center gap-2">
-                {mounted && (
-                  <button onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg"
-                    style={{ color: 'var(--text-muted)', transition: 'color 180ms ease' }} aria-label="Toggle theme">
-                    {resolvedTheme === 'light' ? <IconMoon className="w-3.5 h-3.5" /> : <IconSun className="w-3.5 h-3.5" />}
-                  </button>
-                )}
-                <AppDownloadButton size="sm" />
-                {isLoggedIn ? (
-                  <Link href="/dashboard" className="inline-flex items-center gap-1.5 font-display font-bold text-[13px] px-4 py-2 rounded-[10px]"
-                    style={{ background: '#F5A623', color: '#07090F', boxShadow: '0 0 13px rgba(245,166,35,0.16)', transition: 'filter 200ms ease' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1.07)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1)'}>
-                    Dashboard <IconArrowRight className="w-3 h-3" />
-                  </Link>
-                ) : (
-                  <>
-                    <Link href="/auth/login" className="font-body text-[13px] font-medium px-3 py-2 hover:text-[#F5A623]"
-                      style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }}>Sign in</Link>
-                    <Link href="/auth/register" className="inline-flex items-center gap-1.5 font-display font-bold text-[13px] px-4 py-2 rounded-[10px]"
-                      style={{ background: '#F5A623', color: '#07090F', boxShadow: '0 0 13px rgba(245,166,35,0.16)', transition: 'filter 200ms ease' }}
-                      onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1.07)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1)'}>
-                      Get Started <IconArrowRight className="w-3 h-3" />
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              {/* Mobile controls */}
-              <div className="md:hidden flex items-center gap-1">
-                {mounted && (
-                  <button onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg"
-                    style={{ color: 'var(--text-muted)' }} aria-label="Toggle theme">
-                    {resolvedTheme === 'light' ? <IconMoon className="w-3.5 h-3.5" /> : <IconSun className="w-3.5 h-3.5" />}
-                  </button>
-                )}
-                <button className="w-10 h-10 flex items-center justify-center rounded-lg"
-                  style={{ color: 'var(--text-secondary)' }} onClick={() => setMobileMenuOpen(true)} aria-label="Open menu">
-                  <IconMenu className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
-
-        {/* ── MOBILE DRAWER ───────────────────────────────────────────────── */}
-        {mobileMenuOpen && (
-          <>
-            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 z-50 w-72 flex flex-col px-6"
-              style={{ background: 'var(--bg-elevated)', borderLeft: '1px solid var(--border-subtle)', animation: 'lp-drawerIn 250ms cubic-bezier(0.16,1,0.3,1) both', paddingTop: 'max(20px, env(safe-area-inset-top, 20px))', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5" style={{ color: '#F5A623' }}><IconCrosshair className="w-full h-full" /></div>
-                  <span className="font-display font-bold text-[14px] tracking-[0.09em] uppercase" style={{ color: 'var(--text-primary)' }}>Marksman</span>
-                </div>
-                <button className="w-9 h-9 flex items-center justify-center rounded-lg" style={{ color: 'var(--text-secondary)' }} onClick={() => setMobileMenuOpen(false)}>
-                  <IconX className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex flex-col gap-0.5 flex-1">
-                {[{ label: 'Features', id: 'features' }, { label: 'How it Works', id: 'how-it-works' }, { label: 'Pricing', id: 'pricing' }].map(({ label, id }) => (
-                  <button key={id} onClick={() => scrollTo(id)} className="font-body text-[15px] font-medium text-left py-3 px-2 rounded-lg hover:text-[#F5A623]"
-                    style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }}>{label}</button>
-                ))}
-                {!isLoggedIn && (
-                  <Link href="/auth/login" className="font-body text-[15px] font-medium py-3 px-2 rounded-lg hover:text-[#F5A623]"
-                    style={{ color: 'var(--text-secondary)', transition: 'color 180ms ease' }} onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
-                )}
-              </div>
-              <div className="pb-8 pt-4 flex flex-col gap-3">
-                <AppDownloadButton size="md" className="w-full" />
-                <Link href={isLoggedIn ? '/dashboard' : '/auth/register'} onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 font-display font-bold text-[13px] w-full py-3.5 rounded-[12px]"
-                  style={{ background: '#F5A623', color: '#07090F', boxShadow: '0 0 18px rgba(245,166,35,0.20)' }}>
-                  {isLoggedIn ? 'Go to Dashboard' : 'Get Started Free'}
-                  <IconArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </>
-        )}
+        <MarketingNav />
 
         {/* ── HERO ────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden" style={{ background: 'var(--bg-void)', minHeight: '100dvh', display: 'flex', alignItems: 'center' }}>
@@ -1199,7 +1069,7 @@ export default function HomePage() {
             <div className="absolute rounded-full" style={{ width: '660px', height: '660px', background: 'radial-gradient(circle, rgba(245,166,35,0.047) 0%, transparent 56%)', top: '-16%', right: '-10%', animation: 'lp-orbFloat 20s ease-in-out infinite' }} />
             <div className="absolute rounded-full" style={{ width: '460px', height: '460px', background: 'radial-gradient(circle, rgba(79,195,247,0.026) 0%, transparent 58%)', bottom: '2%', left: '-12%', animation: 'lp-orbFloat 24s ease-in-out infinite reverse' }} />
             {/* Target ring SVG */}
-            <div className="absolute inset-0 flex items-center justify-end pr-12 pointer-events-none select-none" style={{ opacity: 0.055 }}>
+            <div className="absolute inset-0 flex items-center justify-end pr-12 opacity-[0.06] pointer-events-none select-none">
               <svg viewBox="0 0 600 600" className="w-[640px] h-[640px]">
                 {[280, 240, 200, 160, 120, 80, 40].map((r, i) => (
                   <circle key={r} cx="300" cy="300" r={r}
@@ -1211,7 +1081,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pb-20 lg:py-0 w-full"
+          <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32 pb-20 lg:py-0"
             style={{ paddingTop: '7rem' }}>
             <div className="grid lg:grid-cols-[1fr_440px] gap-14 lg:gap-20 items-center">
 
@@ -1307,7 +1177,7 @@ export default function HomePage() {
 
         {/* ── TRUST BAR ────────────────────────────────────────────────────── */}
         <div style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', padding: '22px 0 18px' }}>
-          <div className="max-w-6xl mx-auto px-4 mb-4 text-center">
+          <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32 mb-4 text-center">
             <p className="font-mono text-[9px] tracking-[0.26em] uppercase" style={{ color: 'var(--text-muted)' }}>
               Trusted by national teams &amp; ISSF federations worldwide
             </p>
@@ -1320,11 +1190,11 @@ export default function HomePage() {
         <AppPreviewSection isDark={isDark} />
         <VisionAISection />
         <HowItWorksSection />
-        {/* <PricingSection /> */}
+        <PricingSection />
         <TestimonialsSection />
 
         {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
-        <section className="py-40 lg:py-52 relative overflow-hidden" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <section className="py-24 md:py-40 lg:py-52 relative overflow-hidden bg-bg-surface border-y border-border-subtle">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0" style={{
               backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.010) 1px, transparent 1px)',
@@ -1335,10 +1205,10 @@ export default function HomePage() {
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 50% 46% at 50% 50%, rgba(245,166,35,0.040) 0%, transparent 60%)' }} />
           </div>
 
-          <div className="max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center relative">
+          <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32 text-center relative">
             <Eyebrow>Get Started Today — Free</Eyebrow>
-            <h2 className="font-display font-black mb-7"
-              style={{ fontSize: 'clamp(34px, 5.4vw, 66px)', lineHeight: '0.96', color: 'var(--text-primary)', letterSpacing: '-0.038em' }}>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-7"
+              style={{ color: 'var(--text-primary)', lineHeight: '0.96' }}>
               Train like an elite.<br />
               <span className="gradient-text">Score like a champion.</span>
             </h2>
@@ -1368,7 +1238,7 @@ export default function HomePage() {
 
         {/* ── FOOTER ───────────────────────────────────────────────────────── */}
         <footer className="pt-20" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)', paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
-          <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="w-full px-6 md:px-12 lg:px-24 2xl:px-32">
             <div className="grid md:grid-cols-4 gap-12 mb-14">
               <div className="md:col-span-2">
                 <Link href="/" className="inline-flex items-center gap-2 mb-4">
@@ -1378,11 +1248,11 @@ export default function HomePage() {
                 <p className="font-body text-[13px] leading-[1.7] max-w-xs" style={{ color: 'var(--text-muted)' }}>
                   Elite shooting analytics — precision data, structured coaching, and measurable improvement for every competitor.
                 </p>
-                <div className="flex items-center gap-2 mt-4 rounded-full w-fit px-3 py-1.5"
+                <Link href="https://status.marksmanspro.com" className="flex items-center gap-2 mt-4 rounded-full w-fit px-3 py-1.5 hover:bg-[rgba(0,212,138,0.1)] transition-colors"
                   style={{ background: 'rgba(0,212,138,0.052)', border: '1px solid rgba(0,212,138,0.12)' }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00D48A]" style={{ animation: 'lp-pulseDot 2s ease-in-out infinite' }} />
                   <span className="font-mono text-[9px] text-[#00D48A] tracking-[0.18em]">ALL SYSTEMS NOMINAL</span>
-                </div>
+                </Link>
               </div>
               <div>
                 <p className="font-mono font-semibold text-[9px] tracking-[0.24em] uppercase mb-4" style={{ color: 'var(--text-muted)' }}>Platform</p>

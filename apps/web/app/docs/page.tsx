@@ -35,7 +35,7 @@ function Tip({ children }: { children: React.ReactNode }) {
           <path d="M8 7v5M8 5v.5" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       </span>
-      <p className="text-text-secondary text-[13px] leading-relaxed">{children}</p>
+      <p className="text-text-secondary text-sm leading-relaxed">{children}</p>
     </div>
   );
 }
@@ -49,7 +49,7 @@ function Warning({ children }: { children: React.ReactNode }) {
           <path d="M8 6.5v3.5M8 11.5v.5" stroke="#FF4D6D" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       </span>
-      <p className="text-text-secondary text-[13px] leading-relaxed">{children}</p>
+      <p className="text-text-secondary text-sm leading-relaxed">{children}</p>
     </div>
   );
 }
@@ -63,7 +63,7 @@ function Note({ children }: { children: React.ReactNode }) {
           <path d="M5 8h6M5 5h4M5 11h3" stroke="#4FC3F7" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       </span>
-      <p className="text-text-secondary text-[13px] leading-relaxed">{children}</p>
+      <p className="text-text-secondary text-sm leading-relaxed">{children}</p>
     </div>
   );
 }
@@ -73,11 +73,11 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
     <div className="flex gap-4 mt-5">
       <div className="shrink-0 w-7 h-7 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.3)]
                       flex items-center justify-center mt-0.5">
-        <span className="font-display font-bold text-[13px] text-[#F5A623]">{n}</span>
+        <span className="font-display font-bold text-sm text-[#F5A623]">{n}</span>
       </div>
       <div className="flex-1">
-        <p className="font-display font-semibold text-sm text-text-primary mb-1">{title}</p>
-        <div className="text-text-secondary text-[13px] leading-relaxed">{children}</div>
+        <p className="font-display font-semibold text-base text-text-primary mb-1">{title}</p>
+        <div className="text-text-secondary text-sm leading-relaxed">{children}</div>
       </div>
     </div>
   );
@@ -166,7 +166,7 @@ function DocsContent() {
   }
 
   return (
-      <div className="flex gap-8 max-w-6xl">
+      <div className="flex gap-8 max-w-6xl mx-auto w-full">
 
         {/* ── Sticky TOC ──────────────────────────────────────────────────── */}
         <aside className="hidden lg:block w-52 shrink-0">

@@ -13,7 +13,7 @@ const THEME_INIT_SCRIPT = `
 (function(){
   try {
     var t = localStorage.getItem('theme');
-    if (t === 'light' || (!t && matchMedia('(prefers-color-scheme:light)').matches) || (t === 'system' && matchMedia('(prefers-color-scheme:light)').matches))
+    if (t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme:light)').matches))
       document.documentElement.classList.add('light');
   } catch(e){}
 })()
@@ -44,36 +44,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Marksman — Precision Shooting Analytics',
-    template: '%s | Marksman',
-  },
-  description:
-    'Track every shot with millimetre precision. AI coaching after every session. Built for competitive shooters, coaches, and national teams.',
-  keywords: [
-    'shooting analytics',
-    'air rifle training',
-    'ISSF',
-    'shot analysis',
-    'precision shooting',
-    'competitive shooting',
-    'biometric training',
-  ],
+  title: 'Marksman — Precision Shooting Analytics',
+  description: 'Track every shot with millimetre precision. AI coaching after every session. Built for competitive shooters, coaches, and national teams.',
+  keywords: ['shooting analytics', 'air rifle training', 'ISSF', 'shot analysis', 'precision shooting'],
   openGraph: {
     title: 'Marksman — Precision Shooting Analytics',
     description: 'Track every shot. Get AI coaching. Train smarter.',
     url: 'https://www.marksmanspro.com',
     siteName: 'Marksman',
-    images: [
-      {
-        url: 'https://www.marksmanspro.com/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Marksman — Precision Shooting Analytics',
-      },
-    ],
+    images: [{ url: 'https://www.marksmanspro.com/og-image.png', width: 1200, height: 630 }],
     type: 'website',
-    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
@@ -81,26 +61,7 @@ export const metadata: Metadata = {
     description: 'Track every shot. Get AI coaching. Train smarter.',
     images: ['https://www.marksmanspro.com/og-image.png'],
   },
-  icons: {
-    icon: [
-      { url: '/favicon.svg',      type: 'image/svg+xml' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon.ico',       sizes: '48x48' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    other: [
-      { rel: 'mask-icon', url: '/favicon.svg', color: '#F5A623' },
-    ],
-  },
-  manifest: '/manifest.webmanifest',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'MARKSMAN',
-  },
+  icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {
