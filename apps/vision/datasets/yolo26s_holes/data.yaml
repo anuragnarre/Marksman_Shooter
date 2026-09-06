@@ -1,5 +1,0 @@
-path: /mnt/d/Do Not Open/pulse/shooting/apps/vision/datasets/yolo26s_holes
-train: images/train
-val:   images/val
-nc: 1
-names: ['bullet_hole']

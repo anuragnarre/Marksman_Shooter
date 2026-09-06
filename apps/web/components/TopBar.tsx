@@ -150,9 +150,9 @@ export function TopBar({
           </button>
         )}
 
-        {/* Page title */}
+        {/* Page title — truncated cleanly on small mobile screens */}
         <h1
-          className="font-display font-black text-lg tracking-[0.12em] uppercase truncate"
+          className="font-display font-black text-base sm:text-lg tracking-[0.12em] uppercase truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none"
           style={{
             background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%)',
             WebkitBackgroundClip: 'text',
@@ -277,21 +277,13 @@ export function TopBar({
             className="flex items-center justify-center w-9 h-9 rounded-xl
                        transition-all duration-200 active:scale-90"
             style={{
-              background: 'var(--chip-bg)',
-              border: '1px solid var(--glass-border)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(79,195,247,0.3)';
-              e.currentTarget.style.background = 'rgba(79,195,247,0.06)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--glass-border)';
-              e.currentTarget.style.background = 'var(--chip-bg)';
+              background: notificationsOpen ? 'rgba(79,195,247,0.12)' : 'var(--chip-bg)',
+              border: notificationsOpen ? '1px solid rgba(79,195,247,0.35)' : '1px solid var(--glass-border)',
             }}
             aria-label="Notifications"
             title="Notifications"
           >
-            <span className="relative" style={{ color: 'var(--text-muted)' }}>
+            <span className="relative" style={{ color: notificationsOpen ? '#4FC3F7' : 'var(--text-muted)' }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -306,50 +298,72 @@ export function TopBar({
             </span>
           </button>
           
-          {/* Notification slide-out panel */}
+          {/* Notification slide-out panel (Desktop) / Bottom Sheet Modal (Mobile) */}
           {notificationsOpen && (
-            <div
-              className="absolute top-[calc(100%+12px)] right-0 w-80 rounded-2xl p-4 shadow-2xl animate-slide-up"
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--glass-border)',
-                backdropFilter: 'blur(16px)',
-              }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-bold text-sm text-text-primary">Notifications</h3>
-                <span className="text-[10px] uppercase font-display tracking-wider text-text-secondary">
-                  {unreadCount} New
-                </span>
-              </div>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <p className="text-xs text-text-muted text-center py-4">No notifications</p>
-                ) : (
-                  notifications.map(n => (
-                    <div key={n.id} className="p-3 rounded-xl border border-border-subtle bg-[rgba(255,255,255,0.02)]">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <p className="text-xs font-semibold text-text-primary">{n.title}</p>
-                          <p className="text-[10px] text-text-muted mt-1">{n.time}</p>
+            <>
+              {/* Mobile backdrop */}
+              <div 
+                className="sm:hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md animate-fade-in"
+                onClick={() => setNotificationsOpen(false)}
+              />
+
+              <div
+                className="fixed bottom-0 inset-x-0 sm:absolute sm:bottom-auto sm:top-[calc(100%+12px)] sm:right-0 sm:inset-x-auto w-full sm:w-80 rounded-t-3xl sm:rounded-2xl p-5 sm:p-4 shadow-2xl animate-slide-up z-[111]"
+                style={{
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--glass-border)',
+                  backdropFilter: 'blur(20px)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-border-subtle">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display font-bold text-base sm:text-sm text-text-primary">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/20">
+                        {unreadCount} NEW
+                      </span>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => setNotificationsOpen(false)}
+                    className="p-1.5 rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center min-w-[36px] min-h-[36px]"
+                    aria-label="Close notifications"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="space-y-2.5 max-h-[60vh] sm:max-h-96 overflow-y-auto pr-1">
+                  {notifications.length === 0 ? (
+                    <p className="text-xs text-text-muted text-center py-6">No new notifications</p>
+                  ) : (
+                    notifications.map(n => (
+                      <div key={n.id} className="p-3.5 rounded-xl border border-border-subtle bg-bg-elevated hover:border-border-default transition-colors">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold text-text-primary leading-snug">{n.title}</p>
+                            <p className="text-[10px] text-text-muted mt-1 font-mono">{n.time}</p>
+                          </div>
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 mt-1 shadow-sm"
+                            style={{ background: n.type === 'invite' ? '#FF4D6D' : '#F5A623' }}
+                          />
                         </div>
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0 mt-1"
-                          style={{ background: n.type === 'invite' ? '#FF4D6D' : '#F5A623' }}
-                        />
                       </div>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 
-        {/* Feedback button */}
+        {/* Feedback button — hidden on small mobile screens, available in MobileMenu */}
         <button
           onClick={() => setFeedbackOpen(true)}
-          className="flex items-center justify-center w-9 h-9 rounded-xl
+          className="hidden sm:flex items-center justify-center w-9 h-9 rounded-xl
                      transition-all duration-200 active:scale-90"
           style={{
             background: 'var(--chip-bg)',
@@ -383,9 +397,9 @@ export function TopBar({
           </div>
         )}
 
-        {/* Vertical separator */}
+        {/* Vertical separator — desktop only */}
         <div
-          className="w-px h-5 mx-1 shrink-0"
+          className="hidden sm:block w-px h-5 mx-1 shrink-0"
           style={{ background: 'var(--border-subtle)' }}
         />
 
@@ -441,7 +455,7 @@ export function TopBar({
         <button
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
           className="flex items-center justify-center w-9 h-9 rounded-xl
-                     transition-all duration-200 active:scale-90"
+                     transition-all duration-200 active:scale-90 shrink-0"
           style={{
             background: 'var(--chip-bg)',
             border: '1px solid var(--glass-border)',
@@ -462,10 +476,10 @@ export function TopBar({
           </span>
         </button>
 
-        {/* User avatar */}
+        {/* User avatar — hidden on small mobile screens (< sm), featured in MobileMenu drawer */}
         {user && (
           <div
-            className="flex items-center gap-2.5 pl-1.5 pr-1 py-1 rounded-xl cursor-default
+            className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-1 py-1 rounded-xl cursor-default
                        transition-all duration-200"
             style={{
               background: `${roleColor}08`,

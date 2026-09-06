@@ -31,11 +31,11 @@ export function BottomNav({ onMorePress }: BottomNavProps) {
       style={{
         height: 'calc(68px + env(safe-area-inset-bottom, 0px))',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        background: 'var(--glass-heavy-bg)',
-        backdropFilter: 'blur(32px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(32px) saturate(200%)',
-        borderTop: '1px solid var(--glass-border)',
-        boxShadow: 'var(--shadow-glass)',
+        background: 'var(--bg-surface)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid var(--border-subtle)',
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.4)',
       }}
       aria-label="Mobile navigation"
     >

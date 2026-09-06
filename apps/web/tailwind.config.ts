@@ -22,10 +22,14 @@ const config: Config = {
       // ── Color System ──────────────────────────────────────────────────────
       colors: {
         // Backgrounds — theme-aware via CSS variables
-        void:     'var(--bg-void)',
-        surface:  'var(--bg-surface)',
-        elevated: 'var(--bg-elevated)',
-        subtle:   'var(--bg-subtle)',
+        void:          'var(--bg-void)',
+        surface:       'var(--bg-surface)',
+        elevated:      'var(--bg-elevated)',
+        subtle:        'var(--bg-subtle)',
+        'bg-void':     'var(--bg-void)',
+        'bg-surface':  'var(--bg-surface)',
+        'bg-elevated': 'var(--bg-elevated)',
+        'bg-subtle':   'var(--bg-subtle)',
 
         // Accent — Electric Amber (precision / energy) — same in both themes
         accent: {

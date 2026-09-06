@@ -88,7 +88,7 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-html { scroll-behavior: smooth; }  /* fixes issue #4 — nav anchor scroll */
+html { scroll-behavior: smooth; overflow-x: hidden; }  /* fixes issue #4 — nav anchor scroll */
 
 body {
   background-color: var(--bg-void);
@@ -96,6 +96,8 @@ body {
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 { font-family: 'Rajdhani', sans-serif; }

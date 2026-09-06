@@ -68,47 +68,63 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    if (!user.passwordHash) {
-      throw new UnauthorizedException(
-        'This account uses Google Sign-In. Please log in with Google.',
+      if (!user.passwordHash) {
+        throw new UnauthorizedException(
+          'This account uses Google Sign-In. Please log in with Google.',
+        );
+      }
+
+      const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
+      if (!passwordValid) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const token = this.signToken({ sub: user.id, email: user.email, role: user.role });
+
+      return {
+        access_token: token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          googleId: user.googleId ?? null,
+          createdAt: user.createdAt,
+        },
+      };
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err;
+      console.error('[login] Error:', err);
+      throw new InternalServerErrorException(
+        err instanceof Error ? err.message : 'Database connection failed or internal error',
       );
     }
-
-    const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!passwordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const token = this.signToken({ sub: user.id, email: user.email, role: user.role });
-
-    return {
-      access_token: token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        googleId: user.googleId ?? null,
-        createdAt: user.createdAt,
-      },
-    };
   }
 
   async googleLogin(dto: GoogleAuthDto): Promise<AuthResponse> {
+    // Guard: fail clearly if Google OAuth is not configured on this server
+    const googleClientId = this.configService.get<string>('GOOGLE_CLIENT_ID') ?? '';
+    if (!googleClientId || googleClientId.startsWith('dummy') || googleClientId === 'your-google-web-client-id.apps.googleusercontent.com') {
+      throw new BadRequestException(
+        'Google Sign-In is not configured on this server. Please use email/password login.',
+      );
+    }
+
     // Verify the Google ID token on the server side
     let ticket;
     try {
       ticket = await this.googleClient.verifyIdToken({
         idToken: dto.credential,
-        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        audience: googleClientId,
       });
     } catch (err) {
       console.error('[googleLogin] verifyIdToken failed:', err);
@@ -168,6 +184,7 @@ export class AuthService {
       );
     }
   }
+
 
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({

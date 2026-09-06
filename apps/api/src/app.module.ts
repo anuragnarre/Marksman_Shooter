@@ -15,6 +15,9 @@ import { ScheduleRequestsModule } from './schedule-requests/schedule-requests.mo
 import { PerformanceModule } from './performance/performance.module';
 import { BiometricsModule } from './biometrics/biometrics.module';
 import { EventsModule } from './events/events.module';
+import { EquipmentModule } from './equipment/equipment.module';
+import { RangesModule } from './ranges/ranges.module';
+import { BallisticsModule } from './ballistics/ballistics.module';
 
 @Module({
   imports: [
@@ -33,6 +36,9 @@ import { EventsModule } from './events/events.module';
     PerformanceModule,
     BiometricsModule,
     EventsModule,
+    EquipmentModule,
+    RangesModule,
+    BallisticsModule,
   ],
 })
 export class AppModule {}

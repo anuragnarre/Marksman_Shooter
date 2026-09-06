@@ -21,5 +21,10 @@
     "paths": {
       "@shooting-platform/shared-types": ["src/shared-types"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "prisma"
+  ]
 }

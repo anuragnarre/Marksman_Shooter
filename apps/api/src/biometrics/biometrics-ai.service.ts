@@ -50,7 +50,7 @@ Provide 3-6 insights. Reference specific numbers from the data.`;
 
 @Injectable()
 export class BiometricsAiService {
-  private readonly groq: Groq;
+  private groq: Groq | null = null;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -59,10 +59,12 @@ export class BiometricsAiService {
     private readonly configService: ConfigService,
   ) {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
-    if (!apiKey) {
-      throw new Error('GROQ_API_KEY is not set');
+    const isValidKey = apiKey && !['dummy', 'placeholder', 'your-groq-api-key'].some(p => apiKey.startsWith(p));
+    if (!isValidKey) {
+      console.warn('[BiometricsAiService] GROQ_API_KEY not configured — AI biometric insights will be unavailable');
+    } else {
+      this.groq = new Groq({ apiKey });
     }
-    this.groq = new Groq({ apiKey });
   }
 
   async analyzeSessionBiometrics(
@@ -130,6 +132,11 @@ ${bioData.map(r => `HR=${r.hr ?? '-'} SpO2=${r.spo2 ?? '-'}% RR=${r.rr ?? '-'} [
 
 Analyse the biometric-performance correlation and provide insights in the required JSON format.`;
 
+    if (!this.groq) {
+      throw new InternalServerErrorException(
+        'AI biometric analysis is not configured. Add a GROQ_API_KEY to enable it.',
+      );
+    }
     let raw: string;
     try {
       const completion = await this.groq.chat.completions.create({
@@ -182,9 +189,19 @@ Analyse the biometric-performance correlation and provide insights in the requir
     });
 
     if (readings.length < 3) {
-      throw new ForbiddenException(
-        'Need at least 3 biometric readings to generate advanced insights. Keep your sensor active during sessions.',
-      );
+      // Return a graceful empty state instead of throwing — new users have no data yet
+      return {
+        breathing: { estimatedRate: null, pattern: 'No data yet', consistencyScore: 0, recommendations: ['Connect a biometric device or sync Health Connect to get started.'] },
+        hrStability: { restingHr: 0, activeHr: 0, recoveryRate: 'No data', calmnessScore: 0, zoneBreakdown: { optimal: 0, elevated: 0, high: 0 }, recommendations: [] },
+        focusStress: { stressLevel: 'moderate', hrvTrend: 'No data', mentalReadiness: 0, recommendations: [] },
+        performanceOptimization: { optimalHrZone: '60-80 bpm', bestPerformanceWindow: 'No data', shotTimingCorrelation: 'No data', recommendations: [] },
+        insights: [],
+        overallReadiness: 0,
+        overallReadinessLabel: 'No Data',
+        dataSource: 'none',
+        generatedAt: new Date().toISOString(),
+        model: MODEL,
+      } as any;
     }
 
     // Fetch recent sessions with shots
@@ -352,6 +369,11 @@ ${readings.slice(0, 50).map(r =>
 
 Generate comprehensive advanced insights across all four domains. Reference specific numbers. Be actionable and specific to precision shooting.`;
 
+    if (!this.groq) {
+      throw new InternalServerErrorException(
+        'AI advanced insights are not configured. Add a GROQ_API_KEY to enable them.',
+      );
+    }
     let raw: string;
     try {
       const completion = await this.groq.chat.completions.create({

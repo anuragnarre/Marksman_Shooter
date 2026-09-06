@@ -184,8 +184,9 @@ export class AiCoachService {
     private readonly configService: ConfigService,
   ) {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
-    if (!apiKey) {
-      console.warn('GROQ_API_KEY is not set in .env. AI Coach features will not work.');
+    const isValidKey = apiKey && !['dummy', 'placeholder', 'your-groq-api-key'].some(p => apiKey.startsWith(p));
+    if (!isValidKey) {
+      console.warn('GROQ_API_KEY is not configured. AI Coach features will not work.');
       this.groq = null as any; // Allow startup, fail on request
     } else {
       this.groq = new Groq({ apiKey });
@@ -318,6 +319,11 @@ ${biometricSection}
 Please analyse this session and provide coaching feedback in the required JSON format.`;
 
     // ── 5. Call Groq ─────────────────────────────────────────────────────────
+    if (!this.groq) {
+      throw new InternalServerErrorException(
+        'AI Coach requires a GROQ_API_KEY. Get a free key at https://console.groq.com/keys and add it to apps/api/.env',
+      );
+    }
     let raw: string;
     try {
       const completion = await this.groq.chat.completions.create({
@@ -483,6 +489,11 @@ SCORE TREND (newest first): ${allAvgScores.map(s => s.toFixed(2)).join(' → ')}
 
 Analyse this shooter's complete history and provide the comprehensive performance assistant response in the required JSON format.`;
 
+    if (!this.groq) {
+      throw new InternalServerErrorException(
+        'AI Performance Assistant requires a GROQ_API_KEY. Get a free key at https://console.groq.com/keys and add it to apps/api/.env',
+      );
+    }
     let raw: string;
     try {
       const completion = await this.groq.chat.completions.create({

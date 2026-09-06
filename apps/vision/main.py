@@ -51,14 +51,14 @@ async def startup() -> None:
     load_mask_model()
     if not _yolo_mod._yolo_available:
         logger.warning(
-            "No YOLO model loaded. Running CV-only mode. "
+            "No YOLO model loaded. Running Compatibility Engine with OpenCV. "
             "Accuracy on real images may be reduced. "
             "Train a model with: python scripts/train_yolo26s.py --real-images <path>"
         )
     if not _yolo_mod._yolo_available and not _mask_mod._mask_available:
         import warnings
         warnings.warn(
-            "WARNING: No neural models loaded. Running CV-only mode. "
+            "WARNING: No neural models loaded. Running Compatibility Engine with OpenCV. "
             "Accuracy will be significantly reduced for tight shot groups. "
             "Run: python scripts/train_yolo26s.py --export to generate models.",
             stacklevel=2,
@@ -81,7 +81,7 @@ def health() -> dict:
         "yolo_loaded": _yolo_mod._yolo_available,
         "mask_loaded": _mask_mod._mask_available,
         "neural_models_loaded": neural_loaded,
-        "accuracy_mode": "full" if neural_loaded else "cv_only_reduced_accuracy",
+        "accuracy_mode": "YOLO for Most Accuracy" if neural_loaded else "Compatibility Engine with OpenCV",
         "supported_targets": SUPPORTED_TARGETS,
         "live_endpoints": {
             "http_frame": "POST /live-frame",

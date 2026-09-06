@@ -129,44 +129,44 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="lg:hidden fixed inset-0 z-[90]"
+            className="lg:hidden fixed inset-0 z-[100]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
           />
 
           {/* Drawer panel */}
           <motion.div
-            className="lg:hidden fixed left-0 top-0 bottom-0 z-[91] flex flex-col w-[280px]"
+            className="lg:hidden fixed left-0 top-0 bottom-0 z-[101] flex flex-col w-[300px] max-w-[85vw]"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', stiffness: 380, damping: 38, mass: 0.7 }}
             drag="x"
-            dragConstraints={{ left: -280, right: 0 }}
+            dragConstraints={{ left: -300, right: 0 }}
             dragElastic={0.08}
             onDragEnd={handleDragEnd}
             style={{
               x: dragX,
               paddingTop: 'env(safe-area-inset-top, 0px)',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-              background: 'var(--glass-heavy-bg)',
-              backdropFilter: 'blur(32px) saturate(180%)',
+              backgroundColor: 'var(--bg-surface, #0E1118)',
+              opacity: 1,
               borderRight: '1px solid var(--border-subtle)',
-              boxShadow: 'var(--shadow-glass)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
             }}
           >
             {/* ── Header: logo + close ──────────────────────────── */}
             <div
-              className="flex items-center justify-between px-4 h-14 shrink-0"
+              className="flex items-center justify-between px-4.5 h-16 shrink-0"
               style={{ borderBottom: '1px solid var(--border-subtle)' }}
             >
               <div className="flex items-center gap-2.5">
-                <svg width="24" height="24" viewBox="0 0 64 64" fill="none"
-                  style={{ filter: 'drop-shadow(0 0 5px rgba(245,166,35,0.4))' }}>
+                <svg width="26" height="26" viewBox="0 0 64 64" fill="none"
+                  style={{ filter: 'drop-shadow(0 0 6px rgba(245,166,35,0.45))' }}>
                   <circle cx="32" cy="32" r="22" stroke="#F5A623" strokeWidth="1.5" opacity="0.45"/>
                   <circle cx="32" cy="32" r="12" stroke="#F5A623" strokeWidth="1.5" opacity="0.75"/>
                   <circle cx="32" cy="32" r="3.5" fill="#F5A623"/>
@@ -176,7 +176,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                   <line x1="47" y1="32" x2="56" y2="32" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
                 <span
-                  className="font-display font-black text-base tracking-[0.16em]"
+                  className="font-display font-black text-lg tracking-[0.16em]"
                   style={{
                     background: 'linear-gradient(135deg, #F5A623 0%, #FFD580 100%)',
                     WebkitBackgroundClip: 'text',
@@ -189,13 +189,13 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted
-                           hover:text-text-primary transition-colors active:scale-90"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-text-muted
+                           hover:text-text-primary transition-colors active:scale-90 min-w-[36px] min-h-[36px]"
                 style={{ background: 'var(--chip-bg)', border: '1px solid var(--border-subtle)' }}
                 aria-label="Close menu"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor"
-                  strokeWidth="1.8" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round">
                   <line x1="1" y1="1" x2="11" y2="11" /><line x1="11" y1="1" x2="1" y2="11" />
                 </svg>
               </button>
@@ -204,7 +204,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             {/* ── User info ─────────────────────────────────────── */}
             <button
               onClick={() => router.push('/settings')}
-              className="flex items-center gap-3 px-4 py-3 shrink-0 w-full text-left
+              className="flex items-center gap-3 px-4.5 py-3.5 shrink-0 w-full text-left
                          transition-colors hover:bg-[rgba(255,255,255,0.03)] active:bg-[rgba(255,255,255,0.05)]"
               style={{ borderBottom: '1px solid var(--border-subtle)' }}
               aria-label="Profile & Settings"

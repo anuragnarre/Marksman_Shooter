@@ -51,6 +51,9 @@ model User {
   biometricReadings BiometricReading[] @relation("UserBiometricReadings")
   competitionRegistrations CompetitionEventRegistration[]
   createdCompetitionEvents CompetitionEvent[] @relation("EventCreator")
+  equipment        Equipment[]
+  rangeLocations   RangeLocation[]
+  ballisticProfiles BallisticProfile[]
 }
 
 model Session {
@@ -332,5 +335,61 @@ model CompetitionEventRegistration {
 
   @@unique([eventId, userId])
   @@index([eventId])
+  @@index([userId])
+}
+
+// ── New Entities (Equipment, Ranges, Ballistics) ───────────────────────────
+
+model Equipment {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            String   // 'FIREARM' | 'OPTIC' | 'AMMO'
+  caliber         String?
+  status          String   @default("Active")
+  roundCount      Int      @default(0)
+  regPressure     String?
+  lastCleaned     DateTime?
+  nextService     Int?
+  barrelLifePct   Int?     @default(100)
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RangeLocation {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  status          String   @default("Active")
+  maxDistance     Int?
+  altitude        Int?
+  gpsCoordinates  String?
+  typicalWindDir  String?
+  maxCaliber      String?
+  environmentalLog Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model BallisticProfile {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String?
+  muzzleVelocityFps   Int
+  pelletWeightGrains  Float
+  ballisticCoef       Float
+  sightHeightInches   Float
+  zeroRangeYards      Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
   @@index([userId])
 }

@@ -29,8 +29,16 @@ export function GoogleSignInButton(props: GoogleSignInButtonProps) {
   }, []);
 
   if (!mounted) {
-    // Show skeleton while determining platform
+    // Show skeleton while determining platform — only if Google is configured
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'dummy' || GOOGLE_CLIENT_ID.startsWith('your-google')) {
+      return null;
+    }
     return <ButtonSkeleton />;
+  }
+
+  // Hide entirely when Google OAuth is not configured
+  if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'dummy' || GOOGLE_CLIENT_ID.startsWith('your-google')) {
+    return null;
   }
 
   if (isNative) {
@@ -117,10 +125,9 @@ function WebGoogleSignInButton({
   roleRef.current = role;
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) {
-      onError('Google Sign-In is not configured.');
-      return;
-    }
+    // Client ID is validated at the component level above — this should not be reached
+    // but guard defensively
+    if (!GOOGLE_CLIENT_ID) return;
 
     loadGoogleScript(() => {
       if (!window.google || !containerRef.current) return;

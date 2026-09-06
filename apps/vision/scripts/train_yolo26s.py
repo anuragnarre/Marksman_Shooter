@@ -71,6 +71,8 @@ def generate_yolo_dataset(
     n_per_val = max(1, round(1.0 / val_fraction))  # e.g. every 7th image → val
 
     for i, (img, annotations, desc) in enumerate(generate_test_cases(target_type)):
+        if i >= 250:
+            break
         split = "val" if (i % n_per_val == 0) else "train"
         img_h, img_w = img.shape[:2]
 
@@ -131,7 +133,7 @@ def generate_yolo_dataset(
 
     train_count = len(os.listdir(os.path.join(out_dir, "images", "train")))
     val_count   = len(os.listdir(os.path.join(out_dir, "images", "val")))
-    print(f"Dataset: {train_count} train, {val_count} val → {yaml_path}")
+    print(f"Dataset: {train_count} train, {val_count} val -> {yaml_path}")
     return yaml_path
 
 
@@ -208,12 +210,73 @@ def _add_real_images_with_autolabel(
                   f"(labeled={labeled} bg={background} err={errors})")
 
     print(f"Real images: {labeled} labeled, {background} background, "
-          f"{errors} errors → {len(real_images)} total")
+          f"{errors} errors -> {len(real_images)} total")
 
 
 # ---------------------------------------------------------------------------
 # Training
 # ---------------------------------------------------------------------------
+
+import threading
+import time
+from pathlib import Path
+
+class LiveReporter(threading.Thread):
+    def __init__(self, status_file: str):
+        super().__init__(daemon=True)
+        self.status_file = status_file
+        self._running = True
+        try:
+            import psutil
+            self.psutil = psutil
+        except ImportError:
+            self.psutil = None
+
+    def run(self):
+        while self._running:
+            cpu_usage = self.psutil.cpu_percent() if self.psutil else "N/A"
+            mem_info = self.psutil.virtual_memory() if self.psutil else None
+            mem_usage = f"{mem_info.percent}%" if mem_info else "N/A"
+            
+            # Read Ultralytics results.csv to get the latest epoch
+            # Note: Ultralytics saves runs relative to the shooting directory
+            results_file = Path("../../runs/detect/runs/yolo26s_bullets/train/results.csv")
+            latest_epoch = "Not Started"
+            metrics = ""
+            if results_file.exists():
+                try:
+                    with open(results_file, "r") as f:
+                        lines = f.readlines()
+                        if len(lines) > 1:
+                            last_line = lines[-1].strip().split(",")
+                            if len(last_line) > 0:
+                                latest_epoch = last_line[0].strip()
+                                if len(last_line) > 6:
+                                    metrics = f" | mAP50: {last_line[6].strip()}"
+                except Exception:
+                    pass
+
+            now = time.strftime("%Y-%m-%d %H:%M:%S")
+            md_content = f"""# YOLO Training Live Status
+**Last Updated:** {now}
+
+## System Metrics
+- **CPU Usage:** {cpu_usage}%
+- **RAM Usage:** {mem_usage}
+
+## Training Progress
+- **Latest Epoch:** {latest_epoch}{metrics}
+
+> [!TIP]
+> If your PC accidentally shuts down, you can simply run this script again. It will automatically detect `last.pt` and resume from the exact epoch it left off!
+"""
+            with open(self.status_file, "w") as f:
+                f.write(md_content)
+            time.sleep(5)
+
+    def stop(self):
+        self._running = False
+
 
 def train(
     data_yaml: str,
@@ -231,44 +294,58 @@ def train(
 
     os.makedirs(os.path.dirname(output_model) or ".", exist_ok=True)
 
-    # Start from COCO-pretrained YOLO26-S
-    model = YOLO("yolo26s.pt")
-
-    results = model.train(
-        data=data_yaml,
-        epochs=epochs,
-        batch=batch,
-        imgsz=1280,            # high-res for sub-mm holes at distance
-        patience=25,
-        optimizer="AdamW",
-        lr0=0.001,
-        lrf=0.01,
-        weight_decay=0.0005,
-        warmup_epochs=5,
-        # Loss weights — dfl=0 because YOLO26 uses NMS-free anchor-free head
-        box=7.5,
-        cls=0.5,
-        dfl=0.0,
-        # Augmentation tuned for paper targets under variable lighting
-        augment=True,
-        hsv_h=0.015,
-        hsv_s=0.5,
-        hsv_v=0.5,
-        degrees=15.0,
-        scale=0.4,
-        fliplr=0.5,
-        mosaic=0.8,
-        copy_paste=0.1,        # copies sparse holes across images
-        project="runs/yolo26s_bullets",
-        name="train",
-        exist_ok=True,
-    )
+    # Setup status logging and resume logic
+    last_pt = Path("runs/yolo26s_bullets/train/weights/last.pt")
+    status_file = os.path.join(os.path.dirname(_root), "training_status.md")
+    
+    reporter = LiveReporter(status_file)
+    reporter.start()
+    
+    try:
+        if last_pt.exists():
+            print(f"Resuming training from {last_pt}...")
+            model = YOLO(str(last_pt))
+            results = model.train(resume=True)
+        else:
+            # Start from COCO-pretrained YOLO26-S
+            model = YOLO("yolo26s.pt")
+            results = model.train(
+                data=data_yaml,
+                epochs=epochs,
+                batch=batch,
+                imgsz=1280,            # high-res for sub-mm holes at distance
+                patience=25,
+                optimizer="AdamW",
+                lr0=0.001,
+                lrf=0.01,
+                weight_decay=0.0005,
+                warmup_epochs=5,
+                # Loss weights — dfl=0 because YOLO26 uses NMS-free anchor-free head
+                box=7.5,
+                cls=0.5,
+                dfl=0.0,
+                # Augmentation tuned for paper targets under variable lighting
+                augment=True,
+                hsv_h=0.015,
+                hsv_s=0.5,
+                hsv_v=0.5,
+                degrees=15.0,
+                scale=0.4,
+                fliplr=0.5,
+                mosaic=0.8,
+                copy_paste=0.1,        # copies sparse holes across images
+                project="runs/yolo26s_bullets",
+                name="train",
+                exist_ok=True,
+            )
+    finally:
+        reporter.stop()
 
     # Copy best weights to output path
     best_pt = results.save_dir / "weights" / "best.pt"
     if best_pt.exists():
         shutil.copy2(str(best_pt), output_model)
-        print(f"\nBest model saved → {output_model}")
+        print(f"\nBest model saved -> {output_model}")
     else:
         print(f"WARNING: best.pt not found at {best_pt}")
         return
@@ -284,7 +361,7 @@ def train(
         )
         onnx_path = output_model.replace(".pt", ".onnx")
         if os.path.exists(onnx_path):
-            print(f"ONNX exported → {onnx_path}")
+            print(f"ONNX exported -> {onnx_path}")
         else:
             print("ONNX export path may differ — check the ultralytics output above")
 

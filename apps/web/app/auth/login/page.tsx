@@ -12,12 +12,17 @@ import Link from 'next/link';
 import { login } from '../../../lib/auth';
 import { useAuth } from '../../../contexts/auth-context';
 import { useIsMobile } from '../../../lib/use-mobile';
+import { useToast } from '../../../contexts/toast-context';
 import { GoogleSignInButton } from '../../../components/GoogleSignInButton';
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+const GOOGLE_ENABLED = !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy' && !GOOGLE_CLIENT_ID.startsWith('your-google'));
 
 export default function LoginPage() {
   const router = useRouter();
   const { setUser, isLoggedIn, isLoading } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   const [email, setEmail]         = useState('');
@@ -63,6 +68,32 @@ export default function LoginPage() {
       const msg = err instanceof Error ? err.message : 'Invalid credentials';
       setError(msg);
       setHasError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleTestLogin(role: 'shooter' | 'coach') {
+    const testEmail = role === 'shooter' ? 'shooter@example.com' : 'coach@example.com';
+    const testPassword = 'Password123!';
+    
+    toast(`Logging in with ${role} test account...`, 'info');
+    setEmail(testEmail);
+    setPassword(testPassword);
+    
+    setLoading(true);
+    setError(null);
+    setHasError(false);
+    
+    try {
+      const res = await login({ email: testEmail, password: testPassword });
+      setUser(res.user);
+      router.push('/dashboard');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Invalid credentials';
+      setError(msg);
+      setHasError(true);
+      toast('Login failed: ' + msg, 'error');
     } finally {
       setLoading(false);
     }
@@ -234,19 +265,45 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-subtle" />
-            <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
-            <div className="flex-1 h-px bg-subtle" />
-          </div>
+          {/* Divider + Google Sign In — only shown when Google OAuth is configured */}
+          {GOOGLE_ENABLED && (
+            <>
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-subtle" />
+                <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
+                <div className="flex-1 h-px bg-subtle" />
+              </div>
+              <GoogleSignInButton
+                text="signin_with"
+                onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
+                onError={(msg) => { setError(msg); setHasError(true); }}
+            </>
+          )}
 
-          {/* Google Sign In */}
-          <GoogleSignInButton
-            text="signin_with"
-            onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
-            onError={(msg) => { setError(msg); setHasError(true); }}
-          />
+          {/* Test Accounts */}
+          <div className="mt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+              <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">Test Accounts</span>
+              <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => handleTestLogin('shooter')}
+                className="flex-1 btn bg-[var(--btn-ghost-bg)] hover:bg-[var(--btn-ghost-hover-bg)] border border-[var(--border-subtle)] text-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Test Shooter
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTestLogin('coach')}
+                className="flex-1 btn bg-[var(--btn-ghost-bg)] hover:bg-[var(--btn-ghost-hover-bg)] border border-[var(--border-subtle)] text-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Test Coach
+              </button>
+            </div>
+          </div>
 
           {/* Footer links */}
           <div className="mt-6 text-center space-y-2">

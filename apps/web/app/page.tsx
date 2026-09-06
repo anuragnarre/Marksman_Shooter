@@ -460,7 +460,7 @@ function BentoFeaturesSection() {
             style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Built for precision at every level
           </h2>
-          <p className="font-body text-[15px] w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
+          <p className="font-body text-[15px] max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
             Six capabilities working in concert to give you an unfair analytical edge.
           </p>
         </div>
@@ -587,7 +587,7 @@ function HowItWorksSection() {
             style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Three steps to elite insight
           </h2>
-          <p className="font-body text-[15px] mt-5 w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
+          <p className="font-body text-[15px] mt-5 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)', lineHeight: '1.72' }}>
             From range to refined analysis in under three minutes.
           </p>
         </div>
@@ -815,15 +815,15 @@ function VisionAISection() {
                 style={{ background: 'radial-gradient(circle, rgba(255,77,109,0.38) 0%, rgba(245,166,35,0.16) 55%, transparent 80%)', opacity: 0.09 }} />
 
               {/* Floating chips — cleaner, less heavy shadow */}
-              <div className="absolute top-[5%] right-[-2%] rounded-[13px] px-4 py-3 backdrop-blur-xl"
+              <div className="absolute top-[5%] right-1 sm:right-[-2%] rounded-[13px] px-3.5 sm:px-4 py-2.5 sm:py-3 backdrop-blur-xl"
                 style={{ background: 'rgba(8,10,20,0.94)', border: '1px solid rgba(79,195,247,0.08)', boxShadow: '0 4px 16px rgba(0,0,0,0.32)' }}>
                 <p className="font-mono text-[8px] tracking-[0.16em] uppercase" style={{ color: 'rgba(255,255,255,0.22)' }}>Detected</p>
-                <p className="font-mono font-bold text-[15px] leading-none mt-0.5" style={{ color: '#4FC3F7' }}>10.9 pts</p>
+                <p className="font-mono font-bold text-[13px] sm:text-[15px] leading-none mt-0.5" style={{ color: '#4FC3F7' }}>10.9 pts</p>
               </div>
-              <div className="absolute bottom-[8%] left-[-2%] rounded-[13px] px-4 py-3 backdrop-blur-xl"
+              <div className="absolute bottom-[8%] left-1 sm:left-[-2%] rounded-[13px] px-3.5 sm:px-4 py-2.5 sm:py-3 backdrop-blur-xl"
                 style={{ background: 'rgba(8,10,20,0.94)', border: '1px solid rgba(245,166,35,0.08)', boxShadow: '0 4px 16px rgba(0,0,0,0.32)' }}>
                 <p className="font-mono text-[8px] tracking-[0.16em] uppercase" style={{ color: 'rgba(255,255,255,0.22)' }}>Group MPI</p>
-                <p className="font-mono font-bold text-[15px] leading-none mt-0.5" style={{ color: '#F5A623' }}>0.8mm</p>
+                <p className="font-mono font-bold text-[13px] sm:text-[15px] leading-none mt-0.5" style={{ color: '#F5A623' }}>0.8mm</p>
               </div>
             </div>
           </div>
@@ -876,7 +876,7 @@ function PricingSection() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide mb-4" style={{ color: 'var(--text-primary)', lineHeight: '1.06' }}>
             Simple, transparent pricing
           </h2>
-          <p className="font-body text-[15px] w-full px-6 md:px-12 lg:px-24 2xl:px-32" style={{ color: 'var(--text-secondary)' }}>
+          <p className="font-body text-[15px] max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
             Start free. Upgrade when your team grows.
           </p>
         </div>

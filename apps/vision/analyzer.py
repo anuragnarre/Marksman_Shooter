@@ -360,6 +360,8 @@ def analyze_target_image(
         debug_img = _draw_debug(img_bgr, calibration, holes, shot_results)
         _, buf = cv2.imencode(".png", debug_img)
         response.debug_image = base64.b64encode(buf.tobytes()).decode("utf-8")
+        _, buf_clean = cv2.imencode(".png", img_bgr)
+        response.clean_warped_image = base64.b64encode(buf_clean.tobytes()).decode("utf-8")
 
     return response
 

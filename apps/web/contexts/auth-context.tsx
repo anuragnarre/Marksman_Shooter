@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useRef,
 } from 'react';
 import type { User } from '@shooting-platform/shared-types';
 import {
@@ -14,6 +15,7 @@ import {
   isAuthenticated,
   logout as authLogout,
   persistUser,
+  getToken,
 } from '../lib/auth';
 import { apiFetch } from '../lib/api';
 
@@ -27,15 +29,35 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isMounted = useRef(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const token = getToken();
+    if (!isAuthenticated() || (token && isTokenExpired(token))) {
+      authLogout();
       setIsLoading(false);
       return;
     }
+
     const stored = getStoredUser();
     if (stored) {
       setUserState(stored);
@@ -44,14 +66,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Token exists but user not in localStorage — fetch from API
       apiFetch<User>('/auth/me')
         .then((u) => {
-          persistUser(u);
-          setUserState(u);
+          if (isMounted.current) {
+            persistUser(u);
+            setUserState(u);
+          }
         })
         .catch(() => {
           // Token is invalid/expired — clear it
           authLogout();
         })
-        .finally(() => setIsLoading(false));
+        .finally(() => {
+          if (isMounted.current) setIsLoading(false);
+        });
     }
   }, []);
 

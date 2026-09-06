@@ -16,7 +16,7 @@ const MODEL = 'llama-3.3-70b-versatile';
 
 @Injectable()
 export class PerformanceService {
-  private readonly groq: Groq;
+  private readonly groq: Groq | null = null;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -24,12 +24,12 @@ export class PerformanceService {
     private readonly config: ConfigService,
   ) {
     const apiKey = this.config.get<string>('GROQ_API_KEY');
-    if (!apiKey) {
-      throw new Error(
-        'GROQ_API_KEY is not set — get a free key at https://console.groq.com/keys',
-      );
+    const isValidKey = apiKey && !['dummy', 'placeholder', 'your-groq-api-key'].some(p => apiKey.startsWith(p));
+    if (!isValidKey) {
+      console.warn('[PerformanceService] GROQ_API_KEY not configured — AI training plans will be unavailable');
+    } else {
+      this.groq = new Groq({ apiKey });
     }
-    this.groq = new Groq({ apiKey });
   }
 
   // ── Deep Analysis ──────────────────────────────────────────────────────────
@@ -234,6 +234,11 @@ Generate a 4-week progressive training plan. Return ONLY a valid JSON object in 
 Each week should have 3-4 training sessions. Progress from foundational to advanced across the 4 weeks.`;
 
     let planContent: any;
+    if (!this.groq) {
+      throw new InternalServerErrorException(
+        'AI Training Plans require a GROQ_API_KEY. Get a free key at https://console.groq.com/keys and add it to apps/api/.env',
+      );
+    }
     try {
       const response = await this.groq.chat.completions.create({
         model: MODEL,

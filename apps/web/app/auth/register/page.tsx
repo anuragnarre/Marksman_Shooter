@@ -14,6 +14,9 @@ import type { UserRole } from '@shooting-platform/shared-types';
 import { useIsMobile } from '../../../lib/use-mobile';
 import { GoogleSignInButton } from '../../../components/GoogleSignInButton';
 
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+const GOOGLE_ENABLED = !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy' && !GOOGLE_CLIENT_ID.startsWith('your-google'));
+
 function RegisterPageInner() {
   const router = useRouter();
   const { setUser, isLoggedIn, isLoading } = useAuth();
@@ -228,20 +231,23 @@ function RegisterPageInner() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-subtle" />
-            <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
-            <div className="flex-1 h-px bg-subtle" />
-          </div>
-
-          {/* Google Sign Up — passes the role the user selected above */}
-          <GoogleSignInButton
-            text="signup_with"
-            role={role === 'COACH' ? 'COACH' : 'SHOOTER'}
-            onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
-            onError={(msg) => setError(msg)}
-          />
+          {GOOGLE_ENABLED && (
+            <>
+              {/* Divider */}
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-subtle" />
+                <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">or</span>
+                <div className="flex-1 h-px bg-subtle" />
+              </div>
+              {/* Google Sign Up — passes the role the user selected above */}
+              <GoogleSignInButton
+                text="signup_with"
+                role={role === 'COACH' ? 'COACH' : 'SHOOTER'}
+                onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
+                onError={(msg) => setError(msg)}
+              />
+            </>
+          )}
 
           <p className="mt-6 text-center text-text-muted text-sm">
             Already have an account?{' '}
