@@ -273,6 +273,16 @@ function ShooterView() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => {
+            const laneId = window.prompt("Enter Lane ID to connect:");
+            if (laneId) {
+               apiFetch(`/ranges/lanes/${laneId}/link-session`, { method: 'PUT', body: JSON.stringify({ sessionId: 'pending' }) })
+                 .then(() => alert('Connected to lane!'))
+                 .catch(() => alert('Failed to connect to lane. Check the ID.'));
+            }
+          }} className="btn btn-ghost text-sm hidden sm:inline-flex">
+            Connect to Range
+          </button>
           <Link href="/performance" className="btn btn-ghost text-sm hidden sm:inline-flex">
             Analytics
           </Link>

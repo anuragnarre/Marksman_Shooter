@@ -116,6 +116,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`live_range:${rangeId}`).emit('shot_detected', payload);
   }
 
+  // ── Range Monitor events (V2) ──────────────────────────────────────────
+
+  @SubscribeMessage('joinRangeMonitor')
+  handleJoinRangeMonitor(
+    @MessageBody() rangeId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!rangeId || typeof rangeId !== 'string') return;
+    void client.join(`range_monitor:${rangeId}`);
+    client.emit('joinedRangeMonitor', { rangeId });
+  }
+
+  @SubscribeMessage('leaveRangeMonitor')
+  handleLeaveRangeMonitor(
+    @MessageBody() rangeId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    void client.leave(`range_monitor:${rangeId}`);
+  }
+
+  emitLaneStatusUpdated(rangeId: string, laneId: string, payload: any): void {
+    this.server.to(`range_monitor:${rangeId}`).emit('lane_status_updated', { laneId, ...payload });
+  }
+
   // ── Session events ────────────────────────────────────────────────────────
 
   emitSessionUpdated(sessionId: string, newShotCount: number): void {

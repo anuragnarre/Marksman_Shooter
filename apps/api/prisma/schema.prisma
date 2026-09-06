@@ -13,6 +13,7 @@ datasource db {
 enum Role {
   SHOOTER
   COACH
+  RANGE_OPERATOR
 }
 
 enum DeviceType {
@@ -36,24 +37,31 @@ model User {
   role         Role
   createdAt    DateTime @default(now())
 
-  sessions         Session[]         @relation("ShooterSessions")
-  coachConnections CoachConnection[] @relation("ShooterConnections")
-  coachOf          CoachConnection[] @relation("CoachConnections")
-  feedbacks        CoachFeedback[]
-  coachEvents      TrainingEvent[]   @relation("CoachEvents")
-  shooterEvents    EventAssignee[]   @relation("ShooterEvents")
-  scheduleRequestsAsShooter ScheduleRequest[] @relation("ShooterRequests")
-  scheduleRequestsAsCoach   ScheduleRequest[] @relation("CoachRequests")
-  trainingPlans    TrainingPlan[]
-  shooterProfile   ShooterProfile? @relation("UserShooterProfile")
-  managedShooterProfiles ShooterProfile[] @relation("ManagedShooterProfiles")
-  devices          DeviceRegistration[]
-  biometricReadings BiometricReading[] @relation("UserBiometricReadings")
-  competitionRegistrations CompetitionEventRegistration[]
-  createdCompetitionEvents CompetitionEvent[] @relation("EventCreator")
-  equipment        Equipment[]
-  rangeLocations   RangeLocation[]
-  ballisticProfiles BallisticProfile[]
+  isGuest          Boolean        @default(false)
+  managedByRangeId String?
+  managedByRange   ShootingRange? @relation("RangeManagedGuests", fields: [managedByRangeId], references: [id])
+
+  sessions                  Session[]                      @relation("ShooterSessions")
+  coachConnections          CoachConnection[]              @relation("ShooterConnections")
+  coachOf                   CoachConnection[]              @relation("CoachConnections")
+  feedbacks                 CoachFeedback[]
+  coachEvents               TrainingEvent[]                @relation("CoachEvents")
+  shooterEvents             EventAssignee[]                @relation("ShooterEvents")
+  scheduleRequestsAsShooter ScheduleRequest[]              @relation("ShooterRequests")
+  scheduleRequestsAsCoach   ScheduleRequest[]              @relation("CoachRequests")
+  trainingPlans             TrainingPlan[]
+  shooterProfile            ShooterProfile?                @relation("UserShooterProfile")
+  managedShooterProfiles    ShooterProfile[]               @relation("ManagedShooterProfiles")
+  devices                   DeviceRegistration[]
+  biometricReadings         BiometricReading[]             @relation("UserBiometricReadings")
+  competitionRegistrations  CompetitionEventRegistration[]
+  createdCompetitionEvents  CompetitionEvent[]             @relation("EventCreator")
+  equipment                 Equipment[]
+  rangeLocations            RangeLocation[]
+  ballisticProfiles         BallisticProfile[]
+
+  ownedRanges  ShootingRange[] @relation("RangeOwner")
+  laneBookings LaneBooking[]   @relation("UserBookings")
 }
 
 model Session {
@@ -73,6 +81,7 @@ model Session {
   feedback          CoachFeedback[]
   sessionContext    SessionContext?
   biometricReadings BiometricReading[] @relation("SessionBiometricReadings")
+  activeInLane      RangeLane?         @relation("LaneActiveSession")
 
   @@index([shooterId])
 }
@@ -135,21 +144,21 @@ enum RequestStatus {
 }
 
 model TrainingEvent {
-  id               String    @id @default(uuid())
+  id               String            @id @default(uuid())
   title            String
   description      String?
-  eventType        EventType @default(SESSION)
+  eventType        EventType         @default(SESSION)
   start            DateTime
   end              DateTime
-  allDay           Boolean   @default(false)
+  allDay           Boolean           @default(false)
   color            String?
   recurringGroupId String?
   coachId          String
-  coach            User      @relation("CoachEvents", fields: [coachId], references: [id])
+  coach            User              @relation("CoachEvents", fields: [coachId], references: [id])
   assignees        EventAssignee[]
   scheduleRequests ScheduleRequest[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   deletedAt        DateTime?
 
   @@index([coachId])
@@ -170,44 +179,44 @@ model EventAssignee {
 }
 
 model SessionContext {
-  id               String   @id @default(uuid())
-  sessionId        String   @unique
-  session          Session  @relation(fields: [sessionId], references: [id])
-  heartRate        Int?
-  perceivedEffort  Int?
-  windCondition    String?
-  temperature      Float?
-  notes            String?
-  createdAt        DateTime @default(now())
+  id              String   @id @default(uuid())
+  sessionId       String   @unique
+  session         Session  @relation(fields: [sessionId], references: [id])
+  heartRate       Int?
+  perceivedEffort Int?
+  windCondition   String?
+  temperature     Float?
+  notes           String?
+  createdAt       DateTime @default(now())
 }
 
 model TrainingPlan {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  content      Json
-  weekStart    DateTime
-  generatedAt  DateTime @default(now())
-  focusAreas   String[]
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  content     Json
+  weekStart   DateTime
+  generatedAt DateTime @default(now())
+  focusAreas  String[]
 }
 
 model ScheduleRequest {
-  id               String        @id @default(uuid())
-  eventId          String
-  event            TrainingEvent @relation(fields: [eventId], references: [id])
-  shooterId        String
-  shooter          User          @relation("ShooterRequests", fields: [shooterId], references: [id])
-  coachId          String
-  coach            User          @relation("CoachRequests", fields: [coachId], references: [id])
-  status           RequestStatus @default(PENDING)
-  suggestedStart   DateTime?
-  suggestedEnd     DateTime?
-  suggestedTitle   String?
-  notes            String?
-  coachNote        String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  resolvedAt       DateTime?
+  id             String        @id @default(uuid())
+  eventId        String
+  event          TrainingEvent @relation(fields: [eventId], references: [id])
+  shooterId      String
+  shooter        User          @relation("ShooterRequests", fields: [shooterId], references: [id])
+  coachId        String
+  coach          User          @relation("CoachRequests", fields: [coachId], references: [id])
+  status         RequestStatus @default(PENDING)
+  suggestedStart DateTime?
+  suggestedEnd   DateTime?
+  suggestedTitle String?
+  notes          String?
+  coachNote      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  resolvedAt     DateTime?
 
   @@index([eventId])
   @@index([shooterId])
@@ -216,16 +225,16 @@ model ScheduleRequest {
 }
 
 model ShooterProfile {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  user            User     @relation("UserShooterProfile", fields: [userId], references: [id])
-  shooterCode     String   @unique
-  primaryWeapon   String?
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation("UserShooterProfile", fields: [userId], references: [id])
+  shooterCode      String   @unique
+  primaryWeapon    String?
   managedByCoachId String?
-  managedByCoach  User?    @relation("ManagedShooterProfiles", fields: [managedByCoachId], references: [id])
-  isManaged       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  managedByCoach   User?    @relation("ManagedShooterProfiles", fields: [managedByCoachId], references: [id])
+  isManaged        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([managedByCoachId])
 }
@@ -242,22 +251,23 @@ model DeviceRegistration {
   metadata   Json?
   createdAt  DateTime   @default(now())
 
-  readings BiometricReading[]
+  readings     BiometricReading[]
+  assignedLane RangeLane?
 
   @@index([userId])
   @@index([apiKey])
 }
 
 model BiometricReading {
-  id              String   @id @default(uuid())
+  id              String             @id @default(uuid())
   deviceId        String
   device          DeviceRegistration @relation(fields: [deviceId], references: [id])
   userId          String
-  user            User     @relation("UserBiometricReadings", fields: [userId], references: [id])
+  user            User               @relation("UserBiometricReadings", fields: [userId], references: [id])
   sessionId       String?
-  session         Session? @relation("SessionBiometricReadings", fields: [sessionId], references: [id])
-  timestamp       DateTime @default(now())
-  receivedAt      DateTime @default(now())
+  session         Session?           @relation("SessionBiometricReadings", fields: [sessionId], references: [id])
+  timestamp       DateTime           @default(now())
+  receivedAt      DateTime           @default(now())
   heartRate       Int?
   spo2            Int?
   respiratoryRate Float?
@@ -265,7 +275,7 @@ model BiometricReading {
   steps           Int?
   calories        Float?
   activeMinutes   Float?
-  readingType     String   @default("continuous")
+  readingType     String             @default("continuous")
   confidence      Float?
 
   @@index([userId, timestamp])
@@ -288,34 +298,34 @@ enum PaymentStatus {
 }
 
 model CompetitionEvent {
-  id               String                 @id @default(uuid())
-  name             String
-  description      String?
-  date             DateTime
-  time             String
-  location         String
-  registrationFee  Float?
-  rules            String?
-  guidelines       String?
-  images           String[]
-  videos           String[]
-  status           CompetitionEventStatus @default(DRAFT)
-  maxParticipants  Int?
-  createdById      String
-  createdBy        User                   @relation("EventCreator", fields: [createdById], references: [id])
-  categories       CompetitionEventCategory[]
-  registrations    CompetitionEventRegistration[]
-  createdAt        DateTime               @default(now())
-  updatedAt        DateTime               @updatedAt
+  id              String                         @id @default(uuid())
+  name            String
+  description     String?
+  date            DateTime
+  time            String
+  location        String
+  registrationFee Float?
+  rules           String?
+  guidelines      String?
+  images          String[]
+  videos          String[]
+  status          CompetitionEventStatus         @default(DRAFT)
+  maxParticipants Int?
+  createdById     String
+  createdBy       User                           @relation("EventCreator", fields: [createdById], references: [id])
+  categories      CompetitionEventCategory[]
+  registrations   CompetitionEventRegistration[]
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
 
   @@index([status])
   @@index([date])
 }
 
 model CompetitionEventCategory {
-  id              String           @id @default(uuid())
+  id              String                         @id @default(uuid())
   eventId         String
-  event           CompetitionEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event           CompetitionEvent               @relation(fields: [eventId], references: [id], onDelete: Cascade)
   name            String
   fee             Float?
   maxParticipants Int?
@@ -341,55 +351,115 @@ model CompetitionEventRegistration {
 // ── New Entities (Equipment, Ranges, Ballistics) ───────────────────────────
 
 model Equipment {
-  id              String   @id @default(uuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name            String
-  type            String   // 'FIREARM' | 'OPTIC' | 'AMMO'
-  caliber         String?
-  status          String   @default("Active")
-  roundCount      Int      @default(0)
-  regPressure     String?
-  lastCleaned     DateTime?
-  nextService     Int?
-  barrelLifePct   Int?     @default(100)
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  type          String // 'FIREARM' | 'OPTIC' | 'AMMO'
+  caliber       String?
+  status        String    @default("Active")
+  roundCount    Int       @default(0)
+  regPressure   String?
+  lastCleaned   DateTime?
+  nextService   Int?
+  barrelLifePct Int?      @default(100)
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([userId])
 }
 
 model RangeLocation {
-  id              String   @id @default(uuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name            String
-  status          String   @default("Active")
-  maxDistance     Int?
-  altitude        Int?
-  gpsCoordinates  String?
-  typicalWindDir  String?
-  maxCaliber      String?
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  status           String   @default("Active")
+  maxDistance      Int?
+  altitude         Int?
+  gpsCoordinates   String?
+  typicalWindDir   String?
+  maxCaliber       String?
   environmentalLog Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([userId])
 }
 
 model BallisticProfile {
-  id                  String   @id @default(uuid())
-  userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name                String?
-  muzzleVelocityFps   Int
-  pelletWeightGrains  Float
-  ballisticCoef       Float
-  sightHeightInches   Float
-  zeroRangeYards      Int
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String?
+  muzzleVelocityFps  Int
+  pelletWeightGrains Float
+  ballisticCoef      Float
+  sightHeightInches  Float
+  zeroRangeYards     Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
+  @@index([userId])
+}
+
+// ── Range Operations (V2) ──────────────────────────────────────────────────
+
+model ShootingRange {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique // 6-character code for easy join
+  ownerId   String
+  owner     User     @relation("RangeOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  address   String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lanes         RangeLane[]
+  bookings      LaneBooking[]
+  managedGuests User[]        @relation("RangeManagedGuests")
+
+  @@index([ownerId])
+  @@index([code])
+}
+
+model RangeLane {
+  id              String              @id @default(uuid())
+  rangeId         String
+  range           ShootingRange       @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  laneNumber      Int
+  name            String? // e.g. "Lane 1 - 10m"
+  deviceId        String?             @unique // Link to a camera/sensor
+  device          DeviceRegistration? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  activeSessionId String?             @unique // Link to an active session
+  activeSession   Session?            @relation("LaneActiveSession", fields: [activeSessionId], references: [id], onDelete: SetNull)
+  status          String              @default("AVAILABLE") // AVAILABLE, OCCUPIED, MAINTENANCE
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  bookings LaneBooking[]
+
+  @@unique([rangeId, laneNumber])
+}
+
+model LaneBooking {
+  id            String        @id @default(uuid())
+  rangeId       String
+  range         ShootingRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  laneId        String?
+  lane          RangeLane?    @relation(fields: [laneId], references: [id], onDelete: SetNull)
+  userId        String
+  user          User          @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  startTime     DateTime
+  endTime       DateTime
+  amount        Float         @default(0)
+  paymentStatus String        @default("PENDING") // PENDING, PAID, CANCELLED
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([rangeId, startTime])
   @@index([userId])
 }
