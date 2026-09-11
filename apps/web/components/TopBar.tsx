@@ -15,6 +15,7 @@ import { FeedbackModal } from './FeedbackModal';
 const ADMIN_EMAIL = 'ashwin.hingave123@gmail.com';
 
 interface TopBarProps {
+  backUrl?: string;
   title: string;
   isLive?: boolean;
   sidebarWidth?: number;

@@ -17,7 +17,7 @@ export default function FastWalkInPage() {
     async function loadRange() {
       const myRanges = await apiFetch('/ranges') as any[];
       if (myRanges && myRanges.length > 0) {
-        const details = await apiFetch(`/ranges/${myRanges[0].id}`);
+        const details = await apiFetch(`/ranges/${myRanges[0].id}`) as any;
         setRange(details);
         if (details.lanes && details.lanes.length > 0) {
           setLaneId(details.lanes[0].id);
