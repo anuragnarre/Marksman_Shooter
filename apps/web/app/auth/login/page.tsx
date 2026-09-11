@@ -73,31 +73,11 @@ export default function LoginPage() {
     }
   }
 
-  async function handleTestLogin(role: 'shooter' | 'coach') {
-    const testEmail = role === 'shooter' ? 'shooter@example.com' : 'coach@example.com';
-    const testPassword = 'Password123!';
-    
-    toast(`Logging in with ${role} test account...`, 'info');
-    setEmail(testEmail);
-    setPassword(testPassword);
-    
-    setLoading(true);
-    setError(null);
-    setHasError(false);
-    
-    try {
-      const res = await login({ email: testEmail, password: testPassword });
-      setUser(res.user);
-      router.push('/dashboard');
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Invalid credentials';
-      setError(msg);
-      setHasError(true);
-      toast('Login failed: ' + msg, 'error');
-    } finally {
-      setLoading(false);
+    if (email.trim() === 'shooter@example.com') {
+      toast('✨ Logged in with shooter test account', 'info');
+    } else if (email.trim() === 'coach@example.com') {
+      toast('✨ Logged in with coach test account', 'info');
     }
-  }
 
   return (
     <div
@@ -277,33 +257,10 @@ export default function LoginPage() {
                 text="signin_with"
                 onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
                 onError={(msg) => { setError(msg); setHasError(true); }}
+              />
             </>
           )}
 
-          {/* Test Accounts */}
-          <div className="mt-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-[var(--border-subtle)]" />
-              <span className="text-[10px] font-display uppercase tracking-widest text-text-muted">Test Accounts</span>
-              <div className="flex-1 h-px bg-[var(--border-subtle)]" />
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => handleTestLogin('shooter')}
-                className="flex-1 btn bg-[var(--btn-ghost-bg)] hover:bg-[var(--btn-ghost-hover-bg)] border border-[var(--border-subtle)] text-sm text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Test Shooter
-              </button>
-              <button
-                type="button"
-                onClick={() => handleTestLogin('coach')}
-                className="flex-1 btn bg-[var(--btn-ghost-bg)] hover:bg-[var(--btn-ghost-hover-bg)] border border-[var(--border-subtle)] text-sm text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Test Coach
-              </button>
-            </div>
-          </div>
 
           {/* Footer links */}
           <div className="mt-6 text-center space-y-2">

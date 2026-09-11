@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, UseGuards, Request } from '@ne
 import { RangesService } from './ranges.service';
 import { CreateRangeDto, CreateLaneDto, WalkInGuestDto, BookLaneDto } from './dto/range.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('ranges')
@@ -12,13 +12,13 @@ export class RangesController {
 
   @Post()
   @Roles('RANGE_OPERATOR')
-  createRange(@Request() req, @Body() dto: CreateRangeDto) {
+  createRange(@Request() req: any, @Body() dto: CreateRangeDto) {
     return this.rangesService.createRange(req.user.id, dto);
   }
 
   @Get()
   @Roles('RANGE_OPERATOR')
-  getMyRanges(@Request() req) {
+  getMyRanges(@Request() req: any) {
     return this.rangesService.getMyRanges(req.user.id);
   }
 
