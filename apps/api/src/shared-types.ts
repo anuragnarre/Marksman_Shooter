@@ -2,7 +2,7 @@
 // Shared TypeScript interfaces mirroring every Prisma model.
 // Consumed by both /apps/web and /apps/api.
 
-export type UserRole = 'SHOOTER' | 'COACH';
+export type UserRole = 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR';
 export type ConnectionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface User {
