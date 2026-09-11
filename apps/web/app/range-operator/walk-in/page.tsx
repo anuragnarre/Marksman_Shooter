@@ -15,7 +15,7 @@ export default function FastWalkInPage() {
 
   useEffect(() => {
     async function loadRange() {
-      const myRanges = await apiFetch('/ranges');
+      const myRanges = await apiFetch('/ranges') as any[];
       if (myRanges && myRanges.length > 0) {
         const details = await apiFetch(`/ranges/${myRanges[0].id}`);
         setRange(details);
