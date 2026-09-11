@@ -27,6 +27,7 @@ import {
   Session,
   Shot,
   User,
+  UserRole,
 } from '@shooting-platform/shared-types';
 
 // ── Type alias for the Prisma connection row ──────────────────────────────────
@@ -38,8 +39,8 @@ type PrismaConnection = {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   initiatedBy: string;
   createdAt: Date;
-  shooter?: { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH'; createdAt: Date };
-  coach?:   { id: string; name: string; email: string; role: 'SHOOTER' | 'COACH'; createdAt: Date };
+  shooter?: { id: string; name: string; email: string; role: UserRole; createdAt: Date };
+  coach?:   { id: string; name: string; email: string; role: UserRole; createdAt: Date };
 };
 
 const USER_SELECT = {
@@ -860,7 +861,7 @@ export class CoachService {
     id: string;
     name: string;
     email: string;
-    role: 'SHOOTER' | 'COACH';
+    role: UserRole;
     createdAt: Date;
     shooterProfile?: {
       id: string;
