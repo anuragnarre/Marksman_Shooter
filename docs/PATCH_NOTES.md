@@ -1,5 +1,44 @@
 # 🚀 MARKSMAN — Patch Notes & System Changelog
 
+**Release Date:** September 13, 2026  
+**Version:** v1.3.0-beta (Range Operations & Auth Hardening)
+
+---
+
+## 🛠️ Summary of Changes & Fixes (v1.3.0-beta)
+
+### 1. 🎯 Range Operator Onboarding & Authentication
+* **UI Updates**: Added a "Range" option in the registration screen (`apps/web/app/auth/register/page.tsx`) alongside Shooter and Coach roles.
+* **API Validation**: Updated `register.dto.ts` and `google-auth.dto.ts` to natively support the `RANGE_OPERATOR` role, preventing backend validation rejections.
+* **Google Auth**: Updated the `<GoogleSignInButton />` properties to properly forward the `RANGE_OPERATOR` role to the backend.
+
+### 2. 🌱 Test Data Seeding
+* **Seed Script (`apps/api/prisma/seed.ts`)**: Added a default `RANGE_OPERATOR` test account (`range@example.com` / `Password123!`).
+* **Default Range**: The seed script now automatically spins up a dummy `ShootingRange` ("Marksman Test Range") linked to the test operator for immediate local testing.
+
+### 3. 🔒 Security & Code Cleanup
+* **Removed Hardcoded Test Credentials**: Cleaned up the login page UI (`auth/login/page.tsx`) by removing hardcoded toast messages and auto-fill hints for test accounts.
+* **Removed GCP API Keys**: Found and removed hardcoded Gemini API keys that were triggering GitHub Push Protection in `ai-coach.service.ts`, `biometrics-ai.service.ts`, and `performance.service.ts`. The backend now strictly relies on the `.env` variable `GEMINI_API_KEY`.
+* **Git History Scrubbing**: Rewrote the GitHub commit history on the `main` branch (via an orphan branch) to completely purge all traces of the leaked secrets.
+
+---
+
+## 🔮 Future Implementation Plans (Post-v1.3.0)
+
+Based on the recent scaffolding (`(operator)/lanes` and `(operator)/memberships`), the next phase of development focuses on the **Range Operator Portal**.
+
+### 1. Range Operator Dashboard
+* **Lanes Management**: Build out the UI to view, add, and update status (open, closed, maintenance) for individual shooting lanes at the operator's range.
+* **Memberships/Roster**: Implement tables to manage shooters registered at the range, including their membership status and waivers.
+* **Staff Management**: Allow the `RANGE_OPERATOR` to invite `RANGE_ADMIN` or `RSO` (Range Safety Officer) roles to help manage the facility.
+
+### 2. Core Application Bug Fixing & Polish
+* **Cloudflare / DNS**: Monitor the propagation of `marksmanshooter.in` to ensure consistent global access. Ensure "Always Use HTTPS" and correct SSL/TLS settings are strictly enforced in Cloudflare.
+* **Error Handling**: Standardize API error responses across the Next.js frontend (e.g., catching `HTTP 502` and `Internal Server Error` gracefully with user-friendly fallback UIs instead of crashing the page).
+* **Environment Parity**: Verify that `GEMINI_API_KEY` is properly injected in production environments so AI coaching features do not regress.
+
+---
+
 **Release Date:** September 1, 2026  
 **Version:** v1.2.0-beta  
 **Environment:** Next.js 15 (App Router) + NestJS + Tailscale VPN  
