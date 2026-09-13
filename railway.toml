@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build --workspace=apps/api"
+
+[deploy]
+startCommand = "cd apps/api && npx prisma migrate deploy && cd ../.. && node apps/api/dist/main.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

@@ -1,0 +1,819 @@
+// apps/api/prisma/schema.prisma
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SHOOTER
+  COACH
+  RANGE_OPERATOR
+  RANGE_ADMIN
+  RSO
+  STAFF
+  PARENT_GUARDIAN
+}
+
+enum DeviceType {
+  CUSTOM_SENSOR
+  HEALTH_CONNECT
+  MANUAL
+}
+
+enum ConnectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  googleId     String?  @unique
+  role         Role
+  createdAt    DateTime @default(now())
+
+  isGuest          Boolean        @default(false)
+  managedByRangeId String?
+  managedByRange   ShootingRange? @relation("RangeManagedGuests", fields: [managedByRangeId], references: [id])
+
+  sessions                  Session[]                      @relation("ShooterSessions")
+  coachConnections          CoachConnection[]              @relation("ShooterConnections")
+  coachOf                   CoachConnection[]              @relation("CoachConnections")
+  feedbacks                 CoachFeedback[]
+  coachEvents               TrainingEvent[]                @relation("CoachEvents")
+  shooterEvents             EventAssignee[]                @relation("ShooterEvents")
+  scheduleRequestsAsShooter ScheduleRequest[]              @relation("ShooterRequests")
+  scheduleRequestsAsCoach   ScheduleRequest[]              @relation("CoachRequests")
+  trainingPlans             TrainingPlan[]
+  shooterProfile            ShooterProfile?                @relation("UserShooterProfile")
+  managedShooterProfiles    ShooterProfile[]               @relation("ManagedShooterProfiles")
+  devices                   DeviceRegistration[]
+  biometricReadings         BiometricReading[]             @relation("UserBiometricReadings")
+  competitionRegistrations  CompetitionEventRegistration[]
+  createdCompetitionEvents  CompetitionEvent[]             @relation("EventCreator")
+  equipment                 Equipment[]
+  rangeLocations            RangeLocation[]
+  ballisticProfiles         BallisticProfile[]
+  licenses                  License[]
+  medicalNote               MedicalNote?
+  personalBests             PersonalBest[]                 @relation("ShooterPersonalBests")
+  achievements              Achievement[]
+  trainingGoals             TrainingGoal[]
+
+  ownedRanges  ShootingRange[] @relation("RangeOwner")
+  laneBookings LaneBooking[]   @relation("UserBookings")
+
+  laneInspections         LaneInspectionLog[]
+  waitlistEntries         Waitlist[]
+  adminOrganizations      Organization[]       @relation("OrganizationAdmin")
+  organizationMemberships OrganizationMember[] @relation("OrganizationMember")
+  membershipCards         MembershipCard[]
+  assignedActions         CorrectiveAction[]
+  AmmoLot                 AmmoLot[]
+
+  staffShifts          StaffShift[]
+  assignedMaintenance  MaintenanceTask[] @relation("AssignedMaintenance")
+  completedMaintenance MaintenanceLog[]  @relation("CompletedMaintenance")
+}
+
+model Session {
+  id            String    @id @default(uuid())
+  shooterId     String
+  discipline    String
+  distance      Int
+  weaponType    String
+  numberOfShots Int
+  sessionDate   DateTime
+  trainingMode  String?
+  createdAt     DateTime  @default(now())
+  deletedAt     DateTime?
+
+  shooter           User               @relation("ShooterSessions", fields: [shooterId], references: [id])
+  shots             Shot[]
+  feedback          CoachFeedback[]
+  sessionContext    SessionContext?
+  biometricReadings BiometricReading[] @relation("SessionBiometricReadings")
+  activeInLane      RangeLane?         @relation("LaneActiveSession")
+
+  @@index([shooterId])
+}
+
+model Shot {
+  id         String   @id @default(uuid())
+  sessionId  String
+  shotNumber Int
+  score      Float
+  x          Float
+  y          Float
+  timestamp  DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId])
+}
+
+model CoachConnection {
+  id          String           @id @default(uuid())
+  shooterId   String
+  coachId     String
+  status      ConnectionStatus @default(PENDING)
+  initiatedBy String           @default("SHOOTER") // 'SHOOTER' | 'COACH'
+  createdAt   DateTime         @default(now())
+
+  shooter User @relation("ShooterConnections", fields: [shooterId], references: [id])
+  coach   User @relation("CoachConnections", fields: [coachId], references: [id])
+
+  @@index([shooterId])
+  @@index([coachId])
+}
+
+model CoachFeedback {
+  id        String   @id @default(uuid())
+  coachId   String
+  sessionId String
+  feedback  String
+  createdAt DateTime @default(now())
+
+  coach   User    @relation(fields: [coachId], references: [id])
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@index([coachId])
+  @@index([sessionId])
+}
+
+enum EventType {
+  SESSION
+  TASK
+  PLAN
+  REMINDER
+  COMPETITION
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model TrainingEvent {
+  id               String            @id @default(uuid())
+  title            String
+  description      String?
+  eventType        EventType         @default(SESSION)
+  start            DateTime
+  end              DateTime
+  allDay           Boolean           @default(false)
+  color            String?
+  recurringGroupId String?
+  coachId          String
+  coach            User              @relation("CoachEvents", fields: [coachId], references: [id])
+  assignees        EventAssignee[]
+  scheduleRequests ScheduleRequest[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  deletedAt        DateTime?
+
+  @@index([coachId])
+  @@index([recurringGroupId])
+}
+
+model EventAssignee {
+  id        String        @id @default(uuid())
+  eventId   String
+  event     TrainingEvent @relation(fields: [eventId], references: [id])
+  shooterId String
+  shooter   User          @relation("ShooterEvents", fields: [shooterId], references: [id])
+  status    String        @default("PENDING")
+
+  @@unique([eventId, shooterId])
+  @@index([eventId])
+  @@index([shooterId])
+}
+
+model SessionContext {
+  id              String   @id @default(uuid())
+  sessionId       String   @unique
+  session         Session  @relation(fields: [sessionId], references: [id])
+  heartRate       Int?
+  perceivedEffort Int?
+  windCondition   String?
+  temperature     Float?
+  notes           String?
+  createdAt       DateTime @default(now())
+}
+
+model TrainingPlan {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  content     Json
+  weekStart   DateTime
+  generatedAt DateTime @default(now())
+  focusAreas  String[]
+}
+
+model ScheduleRequest {
+  id             String        @id @default(uuid())
+  eventId        String
+  event          TrainingEvent @relation(fields: [eventId], references: [id])
+  shooterId      String
+  shooter        User          @relation("ShooterRequests", fields: [shooterId], references: [id])
+  coachId        String
+  coach          User          @relation("CoachRequests", fields: [coachId], references: [id])
+  status         RequestStatus @default(PENDING)
+  suggestedStart DateTime?
+  suggestedEnd   DateTime?
+  suggestedTitle String?
+  notes          String?
+  coachNote      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  resolvedAt     DateTime?
+
+  @@index([eventId])
+  @@index([shooterId])
+  @@index([coachId])
+  @@index([status])
+}
+
+model ShooterProfile {
+  id               String  @id @default(uuid())
+  userId           String  @unique
+  user             User    @relation("UserShooterProfile", fields: [userId], references: [id])
+  shooterCode      String  @unique
+  primaryWeapon    String?
+  managedByCoachId String?
+  managedByCoach   User?   @relation("ManagedShooterProfiles", fields: [managedByCoachId], references: [id])
+  isManaged        Boolean @default(false)
+
+  dateOfBirth           DateTime?
+  gender                String? // MALE, FEMALE, NON_BINARY
+  dominantHand          String? // LEFT, RIGHT, AMBIDEXTROUS
+  eyeDominance          String? // LEFT, RIGHT
+  stance                String? // STANDING, PRONE, KNEELING
+  nationality           String?
+  heightCm              Int?
+  weightKg              Float?
+  phone                 String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+
+  currentStreak Int @default(0)
+  longestStreak Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([managedByCoachId])
+}
+
+model MedicalNote {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  conditions   String?
+  medications  String?
+  restrictions String?
+  coachOnly    Boolean  @default(true)
+  lastUpdated  DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model License {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String // NRAI, ISSF, STATE
+  licenseNumber String
+  issuedBy      String
+  issuedDate    DateTime
+  expiryDate    DateTime
+  status        String   @default("VALID")
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PersonalBest {
+  id         String   @id @default(uuid())
+  shooterId  String
+  user       User     @relation("ShooterPersonalBests", fields: [shooterId], references: [id], onDelete: Cascade)
+  discipline String
+  distance   Int
+  weaponType String
+  score      Float
+  sessionId  String
+  achievedAt DateTime @default(now())
+
+  @@unique([shooterId, discipline, distance, weaponType])
+  @@index([shooterId])
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String // FIRST_SESSION, PERFECT_10
+  name        String
+  description String
+  earnedAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model TrainingGoal {
+  id          String   @id @default(uuid())
+  shooterId   String
+  user        User     @relation(fields: [shooterId], references: [id], onDelete: Cascade)
+  discipline  String
+  targetScore Float
+  targetDate  DateTime
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+
+  @@index([shooterId])
+}
+
+model DeviceRegistration {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  deviceName String
+  deviceType DeviceType
+  apiKey     String     @unique
+  lastSeenAt DateTime?
+  isActive   Boolean    @default(true)
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  readings     BiometricReading[]
+  assignedLane RangeLane?
+
+  @@index([userId])
+  @@index([apiKey])
+}
+
+model BiometricReading {
+  id              String             @id @default(uuid())
+  deviceId        String
+  device          DeviceRegistration @relation(fields: [deviceId], references: [id])
+  userId          String
+  user            User               @relation("UserBiometricReadings", fields: [userId], references: [id])
+  sessionId       String?
+  session         Session?           @relation("SessionBiometricReadings", fields: [sessionId], references: [id])
+  timestamp       DateTime           @default(now())
+  receivedAt      DateTime           @default(now())
+  heartRate       Int?
+  spo2            Int?
+  respiratoryRate Float?
+  stressLevel     Float?
+  steps           Int?
+  calories        Float?
+  activeMinutes   Float?
+  readingType     String             @default("continuous")
+  confidence      Float?
+
+  @@index([userId, timestamp])
+  @@index([sessionId, timestamp])
+  @@index([deviceId, timestamp])
+}
+
+// ── Competition Events ──────────────────────────────────────────────────────
+
+enum CompetitionEventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMING_SOON
+}
+
+model CompetitionEvent {
+  id              String                         @id @default(uuid())
+  name            String
+  description     String?
+  date            DateTime
+  time            String
+  location        String
+  registrationFee Float?
+  rules           String?
+  guidelines      String?
+  images          String[]
+  videos          String[]
+  status          CompetitionEventStatus         @default(DRAFT)
+  maxParticipants Int?
+  createdById     String
+  createdBy       User                           @relation("EventCreator", fields: [createdById], references: [id])
+  categories      CompetitionEventCategory[]
+  registrations   CompetitionEventRegistration[]
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+
+  @@index([status])
+  @@index([date])
+}
+
+model CompetitionEventCategory {
+  id              String                         @id @default(uuid())
+  eventId         String
+  event           CompetitionEvent               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name            String
+  fee             Float?
+  maxParticipants Int?
+  registrations   CompetitionEventRegistration[]
+}
+
+model CompetitionEventRegistration {
+  id            String                    @id @default(uuid())
+  eventId       String
+  event         CompetitionEvent          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User                      @relation(fields: [userId], references: [id])
+  categoryId    String?
+  category      CompetitionEventCategory? @relation(fields: [categoryId], references: [id])
+  paymentStatus PaymentStatus             @default(COMING_SOON)
+  registeredAt  DateTime                  @default(now())
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// ── New Entities (Equipment, Ranges, Ballistics) ───────────────────────────
+
+model Equipment {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  type          String // 'FIREARM' | 'OPTIC' | 'AMMO'
+  make          String?
+  model         String?
+  serialNumber  String?   @unique
+  caliber       String?
+  status        String    @default("Active")
+  roundCount    Int       @default(0)
+  barrelLifePct Int?      @default(100)
+  purchaseDate  DateTime?
+  purchasePrice Float?
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model AmmoLot {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brand              String
+  caliber            String
+  bulletWeightGrains Float
+  lotNumber          String?
+  quantity           Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RangeLocation {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  status           String   @default("Active")
+  maxDistance      Int?
+  altitude         Int?
+  gpsCoordinates   String?
+  typicalWindDir   String?
+  maxCaliber       String?
+  environmentalLog Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model BallisticProfile {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String?
+  muzzleVelocityFps  Int
+  pelletWeightGrains Float
+  ballisticCoef      Float
+  sightHeightInches  Float
+  zeroRangeYards     Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ── Range Operations (V2) ──────────────────────────────────────────────────
+
+model ShootingRange {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique // 6-character code for easy join
+  ownerId   String
+  owner     User     @relation("RangeOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  address   String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lanes            RangeLane[]
+  bookings         LaneBooking[]
+  managedGuests    User[]            @relation("RangeManagedGuests")
+  RangeSafetyRule  RangeSafetyRule[]
+  staffShifts      StaffShift[]
+  maintenanceTasks MaintenanceTask[]
+
+  @@index([ownerId])
+  @@index([code])
+}
+
+model RangeLane {
+  id              String              @id @default(uuid())
+  rangeId         String
+  range           ShootingRange       @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  laneNumber      Int
+  name            String? // e.g. "Lane 1 - 10m"
+  deviceId        String?             @unique // Link to a camera/sensor
+  device          DeviceRegistration? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  activeSessionId String?             @unique // Link to an active session
+  activeSession   Session?            @relation("LaneActiveSession", fields: [activeSessionId], references: [id], onDelete: SetNull)
+  status          String              @default("AVAILABLE") // AVAILABLE, OCCUPIED, MAINTENANCE
+  targetFrameType String?
+  maxCaliber      String?
+  notes           String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  bookings          LaneBooking[]
+  LaneInspectionLog LaneInspectionLog[]
+  TimeSlot          TimeSlot[]
+  maintenanceTasks  MaintenanceTask[]
+
+  @@unique([rangeId, laneNumber])
+}
+
+model LaneBooking {
+  id            String        @id @default(uuid())
+  rangeId       String
+  range         ShootingRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  laneId        String?
+  lane          RangeLane?    @relation(fields: [laneId], references: [id], onDelete: SetNull)
+  userId        String
+  user          User          @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  startTime     DateTime
+  endTime       DateTime
+  amount        Float         @default(0)
+  paymentStatus String        @default("PENDING") // PENDING, PAID, CANCELLED
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([rangeId, startTime])
+  @@index([userId])
+}
+
+model MembershipTier {
+  id                  String   @id @default(uuid())
+  rangeId             String
+  name                String
+  price               Float
+  billingPeriod       String // MONTHLY, ANNUAL
+  maxBookingsPerMonth Int
+  laneDiscountPct     Float    @default(0)
+  createdAt           DateTime @default(now())
+
+  subscriptions MembershipSubscription[]
+}
+
+model MembershipSubscription {
+  id                 String         @id @default(uuid())
+  userId             String
+  tierId             String
+  tier               MembershipTier @relation(fields: [tierId], references: [id])
+  status             String // ACTIVE, CANCELLED, EXPIRED
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  autoRenew          Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([userId])
+}
+
+model IncidentReport {
+  id               String             @id @default(uuid())
+  rangeId          String
+  reporterId       String
+  laneId           String?
+  incidentDate     DateTime
+  type             String // NEGLIGENT_DISCHARGE, INJURY, OTHER
+  severity         String // MINOR, SERIOUS, CRITICAL
+  description      String
+  status           String             @default("OPEN")
+  createdAt        DateTime           @default(now())
+  IncidentPhoto    IncidentPhoto[]
+  CorrectiveAction CorrectiveAction[]
+
+  @@index([rangeId])
+}
+
+model SafetyAcknowledgment {
+  id             String   @id @default(uuid())
+  userId         String
+  rangeId        String
+  acknowledgedAt DateTime @default(now())
+  version        Int      @default(1)
+
+  @@index([userId, rangeId])
+}
+
+model LaneInspectionLog {
+  id             String    @id @default(uuid())
+  laneId         String
+  lane           RangeLane @relation(fields: [laneId], references: [id], onDelete: Cascade)
+  rsoId          String
+  rso            User      @relation(fields: [rsoId], references: [id])
+  inspectionDate DateTime  @default(now())
+  status         String
+  notes          String?
+  photos         String[]
+}
+
+model TimeSlot {
+  id        String     @id @default(uuid())
+  rangeId   String
+  laneId    String?
+  lane      RangeLane? @relation(fields: [laneId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  capacity  Int        @default(1)
+  slotType  String     @default("WALK_IN") // WALK_IN, RESERVATION_ONLY
+  status    String     @default("AVAILABLE") // AVAILABLE, FULL, CLOSED
+}
+
+model Waitlist {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  slotId     String
+  position   Int
+  joinedAt   DateTime  @default(now())
+  notifiedAt DateTime?
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  type        String // CLUB, ACADEMY, CORPORATE, etc.
+  adminUserId String
+  admin       User     @relation("OrganizationAdmin", fields: [adminUserId], references: [id])
+  logoUrl     String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  members OrganizationMember[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation("OrganizationMember", fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("ATHLETE") // ADMIN, COACH, ATHLETE, PARENT
+  joinedAt       DateTime     @default(now())
+
+  @@unique([organizationId, userId])
+}
+
+model MembershipCard {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardNumber String   @unique
+  qrCodeUrl  String?
+  issuedAt   DateTime @default(now())
+}
+
+model RangeSafetyRule {
+  id          String        @id @default(uuid())
+  rangeId     String
+  range       ShootingRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  order       Int
+  title       String
+  description String
+  category    String // PPE, MUZZLE_DISCIPLINE, etc.
+  isMandatory Boolean       @default(true)
+}
+
+model IncidentPhoto {
+  id         String         @id @default(uuid())
+  incidentId String
+  incident   IncidentReport @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  photoUrl   String
+  uploadedAt DateTime       @default(now())
+}
+
+model CorrectiveAction {
+  id           String         @id @default(uuid())
+  incidentId   String
+  incident     IncidentReport @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  description  String
+  assignedToId String
+  assignedTo   User           @relation(fields: [assignedToId], references: [id])
+  dueDate      DateTime?
+  status       String         @default("OPEN") // OPEN, IN_PROGRESS, COMPLETED
+  completedAt  DateTime?
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String
+  beforeData   Json?
+  afterData    Json?
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime @default(now())
+
+  @@index([resourceType, resourceId])
+  @@index([userId])
+}
+
+// ── Phase 2: Staff & Maintenance ──────────────────────────────────────────
+
+model StaffShift {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rangeId   String
+  range     ShootingRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+  role      String // RSO, FRONT_DESK, MANAGER
+  status    String        @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED, NO_SHOW
+  clockIn   DateTime?
+  clockOut  DateTime?
+  notes     String?
+  createdAt DateTime      @default(now())
+
+  @@index([userId, startTime])
+  @@index([rangeId, startTime])
+}
+
+model MaintenanceTask {
+  id           String        @id @default(uuid())
+  rangeId      String
+  range        ShootingRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+  laneId       String?
+  lane         RangeLane?    @relation(fields: [laneId], references: [id], onDelete: SetNull)
+  title        String
+  description  String?
+  frequency    String // ONCE, DAILY, WEEKLY, MONTHLY
+  nextDueDate  DateTime
+  assignedToId String?
+  assignedTo   User?         @relation("AssignedMaintenance", fields: [assignedToId], references: [id], onDelete: SetNull)
+  status       String        @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, OVERDUE
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  logs MaintenanceLog[]
+
+  @@index([rangeId])
+}
+
+model MaintenanceLog {
+  id          String          @id @default(uuid())
+  taskId      String
+  task        MaintenanceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  completedBy String
+  user        User            @relation("CompletedMaintenance", fields: [completedBy], references: [id])
+  completedAt DateTime        @default(now())
+  notes       String?
+  cost        Float?          @default(0)
+
+  @@index([taskId])
+}
