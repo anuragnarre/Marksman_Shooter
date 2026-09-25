@@ -7,6 +7,8 @@ services:
     buildCommand: npm install && npm run db:generate && npm run build:api
     startCommand: cd apps/api && npm run start:prod
     envVars:
+      - key: NODE_VERSION
+        value: "20.10.0"
       - key: DATABASE_URL
         fromDatabase:
           name: marksman-db
@@ -38,8 +40,10 @@ services:
     runtime: node
     plan: free
     buildCommand: npm install && npm run build:web
-    startCommand: cd apps/web && npm run start
+    startCommand: cd apps/web && npx serve@latest out -l tcp://0.0.0.0:$PORT
     envVars:
+      - key: NODE_VERSION
+        value: "20.10.0"
       - key: NEXT_PUBLIC_API_URL
         value: "https://api.marksmanshooter.in"
       - key: NEXT_PUBLIC_WS_URL
