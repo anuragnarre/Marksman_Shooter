@@ -301,17 +301,22 @@ if (-not $NoVision) {
 Write-Header "3/4  Starting NestJS API"
 $apiDir = Join-Path $Root "apps\api"
 
-if (-not (Test-Path "$apiDir\node_modules")) {
-    Write-Info "Installing API dependencies..."
-    Set-Location $apiDir
+if (-not (Test-Path "$Root\node_modules")) {
+    Write-Info "Installing monorepo dependencies..."
+    Set-Location $Root
     npm install --silent 2>&1 | Out-Null
 }
 
-# Run Prisma migrate
-Write-Info "Running Prisma migrations..."
+Write-Info "Building shared-types..."
+Set-Location $Root
+cmd /c "npm run build:shared 2>&1" | Out-Null
+
+# Sync Prisma schema
+Write-Info "Syncing Prisma schema with database..."
 Set-Location $apiDir
-cmd /c "npx prisma migrate deploy 2>&1" | Out-Null
-Write-Ok "Prisma migrations applied"
+cmd /c "npx prisma db push 2>&1" | Out-Null
+cmd /c "npx prisma generate 2>&1" | Out-Null
+Write-Ok "Prisma database synced and client generated"
 
 Write-Info "Starting NestJS API on :3001"
 $apiJob = Start-Job -Name "API" -ScriptBlock {
@@ -326,11 +331,7 @@ $null = Wait-For-Port 3001 "NestJS API" 40
 Write-Header "4/4  Starting Next.js Web App"
 $webDir = Join-Path $Root "apps\web"
 
-if (-not (Test-Path "$webDir\node_modules")) {
-    Write-Info "Installing web dependencies..."
-    Set-Location $webDir
-    npm install --silent 2>&1 | Out-Null
-}
+# Monorepo dependencies are installed at root, skipping web-specific install
 
 Write-Info "Starting Next.js on :3000"
 $webJob = Start-Job -Name "Web" -ScriptBlock {

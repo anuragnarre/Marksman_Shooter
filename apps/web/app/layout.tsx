@@ -44,16 +44,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Marksman — Tactical Range Ops',
     description: 'Track every shot. Get AI coaching. Train smarter.',
-    url: 'https://www.marksmanspro.com',
+    url: 'https://www.marksmanshooter.in',
     siteName: 'Marksman',
-    images: [{ url: 'https://www.marksmanspro.com/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://www.marksmanshooter.in/og-image.png', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Marksman — Tactical Range Ops',
     description: 'Track every shot. Get AI coaching. Train smarter.',
-    images: ['https://www.marksmanspro.com/og-image.png'],
+    images: ['https://www.marksmanshooter.in/og-image.png'],
   },
   icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
 };
