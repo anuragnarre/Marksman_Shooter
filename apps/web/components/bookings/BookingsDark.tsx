@@ -451,7 +451,7 @@ export function BookingsDark({
                       <input
                         className="w-full bg-surface-container-high text-on-surface font-body-md text-body-md pl-10 pr-space-md py-space-sm rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary font-medium"
                         type="text"
-                        value="M-7431 (Elena Rostova)"
+                        defaultValue="M-7431 (Elena Rostova)"
                       />
                       <button
                         className="absolute right-space-sm text-outline hover:text-on-surface"

@@ -112,7 +112,7 @@ export function SafetyLight({ incidents = [], auditLogs = [], isLoading = false,
 <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
 <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
 <path className="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.5" />
-<path className="text-on-tertiary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="99.4, 100" stroke-linecap="butt" strokeWidth="3.5" />
+<path className="text-on-tertiary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="99.4, 100" strokeLinecap="butt" strokeWidth="3.5" />
 </svg>
 <span className="absolute font-label-sm text-[10px] font-bold text-on-surface">GR-A</span>
 </div>

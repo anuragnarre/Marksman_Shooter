@@ -22,9 +22,9 @@ export default function StaffDashboard() {
           <div className="flex gap-4">
              <div className="text-right">
                <p className="text-xs text-on-surface-variant uppercase font-bold">Shift Status</p>
-               <p className="font-bold text-[#4CAF50] flex items-center gap-1 justify-end">
+               <div className="font-bold text-[#4CAF50] flex items-center gap-1 justify-end">
                  <div className="w-2 h-2 bg-[#4CAF50] rounded-full animate-pulse"></div> Clocked In
-               </p>
+               </div>
              </div>
           </div>
         </div>

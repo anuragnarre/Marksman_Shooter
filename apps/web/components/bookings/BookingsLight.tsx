@@ -466,7 +466,7 @@ export function BookingsLight({
                 id="shooterInput"
                 placeholder="Scan Badge or Enter Member ID..."
                 type="text"
-                value="M-7431 (Elena Rostov)"
+                defaultValue="M-7431 (Elena Rostov)"
               />
               <span className="absolute right-3 material-symbols-outlined text-[18px] text-on-surface-variant">
                 badge

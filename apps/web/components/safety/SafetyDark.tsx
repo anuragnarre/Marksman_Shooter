@@ -104,7 +104,7 @@ export function SafetyDark({ incidents = [], auditLogs = [], isLoading = false, 
 <div className="relative w-14 h-14 flex items-center justify-center">
 <svg className="w-14 h-14 -rotate-90" viewBox="0 0 48 48">
 <circle className="text-surface-container-highest" cx="24" cy="24" fill="none" r="20" stroke="currentColor" strokeWidth="4" />
-<circle className="text-primary" cx="24" cy="24" fill="none" r="20" stroke="currentColor" strokeDasharray="125.6" stroke-dashoffset="1.25" stroke-linecap="round" strokeWidth="4" />
+<circle className="text-primary" cx="24" cy="24" fill="none" r="20" stroke="currentColor" strokeDasharray="125.6" strokeDashoffset="1.25" strokeLinecap="round" strokeWidth="4" />
 </svg>
 <span className="absolute material-symbols-outlined text-primary text-[18px]">verified</span>
 </div>
