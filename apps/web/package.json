@@ -28,7 +28,6 @@
     "@fullcalendar/timegrid": "^6.1.20",
     "@shooting-platform/shared-types": "*",
     "@vercel/kms": "^0.3.0",
-    "@vercel/postgres": "^0.10.0",
     "clsx": "^2.1.1",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
