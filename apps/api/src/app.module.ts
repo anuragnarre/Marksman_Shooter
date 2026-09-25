@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 
 // apps/api/src/app.module.ts
 // ... existing imports ...
+import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { ShotsModule } from './shots/shots.module';
@@ -87,6 +88,7 @@ import { AuditLogInterceptor } from './safety/audit-log.interceptor';
     BillingModule,
     ExportModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,
