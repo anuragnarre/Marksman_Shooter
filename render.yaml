@@ -40,7 +40,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm install && npm run build:web
-    startCommand: cd apps/web && npx serve@latest out -l tcp://0.0.0.0:$PORT
+    startCommand: cd apps/web && npx --yes serve@latest out -l tcp://0.0.0.0:$PORT
     envVars:
       - key: NODE_VERSION
         value: "20.10.0"
