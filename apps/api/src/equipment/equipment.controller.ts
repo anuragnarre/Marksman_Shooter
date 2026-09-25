@@ -39,4 +39,34 @@ export class EquipmentController {
   remove(@Param('id') id: string, @Req() req: any) {
     return this.equipmentService.remove(id, req.user.id);
   }
+
+  @Post(':id/service-logs')
+  @ApiOperation({ summary: 'Add a service log to equipment' })
+  addServiceLog(@Param('id') id: string, @Body() data: any) {
+    return this.equipmentService.addServiceLog(id, data);
+  }
+
+  @Get('ammo-lots')
+  @ApiOperation({ summary: 'Get all ammo lots for user' })
+  getAmmoLots(@Req() req: any) {
+    return this.equipmentService.getAmmoLots(req.user.id);
+  }
+
+  @Post('ammo-lots')
+  @ApiOperation({ summary: 'Create a new ammo lot' })
+  addAmmoLot(@Req() req: any, @Body() data: any) {
+    return this.equipmentService.addAmmoLot(req.user.id, data);
+  }
+
+  @Post('ammo-lots/:id/reloading-logs')
+  @ApiOperation({ summary: 'Add a reloading log to an ammo lot' })
+  addReloadingLog(@Param('id') id: string, @Body() data: any) {
+    return this.equipmentService.addReloadingLog(id, data);
+  }
+
+  @Post(':id/ballistic-profiles')
+  @ApiOperation({ summary: 'Add a ballistic profile to equipment' })
+  addBallisticProfile(@Param('id') id: string, @Body() data: any) {
+    return this.equipmentService.createBallisticProfile(id, data);
+  }
 }

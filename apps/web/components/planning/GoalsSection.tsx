@@ -566,7 +566,7 @@ function GoalForm({
             <input
               type="number" step="0.1" min="1" max="10.9"
               value={targetAvg}
-              onChange={e => setTargetAvg(e.target.value)}
+              onChange={e = /> setTargetAvg(e.target.value)}
               placeholder="e.g. 9.5"
               className="field w-full"
             />
@@ -576,7 +576,7 @@ function GoalForm({
             <input
               type="number" min="0" max="200"
               value={targetXRings}
-              onChange={e => setTargetXRings(e.target.value)}
+              onChange={e = /> setTargetXRings(e.target.value)}
               placeholder="e.g. 10"
               className="field w-full"
             />

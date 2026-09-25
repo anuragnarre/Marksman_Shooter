@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsInt, IsEmail, MinLength, MaxLength } from 'class-validator';
+import {  IsString, IsOptional, IsBoolean, IsInt, IsEmail, MinLength } from 'class-validator';
 
 export class CreateRangeDto {
   @IsString()
@@ -53,3 +53,35 @@ export class BookLaneDto {
   @IsString()
   endTime: string; // ISO
 }
+
+export class UpdateLaneDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  deviceId?: string;
+
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+
+export class LogLaneInspectionDto {
+  @IsBoolean()
+  passed: boolean;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+
+  @IsString()
+  @IsOptional()
+  checklistResult?: string;
+}
+

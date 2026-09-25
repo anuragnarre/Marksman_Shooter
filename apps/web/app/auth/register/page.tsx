@@ -29,15 +29,12 @@ function RegisterPageInner() {
   const safeTopInset = isMobile ? 'max(env(safe-area-inset-top, 0px), 24px)' : 'env(safe-area-inset-top, 0px)';
 
   const searchParams = useSearchParams();
-  const VALID_ROLES: UserRole[] = ['SHOOTER', 'COACH', 'RANGE_OPERATOR'];
-  const paramRole = searchParams.get('role') as UserRole;
-  const initialRole: UserRole = VALID_ROLES.includes(paramRole) ? paramRole : 'SHOOTER';
 
   const [name, setName]               = useState('');
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole]               = useState<UserRole>(initialRole);
+  const role: UserRole = 'RANGE_OPERATOR';
   const [error, setError]             = useState<string | null>(null);
   const [loading, setLoading]         = useState(false);
 
@@ -57,7 +54,8 @@ function RegisterPageInner() {
     try {
       const res = await register({ name: trimmedName, email: email.trim(), password, role });
       setUser(res.user);
-      router.push('/dashboard');
+      
+      router.push('/onboarding');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -189,36 +187,7 @@ function RegisterPageInner() {
               {password.length > 0 && <PasswordStrength password={password} />}
             </div>
 
-            {/* Role selector */}
-            <div>
-              <span className="label block mb-2">I am a</span>
-              <div className="grid grid-cols-3 gap-2">
-                <RoleCard
-                  id="SHOOTER"
-                  selected={role === 'SHOOTER'}
-                  onSelect={() => setRole('SHOOTER')}
-                  icon={<RifleIcon />}
-                  label="Shooter"
-                  description="Track my training sessions"
-                />
-                <RoleCard
-                  id="COACH"
-                  selected={role === 'COACH'}
-                  onSelect={() => setRole('COACH')}
-                  icon={<CoachIcon />}
-                  label="Coach"
-                  description="Manage and review shooters"
-                />
-                <RoleCard
-                  id="RANGE_OPERATOR"
-                  selected={role === 'RANGE_OPERATOR'}
-                  onSelect={() => setRole('RANGE_OPERATOR')}
-                  icon={<RangeIcon />}
-                  label="Range"
-                  description="Manage your shooting range"
-                />
-              </div>
-            </div>
+            <input type="hidden" name="role" value={role} />
 
             {error && (
               <div id="reg-error" role="alert"
@@ -251,7 +220,10 @@ function RegisterPageInner() {
               <GoogleSignInButton
                 text="signup_with"
                 role={role as any}
-                onSuccess={(user) => { setUser(user); router.push('/dashboard'); }}
+                onSuccess={(user) => { 
+                  setUser(user); 
+                  router.push('/onboarding');
+                }}
                 onError={(msg) => setError(msg)}
               />
             </>

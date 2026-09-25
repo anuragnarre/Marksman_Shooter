@@ -678,11 +678,11 @@ export default function AnalyticsSection() {
               margin={{ top: 8, right: 12, bottom: 4, left: 0 }}
             >
               <defs>
-                <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1" />
                   <stop offset="0%"   stopColor={C.amber} stopOpacity={0.30} />
                   <stop offset="100%" stopColor={C.amber} stopOpacity={0}    />
                 </linearGradient>
-                <linearGradient id="bandGrad" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="bandGrad" x1="0" y1="0" x2="0" y2="1" />
                   <stop offset="0%"   stopColor={C.amber} stopOpacity={0.08} />
                   <stop offset="100%" stopColor={C.amber} stopOpacity={0.02} />
                 </linearGradient>
@@ -987,7 +987,7 @@ export default function AnalyticsSection() {
                   const cy = Number(props.cy ?? 0);
                   const val = Number(props.value ?? 0);
                   return <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={3}
-                    fill={val > 1 ? C.red : C.green} stroke={C.surface} strokeWidth={1.5} />;
+                    fill={val  /> 1 ? C.red : C.green} stroke={C.surface} strokeWidth={1.5} />;
                 }}
                 isAnimationActive animationDuration={1200} />
             </ComposedChart>
@@ -1142,7 +1142,7 @@ export default function AnalyticsSection() {
           <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
             <AreaChart data={filtered} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
               <defs>
-                <linearGradient id="grGrad" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="grGrad" x1="0" y1="0" x2="0" y2="1" />
                   <stop offset="0%"   stopColor={C.blue} stopOpacity={0.25} />
                   <stop offset="100%" stopColor={C.blue} stopOpacity={0}    />
                 </linearGradient>

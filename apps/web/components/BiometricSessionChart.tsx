@@ -81,7 +81,7 @@ export function BiometricSessionChart({ sessionId, shots = [], height = 280 }: P
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
         <defs>
-          <linearGradient id="hrGradient" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="hrGradient" x1="0" y1="0" x2="0" y2="1" />
             <stop offset="5%" stopColor="#FF4D6D" stopOpacity={0.3} />
             <stop offset="95%" stopColor="#FF4D6D" stopOpacity={0} />
           </linearGradient>

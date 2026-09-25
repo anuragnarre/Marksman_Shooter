@@ -103,6 +103,55 @@ export class RangesService {
     });
   }
 
+  async updateLane(laneId: string, data: any) {
+    return this.prisma.rangeLane.update({
+      where: { id: laneId },
+      data: {
+        name: data.name,
+        status: data.status,
+        maxCaliber: data.maxCaliber,
+        targetFrameType: data.targetFrameType,
+        notes: data.notes,
+        supportedDistances: data.supportedDistances,
+      },
+    });
+  }
+
+  async updateLaneStatus(laneId: string, status: string) {
+    const update: any = { status };
+    if (status === 'AVAILABLE') update.activeSessionId = null;
+    return this.prisma.rangeLane.update({ where: { id: laneId }, data: update });
+  }
+
+  async getLanes(rangeId: string) {
+    return this.prisma.rangeLane.findMany({
+      where: { rangeId },
+      include: {
+        activeSession: { include: { shooter: { select: { id: true, name: true } } } },
+        device: true,
+      },
+      orderBy: { laneNumber: 'asc' },
+    });
+  }
+
+  async logLaneInspection(laneId: string, rsoId: string, data: any) {
+    const log = await this.prisma.laneInspectionLog.create({
+      data: {
+        laneId,
+        rsoId,
+        status: data.status ?? 'PASS',
+        notes: data.notes,
+        photos: data.photos ?? [],
+      },
+    });
+    // Update lastInspectedAt on the lane
+    await this.prisma.rangeLane.update({
+      where: { id: laneId },
+      data: { lastInspectedAt: new Date() },
+    });
+    return log;
+  }
+
   async bookLane(rangeId: string, dto: BookLaneDto) {
     return this.prisma.laneBooking.create({
       data: {
@@ -116,3 +165,4 @@ export class RangesService {
     });
   }
 }
+

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, UseGuards, Req } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -11,14 +11,14 @@ export class OrganizationsController {
 
   @Post()
   @Roles('RANGE_ADMIN')
-  create(@Body() createOrgDto: { name: string; contactEmail?: string; contactPhone?: string }) {
-    return this.organizationsService.createOrganization(createOrgDto);
+  create(@Req() req: any, @Body() createOrgDto: { name: string; type: string; description?: string }) {
+    return this.organizationsService.createOrganization(req.user.id, createOrgDto);
   }
 
   @Get()
   @Roles('RANGE_ADMIN', 'RSO', 'STAFF')
-  findAll() {
-    return this.organizationsService.getAllOrganizations();
+  findAll(@Req() req: any) {
+    return this.organizationsService.getOrganizationsByUser(req.user.id);
   }
 
   @Get(':id')
@@ -29,7 +29,13 @@ export class OrganizationsController {
 
   @Put(':id')
   @Roles('RANGE_ADMIN')
-  update(@Param('id') id: string, @Body() updateOrgDto: { name?: string; contactEmail?: string; contactPhone?: string }) {
+  update(@Param('id') id: string, @Body() updateOrgDto: { name?: string; description?: string }) {
     return this.organizationsService.updateOrganization(id, updateOrgDto);
+  }
+
+  @Post(':id/ranges')
+  @Roles('RANGE_ADMIN')
+  registerRange(@Req() req: any, @Param('id') id: string, @Body() data: any) {
+    return this.organizationsService.registerRange(id, req.user.id, data);
   }
 }

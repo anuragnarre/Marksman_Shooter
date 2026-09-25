@@ -912,7 +912,7 @@ function RequestChangeModal({ ev, onClose, onSuccess }:
           <div>
             <label className="label block mb-1.5">Suggest Different Activity (optional)</label>
             <input className="field w-full" placeholder="Leave blank to keep current activity"
-              value={form.suggestedTitle} onChange={e => f('suggestedTitle', e.target.value)} />
+              value={form.suggestedTitle} onChange={e = /> f('suggestedTitle', e.target.value)} />
           </div>
 
           {/* Suggested time */}
@@ -922,12 +922,12 @@ function RequestChangeModal({ ev, onClose, onSuccess }:
               <div>
                 <label className="text-[10px] font-display uppercase tracking-widest mb-1 block" style={{ color: 'var(--text-muted)' }}>Start</label>
                 <input type="datetime-local" className="field w-full text-sm"
-                  value={form.suggestedStart} onChange={e => f('suggestedStart', e.target.value)} />
+                  value={form.suggestedStart} onChange={e = /> f('suggestedStart', e.target.value)} />
               </div>
               <div>
                 <label className="text-[10px] font-display uppercase tracking-widest mb-1 block" style={{ color: 'var(--text-muted)' }}>End</label>
                 <input type="datetime-local" className="field w-full text-sm"
-                  value={form.suggestedEnd} onChange={e => f('suggestedEnd', e.target.value)} />
+                  value={form.suggestedEnd} onChange={e = /> f('suggestedEnd', e.target.value)} />
               </div>
             </div>
           </div>
@@ -1278,7 +1278,7 @@ function SelfEventModal({ mode, form, setForm, saving, error, onSave, onDelete, 
               className="field w-full"
               placeholder="e.g. Breathing drill, dry fire, stretch routine"
               value={form.title}
-              onChange={(e) => f('title', e.target.value)}
+              onChange={(e) = /> f('title', e.target.value)}
             />
           </div>
           <div>
@@ -1311,7 +1311,7 @@ function SelfEventModal({ mode, form, setForm, saving, error, onSave, onDelete, 
                 type={form.allDay ? 'date' : 'datetime-local'}
                 className="field w-full"
                 value={form.allDay ? form.start.slice(0, 10) : form.start}
-                onChange={(e) => f('start', e.target.value)}
+                onChange={(e) = /> f('start', e.target.value)}
               />
             </div>
             <div>
@@ -1320,7 +1320,7 @@ function SelfEventModal({ mode, form, setForm, saving, error, onSave, onDelete, 
                 type={form.allDay ? 'date' : 'datetime-local'}
                 className="field w-full"
                 value={form.allDay ? form.end.slice(0, 10) : form.end}
-                onChange={(e) => f('end', e.target.value)}
+                onChange={(e) = /> f('end', e.target.value)}
               />
             </div>
           </div>
@@ -1419,7 +1419,7 @@ function EventModal({ mode, form, setForm, shooters, saving, error, onSave, onDe
           {error && <div className="px-4 py-3 rounded-lg text-sm" style={{ background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.3)', color: '#FF4D6D' }}>{error}</div>}
           <div>
             <label className="label block mb-1.5">Event Title *</label>
-            <input className="field w-full" placeholder="e.g. Prone position drill" value={form.title} onChange={e => f('title', e.target.value)} />
+            <input className="field w-full" placeholder="e.g. Prone position drill" value={form.title} onChange={e = /> f('title', e.target.value)} />
           </div>
           <div>
             <label className="label block mb-1.5">Type</label>
@@ -1440,12 +1440,12 @@ function EventModal({ mode, form, setForm, shooters, saving, error, onSave, onDe
             <div>
               <label className="label block mb-1.5">Start</label>
               <input type={form.allDay ? 'date' : 'datetime-local'} className="field w-full"
-                value={form.allDay ? form.start.slice(0,10) : form.start} onChange={e => f('start', e.target.value)} />
+                value={form.allDay ? form.start.slice(0,10) : form.start} onChange={e = /> f('start', e.target.value)} />
             </div>
             <div>
               <label className="label block mb-1.5">End</label>
               <input type={form.allDay ? 'date' : 'datetime-local'} className="field w-full"
-                value={form.allDay ? form.end.slice(0,10) : form.end} onChange={e => f('end', e.target.value)} />
+                value={form.allDay ? form.end.slice(0,10) : form.end} onChange={e = /> f('end', e.target.value)} />
             </div>
           </div>
           <label className="flex items-center gap-3 cursor-pointer">
@@ -1495,7 +1495,7 @@ function EventModal({ mode, form, setForm, shooters, saving, error, onSave, onDe
               {form.recurringType !== 'none' && (
                 <div className="mt-2">
                   <label className="label block mb-1.5">Repeat until</label>
-                  <input type="date" className="field w-full" value={form.recurringUntil} onChange={e => f('recurringUntil', e.target.value)} />
+                  <input type="date" className="field w-full" value={form.recurringUntil} onChange={e = /> f('recurringUntil', e.target.value)} />
                 </div>
               )}
             </div>

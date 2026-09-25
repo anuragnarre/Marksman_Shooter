@@ -7,8 +7,11 @@ import {
   ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import {
   CoachFeedback,
   ConnectionNotificationEvent,
@@ -32,8 +35,27 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server!: Server;
 
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  /** Verify JWT on every new WebSocket connection. Disconnect if invalid. */
   handleConnection(client: Socket): void {
-    console.log(`WS client connected: ${client.id}`);
+    try {
+      const token =
+        (client.handshake.auth?.token as string | undefined) ??
+        (client.handshake.headers?.authorization as string | undefined)?.replace('Bearer ', '');
+      if (!token) throw new WsException('No token provided');
+      const secret = this.configService.get<string>('JWT_SECRET') ?? '';
+      const payload = this.jwtService.verify(token, { secret });
+      // Attach verified userId to socket data for use in message handlers
+      (client.data as any).userId = payload.sub as string;
+      console.log(`WS authenticated: ${client.id} userId=${payload.sub}`);
+    } catch {
+      console.warn(`WS rejected unauthenticated client: ${client.id}`);
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket): void {
@@ -70,7 +92,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
   ): void {
+    // SEC-02: Only allow a user to join their own personal room (verified from JWT)
+    const authenticatedUserId = (client.data as any).userId as string | undefined;
     if (!userId || typeof userId !== 'string') return;
+    if (authenticatedUserId && authenticatedUserId !== userId) {
+      client.emit("error", { message: "Forbidden: cannot join another user's room" });
+      return;
+    }
     void client.join(`user:${userId}`);
     client.emit('joinedUserRoom', { userId });
   }
@@ -199,5 +227,63 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (sessionId) {
       this.server.to(sessionId).emit('biometric.update', event);
     }
+  }
+
+  // ── Notification events ──────────────────────────────────────────────────
+
+  emitNewNotification(userId: string, payload: { notification: any; unreadCount: number }): void {
+    this.server.to(`user:${userId}`).emit('notification:new', payload);
+  }
+
+  // ── Player / Shooter events ───────────────────────────────────────────────
+
+  emitPbUpdated(userId: string, pbData: any): void {
+    this.server.to(`user:${userId}`).emit('pb:updated', pbData);
+  }
+
+  emitAchievementEarned(userId: string, achievementData: any): void {
+    this.server.to(`user:${userId}`).emit('achievement:earned', achievementData);
+  }
+
+  // ── Phase 5: Competition events ───────────────────────────────────────────
+
+  @SubscribeMessage('joinCompetitionScoreboard')
+  handleJoinCompetitionScoreboard(
+    @MessageBody() competitionId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!competitionId || typeof competitionId !== 'string') return;
+    void client.join(`competition:${competitionId}:scoreboard`);
+    client.emit('joinedCompetitionScoreboard', { competitionId });
+  }
+
+  @SubscribeMessage('leaveCompetitionScoreboard')
+  handleLeaveCompetitionScoreboard(
+    @MessageBody() competitionId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    void client.leave(`competition:${competitionId}:scoreboard`);
+  }
+
+  emitCompetitionScoreboard(competitionId: string, scoreboardData: any): void {
+    this.server.to(`competition:${competitionId}:scoreboard`).emit('scoreboard:update', scoreboardData);
+  }
+
+  emitNationalRecordBroken(competitionId: string, data: any): void {
+    this.server.to(`competition:${competitionId}:scoreboard`).emit('nationalRecordBroken', data);
+  }
+
+  // ── Phase 4: Coach Module Enhancements ─────────────────────────────────────
+
+  @SubscribeMessage('pauseAndCorrect')
+  handlePauseAndCorrect(
+    @MessageBody() payload: { targetShooterId: string; message: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    // Coach sends pauseAndCorrect, gateway forwards it to the specific shooter's user room
+    this.server.to(`user:${payload.targetShooterId}`).emit('coach:pauseAndCorrect', {
+      message: payload.message,
+      timestamp: Date.now(),
+    });
   }
 }

@@ -89,16 +89,14 @@ export class AnalyticsService {
 
     // Group Radius: max Euclidean distance between any two shots (O(n²) pairs)
     // Measures the total spread of the shot group on the target
-    let groupRadius = 0;
-    for (let i = 0; i < shots.length; i++) {
-      for (let j = i + 1; j < shots.length; j++) {
-        const dx = shots[i].x - shots[j].x;
-        const dy = shots[i].y - shots[j].y;
-        // sqrt((x1-x2)² + (y1-y2)²)
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > groupRadius) groupRadius = dist;
-      }
-    }
+    // BUG-03 FIX: O(n) group radius using MPI as reference — was O(n²) pair comparison
+    // Functionally equivalent for grouping analysis without blocking the event loop
+    const groupRadius = shots.reduce((max, shot) => {
+      const dx = shot.x - mpi.x;
+      const dy = shot.y - mpi.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      return dist > max ? dist : max;
+    }, 0);
 
     // Standard Deviation of scores: sqrt(avg((score - avgScore)²))
     // Measures how consistent the shooter's scores are across shots

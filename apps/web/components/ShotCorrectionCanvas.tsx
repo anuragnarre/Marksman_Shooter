@@ -186,7 +186,7 @@ export default function ShotCorrectionCanvas({
   const didDrag = useRef(false);
 
   // A transparent SVG placeholder sized to warpWidth × warpHeight.
-  // Used as the <img> source so ResizeObserver computes the correct content
+  // Used as the <img /> source so ResizeObserver computes the correct content
   // area for the coordinate transform — without displaying the raw camera photo.
   const placeholderSrc = useMemo(
     () => `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="${warpWidth}" height="${warpHeight}"/>`,

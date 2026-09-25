@@ -111,12 +111,12 @@ export function ScoreOverTimeChart({ shots, average }: ScoreOverTimeProps) {
         <AreaChart data={data} margin={CHART_MARGIN}>
           <defs>
             {/* Gradient fill below the line — amber fade to transparent */}
-            <linearGradient id={fillGradId} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={fillGradId} x1="0" y1="0" x2="0" y2="1" />
               <stop offset="0%"   stopColor="#F5A623" stopOpacity={0.22} />
               <stop offset="100%" stopColor="#F5A623" stopOpacity={0}    />
             </linearGradient>
             {/* Gradient stroke — blue → amber left-to-right */}
-            <linearGradient id={strokeGradId} x1="0" y1="0" x2="1" y2="0">
+            <linearGradient id={strokeGradId} x1="0" y1="0" x2="1" y2="0" />
               <stop offset="0%"   stopColor="#4FC3F7" />
               <stop offset="60%"  stopColor="#F5A623" />
               <stop offset="100%" stopColor="#F5A623" />

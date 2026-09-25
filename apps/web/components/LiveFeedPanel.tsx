@@ -30,7 +30,7 @@ export default function LiveFeedPanel({
   const feedUrl = streamUrl ?? process.env.NEXT_PUBLIC_STREAM_URL ?? 'http://localhost:8001';
   const mjpegUrl = `${feedUrl}/mjpeg`;
 
-  // Draw shot overlays on canvas above the <img>
+  // Draw shot overlays on canvas above the <img />
   useEffect(() => {
     if (!showOverlay || !canvasRef.current || !containerRef.current) return;
     const canvas = canvasRef.current;
@@ -112,7 +112,7 @@ export default function LiveFeedPanel({
           src={mjpegUrl}
           alt="Live camera feed"
           className="w-full h-full object-cover"
-          onLoad={() => setImgLoaded(true)}
+          onLoad={() = /> setImgLoaded(true)}
           onError={() => setImgError(true)}
           style={{ display: imgLoaded ? 'block' : 'none' }}
         />

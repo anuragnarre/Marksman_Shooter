@@ -424,7 +424,7 @@ export function DeviceManager() {
           <input
             type="text"
             value={newName}
-            onChange={e => setNewName(e.target.value)}
+            onChange={e = /> setNewName(e.target.value)}
             placeholder="Device name (e.g. My Pulse Oximeter)"
             className="field w-full"
             onKeyDown={e => e.key === 'Enter' && handleRegister()}

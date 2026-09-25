@@ -1,5 +1,5 @@
 import React from "react";
-import { GlassCard } from "./Card";
+import { GlassCard } from "../ui/Card";
 import { Award, Target, TrendingUp } from "lucide-react";
 
 export function PersonalBestsWidget() {

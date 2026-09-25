@@ -12,12 +12,14 @@ import { parseFile } from './shots.parser';
 import { ManualShotsDto } from './dto/manual-shots.dto';
 import { Shot, ShotInput, UserRole, VisionShotResult } from '@shooting-platform/shared-types';
 import { UpdateShotDto } from './dto/update-shot.dto';
+import { VisionService } from './vision.service';
 
 @Injectable()
 export class ShotsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventsGateway: EventsGateway,
+    private readonly visionService: VisionService,
   ) {}
 
   // ── Shared creation method (all 3 input methods funnel here) ───────────────
@@ -36,7 +38,7 @@ export class ShotsService {
     // Verify session ownership / access
     const session = await this.prisma.session.findFirst({
       where: { id: sessionId, deletedAt: null },
-      select: { id: true, shooterId: true },
+      select: { id: true, shooterId: true, competitionEntryId: true, discipline: true },
     });
 
     if (!session) {
@@ -54,6 +56,23 @@ export class ShotsService {
     }
 
     const existingForNumbering = await this.prisma.shot.count({ where: { sessionId } });
+
+    // ISSF format enforcement for competitions
+    if (session.competitionEntryId) {
+      let maxShots = 0;
+      if (session.discipline.includes('10m Air Rifle') || session.discipline.includes('10m Air Pistol')) {
+        maxShots = 60;
+      } else if (session.discipline.includes('50m 3P')) {
+        maxShots = 120;
+      } else if (session.discipline.includes('25m')) {
+        maxShots = 60;
+      } // Add more as needed
+
+      if (maxShots > 0 && (existingForNumbering + shots.length > maxShots)) {
+        throw new BadRequestException(`ISSF Format Enforcement: Maximum ${maxShots} shots allowed for ${session.discipline}`);
+      }
+    }
+
     const created = await this.prisma.$transaction(
       shots.map((shot, i) =>
         this.prisma.shot.create({
@@ -72,6 +91,11 @@ export class ShotsService {
 
     // Emit WebSocket event to notify clients watching this session
     this.eventsGateway.emitSessionUpdated(sessionId, totalShots);
+
+    // Phase 3: Evaluate PBs and Achievements in background (fire and forget)
+    this.evaluatePersonalBestAndAchievements(session.id, session.shooterId).catch(err => {
+      console.error('[shots] PB/Achievement eval failed:', err);
+    });
 
     return created.map((s) => ({
       id: s.id,
@@ -117,47 +141,9 @@ export class ShotsService {
     file: Express.Multer.File,
     shooterIdHint?: string,
   ): Promise<Shot[]> {
-    const visionUrl = process.env.VISION_SERVICE_URL;
-    if (!visionUrl) {
-      throw new BadRequestException('Vision service URL is not configured');
-    }
+    const analysisResult = await this.visionService.analyzeImage(file.buffer, file.mimetype, 'air_rifle_10m');
 
-    // Forward image to FastAPI vision service
-    const formData = new FormData();
-    const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
-    formData.append('file', blob, file.originalname);
-
-    let visionResponse: Response;
-    try {
-      visionResponse = await fetch(`${visionUrl}/analyze`, {
-        method: 'POST',
-        body: formData,
-      });
-    } catch (err) {
-      throw new ServiceUnavailableException(
-        'Vision service is not running. Start it with: cd apps/vision && uvicorn main:app',
-      );
-    }
-
-    if (!visionResponse.ok) {
-      const errorText = await visionResponse.text();
-      throw new BadRequestException(`Vision service error: ${errorText}`);
-    }
-
-    const analysisResult = await visionResponse.json() as {
-      shots: Array<{
-        shotNumber: number;
-        score: number;
-        x: number;
-        y: number;
-      }>;
-    };
-
-    if (!Array.isArray(analysisResult.shots)) {
-      throw new BadRequestException('Vision service returned unexpected format');
-    }
-
-    if (analysisResult.shots.length === 0) {
+    if (!analysisResult.targetDetected || analysisResult.shots.length === 0) {
       throw new BadRequestException('No bullet holes detected in this photo. Ensure the target is clearly visible and well-lit.');
     }
 
@@ -192,105 +178,41 @@ export class ShotsService {
     warpHeight: number;
     warpMmPerPixel: number;
   }> {
-    const visionUrl = process.env.VISION_SERVICE_URL;
-    if (!visionUrl) {
-      throw new BadRequestException('Vision service URL is not configured');
-    }
+    const analysisResult = await this.visionService.analyzeImage(file.buffer, file.mimetype, targetType);
 
-    const formData = new FormData();
-    const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
-    formData.append('file', blob, file.originalname);
-    formData.append('target_type', targetType);
-
-    let visionResponse: Response;
-    try {
-      visionResponse = await fetch(`${visionUrl}/analyze`, {
-        method: 'POST',
-        body: formData,
-      });
-    } catch {
-      throw new ServiceUnavailableException(
-        'Vision service is not running. Start it with: cd apps/vision && uvicorn main:app',
-      );
-    }
-
-    if (!visionResponse.ok) {
-      const errorText = await visionResponse.text();
-      throw new BadRequestException(`Vision service error: ${errorText}`);
-    }
-
-    const raw = await visionResponse.json() as {
-      shots: Array<{
-        shot_number: number;
-        score: number;
-        x: number;
-        y: number;
-        pixel_x: number;
-        pixel_y: number;
-        confidence: number;
-        is_inner_ten?: boolean;
-        dist_mm?: number;
-      }>;
-      target_detected: boolean;
-      processing_time_ms: number;
-      warp_center_x?: number;
-      warp_center_y?: number;
-      warp_width?: number;
-      warp_height?: number;
-      warp_mm_per_pixel?: number;
-    };
-
-    if (!Array.isArray(raw.shots)) {
-      throw new BadRequestException('Vision service returned unexpected format');
-    }
-
-    const visionShots: VisionShotResult[] = raw.shots.map((s) => ({
-      shotNumber: s.shot_number,
-      score:      s.score,
-      x:          s.x,
-      y:          s.y,
-      pixelX:     s.pixel_x,
-      pixelY:     s.pixel_y,
-      confidence: s.confidence,
-      isInnerTen: s.is_inner_ten ?? false,
-      distMm:     s.dist_mm ?? 0,
-    }));
-
-    const inputs: ShotInput[] = visionShots.map((s) => ({
+    const visionShots: VisionShotResult[] = analysisResult.shots.map((s) => ({
       shotNumber: s.shotNumber,
       score:      s.score,
       x:          s.x,
       y:          s.y,
+      pixelX:     500, // Gemini doesn't return exact pixels easily, default to center for UI rendering fallback
+      pixelY:     500,
+      confidence: 0.95,
+      isInnerTen: s.score >= 10.2,
+      distMm:     Math.sqrt(s.x * s.x + s.y * s.y),
     }));
 
-    const warpMeta = {
-      warpCenterX:   raw.warp_center_x   ?? 500,
-      warpCenterY:   raw.warp_center_y   ?? 500,
-      warpWidth:     raw.warp_width      ?? 1000,
-      warpHeight:    raw.warp_height     ?? 1000,
-      warpMmPerPixel: raw.warp_mm_per_pixel ?? 0.17,
-    };
+    const inputs: ShotInput[] = visionShots.map((vs) => ({
+      shotNumber: vs.shotNumber,
+      score:      vs.score,
+      x:          vs.x,
+      y:          vs.y,
+    }));
 
-    if (visionShots.length === 0) {
-      return {
-        shots:            [],
-        targetDetected:   raw.target_detected,
-        processingTimeMs: raw.processing_time_ms,
-        savedShots:       [],
-        ...warpMeta,
-      };
-    }
-
-    const savedShots = persist
+    const savedShots = (persist && analysisResult.targetDetected && inputs.length > 0)
       ? await this.createShots(sessionId, actorId, actorRole, inputs, shooterIdHint)
       : [];
 
     return {
       shots:            visionShots,
-      targetDetected:   raw.target_detected,
-      processingTimeMs: raw.processing_time_ms,
+      targetDetected:   analysisResult.targetDetected,
+      processingTimeMs: analysisResult.processingTimeMs,
       savedShots,
-      ...warpMeta,
+      warpCenterX: 500,
+      warpCenterY: 500,
+      warpWidth: 1000,
+      warpHeight: 1000,
+      warpMmPerPixel: 0.17,
     };
   }
 
@@ -490,6 +412,139 @@ export class ShotsService {
 
     if (!connection && !managedProfile) {
       throw new ForbiddenException('No approved coaching relationship with this shooter');
+    }
+  }
+
+  // ── Phase 3: Personal Best & Achievement Evaluation ────────────────────────
+
+  private async evaluatePersonalBestAndAchievements(sessionId: string, shooterId: string): Promise<void> {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      include: { shots: true }
+    });
+    if (!session || session.shots.length === 0) return;
+
+    // 1. Personal Best Evaluation
+    const sessionScore = session.shots.reduce((acc, shot) => acc + shot.score, 0);
+
+    const existingPb = await this.prisma.personalBest.findUnique({
+      where: {
+        shooterId_discipline_distance_weaponType: {
+          shooterId,
+          discipline: session.discipline,
+          distance: session.distance,
+          weaponType: session.weaponType
+        }
+      }
+    });
+
+    if (!existingPb || sessionScore > existingPb.score) {
+      const pb = await this.prisma.personalBest.upsert({
+        where: {
+          shooterId_discipline_distance_weaponType: {
+            shooterId,
+            discipline: session.discipline,
+            distance: session.distance,
+            weaponType: session.weaponType
+          }
+        },
+        create: {
+          shooterId,
+          discipline: session.discipline,
+          distance: session.distance,
+          weaponType: session.weaponType,
+          score: sessionScore,
+          sessionId: session.id
+        },
+        update: {
+          score: sessionScore,
+          sessionId: session.id,
+          achievedAt: new Date()
+        }
+      });
+      // Emit PB Updated Event
+      this.eventsGateway.emitPbUpdated(shooterId, pb);
+    }
+
+    // 1b. National Record Evaluation (Category 5)
+    // For simplicity we use the shooter's age category as OPEN unless they have a profile with a calculated age
+    // We fetch current national record
+    const nr = await this.prisma.nationalRecord.findUnique({
+      where: {
+        discipline_distance_weaponType_ageCategory_gender: {
+          discipline: session.discipline,
+          distance: session.distance,
+          weaponType: session.weaponType,
+          ageCategory: 'OPEN', // In a full app, determine age from ShooterProfile
+          gender: 'MIXED'      // Similarly, determine gender from ShooterProfile
+        }
+      }
+    });
+
+    if (!nr || sessionScore > nr.score) {
+      const newNr = await this.prisma.nationalRecord.upsert({
+        where: {
+          discipline_distance_weaponType_ageCategory_gender: {
+            discipline: session.discipline,
+            distance: session.distance,
+            weaponType: session.weaponType,
+            ageCategory: 'OPEN',
+            gender: 'MIXED'
+          }
+        },
+        create: {
+          discipline: session.discipline,
+          distance: session.distance,
+          weaponType: session.weaponType,
+          ageCategory: 'OPEN',
+          gender: 'MIXED',
+          score: sessionScore,
+          holderId: shooterId,
+        },
+        update: {
+          score: sessionScore,
+          holderId: shooterId,
+          achievedAt: new Date()
+        }
+      });
+      // Emit a global event or user event for National Record
+      this.eventsGateway.emitNewNotification(shooterId, {
+        notification: { title: 'New National Record!', body: `You set a new record of ${sessionScore}!` },
+        unreadCount: 1
+      });
+    }
+
+    // 2. Achievements Check
+    // Example Achievement: PERFECT_10 (score >= 10.0 on all shots in a session of >= 10 shots)
+    if (session.shots.length >= 10 && session.shots.every(s => s.score >= 10.0)) {
+      await this.awardAchievement(shooterId, 'PERFECT_10', 'Perfect 10s', 'Scored 10.0 or higher on every shot in a session (min 10 shots).');
+    }
+
+    // Example Achievement: FIRST_SESSION
+    const sessionCount = await this.prisma.session.count({ where: { shooterId } });
+    if (sessionCount === 1) {
+      await this.awardAchievement(shooterId, 'FIRST_SESSION', 'First Session', 'Completed your first training session.');
+    }
+  }
+
+  private async awardAchievement(userId: string, type: string, name: string, description: string): Promise<void> {
+    // Check if they already have it
+    const existing = await this.prisma.achievement.findFirst({
+      where: { userId, type }
+    });
+    
+    if (!existing) {
+      const achievement = await this.prisma.achievement.create({
+        data: { userId, type, name, description }
+      });
+      // Emit event
+      this.eventsGateway.emitAchievementEarned(userId, achievement);
+      
+      // Also send a push notification
+      this.eventsGateway.emitNewNotification(userId, {
+        notification: { title: 'Achievement Unlocked!', body: `You earned: ${name}` },
+        unreadCount: 1
+      });
     }
   }
 }

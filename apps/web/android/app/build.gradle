@@ -1,10 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.marksman.shooting"
+    namespace = "com.marksman.rangeapp"
     compileSdk = rootProject.ext.compileSdkVersion
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
     defaultConfig {
-        applicationId "com.marksman.shooting"
+        applicationId "com.marksman.rangeapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -16,21 +20,10 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    signingConfigs {
-        release {
-            if (project.hasProperty('MARKSMAN_KEYSTORE_FILE')) {
-                storeFile file(MARKSMAN_KEYSTORE_FILE)
-                storePassword MARKSMAN_KEYSTORE_PASSWORD
-                keyAlias MARKSMAN_KEY_ALIAS
-                keyPassword MARKSMAN_KEY_PASSWORD
-            }
-        }
-    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }

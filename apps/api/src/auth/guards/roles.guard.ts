@@ -9,6 +9,12 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { JwtPayload, UserRole } from '@shooting-platform/shared-types';
 
+const ROLE_HIERARCHY: Partial<Record<UserRole, UserRole[]>> = {
+  RANGE_ADMIN: ['RANGE_OPERATOR', 'RSO', 'STAFF', 'RANGE_ADMIN'],
+  RANGE_OPERATOR: ['RSO', 'STAFF', 'RANGE_OPERATOR'],
+  RSO: ['STAFF', 'RSO'],
+};
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -29,7 +35,10 @@ export class RolesGuard implements CanActivate {
       .getRequest<{ user: JwtPayload }>();
     const user = request.user;
 
-    if (!requiredRoles.includes(user.role)) {
+    const userRoles = ROLE_HIERARCHY[user.role] || [user.role];
+    const hasRole = requiredRoles.some((role) => userRoles.includes(role));
+
+    if (!hasRole) {
       throw new ForbiddenException(
         `This action requires one of these roles: ${requiredRoles.join(', ')}`,
       );

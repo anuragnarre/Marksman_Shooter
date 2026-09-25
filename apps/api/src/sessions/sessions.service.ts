@@ -6,12 +6,16 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { WeatherService } from '../ranges/weather.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { Session, UserRole } from '@shooting-platform/shared-types';
 
 @Injectable()
 export class SessionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly weatherService: WeatherService,
+  ) {}
 
   async createForActor(
     actorId: string,
@@ -30,8 +34,33 @@ export class SessionsService {
         numberOfShots: dto.numberOfShots,
         sessionDate: new Date(dto.sessionDate),
         trainingMode: dto.trainingMode ?? null,
+        rangeId: dto.rangeId ?? null,
       },
     });
+
+    // 2.4.1 Auto-fetch weather if session is at a range with GPS
+    if (dto.rangeId) {
+      try {
+        const weather = await this.weatherService.getWeatherForRange(dto.rangeId);
+        if (weather) {
+          await this.prisma.sessionContext.upsert({
+            where: { sessionId: session.id },
+            create: {
+              sessionId: session.id,
+              temperature: weather.temperature,
+              windCondition: `${weather.windSpeed} km/h`,
+            },
+            update: {
+              temperature: weather.temperature,
+              windCondition: `${weather.windSpeed} km/h`,
+            },
+          });
+        }
+      } catch {
+        // Non-fatal — weather enrichment is best-effort
+      }
+    }
+
     return this.mapSession(session);
   }
 

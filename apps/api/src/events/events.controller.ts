@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtPayload } from '@shooting-platform/shared-types';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('events')
 export class EventsController {
@@ -87,5 +88,18 @@ export class EventsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id') id: string) {
     return this.eventsService.delete(id);
+  }
+
+  @Get(':id/scoreboard')
+  @ApiOperation({ summary: 'Get the scoreboard for an event' })
+  async getScoreboard(@Param('id') id: string) {
+    return this.eventsService.getScoreboard(id);
+  }
+
+  @Put(':id/scoreboard')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update an entry in the scoreboard' })
+  async updateScoreboard(@Param('id') id: string, @Body() data: any) {
+    return this.eventsService.updateScoreboard(id, data);
   }
 }

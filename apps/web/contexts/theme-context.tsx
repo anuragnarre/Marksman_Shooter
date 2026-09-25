@@ -12,8 +12,8 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'light',
-  resolvedTheme: 'light',
+  theme: 'dark',
+  resolvedTheme: 'dark',
   setTheme: () => {},
 });
 
@@ -26,19 +26,21 @@ function applyTheme(resolved: ResolvedTheme) {
   const root = document.documentElement;
   if (resolved === 'light') {
     root.classList.add('light');
+    root.classList.remove('dark');
   } else {
+    root.classList.add('dark');
     root.classList.remove('light');
   }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
+  const [theme, setThemeState] = useState<Theme>('dark');
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('dark');
 
   // Initialize from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem('theme') as Theme | null;
-    const initial = stored && ['dark', 'light', 'system'].includes(stored) ? stored : 'light';
+    const initial = stored && ['dark', 'light', 'system'].includes(stored) ? stored : 'dark';
     setThemeState(initial);
 
     const resolved = initial === 'system' ? getSystemTheme() : initial;

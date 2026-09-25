@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, Min, Max, IsOptional, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, Max, IsOptional, ValidateNested, MaxLength } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -34,12 +34,14 @@ export class CreateBallisticsDto {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
+  @MaxLength(255)
   weaponType: string;
 
   @ApiProperty({ example: '.308 Win', description: 'Caliber of the weapon' })
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
+  @MaxLength(255)
   caliber: string;
 
   @ApiProperty({ example: 168, description: 'Weight of the bullet in grains' })

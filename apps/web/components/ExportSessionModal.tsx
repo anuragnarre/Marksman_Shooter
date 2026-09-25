@@ -591,7 +591,7 @@ export function ExportSessionModal({
           </style>
         </head>
         <body>
-          <img src="${dataUrl}" onload="window.print(); window.close();" />
+          <img src="${dataUrl}" />
         </body>
       </html>
     `);
@@ -682,7 +682,7 @@ export function ExportSessionModal({
                   min={70}
                   max={100}
                   value={Math.round(quality * 100)}
-                  onChange={(e) => setQuality(parseInt(e.target.value) / 100)}
+                  onChange={(e) = /> setQuality(parseInt(e.target.value) / 100)}
                   className="w-24 accent-[#F5A623]"
                 />
                 <span className="text-xs font-mono text-text-secondary w-8">{Math.round(quality * 100)}%</span>

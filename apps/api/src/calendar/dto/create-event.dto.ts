@@ -1,8 +1,7 @@
 // apps/api/src/calendar/dto/create-event.dto.ts
-import {
+import { 
   IsString, IsOptional, IsEnum, IsBoolean,
-  IsDateString, IsArray, IsNumber, Min, Max, MaxLength
-} from 'class-validator';
+  IsDateString, IsArray, IsNumber, Min, Max, MaxLength } from 'class-validator';
 
 export type EventType = 'SESSION' | 'TASK' | 'PLAN' | 'REMINDER' | 'COMPETITION';
 export type RecurringType = 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';

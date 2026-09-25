@@ -12,7 +12,7 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { SessionContextDto } from './dto/session-context.dto';
 import { DeepAnalysis, TrainingPlan, UserRole } from '@shooting-platform/shared-types';
 
-const MODEL = 'gemini-3.1-pro';
+const MODEL = 'gemini-2.0-flash';  // PERF-04: corrected from invalid 'gemini-3.1-pro'
 
 @Injectable()
 export class PerformanceService {

@@ -246,7 +246,7 @@ export function ShotTimelineSlider({
           min={0}
           max={shots.length - 1}
           value={index}
-          onChange={(e) => {
+          onChange={(e) = /> {
             stopPlay();
             setIndex(Number(e.target.value));
           }}

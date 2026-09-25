@@ -1,5 +1,5 @@
 // apps/api/src/biometrics/dto/health-connect-sync.dto.ts
-import { Type } from 'class-transformer';
+import {   Type  } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,

@@ -277,4 +277,24 @@ export class CoachController {
   ): Promise<CoachFeedback> {
     return this.coachService.addFeedback(user.sub, dto);
   }
+
+  // ── Phase 4: Coach Module Enhancements ─────────────────────────────────────
+
+  @Get('directory')
+  @Roles('SHOOTER', 'COACH')
+  async getCoachDirectory() {
+    return this.coachService.getCoachDirectory();
+  }
+
+  @Get('squads/:id/performance')
+  @Roles('COACH')
+  async getSquadPerformance(@Param('id') squadId: string, @CurrentUser() user: JwtPayload) {
+    return this.coachService.getSquadPerformance(squadId, user.sub);
+  }
+
+  @Post('group-sessions')
+  @Roles('COACH')
+  async createGroupSession(@CurrentUser() user: JwtPayload, @Body() data: any) {
+    return this.coachService.createGroupSession(user.sub, data);
+  }
 }

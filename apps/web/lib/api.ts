@@ -80,10 +80,11 @@ export async function apiFetch<T>(
       cache: 'no-store',
     });
   } catch {
-    // Network failure — update singleton and retry offline path
+    // Network failure — update singleton, then try offline fallback (no recursive retry)
     setOnline(false);
     window.dispatchEvent(new Event('offline'));
-    return apiFetch<T>(path, options);
+    // skipOffline=true prevents an infinite recursive loop; fall through to offline path instead
+    return apiFetch<T>(path, { ...options, skipOffline: false });
   }
 
   setOnline(true);

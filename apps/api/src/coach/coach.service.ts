@@ -1006,6 +1006,66 @@ export class CoachService {
     return groupRadius;
   }
 
+  // ── Phase 4: Coach Module Enhancements ─────────────────────────────────────
+
+  async getCoachDirectory() {
+    const coaches = await this.prisma.user.findMany({
+      where: { role: 'COACH' },
+      include: {
+        coachProfile: true,
+      },
+    });
+    return coaches.map(c => ({
+      ...this.mapUser(c),
+      coachProfile: c.coachProfile,
+    }));
+  }
+
+  async getSquadPerformance(squadId: string, coachId: string) {
+    const squad = await this.prisma.squad.findFirst({
+      where: { id: squadId, coachId },
+      include: {
+        members: {
+          include: {
+            shooter: true,
+          }
+        }
+      }
+    });
+
+    if (!squad) {
+      throw new NotFoundException('Squad not found or access denied');
+    }
+
+    const performance = [];
+
+    for (const member of squad.members) {
+      const summary = await this.getShooterPerformanceSummary(coachId, member.shooterId);
+      performance.push({
+        userId: member.shooterId,
+        name: member.shooter.name,
+        email: member.shooter.email,
+        summary
+      });
+    }
+
+    return {
+      squadId: squad.id,
+      name: squad.name,
+      performance,
+    };
+  }
+
+  async createGroupSession(coachId: string, data: any) {
+    return this.prisma.groupSession.create({
+      data: {
+        squadId: data.squadId,
+        date: new Date(data.date),
+        notes: data.title || "Group Session",
+      }
+    });
+  }
+
   private round(value: number, decimals = 2): number {
     const base = Math.pow(10, decimals);
     return Math.round(value * base) / base;

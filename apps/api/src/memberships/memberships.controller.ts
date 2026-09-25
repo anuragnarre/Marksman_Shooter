@@ -32,4 +32,17 @@ export class MembershipsController {
   getUserSubscription(@Param('userId') userId: string) {
     return this.membershipsService.getUserSubscription(userId);
   }
+
+  @Get('subscriptions')
+  @Roles('RANGE_ADMIN', 'STAFF', 'RANGE_OPERATOR')
+  getAllSubscriptions() {
+    return this.membershipsService.getAllSubscriptions();
+  }
+
+  @Get('organizations')
+  @Roles('RANGE_ADMIN', 'STAFF', 'RANGE_OPERATOR')
+  getAllOrganizations() {
+    return this.membershipsService.getAllOrganizations();
+  }
 }
+

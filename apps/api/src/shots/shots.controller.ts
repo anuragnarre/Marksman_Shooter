@@ -14,6 +14,7 @@ import {
   Headers,
   UnauthorizedException,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ShotsService } from './shots.service';
 import { ManualShotsDto } from './dto/manual-shots.dto';
@@ -183,6 +184,7 @@ export class ShotsController {
    * No JWT auth — authenticated by X-Engine-Key header (matches ENGINE_API_KEY env var).
    * If ENGINE_API_KEY is not set, this endpoint is open (local dev only).
    */
+  @SkipThrottle()
   @Post('live-frame')
   async liveFrame(
     @Body() body: {

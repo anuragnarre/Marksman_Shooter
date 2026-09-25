@@ -230,7 +230,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) = /> setQuery(e.target.value)}
             placeholder="Search commands, pages, sessions…"
             className="flex-1 bg-transparent py-4 text-[14px] text-text-primary outline-none placeholder:text-text-muted"
             style={{ fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif' }}

@@ -155,4 +155,38 @@ export class EventsService {
       orderBy: { date: 'desc' },
     });
   }
+
+  async getScoreboard(eventId: string) {
+    return this.prisma.scoreboardEntry.findMany({
+      where: { competitionId: eventId },
+      orderBy: [
+        { categoryId: 'asc' },
+        { totalScore: 'desc' }
+      ]
+    });
+  }
+
+  async updateScoreboard(eventId: string, data: any) {
+    // Basic upsert or create
+    const entry = await this.prisma.scoreboardEntry.findFirst({
+      where: { competitionId: eventId, shooterId: data.shooterId, categoryId: data.categoryId }
+    });
+    
+    if (entry) {
+      return this.prisma.scoreboardEntry.update({
+        where: { id: entry.id },
+        data: { totalScore: data.totalScore, rank: data.rank }
+      });
+    } else {
+      return this.prisma.scoreboardEntry.create({
+        data: {
+          competitionId: eventId,
+          categoryId: data.categoryId,
+          shooterId: data.shooterId,
+          totalScore: data.totalScore,
+          rank: data.rank
+        }
+      });
+    }
+  }
 }

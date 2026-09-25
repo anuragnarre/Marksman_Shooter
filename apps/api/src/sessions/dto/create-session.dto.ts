@@ -9,6 +9,7 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateSessionDto {
@@ -16,6 +17,7 @@ export class CreateSessionDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   discipline!: string;
 
   @ApiProperty({ example: 50, description: 'Distance in yards or meters' })
@@ -28,6 +30,7 @@ export class CreateSessionDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   weaponType!: string;
 
   @ApiProperty({ example: 60, description: 'Number of shots fired' })
@@ -44,5 +47,11 @@ export class CreateSessionDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   trainingMode?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-range-id', description: 'Range ID for weather enrichment' })
+  @IsOptional()
+  @IsString()
+  rangeId?: string;
 }

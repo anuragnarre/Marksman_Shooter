@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Marksman</string>
-    <string name="title_activity_main">Marksman</string>
-    <string name="package_name">com.marksman.shooting</string>
-    <string name="custom_url_scheme">com.marksman.shooting</string>
+    <string name="app_name">MarksmanMarksMarksmanApp</string>
+    <string name="title_activity_main">MarksmanMarksMarksmanApp</string>
+    <string name="package_name">com.marksman.rangeapp</string>
+    <string name="custom_url_scheme">com.marksman.rangeapp</string>
 </resources>

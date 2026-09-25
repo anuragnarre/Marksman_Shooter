@@ -39,6 +39,8 @@ export class CreateRangeDto {
   @Matches(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/, {
     message: 'gpsCoordinates must be a valid lat,lng string',
   })
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+  @MaxLength(255)
   gpsCoordinates?: string;
 
   @ApiPropertyOptional({ example: 'NW', description: 'Typical wind direction' })

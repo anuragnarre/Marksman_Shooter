@@ -24,4 +24,34 @@ export class MembershipsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async getAllSubscriptions() {
+    return this.prisma.membershipSubscription.findMany({
+      include: {
+        tier: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            shooterProfile: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async getAllOrganizations() {
+    return this.prisma.organization.findMany({
+      include: {
+        _count: {
+          select: { members: true }
+        },
+        admin: {
+          select: { name: true }
+        }
+      }
+    });
+  }
 }
+
