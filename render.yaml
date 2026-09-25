@@ -11,6 +11,16 @@ services:
         fromDatabase:
           name: marksman-db
           property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: marksman-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: marksman-redis
+          property: port
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -40,11 +50,18 @@ services:
     name: marksman-vision
     runtime: python
     plan: free
-    buildCommand: cd apps/vision && pip install -r requirements.txt
-    startCommand: cd apps/vision && uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: apps/vision
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+  # 4. Redis Cache & Queue
+  - type: redis
+    name: marksman-redis
+    plan: free
+    ipAllowList: [] # Allow all internal connections
 
 databases:
-  # 4. PostgreSQL Database
+  # 5. PostgreSQL Database
   - name: marksman-db
     databaseName: shooting-platform
     user: marksman
