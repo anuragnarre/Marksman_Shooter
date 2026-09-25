@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:shared && npx next build",
-  "installCommand": "npm install --prefix ../.. && npm install",
+  "installCommand": "cd ../.. && npm install",
+  "buildCommand": "npx next build",
   "framework": "nextjs"
 }
