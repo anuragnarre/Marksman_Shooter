@@ -1,0 +1,4617 @@
+{
+  "shooting/apps/api/package.json": {
+    "mtime": 1789144438.0796144,
+    "ast_hash": "c15019a65fbef1870bf5b40199ae52aa",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260310215313_init/migration.sql": {
+    "mtime": 1787548698.5732138,
+    "ast_hash": "7687aeabdb1fdc527bdbe39cf3781ae6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260311074830_add_rejected_status/migration.sql": {
+    "mtime": 1787548698.5762146,
+    "ast_hash": "a03e688b031c5d2e40bc0873e25ad959",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260311120000_add_soldier_role/migration.sql": {
+    "mtime": 1787548698.5772142,
+    "ast_hash": "fe549414257c161121fa0f6746b17d40",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260311125811_add_soldier_role/migration.sql": {
+    "mtime": 1787548698.5772142,
+    "ast_hash": "53c5e2390b4f590b385ee5c17a828d13",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260312173650_add_training_events/migration.sql": {
+    "mtime": 1787548698.5782144,
+    "ast_hash": "ce63d57f71e44543a88e8f1d1fa47084",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260312190001_add_schedule_requests/migration.sql": {
+    "mtime": 1787548698.5782144,
+    "ast_hash": "ae00e19afaddca6266774d7386b97977",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260312193110_add_performance_models/migration.sql": {
+    "mtime": 1787548698.5782144,
+    "ast_hash": "e96b9313436e203ace0e82cb48a0aad3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260314110000_add_managed_shooter_profiles/migration.sql": {
+    "mtime": 1787548698.5792148,
+    "ast_hash": "75fe9e120c137a92448bdda042a8ca67",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260320185509_add_biometrics/migration.sql": {
+    "mtime": 1787548698.5792148,
+    "ast_hash": "8ea5cb95f3f85ffe3a99d3e6b5c04b2e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260324000000_add_google_id/migration.sql": {
+    "mtime": 1787548698.5792148,
+    "ast_hash": "962f2d2c34d8e7e9601a9f534552bf52",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260324000001_make_password_hash_nullable/migration.sql": {
+    "mtime": 1787548698.5802147,
+    "ast_hash": "5c6faa2e7039ff19e27a5157e6d32d6b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260325000000_remove_soldier_role/migration.sql": {
+    "mtime": 1787548698.5802147,
+    "ast_hash": "de72244b60f6acc5a4c87748a861b283",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260827161834_add_competition_events/migration.sql": {
+    "mtime": 1787847514.119856,
+    "ast_hash": "7f0990a52b84fb6fb33687db13e8532b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260829161259_add_equipment_ranges_ballistics/migration.sql": {
+    "mtime": 1788019979.0189912,
+    "ast_hash": "7ef85423578fa1b8b229e8c1f020821e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/migrations/20260906053021_init_range_ops/migration.sql": {
+    "mtime": 1789122229.0278368,
+    "ast_hash": "fe354a8a8d466c37d9bf4d4ad66b7bb6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/prisma/seed.ts": {
+    "mtime": 1787548698.5812151,
+    "ast_hash": "d1cd3b327a907dcf554b45fea9fa08b7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ai-coach/ai-coach.controller.ts": {
+    "mtime": 1787548698.5812151,
+    "ast_hash": "af5d60fcad6182a4621583dd2760f623",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ai-coach/ai-coach.module.ts": {
+    "mtime": 1787548698.5812151,
+    "ast_hash": "e85bceaac52310a99c690e0a05832f2f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ai-coach/ai-coach.service.ts": {
+    "mtime": 1789184815.8736587,
+    "ast_hash": "d352d7cd4ef3debcf6512a0554489826",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ai-coach/dto/analyze-session.dto.ts": {
+    "mtime": 1787548698.582215,
+    "ast_hash": "9b7ae560d69e9b43482bfb75a66a335b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/analytics/analytics.controller.ts": {
+    "mtime": 1787548698.583215,
+    "ast_hash": "d926ed769a214399733546b0886af109",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/analytics/analytics.module.ts": {
+    "mtime": 1787548698.583215,
+    "ast_hash": "031d3440e263b19256b8c8cb5e8cabef",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/analytics/analytics.service.ts": {
+    "mtime": 1787548698.583215,
+    "ast_hash": "11faeadc24eb30548a46c857a5cd6c8f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/app.module.ts": {
+    "mtime": 1789144125.937556,
+    "ast_hash": "d6f5d1061ad91ccf8d419f436e7c3b6a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/auth.controller.ts": {
+    "mtime": 1787548698.5842152,
+    "ast_hash": "5ab80eca3c186cf8419a582798b5d6a8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/auth.module.ts": {
+    "mtime": 1787548698.5842152,
+    "ast_hash": "03fb35f9a0a9094034c567577bcc3878",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/auth.service.ts": {
+    "mtime": 1788671899.196406,
+    "ast_hash": "b6e6e0c09577539ae386d337f01779a2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/decorators/current-user.decorator.ts": {
+    "mtime": 1787548698.5863304,
+    "ast_hash": "2fe7d75708b47d6841ec770f5ff0801e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/decorators/roles.decorator.ts": {
+    "mtime": 1787548698.5863304,
+    "ast_hash": "049b60c90ec3d95a9eb20d3def8aa3f7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/dto/google-auth.dto.ts": {
+    "mtime": 1787548698.5872338,
+    "ast_hash": "e6a363905cc54192aa096c0eca6e57fa",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/dto/login.dto.ts": {
+    "mtime": 1787548698.5882251,
+    "ast_hash": "3c6dafa855c46724efeaeb04368d7850",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/dto/register.dto.ts": {
+    "mtime": 1787548698.5882251,
+    "ast_hash": "611b1f6e452aed5181b30c9650693540",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/guards/jwt-auth.guard.ts": {
+    "mtime": 1787548698.5892165,
+    "ast_hash": "1ba5bb1728c34cc422321bda74834041",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/jwt.strategy.ts": {
+    "mtime": 1787548698.5892165,
+    "ast_hash": "1e5a24d2bfe52ceb67b10009bdee86b7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/auth/roles.guard.ts": {
+    "mtime": 1787548698.5892165,
+    "ast_hash": "eed0a5fc1f8ca97b66c4426e713e38e3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ballistics/ballistics.controller.ts": {
+    "mtime": 1788370439.5674217,
+    "ast_hash": "92bc6fbea73fdc319f9bd7d036ec4ee3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ballistics/ballistics.module.ts": {
+    "mtime": 1788020176.2915304,
+    "ast_hash": "c8a3377a07201a7f9461851cf69fdcbf",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ballistics/ballistics.service.ts": {
+    "mtime": 1788020194.9801028,
+    "ast_hash": "343976e39146a650b84ec258b1bf4f89",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ballistics/dto/create-ballistics.dto.ts": {
+    "mtime": 1788370426.143476,
+    "ast_hash": "ce1d1343585c14677b09df2652b3644b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ballistics/dto/update-ballistics.dto.ts": {
+    "mtime": 1788370199.7307227,
+    "ast_hash": "f87bb43e8bf190354ccc4bff62d3bea2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/biometrics-ai.service.ts": {
+    "mtime": 1789184817.915633,
+    "ast_hash": "72e8b4f198b75f99b48384976269e922",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/biometrics.controller.ts": {
+    "mtime": 1787548698.5911794,
+    "ast_hash": "b582f74d7394922db2701f0431b6b6b9",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/biometrics.module.ts": {
+    "mtime": 1787548698.5911794,
+    "ast_hash": "aad6976f85f7f074cc5a217ad2f91380",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/biometrics.service.ts": {
+    "mtime": 1787548698.5911794,
+    "ast_hash": "fd9b26e2657ff0c5cf455779ceea5469",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/dto/health-connect-sync.dto.ts": {
+    "mtime": 1787548698.5921767,
+    "ast_hash": "a0c62b4b247c89d42471772f30204d3b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/dto/register-device.dto.ts": {
+    "mtime": 1787548698.5921767,
+    "ast_hash": "a7be50e589c5ad7da11a0c50445e2a1f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/dto/vitals-payload.dto.ts": {
+    "mtime": 1787548698.5931756,
+    "ast_hash": "8c7ddc19a9313fc1be3519382f98f79a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/biometrics/guards/device-auth.guard.ts": {
+    "mtime": 1787548698.5931756,
+    "ast_hash": "498163cfcde49474cb4d54c22d5aee9b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/calendar/calendar.controller.ts": {
+    "mtime": 1787548698.5931756,
+    "ast_hash": "a09d4f36f57b182491944ebfd6c3a359",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/calendar/calendar.module.ts": {
+    "mtime": 1787548698.5931756,
+    "ast_hash": "e21498c1cca26bb6e7fcbd2a2ff3b528",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/calendar/calendar.service.ts": {
+    "mtime": 1787548698.5941756,
+    "ast_hash": "86b19ca95fcd3801215b5fea9fbdbc80",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/calendar/dto/create-event.dto.ts": {
+    "mtime": 1788370761.6222513,
+    "ast_hash": "bfa6ea3fe6305f5cc81c2c83bf084a0c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/calendar/dto/update-event.dto.ts": {
+    "mtime": 1787548698.595176,
+    "ast_hash": "a038edff9b33524dd5a37938e1b98a00",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/coach.controller.ts": {
+    "mtime": 1787548698.595176,
+    "ast_hash": "f5057c5848c0d01071e98a6af68767df",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/coach.module.ts": {
+    "mtime": 1787548698.595176,
+    "ast_hash": "91ccb93b7c68a2357a8c7457da82da9e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/coach.service.ts": {
+    "mtime": 1789122685.358119,
+    "ast_hash": "41fdac896bfb0e7da03112bb01cd7682",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/create-connection.dto.ts": {
+    "mtime": 1787548698.5971758,
+    "ast_hash": "a6963afe021fe8072b537e75581344a3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/create-feedback.dto.ts": {
+    "mtime": 1787548698.5971758,
+    "ast_hash": "f89be5242f091507758ae1c83b742503",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/create-managed-shooter.dto.ts": {
+    "mtime": 1787548698.598176,
+    "ast_hash": "37ca8b1fec25b43be3122e668ff0f681",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/create-managed-shots.dto.ts": {
+    "mtime": 1787548698.598176,
+    "ast_hash": "0bbf41975da9b966323c786c87757293",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/invite-shooter.dto.ts": {
+    "mtime": 1787548698.598176,
+    "ast_hash": "0374346c72209dc3b3d84037bfb5d900",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/coach/dto/update-managed-shooter.dto.ts": {
+    "mtime": 1787548698.598176,
+    "ast_hash": "a7e269eea5141683bcc4b49dcac016ba",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/equipment/dto/create-equipment.dto.ts": {
+    "mtime": 1788370396.0101578,
+    "ast_hash": "0310db85c419e8f12aae59f146088b27",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/equipment/dto/update-equipment.dto.ts": {
+    "mtime": 1788370123.3407493,
+    "ast_hash": "8508f1d9e43d09f0f1895fa63ea24714",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/equipment/equipment.controller.ts": {
+    "mtime": 1788370558.846553,
+    "ast_hash": "d27c838b31babb0318e200f5375437a1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/equipment/equipment.module.ts": {
+    "mtime": 1788020086.4428563,
+    "ast_hash": "19acbec82ddbed228393ccda6ec5cb45",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/equipment/equipment.service.ts": {
+    "mtime": 1788020100.7876902,
+    "ast_hash": "f3727ddf26ebe19d200ceac0bd19cad1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/dto/create-event.dto.ts": {
+    "mtime": 1787548698.5991766,
+    "ast_hash": "1c3006c7a45f40143e8dc8a484c4ebfe",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/dto/register-event.dto.ts": {
+    "mtime": 1787548698.5991766,
+    "ast_hash": "02344f11a8dc5b9d2b5cc2237371cc9d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/dto/update-event.dto.ts": {
+    "mtime": 1787548698.5991766,
+    "ast_hash": "de4a8c499545c3ae35b201ea18504a00",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/events.controller.ts": {
+    "mtime": 1787548698.6001763,
+    "ast_hash": "b6de480533a0638587df1ee7f5b2aaed",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/events.module.ts": {
+    "mtime": 1787548698.6001763,
+    "ast_hash": "baf929eeb9318fbe42c9dfb0324b85eb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/events.service.ts": {
+    "mtime": 1787548698.6001763,
+    "ast_hash": "cbe6c5158978d335727025bf40755e4b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/events/guards/admin.guard.ts": {
+    "mtime": 1787548698.6011965,
+    "ast_hash": "0c52b32825962db551a16019bc3af01a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/gateway/events.gateway.ts": {
+    "mtime": 1789122229.0308378,
+    "ast_hash": "35eaa3fc956f1df35c9714c13482fd82",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/gateway/gateway.module.ts": {
+    "mtime": 1787548698.6021821,
+    "ast_hash": "f355fb40129be65bdd89e48db9c5b78d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/main.ts": {
+    "mtime": 1789140468.5404677,
+    "ast_hash": "49d869320d4b8bb302291cde9454c141",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/memberships/memberships.controller.ts": {
+    "mtime": 1789143366.5109477,
+    "ast_hash": "00cccc74f830a67cf381abd546c60851",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/memberships/memberships.module.ts": {
+    "mtime": 1789142447.3055978,
+    "ast_hash": "dbd62ef05233135c1380393722833ebc",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/memberships/memberships.service.ts": {
+    "mtime": 1789143335.829593,
+    "ast_hash": "41a6efab4d3fb844015c08b8aab3de90",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/organizations/organizations.controller.ts": {
+    "mtime": 1789143274.783399,
+    "ast_hash": "3ff02ad3bc7b2b3946923d79c5967000",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/organizations/organizations.module.ts": {
+    "mtime": 1789142447.3055978,
+    "ast_hash": "63f84e8f38ccb54a50a06f2362b634ca",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/organizations/organizations.service.ts": {
+    "mtime": 1789143239.3228352,
+    "ast_hash": "2c61596f8671af931bc8e5b52a8bca27",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/performance/dto/session-context.dto.ts": {
+    "mtime": 1787548698.6021821,
+    "ast_hash": "b9f2a9625e5821613e7faad0cb2c8821",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/performance/performance.controller.ts": {
+    "mtime": 1787548698.603182,
+    "ast_hash": "79df1513fceec9e10662a4a6a03c6c33",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/performance/performance.module.ts": {
+    "mtime": 1787548698.603182,
+    "ast_hash": "9d577aa2f80c672fda46c233f50a2ba2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/performance/performance.service.ts": {
+    "mtime": 1789184812.9053502,
+    "ast_hash": "572850306269dd257c231c72268bb4d5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/prisma/prisma.module.ts": {
+    "mtime": 1787548698.6041796,
+    "ast_hash": "29d4b98934a4e0d8c8570e527f032b43",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/prisma/prisma.service.ts": {
+    "mtime": 1787548698.6041796,
+    "ast_hash": "5211159ebb6868a108b44d5dbe2904a7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/range-operations.controller.spec.ts": {
+    "mtime": 1789144601.3218358,
+    "ast_hash": "42d6a5a63a86ea2c7c1496d0140f0a68",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/range-operations.controller.ts": {
+    "mtime": 1789144710.2390041,
+    "ast_hash": "aa282fa0e14ba27a50da4e6d41b13e8e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/range-operations.module.ts": {
+    "mtime": 1789144601.3223433,
+    "ast_hash": "c45a826c7c5f08fc2fcc4daf9ddfa8f8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/range-operations.service.spec.ts": {
+    "mtime": 1789144091.6839087,
+    "ast_hash": "db69397a1254f3911ccc8bccf0d847e0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/range-operations.service.ts": {
+    "mtime": 1789144665.5581698,
+    "ast_hash": "7c09af99cda394a1aeace2de72daaaa0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/telemetry/telemetry.gateway.spec.ts": {
+    "mtime": 1789144440.4510741,
+    "ast_hash": "7fac5e19a2a4a5b9c2746100b82f84b0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/range-operations/telemetry/telemetry.gateway.ts": {
+    "mtime": 1789144530.01134,
+    "ast_hash": "b15effe8091a8be14804a1596a1e5372",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/dto/create-range.dto.ts": {
+    "mtime": 1788370410.8736887,
+    "ast_hash": "97090dd9aaaff855a18afb7b4679f8b0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/dto/range.dto.ts": {
+    "mtime": 1789122229.0428355,
+    "ast_hash": "2ed5c87df56018c505b74d9fcd323d9b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/dto/update-range.dto.ts": {
+    "mtime": 1788370169.0584495,
+    "ast_hash": "17f125a03d666180247d7d9d90debe81",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/ranges.controller.ts": {
+    "mtime": 1789122229.0438359,
+    "ast_hash": "1ef1638e2f170170fdfea68396e56f53",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/ranges.module.ts": {
+    "mtime": 1789122229.0448365,
+    "ast_hash": "85f767ca0f2f9b419b262391a6b4d540",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/ranges/ranges.service.ts": {
+    "mtime": 1789122229.0458364,
+    "ast_hash": "cb4ae4d5fb8efa930e3e8b277a3e421e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/safety/safety.controller.ts": {
+    "mtime": 1789143452.769652,
+    "ast_hash": "33723b2ed2bc27c2af7dc73c1b55c6db",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/safety/safety.module.ts": {
+    "mtime": 1789142447.3065965,
+    "ast_hash": "55497106091aab54212825418abb0d14",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/safety/safety.service.ts": {
+    "mtime": 1789143410.0390458,
+    "ast_hash": "4a9a21301ec506a2a4ddcbcd77dc0bf3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/schedule-requests/dto/create-request.dto.ts": {
+    "mtime": 1787548698.6041796,
+    "ast_hash": "5d9097f51c89fb6c6ea6b21a45ee3ade",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/schedule-requests/dto/resolve-request.dto.ts": {
+    "mtime": 1787548698.6051793,
+    "ast_hash": "4c7cc2d69b0cc68e080bcd535f23f2de",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/schedule-requests/schedule-requests.controller.ts": {
+    "mtime": 1787548698.6051793,
+    "ast_hash": "817df6cea40967b2bca8adbd92c19e1e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/schedule-requests/schedule-requests.module.ts": {
+    "mtime": 1787548698.6051793,
+    "ast_hash": "a34a5788a3c5ddbb0515ca5276a43aae",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/schedule-requests/schedule-requests.service.ts": {
+    "mtime": 1787548698.606178,
+    "ast_hash": "fb7dfc751b8c7135c59eb45cee4c4bb5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/sessions/dto/create-session.dto.ts": {
+    "mtime": 1788370451.8079193,
+    "ast_hash": "390ff0539929dbdf777209ff9eb8a34e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/sessions/sessions.controller.ts": {
+    "mtime": 1788370512.247987,
+    "ast_hash": "c2f02d65e58e037eef0474b0189cb8ff",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/sessions/sessions.module.ts": {
+    "mtime": 1787548698.606178,
+    "ast_hash": "c652b6af042e4bacd4cfcdfb159d8391",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/sessions/sessions.service.ts": {
+    "mtime": 1787548698.6071784,
+    "ast_hash": "7ddb9eb4ea6c6c91dbc8f8196734704a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shared-types.ts": {
+    "mtime": 1789141833.206009,
+    "ast_hash": "ce18b747d6023a3c8eb3fff8e9b9a4f2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shooter-profile/shooter-profile.controller.ts": {
+    "mtime": 1789140616.664605,
+    "ast_hash": "fa9bdeba20fac386e40d6e4cd0b57307",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shooter-profile/shooter-profile.module.ts": {
+    "mtime": 1789140577.9061618,
+    "ast_hash": "9428981b6a3540c403d61b019e9a80ee",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shooter-profile/shooter-profile.service.ts": {
+    "mtime": 1789140590.3930206,
+    "ast_hash": "82421b4e89a429f5493cf504d75337b0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/dto/import-shots.dto.ts": {
+    "mtime": 1787548698.6081793,
+    "ast_hash": "8897a4762c2f584151634a8ae7c74042",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/dto/manual-shots.dto.ts": {
+    "mtime": 1787548698.6081793,
+    "ast_hash": "1ac27682ebb69d7e04dc31638e69d72c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/dto/update-shot.dto.ts": {
+    "mtime": 1787548698.6081793,
+    "ast_hash": "2373b4fe77dc1c012fd960e03231797d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/shots.controller.ts": {
+    "mtime": 1788007826.6075964,
+    "ast_hash": "7434130ef29ddc64990880e126f0f3f4",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/shots.module.ts": {
+    "mtime": 1787548698.609179,
+    "ast_hash": "259661c31832dbab324d64a50a926609",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/shots.parser.ts": {
+    "mtime": 1787548698.6101792,
+    "ast_hash": "b50c1006ef09cd74ffc3af3474620b99",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/shots/shots.service.ts": {
+    "mtime": 1788007788.0513325,
+    "ast_hash": "13f41367fa6133f20e062d3e3d8fea32",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/suggestions/rules.engine.ts": {
+    "mtime": 1787548698.6101792,
+    "ast_hash": "6587ac66548e71e90fb4e6d3ac440ce2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/suggestions/suggestions.controller.ts": {
+    "mtime": 1787548698.6111798,
+    "ast_hash": "4294a9939526aeabf725f3d53033d24a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/suggestions/suggestions.module.ts": {
+    "mtime": 1787548698.6111798,
+    "ast_hash": "9d301f3b9c5ec8665f9c844310020377",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/src/suggestions/suggestions.service.ts": {
+    "mtime": 1787548698.6111798,
+    "ast_hash": "12bf577e4701e0a3fd715426ab87e277",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/tsconfig.build.json": {
+    "mtime": 1787548698.6121788,
+    "ast_hash": "716ec58aa23c168c8e634247084a7911",
+    "semantic_hash": ""
+  },
+  "shooting/apps/api/tsconfig.json": {
+    "mtime": 1788370678.3906007,
+    "ast_hash": "e1c1ec40e3fc70f740ba9431b389f45b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/analyzer.py": {
+    "mtime": 1788494333.756425,
+    "ast_hash": "7aa846e4c3b3c1e493b6eec7483ff90b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/main.py": {
+    "mtime": 1788625551.5417495,
+    "ast_hash": "59242b410d5b2531e096f7614ba39ad1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/models.py": {
+    "mtime": 1788494319.1847472,
+    "ast_hash": "97411af027340b657a100c7c4fa5289f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/models_export/export_coreml.py": {
+    "mtime": 1787548699.562739,
+    "ast_hash": "8ee93eaa6ee099570e77a22db05b27b2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/models_export/export_tflite.py": {
+    "mtime": 1787548699.5637388,
+    "ast_hash": "3a0fff509ed784061ae868e4a72c7e94",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/__init__.py": {
+    "mtime": 1787548699.5637388,
+    "ast_hash": "8892daa5a22c9929acf25c3de50f754b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/calibration_engine.py": {
+    "mtime": 1787548699.5637388,
+    "ast_hash": "308d07b7b78a27cd9e0be44c5c8b7677",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/camera_calibration.py": {
+    "mtime": 1787582409.3202722,
+    "ast_hash": "4838e477e3f738325be623d768289153",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/clahe.py": {
+    "mtime": 1787548699.5637388,
+    "ast_hash": "5660ad743ae6ea4d32ed8edd5f9bb228",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/differencer.py": {
+    "mtime": 1787582439.8295212,
+    "ast_hash": "67c6aa10f97b36f93d374a45cecf7ba4",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/hole_detector.py": {
+    "mtime": 1787548699.5647388,
+    "ast_hash": "8282ad15d50856be02589869d7d5bb79",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/mask_detector.py": {
+    "mtime": 1787548699.565739,
+    "ast_hash": "535f06832ec1265e15f6a17e0ef887de",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/nms.py": {
+    "mtime": 1787548699.565739,
+    "ast_hash": "3bb42f84cf4d47f5ec41e1d5a55fe7c7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/perspective.py": {
+    "mtime": 1787548699.565739,
+    "ast_hash": "e3c4f2c97d9915ccdddecc2a95f0f5af",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/quality_check.py": {
+    "mtime": 1787548699.565739,
+    "ast_hash": "1d1fdf6cbe1b47390716716a8e6d7677",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/scorer.py": {
+    "mtime": 1787548699.566739,
+    "ast_hash": "58e64b0d4f7559f1bf2a66bb5edcce4f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/target_detector.py": {
+    "mtime": 1787548699.566739,
+    "ast_hash": "d7b9e18fc1069a46763dd6336310a228",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/target_specs.py": {
+    "mtime": 1788007525.7646494,
+    "ast_hash": "f4e66dcf2b797b450941015f0e1498d6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/types.py": {
+    "mtime": 1787548699.566739,
+    "ast_hash": "71dba5874e085f3851169383342a381f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/pipeline/yolo_detector.py": {
+    "mtime": 1787548699.5677392,
+    "ast_hash": "6157378d4c5f2dc35f716ff8c1c3b170",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/run_tests.py": {
+    "mtime": 1787548699.5677392,
+    "ast_hash": "defe8be17b6657a0f4440ac39452dff0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/download_datasets.py": {
+    "mtime": 1788493276.3541975,
+    "ast_hash": "28f3684d2efbd138bf19a5688de73466",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/preprocess_and_autolabel.py": {
+    "mtime": 1788494351.9710677,
+    "ast_hash": "25eedc82551463e6e010b583974744d8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/test_service.py": {
+    "mtime": 1787548699.5687392,
+    "ast_hash": "85774f4b07fd851fa1cb1225d8edfac7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/train_hog_svm.py": {
+    "mtime": 1788494378.5342672,
+    "ast_hash": "891d22bef1bb859d809dbd52dacf481a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/train_maskrcnn.py": {
+    "mtime": 1787548699.5687392,
+    "ast_hash": "dcd0e5e9385c60dc8acee77d84675f80",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/train_models.sh": {
+    "mtime": 1787548699.5687392,
+    "ast_hash": "e58b1b7e0e7f58389c8dff5475c00c59",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/train_yolo26s.py": {
+    "mtime": 1788512302.307609,
+    "ast_hash": "e101cc5332e9e1902167af3d214b8c9f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/scripts/yolo_autolabel.py": {
+    "mtime": 1788494961.403252,
+    "ast_hash": "6d53fe952461628d051f67f84a13e5ef",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/test_model.py": {
+    "mtime": 1787548699.5697393,
+    "ast_hash": "e3afe3a083aa671b47334ce767afc36c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/test_pipeline.py": {
+    "mtime": 1787548699.5707412,
+    "ast_hash": "21b3f5425cf09d81a6db74d6a6abdae4",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/tests/__init__.py": {
+    "mtime": 1787548699.5707412,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/tests/generate_synthetic.py": {
+    "mtime": 1787548699.5707412,
+    "ast_hash": "59cbef3c6282447743414c8a66969188",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/tests/test_accuracy.py": {
+    "mtime": 1787548699.5717413,
+    "ast_hash": "8c5f7af30d754154be88c930567ce87e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/build.gradle": {
+    "mtime": 1787548699.5727403,
+    "ast_hash": "ca03fc0cc59d502a6a7b68dd2e3a5412",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/capacitor.build.gradle": {
+    "mtime": 1788660522.4517262,
+    "ast_hash": "55c72c38495632160f26c772d8f4193a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/google-services.json": {
+    "mtime": 1787548699.5727403,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java": {
+    "mtime": 1787548699.5747406,
+    "ast_hash": "c777a4127ae7213f7da22c4105bdfeab",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/assets/capacitor.config.json": {
+    "mtime": 1788660522.3419044,
+    "ast_hash": "e7a1d3b934239ecfe8d4a255729c447b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/assets/capacitor.plugins.json": {
+    "mtime": 1788660522.4231398,
+    "ast_hash": "372bbffaf279de19b53ce5cedc87fe2b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/assets/public/cordova.js": {
+    "mtime": 1788660522.447721,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/assets/public/cordova_plugins.js": {
+    "mtime": 1788660522.448721,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/java/com/marksman/shooting/MainActivity.java": {
+    "mtime": 1787548699.5757413,
+    "ast_hash": "7ffb11fc59698662e5fe1f2fe0fb0484",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java": {
+    "mtime": 1787548699.61038,
+    "ast_hash": "3f8a2768101e4de10f606ea4516fd339",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/build.gradle": {
+    "mtime": 1787548699.611384,
+    "ast_hash": "ca5f0fa0ea4c3997363777d8a2b6467b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/capacitor-cordova-android-plugins/build.gradle": {
+    "mtime": 1788660522.453725,
+    "ast_hash": "2af61653d70c95d20802c8b5c433ba90",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/capacitor-cordova-android-plugins/cordova.variables.gradle": {
+    "mtime": 1788660522.4613008,
+    "ast_hash": "d2372a0ae9aa60abb8d03e7f06bf9194",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/capacitor.settings.gradle": {
+    "mtime": 1788660522.4517262,
+    "ast_hash": "3671a748713305b512de9bd71efa5c17",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/gradlew": {
+    "mtime": 1787548699.6133833,
+    "ast_hash": "f2d3d383787f61a4a99710ee8d780434",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/settings.gradle": {
+    "mtime": 1787548699.6133833,
+    "ast_hash": "c609df618dbeec637255380c9f707ccf",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/variables.gradle": {
+    "mtime": 1787548699.6133833,
+    "ast_hash": "c3ee7e06874be7d2fe8827cf06eb3833",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(dashboard)/armory/page.tsx": {
+    "mtime": 1789139508.5397754,
+    "ast_hash": "f37112076b34ee8b1ed85cf765163bbf",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(dashboard)/profile/page.tsx": {
+    "mtime": 1789139436.1116261,
+    "ast_hash": "75a3c27c6215e21fa24af7730dd09069",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/checkin/page.tsx": {
+    "mtime": 1789142741.2251816,
+    "ast_hash": "73b11a8ab809dd32ab06917da076eb43",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/dashboard/page.tsx": {
+    "mtime": 1789143012.52372,
+    "ast_hash": "d8177d9abe502cb0ae770ac88309aed7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/lanes/page.tsx": {
+    "mtime": 1789142690.8502748,
+    "ast_hash": "5b43f241513a550f1a38239fef50dddd",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/memberships/page.tsx": {
+    "mtime": 1789142857.1275723,
+    "ast_hash": "f35d28830799cd5e0e736e3ab02e1a1f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/safety/page.tsx": {
+    "mtime": 1789142938.9112494,
+    "ast_hash": "bf09ee2531cd099adc441509d88350fb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/(operator)/staff/schedule/page.tsx": {
+    "mtime": 1789144849.2086391,
+    "ast_hash": "a7e6359fc353d7a7e791e4da64d8be2e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/admin/feedback/page.tsx": {
+    "mtime": 1787548699.6143825,
+    "ast_hash": "4b8ea5286a2be709bd46f2624b1d7b97",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/api/auth/[...nextauth]/route.ts": {
+    "mtime": 1787548699.615382,
+    "ast_hash": "99682c93031b31a4d6621c7616b4903f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/api/download/android/route.ts": {
+    "mtime": 1787548699.615382,
+    "ast_hash": "1cb0da565e91435addac7ed2de486362",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/api/feedback/route.ts": {
+    "mtime": 1787548699.615382,
+    "ast_hash": "4c9e287b7ed49e19730af69f92d411e7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/api/vitals/route.ts": {
+    "mtime": 1787548699.6163826,
+    "ast_hash": "ff1f04e8e114b0f35a15ed5b46dcda58",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/auth/login/page.tsx": {
+    "mtime": 1789122229.0488396,
+    "ast_hash": "c94956e58704099c8c69366f6fee5010",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/auth/register/page.tsx": {
+    "mtime": 1788628409.539691,
+    "ast_hash": "c1e7cc40b9cfb9ad81e31a20f1b063fa",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/ballistics/page.tsx": {
+    "mtime": 1788020286.556648,
+    "ast_hash": "1e848f7128129cc79fc12e0c7f5dee4d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/connect/page.tsx": {
+    "mtime": 1787548699.6173823,
+    "ast_hash": "ad60434a9be17f4b8d15a208c9f631a8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/dashboard/page.tsx": {
+    "mtime": 1789122229.04984,
+    "ast_hash": "f7d2cc45c9975221735347bd661ce290",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/docs/page.tsx": {
+    "mtime": 1787763618.9039922,
+    "ast_hash": "ec8a4f29a066e388c913bd9a7872e108",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/equipment/page.tsx": {
+    "mtime": 1788020409.298145,
+    "ast_hash": "85ceaa5e33e58b119d93220e7a99068a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/error.tsx": {
+    "mtime": 1787548699.6193814,
+    "ast_hash": "ff39ecc85acc351396f8976c5ac85d0f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/layout.tsx": {
+    "mtime": 1788015865.8431013,
+    "ast_hash": "ddb2f8ac5819c147ecaac72827db31ab",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/live-analysis/LiveAnalysisDashboard.tsx": {
+    "mtime": 1787581818.5385752,
+    "ast_hash": "2e81f125c4c450b1933900c04ac64d2a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/live-analysis/page.tsx": {
+    "mtime": 1787581792.6110678,
+    "ast_hash": "fdd9932a13af6bf2916b546d47c18cef",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/loading.tsx": {
+    "mtime": 1787548699.620383,
+    "ast_hash": "521d503ad706bff7a6b5d65884e69e39",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/manifest.ts": {
+    "mtime": 1787548699.620383,
+    "ast_hash": "bb9a5ec3a8fa1b78e28ff071975a0c05",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/not-found.tsx": {
+    "mtime": 1787548699.620383,
+    "ast_hash": "2e51c36b11fb114fab57cb9876e50fc4",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/offline/page.tsx": {
+    "mtime": 1787548699.6213841,
+    "ast_hash": "c784b47c2929137dc83225f9bd2d034a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/page.tsx": {
+    "mtime": 1788282301.47929,
+    "ast_hash": "cbda303e2d229c769b5be8b62a085cd9",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/performance/ai-assistant/page.tsx": {
+    "mtime": 1787548699.6223838,
+    "ast_hash": "e6a9f753b1143eec75377e65f266fb43",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/performance/ai-coach/page.tsx": {
+    "mtime": 1787548699.6223838,
+    "ast_hash": "683f5989cb8591a7a0380bc6864f9973",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/performance/competitions/page.tsx": {
+    "mtime": 1788006914.6878936,
+    "ast_hash": "c69485ac57fe92f7e65a57909048df3a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/performance/health/page.tsx": {
+    "mtime": 1787548699.6233838,
+    "ast_hash": "6231cacd80bb2a061b91447ec980d761",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/performance/page.tsx": {
+    "mtime": 1787548699.6233838,
+    "ast_hash": "f5cd72d14b70673843767d014f2e1008",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/planning/drills/page.tsx": {
+    "mtime": 1788006861.2281094,
+    "ast_hash": "823e8ba594bc880475ec374cb36e93a8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/planning/page.tsx": {
+    "mtime": 1787548699.6243813,
+    "ast_hash": "684b17c9a32ad10038df92b325a5cb40",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/planning/training-plan/page.tsx": {
+    "mtime": 1787548699.6243813,
+    "ast_hash": "5b55bb169b8639ffea804ac86db7722a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/range-operator/bookings/page.tsx": {
+    "mtime": 1789126488.4952893,
+    "ast_hash": "7fc6fcc6fe44a08e9297d2a15a6b00c0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/range-operator/dashboard/page.tsx": {
+    "mtime": 1789122586.4407961,
+    "ast_hash": "042bfaa3fe5345bf2d3dd811fea52790",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/range-operator/walk-in/page.tsx": {
+    "mtime": 1789123643.375717,
+    "ast_hash": "8b359104e4f47939a63ccd5a18682c25",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/ranges/page.tsx": {
+    "mtime": 1788020344.3041422,
+    "ast_hash": "dbd96d1588d338db298845c2a65b4f19",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/[id]/page.tsx": {
+    "mtime": 1787548699.625381,
+    "ast_hash": "f3d2c2e21a0753baed77001727405646",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/compare/page.tsx": {
+    "mtime": 1787548699.6263838,
+    "ast_hash": "bc2f7c9a9afc28ac2fecd1aa16d67040",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/live/page.tsx": {
+    "mtime": 1788008013.4758787,
+    "ast_hash": "9bca38b1884d92f2aaf1aa828eae6094",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/new/page.tsx": {
+    "mtime": 1787548699.6263838,
+    "ast_hash": "e1588065e8f3d7d03bc11a80bd7ba494",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/page.tsx": {
+    "mtime": 1787548699.6273828,
+    "ast_hash": "2979376e743fe54d101058fa09bf12e0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sessions/zen/page.tsx": {
+    "mtime": 1787548699.6273828,
+    "ast_hash": "2f435c3db75174ad56ce9442fe38189e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/settings/page.tsx": {
+    "mtime": 1787763688.2412403,
+    "ast_hash": "e34c3891f14825bd235834a93a1f50c6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/app/sw-register.tsx": {
+    "mtime": 1787548699.6283827,
+    "ast_hash": "516fefba4af6e0ef22354f09ac0914cf",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/capacitor.config.ts": {
+    "mtime": 1787548699.6293828,
+    "ast_hash": "14a89e9127630aa91dd139f7caf62199",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/AICoachPanel.tsx": {
+    "mtime": 1787548699.6293828,
+    "ast_hash": "a847f63bbf925838a9c84bfdb712e1b2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/AnalyticsCharts.tsx": {
+    "mtime": 1787548699.630383,
+    "ast_hash": "19b23d3c2e5e6f59b82b9199d19c652c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/AppDownloadButton.tsx": {
+    "mtime": 1787548699.630383,
+    "ast_hash": "dde3ecf3a6427f1d4afdcb2d88ff2674",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/AppShell.tsx": {
+    "mtime": 1787762050.1987503,
+    "ast_hash": "c37ba5556d9c8346d18cb5d54998fdec",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/BiometricLiveCard.tsx": {
+    "mtime": 1787548699.6314054,
+    "ast_hash": "664368393bbca28ee3e53bbaad8ce02b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/BiometricPulseWidget.tsx": {
+    "mtime": 1787548699.631929,
+    "ast_hash": "df7a7cd0aa5ffbecd0beaac1611f865d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/BiometricSessionChart.tsx": {
+    "mtime": 1787548699.631929,
+    "ast_hash": "561df723ebce32943ad5bcc71a7bbbec",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/BiometricTrendChart.tsx": {
+    "mtime": 1787548699.631929,
+    "ast_hash": "cec69e2a8699cf39ba067c39905ebfe6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/BottomNav.tsx": {
+    "mtime": 1788283717.4877284,
+    "ast_hash": "a2047a4f20a4f784e8ddbcd64697bab9",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/CommandPalette.tsx": {
+    "mtime": 1787548699.6329248,
+    "ast_hash": "e924c792e34417e18a98194c28ca528b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ConfirmModal.tsx": {
+    "mtime": 1787548699.6329248,
+    "ast_hash": "83afa39776d73cfc4a2aaa3bba30c86f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ConflictToast.tsx": {
+    "mtime": 1787548699.6329248,
+    "ast_hash": "02bf1238bc5295b9eafe06d061670609",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/CursorGlow.tsx": {
+    "mtime": 1787758821.038999,
+    "ast_hash": "989542743186d1775dd1e3a25f80c57e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/DeviceManager.tsx": {
+    "mtime": 1787763655.6450584,
+    "ast_hash": "df2b7e95c8dfb60bf6e14172af039199",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ExportSessionModal.tsx": {
+    "mtime": 1787548699.6339247,
+    "ast_hash": "5131d13ce3366f5cbf14361392dc88ee",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/FeedbackModal.tsx": {
+    "mtime": 1787548699.634925,
+    "ast_hash": "00884ef61f2eafd75dc71de51691eba7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/GoogleSignInButton.tsx": {
+    "mtime": 1788628354.7457507,
+    "ast_hash": "65c1f95aa3e7c55980534975ff4f3856",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/HealthConnectSetup.tsx": {
+    "mtime": 1787548699.634925,
+    "ast_hash": "0aaa627dc2536bcd37503222db8ca503",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/LiveFeedPanel.tsx": {
+    "mtime": 1788007964.8525467,
+    "ast_hash": "f2d39290487453c2de370f148e4f1c8a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/LoadingScreen.tsx": {
+    "mtime": 1787753058.5731678,
+    "ast_hash": "75c1065320503e03afb49d8b0bfedd99",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/MarketingNav.tsx": {
+    "mtime": 1788283855.7047994,
+    "ast_hash": "35b876ca6d9baae33dcba9c558318cfb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/MiniTargetCanvas.tsx": {
+    "mtime": 1787758340.911816,
+    "ast_hash": "bb40f511cc0349ef8b2632da1a16552b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/MobileMenu.tsx": {
+    "mtime": 1788283884.4409037,
+    "ast_hash": "6e4854eb46cf22f9f631cd835b7a08bc",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/OfflineBanner.tsx": {
+    "mtime": 1787848650.214001,
+    "ast_hash": "6d46d59967bc59270d3d1f8c098b11d1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/PageTransition.tsx": {
+    "mtime": 1787548699.6359246,
+    "ast_hash": "e4472919eacd70a935a1ca3710cf666f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ShotCorrectionCanvas.tsx": {
+    "mtime": 1787548699.636924,
+    "ast_hash": "e3e1d3aa723110ebc3fc3f76c2c7ccd2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ShotHeatmap.tsx": {
+    "mtime": 1787548699.636924,
+    "ast_hash": "8b233fd44d3a9cf8e82ab57740576c1e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ShotOverlayCanvas.tsx": {
+    "mtime": 1787548699.636924,
+    "ast_hash": "a5c6699c352c0066cd25d19207c8f7e6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ShotTimelineSlider.tsx": {
+    "mtime": 1787548699.6379242,
+    "ast_hash": "b133c87b260f194f652c0fabaded2fb5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/Sidebar.tsx": {
+    "mtime": 1788008032.7298808,
+    "ast_hash": "c7a8ee76ef5415c1c97d98e3410f7c5c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/StaggerGrid.tsx": {
+    "mtime": 1787548699.6379242,
+    "ast_hash": "6e44fa1889ce6d3d4737913da06078f7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/SwipeNavigator.tsx": {
+    "mtime": 1787548699.6389253,
+    "ast_hash": "dfc842841f20d085bbe3659e167af7d1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/SyncStatusIndicator.tsx": {
+    "mtime": 1787548699.6389253,
+    "ast_hash": "adb10c7a1112a668b87ece9beba16ff8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/TargetCanvas.tsx": {
+    "mtime": 1787548699.6389253,
+    "ast_hash": "a08b4d9c2d7021d59a4339d991b5006a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/TopBar.tsx": {
+    "mtime": 1789123598.1510372,
+    "ast_hash": "195d17f464a18d2b90c935f4a1136ed3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/docs/GuidanceSection.tsx": {
+    "mtime": 1787548699.639925,
+    "ast_hash": "131873d525705466cd6d4abdb5d7d080",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/layouts/DashboardLayout.tsx": {
+    "mtime": 1789139326.0533128,
+    "ast_hash": "efc0f106c9e95a799f393612c1b090fb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/live-analysis/LiveTargetSelector.tsx": {
+    "mtime": 1787581788.2791412,
+    "ast_hash": "ff4f02041749ba8d01a9766a336700a6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/live-analysis/RealTimeScoreboard.tsx": {
+    "mtime": 1787581770.7972739,
+    "ast_hash": "d376bfadf32b72aa4a3bbb11adf0dae8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/live-analysis/TargetCanvas.tsx": {
+    "mtime": 1787581766.973245,
+    "ast_hash": "3826e4facff101778df17eee139dc0b9",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/performance/AnalyticsSection.tsx": {
+    "mtime": 1787548699.6409247,
+    "ast_hash": "546251a5c484de0edde2103aa55da472",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/performance/PerformanceOverview.tsx": {
+    "mtime": 1787548699.6409247,
+    "ast_hash": "6fd8df983baa62a6bbb677722720fc0e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/performance/PerformanceSectionNav.tsx": {
+    "mtime": 1787548699.6409247,
+    "ast_hash": "cd24fb82fe100232451447e5b16f28ac",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/planning/CalendarSection.tsx": {
+    "mtime": 1787548699.6419249,
+    "ast_hash": "5e1a9cdd0b51ef59a49c67f45558c394",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/planning/GoalsSection.tsx": {
+    "mtime": 1787548699.6419249,
+    "ast_hash": "3f273b812b653c85df971040451c59ff",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/planning/PlanningSectionNav.tsx": {
+    "mtime": 1787548699.642926,
+    "ast_hash": "7cfcf48774913eed90dba85b48877890",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/shooter/PersonalBestsWidget.tsx": {
+    "mtime": 1789139473.803291,
+    "ast_hash": "6b9f44568a092091cacb992e5f188f6f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/Button.tsx": {
+    "mtime": 1789139263.4744096,
+    "ast_hash": "a3ec7d4abbc1b89517f4194008b33f1c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/Card.tsx": {
+    "mtime": 1789139232.1868768,
+    "ast_hash": "ca3ea0cda05e0245be45588c042333d6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/Input.tsx": {
+    "mtime": 1789139285.299167,
+    "ast_hash": "2801fa6715695e34e9448981b9772a87",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/LiveIndicator.tsx": {
+    "mtime": 1787548699.642926,
+    "ast_hash": "be5e43a14c6f9a226a3d5f1a1782aa9f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/MetricCard.tsx": {
+    "mtime": 1787760563.3383982,
+    "ast_hash": "996fda2207bcbf9791aa2aa3b79ade68",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/ProgressStep.tsx": {
+    "mtime": 1787548699.6439264,
+    "ast_hash": "b6f0632e74883b6331ebcf1834881d1b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/ScoreRing.tsx": {
+    "mtime": 1787548699.6439264,
+    "ast_hash": "f8932a7ebed2152586d5b302152c68d3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/ShotTable.tsx": {
+    "mtime": 1787548699.644925,
+    "ast_hash": "d0af69bc941f754644b1ce7d173c266d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/SkeletonCard.tsx": {
+    "mtime": 1787548699.644925,
+    "ast_hash": "72e739949b4b509dbe253e50c75e43ca",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/StatusBadge.tsx": {
+    "mtime": 1787548699.644925,
+    "ast_hash": "e250130bc9a0e034cf92d0c7354af0b3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/SuggestionItem.tsx": {
+    "mtime": 1787548699.644925,
+    "ast_hash": "728249201e90e340c9603a566a575631",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/TabBar.tsx": {
+    "mtime": 1787548699.6459253,
+    "ast_hash": "d89e05e7bcc7f17036a9a6611fa55fac",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/components/ui/WeatherWidget.tsx": {
+    "mtime": 1789142971.9534042,
+    "ast_hash": "e9ead0e07e9363a201a6a39981f0b3f7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/contexts/auth-context.tsx": {
+    "mtime": 1788620493.069669,
+    "ast_hash": "0709109eed23d890c0d01f67c47ea587",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/contexts/theme-context.tsx": {
+    "mtime": 1788671845.6078973,
+    "ast_hash": "98c6ff939970bdc582dfe2faa6ee4d78",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/contexts/toast-context.tsx": {
+    "mtime": 1787548699.646952,
+    "ast_hash": "6076d7e4b78b8db95f15dfc808c2565e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/data/feedback.json": {
+    "mtime": 1787548699.6474738,
+    "ast_hash": "35d0e0b801444bb1f4c2115720f8e4f6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/hooks/useCountUp.ts": {
+    "mtime": 1787759827.244598,
+    "ast_hash": "481a365494d4a1efe380971a530fc274",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/hooks/useLiveRange.ts": {
+    "mtime": 1788008142.365677,
+    "ast_hash": "9de8396fee62204ab43ae932b92616f1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/hooks/useNetwork.ts": {
+    "mtime": 1787548699.6474738,
+    "ast_hash": "51244886a05709b4d2bbdfeec3295934",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/hooks/useOfflineData.ts": {
+    "mtime": 1787548699.6484702,
+    "ast_hash": "d44d3b6a5041c338a727c81479ebd265",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/hooks/useSyncStatus.ts": {
+    "mtime": 1787548699.6484702,
+    "ast_hash": "37262c7e73dc8d1ec4c9f2f128ff84fd",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/api.ts": {
+    "mtime": 1787846205.2054188,
+    "ast_hash": "0514a36b8ca784301b30c761f3499f8d",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/auth.ts": {
+    "mtime": 1788620515.5638688,
+    "ast_hash": "1796b29a58f67b9930cd9ebf65aa521a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/capacitor.ts": {
+    "mtime": 1787548699.6494694,
+    "ast_hash": "f54f60c8a7b4e821613788cc2c513003",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/chart-theme.ts": {
+    "mtime": 1787762304.3799121,
+    "ast_hash": "a6a3e218b89b8fc5bfb4d2779df70c49",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/db.ts": {
+    "mtime": 1787548699.6494694,
+    "ast_hash": "26dfcaea7efa6a0d193a7533ef067a1e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/draw-target.ts": {
+    "mtime": 1787548699.650469,
+    "ast_hash": "27e71f466cb8fae32895a30e790b07ac",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/export.ts": {
+    "mtime": 1787548699.651469,
+    "ast_hash": "b5bf576b9e098a697165910223b234d6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/google-auth.ts": {
+    "mtime": 1787548699.651469,
+    "ast_hash": "418582c3c168e9c68ad541b01ceae014",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/health-connect.ts": {
+    "mtime": 1787548699.651469,
+    "ast_hash": "4a73607a3ec2eaf0beb87b940bb8faea",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/image-store.ts": {
+    "mtime": 1787548699.65247,
+    "ast_hash": "f2e8acd80cd113f619619e8f10b34ee0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/network-state.ts": {
+    "mtime": 1787548699.65247,
+    "ast_hash": "4b2ac0b7dac8cc1f8ec892e4d3812e46",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/offline-api.ts": {
+    "mtime": 1787548699.65247,
+    "ast_hash": "b027368adc65599c230a1d293260ac8f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/session-time.ts": {
+    "mtime": 1787548699.6534705,
+    "ast_hash": "d788e98652682348157750a7f915e5d5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/sync-engine.ts": {
+    "mtime": 1787548699.6534705,
+    "ast_hash": "b41bd457f706b52b92a23d8357990ea8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/target-specs.ts": {
+    "mtime": 1787581725.7574239,
+    "ast_hash": "b4173cb4587b2b96c2d319103cf0902b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/use-coach-shooter.ts": {
+    "mtime": 1787548699.6534705,
+    "ast_hash": "89d4c0da9551a22589759955725b693b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/use-mobile.ts": {
+    "mtime": 1787548699.6534705,
+    "ast_hash": "6669179a6450a307a434e1dbc1c0a1d0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/utils.ts": {
+    "mtime": 1789139204.18237,
+    "ast_hash": "d9837f38cc05303254571985e3164050",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/lib/vision-service.ts": {
+    "mtime": 1787548699.6544704,
+    "ast_hash": "c7df4f4d916522bae5a8ac5fa5837df8",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/next-env.d.ts": {
+    "mtime": 1787548699.6544704,
+    "ast_hash": "90426577ad8f38459f3e566411c85589",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/next.config.ts": {
+    "mtime": 1789127509.6049159,
+    "ast_hash": "c318bbb66c6fb4650f67c5e65ecd0f55",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/package.json": {
+    "mtime": 1789139151.6554654,
+    "ast_hash": "3eb2f42acb69b8d2414e3aa92b79e9ff",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/postcss.config.js": {
+    "mtime": 1787548699.6554708,
+    "ast_hash": "0cf04d6780cfaba486871dfcf90f57c3",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/sw.js": {
+    "mtime": 1787764896.3418841,
+    "ast_hash": "8e240cd6b2aaa5134b739eb6d437bc77",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/scripts/edge_to_edge.py": {
+    "mtime": 1787756598.5216975,
+    "ast_hash": "c382ce9fa29b8a547860d6ecadf1321a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/scripts/overhaul.py": {
+    "mtime": 1787755950.8445144,
+    "ast_hash": "e486b82c368f1e4e7c64c5669e7ca3cc",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/scripts/refactor_nav.py": {
+    "mtime": 1787758330.246682,
+    "ast_hash": "5d2a550a36524e71f9a24145f9a28100",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/scripts/refactor_theme.py": {
+    "mtime": 1787758303.7822845,
+    "ast_hash": "c0125a0b0a44f6c7f968e4a71d085d83",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/scripts/responsive.py": {
+    "mtime": 1787756229.2824645,
+    "ast_hash": "84ec100d52d61d7703e3f5bd31b33cc0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/tailwind.config.ts": {
+    "mtime": 1788283828.7380652,
+    "ast_hash": "f3e2dbe5f8da768292e4c636fbce5599",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/tsconfig.json": {
+    "mtime": 1787548699.6594718,
+    "ast_hash": "1ee66b12286cdfac1ff4cfc0ed97a9f1",
+    "semantic_hash": ""
+  },
+  "shooting/docs/generate_ppt.py": {
+    "mtime": 1788369854.570303,
+    "ast_hash": "6797785370fe70d0d5a4cf06b5a93c2d",
+    "semantic_hash": ""
+  },
+  "shooting/engine/start.py": {
+    "mtime": 1788007755.3751712,
+    "ast_hash": "5bd02358d44aab0b2b5f5119830179ac",
+    "semantic_hash": ""
+  },
+  "shooting/engine/stream.py": {
+    "mtime": 1788007657.524884,
+    "ast_hash": "f36465437299cea84e0ea696ebd2fb2f",
+    "semantic_hash": ""
+  },
+  "shooting/engine/vision_engine.py": {
+    "mtime": 1788007727.6330504,
+    "ast_hash": "4a446affc4b4e69af59431ae63b2e0fe",
+    "semantic_hash": ""
+  },
+  "shooting/engine/ws_client.py": {
+    "mtime": 1788007681.2948263,
+    "ast_hash": "8986f0ec1504373e01809c11b1f0a81a",
+    "semantic_hash": ""
+  },
+  "shooting/mobile-dev.ps1": {
+    "mtime": 1787548699.6614716,
+    "ast_hash": "7293444c95a5b508c9875c1f707bc2a1",
+    "semantic_hash": ""
+  },
+  "shooting/package.json": {
+    "mtime": 1789126680.345911,
+    "ast_hash": "095234f57fb3fa3056fe978dfc5c99d7",
+    "semantic_hash": ""
+  },
+  "shooting/packages/shared-types/index.d.ts": {
+    "mtime": 1787548699.6634731,
+    "ast_hash": "a9e36df21720cc5a1cfd8e97ecda2eb8",
+    "semantic_hash": ""
+  },
+  "shooting/packages/shared-types/index.js": {
+    "mtime": 1787548699.6634731,
+    "ast_hash": "12db821d8c4ed89d8465078dfca6cf15",
+    "semantic_hash": ""
+  },
+  "shooting/packages/shared-types/index.ts": {
+    "mtime": 1789125872.8423598,
+    "ast_hash": "5728c92800f3547ea3a3ebb92470874f",
+    "semantic_hash": ""
+  },
+  "shooting/packages/shared-types/package.json": {
+    "mtime": 1787548699.6644728,
+    "ast_hash": "53f6d35e53b5aa5f0e60d93103255a90",
+    "semantic_hash": ""
+  },
+  "shooting/packages/shared-types/tsconfig.json": {
+    "mtime": 1787548699.6644728,
+    "ast_hash": "1bc063e51428c26b62e7c567f8ec27f2",
+    "semantic_hash": ""
+  },
+  "shooting/start-local.ps1": {
+    "mtime": 1789184517.9976323,
+    "ast_hash": "70d224e8e5eb1d6c6cd30ccdfb2035f3",
+    "semantic_hash": ""
+  },
+  "shooting/start-netbird.ps1": {
+    "mtime": 1789127518.349875,
+    "ast_hash": "181fce5a1b7795f00d1b346eedc9fc87",
+    "semantic_hash": ""
+  },
+  "shooting/start-public.ps1": {
+    "mtime": 1788671421.3786497,
+    "ast_hash": "50a8100ffb5e1f55b9955fbcd8634a18",
+    "semantic_hash": ""
+  },
+  "shooting/start-tailscale.ps1": {
+    "mtime": 1788277305.320984,
+    "ast_hash": "c142d5418128ec8d788db9b36c156d3e",
+    "semantic_hash": ""
+  },
+  "shooting/.superpowers/brainstorm/42481-1774855864/content/correction-placement.html": {
+    "mtime": 1787548698.569212,
+    "ast_hash": "f29f893139d5e4ffa9d6530aa332984c",
+    "semantic_hash": ""
+  },
+  "shooting/.superpowers/brainstorm/42481-1774855864/content/correction-ui-design.html": {
+    "mtime": 1787548698.569212,
+    "ast_hash": "a20d7910dde302b4f69ccd7666158bad",
+    "semantic_hash": ""
+  },
+  "shooting/.superpowers/brainstorm/42481-1774855864/content/waiting-1.html": {
+    "mtime": 1787548698.569212,
+    "ast_hash": "484f41fa91be936104ed1d80e8c9da0a",
+    "semantic_hash": ""
+  },
+  "shooting/CLAUDE.md": {
+    "mtime": 1787548698.5712154,
+    "ast_hash": "5207f535561a9935f01c993314105e9e",
+    "semantic_hash": ""
+  },
+  "shooting/README.md": {
+    "mtime": 1787548698.5712154,
+    "ast_hash": "fb389652bec3518861c61d4b9326ad9e",
+    "semantic_hash": ""
+  },
+  "shooting/TEST_ACCOUNTS.md": {
+    "mtime": 1788635047.9904299,
+    "ast_hash": "d2055ef96bd34b7e457a61ef23546364",
+    "semantic_hash": ""
+  },
+  "shooting/android.md": {
+    "mtime": 1787548698.5722144,
+    "ast_hash": "89133d2023fed08702c96c4297814cac",
+    "semantic_hash": ""
+  },
+  "shooting/apps/training_status.md": {
+    "mtime": 1789122229.0478363,
+    "ast_hash": "619aba3a6f29030eb78a5f0d00a2ec4a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/models/MODELS.md": {
+    "mtime": 1787548699.562739,
+    "ast_hash": "e2f72e864a0d56829ceb59d39517742e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/requirements.txt": {
+    "mtime": 1787548699.5677392,
+    "ast_hash": "f6db72f61770d9777a3ce7bc8d062aa9",
+    "semantic_hash": ""
+  },
+  "shooting/apps/vision/runtime.txt": {
+    "mtime": 1787548699.5677392,
+    "ast_hash": "07c30dd85bf1fdf9777ef61df890e9bf",
+    "semantic_hash": ""
+  },
+  "shooting/docker-compose.yml": {
+    "mtime": 1788007867.228183,
+    "ast_hash": "61e6e83fa52094690cbfac123b897562",
+    "semantic_hash": ""
+  },
+  "shooting/docs/AIRGUN_LIVE_TRACKING_PLAN.md": {
+    "mtime": 1788369560.752333,
+    "ast_hash": "aa6e0968d27f0566699f112d59663d97",
+    "semantic_hash": ""
+  },
+  "shooting/docs/FIREARM_LIVE_TRACKING_PLAN.md": {
+    "mtime": 1788369562.7764702,
+    "ast_hash": "1d5de0f7157edae2598d48131faf58f8",
+    "semantic_hash": ""
+  },
+  "shooting/docs/MARKSMAN_MASTER_PLAN.md": {
+    "mtime": 1789184819.9749038,
+    "ast_hash": "8dc6ae7b128794c1858ede3a23578f7c",
+    "semantic_hash": ""
+  },
+  "shooting/docs/PATCH_NOTES.md": {
+    "mtime": 1788284241.8039155,
+    "ast_hash": "c183a73a1ce921e29906043051cd23a0",
+    "semantic_hash": ""
+  },
+  "shooting/docs/superpowers/specs/2026-03-30-detection-accuracy-correction-ui-design.md": {
+    "mtime": 1787548699.6614716,
+    "ast_hash": "87c9d4d78284e19d057dcce721f52058",
+    "semantic_hash": ""
+  },
+  "shooting/engine/README.md": {
+    "mtime": 1788008068.8236048,
+    "ast_hash": "c508e049b5167ecc11fcc81b9361abea",
+    "semantic_hash": ""
+  },
+  "shooting/engine/config.yaml": {
+    "mtime": 1788007609.8459375,
+    "ast_hash": "8a30735db497b82fbbb01d9c31f791f6",
+    "semantic_hash": ""
+  },
+  "shooting/engine/requirements.txt": {
+    "mtime": 1788007624.7414806,
+    "ast_hash": "fdaf9df341d93ba3467af4aba444af86",
+    "semantic_hash": ""
+  },
+  "shooting/render.yaml": {
+    "mtime": 1789124733.0073965,
+    "ast_hash": "31c1df75238d62c95351ff31fc18c5d0",
+    "semantic_hash": ""
+  },
+  "shooting/runs/detect/runs/yolo26s_bullets/train/args.yaml": {
+    "mtime": 1788507615.389273,
+    "ast_hash": "0d495e682af564b079e3d2a97cebf003",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-hdpi/splash.png": {
+    "mtime": 1787548699.5757413,
+    "ast_hash": "7b911d5ca105b57fa2414c3358b63734",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-ldpi/splash.png": {
+    "mtime": 1787548699.5767415,
+    "ast_hash": "25775c3198527513a30dc098164a2efc",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-mdpi/splash.png": {
+    "mtime": 1787548699.5767415,
+    "ast_hash": "68429d246c4e13a554955055271e4595",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-hdpi/splash.png": {
+    "mtime": 1787548699.5777407,
+    "ast_hash": "cd4707c2ebaa90900d2aa840970af518",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-ldpi/splash.png": {
+    "mtime": 1787548699.5777407,
+    "ast_hash": "636e852a506f99cb6ec24c3293c0595e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-mdpi/splash.png": {
+    "mtime": 1787548699.578741,
+    "ast_hash": "5540c43952dad9eee4a84f22871843a2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-xhdpi/splash.png": {
+    "mtime": 1787548699.579741,
+    "ast_hash": "eac2f61157744edc9f4f85ede875d5b5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-xxhdpi/splash.png": {
+    "mtime": 1787548699.579741,
+    "ast_hash": "ca514db002791ba11e226b1cc1afc075",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-night-xxxhdpi/splash.png": {
+    "mtime": 1787548699.5807407,
+    "ast_hash": "960f6a5c1a17ab6fefb1cc73a9c76a7a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-xhdpi/splash.png": {
+    "mtime": 1787548699.5807407,
+    "ast_hash": "bbfa2633259e567d70e8608cbed283f2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-xxhdpi/splash.png": {
+    "mtime": 1787548699.581741,
+    "ast_hash": "bf42b6df3e827e8f4568bf1fc46afe57",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-land-xxxhdpi/splash.png": {
+    "mtime": 1787548699.581741,
+    "ast_hash": "276bebe3080add1a5326f1bd4f3d033f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-night/splash.png": {
+    "mtime": 1787548699.5827415,
+    "ast_hash": "636e852a506f99cb6ec24c3293c0595e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-hdpi/splash.png": {
+    "mtime": 1787548699.5827415,
+    "ast_hash": "afe94bf4f6561cff9fd7a98d9af5b68a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-ldpi/splash.png": {
+    "mtime": 1787548699.5837412,
+    "ast_hash": "c5fc970f0206adb747b288e5af965389",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-mdpi/splash.png": {
+    "mtime": 1787548699.5837412,
+    "ast_hash": "15307a8ad0cf2c6a6943d33fe8abd89e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-hdpi/splash.png": {
+    "mtime": 1787548699.5837412,
+    "ast_hash": "c5aab6c41dd22c0a9a0df1e73926210b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-ldpi/splash.png": {
+    "mtime": 1787548699.5847414,
+    "ast_hash": "05f59ed51641d59a2451f442c9547cb2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-mdpi/splash.png": {
+    "mtime": 1787548699.5857422,
+    "ast_hash": "576c77f1ef178b9b421dcb7fbca3b67f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-xhdpi/splash.png": {
+    "mtime": 1787548699.5857422,
+    "ast_hash": "35c14b7d758b7d7139f08c7121ac5e3c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-xxhdpi/splash.png": {
+    "mtime": 1787548699.5867817,
+    "ast_hash": "c14abc185630d4e836239aa5d3216da5",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-night-xxxhdpi/splash.png": {
+    "mtime": 1787548699.587305,
+    "ast_hash": "ad98414ff8c99cb8598368341a52805c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-xhdpi/splash.png": {
+    "mtime": 1787548699.5878253,
+    "ast_hash": "9b79f288cba32152d845368bc9322978",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-xxhdpi/splash.png": {
+    "mtime": 1787548699.588341,
+    "ast_hash": "f65289ff7b044111cd85648537ab2916",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable-port-xxxhdpi/splash.png": {
+    "mtime": 1787548699.5888598,
+    "ast_hash": "a39fe6ffdfbe68cdca79289dbeff9d64",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/drawable/splash.png": {
+    "mtime": 1787548699.589903,
+    "ast_hash": "15307a8ad0cf2c6a6943d33fe8abd89e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1787548699.5914676,
+    "ast_hash": "f3537b52586f603005dbeba3ac72f200",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher_background.png": {
+    "mtime": 1787548699.5919943,
+    "ast_hash": "bd051582cdd06a388fc29bad06932698",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.592528,
+    "ast_hash": "c7e4ed2573acb3f7e7c0a40496fcfc92",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
+    "mtime": 1787548699.593053,
+    "ast_hash": "229164883ab2de7fbb8677beb8e5e75c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-ldpi/ic_launcher.png": {
+    "mtime": 1787548699.5935867,
+    "ast_hash": "f9d272b4ff1e573e6e35f9e81ef20fdc",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-ldpi/ic_launcher_background.png": {
+    "mtime": 1787548699.5935867,
+    "ast_hash": "4f01518e1a9ea614256a1c9675102740",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-ldpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.5941086,
+    "ast_hash": "d965e4031bec89f5b1993121f648a61c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-ldpi/ic_launcher_round.png": {
+    "mtime": 1787548699.5967557,
+    "ast_hash": "dd631fb9c1e3c1710eb7d5cd6521cf53",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1787548699.5972776,
+    "ast_hash": "9b351a7e433b93a6e50f7acff9699f7f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher_background.png": {
+    "mtime": 1787548699.597797,
+    "ast_hash": "1d37a1e7d73037ae89999533674ef974",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.5988295,
+    "ast_hash": "61baa54ab058836e98041f50fe4ee5cb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
+    "mtime": 1787548699.5993617,
+    "ast_hash": "bb318e6d4fae7ba76ae9587bfa574f57",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1787548699.5993617,
+    "ast_hash": "951daaf174d7d24f8c53c475a5e90de6",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher_background.png": {
+    "mtime": 1787548699.6023047,
+    "ast_hash": "321cdc26ac64a784a374f64c4ae12d20",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.6040206,
+    "ast_hash": "c7a3dae9cab6717f418a71139ef2a31f",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
+    "mtime": 1787548699.6045492,
+    "ast_hash": "5d4264e1739ce96bee95895131079727",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1787548699.6045492,
+    "ast_hash": "e60a3703997572c8fa3f516052b52432",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_background.png": {
+    "mtime": 1787548699.6050832,
+    "ast_hash": "5addf2597ede4ea38ab3df9804c6e34c",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.6056178,
+    "ast_hash": "38efe407542c5d10a760a429ed35e48a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
+    "mtime": 1787548699.6061516,
+    "ast_hash": "8d129235631cbcdb99407b3a604a4d5a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1787548699.6066835,
+    "ast_hash": "404fe32b30f49b2f6eb7fb3b821ab36a",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png": {
+    "mtime": 1787548699.6072176,
+    "ast_hash": "d70ed95a1753c05e22e71a3205be7aa1",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1787548699.6082816,
+    "ast_hash": "0c109af21572b0171628c6c9132ecd4e",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
+    "mtime": 1787548699.6082816,
+    "ast_hash": "b95729c85ba3005b1b91afc0d79574eb",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/assets/icon.png": {
+    "mtime": 1787548699.6283827,
+    "ast_hash": "82096ae57295ff60caff51b69efa8d01",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/apple-touch-icon.png": {
+    "mtime": 1787548699.6554708,
+    "ast_hash": "28be9561d5f9f2925d86b1649e0a0cfd",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/favicon-16x16.png": {
+    "mtime": 1787548699.6554708,
+    "ast_hash": "2d74fce62ab7fa42c1fa47f2afb699f2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/favicon-32x32.png": {
+    "mtime": 1787548699.6564708,
+    "ast_hash": "1b6846d3a5cf04d2c93fa72fda1bdda0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/favicon.svg": {
+    "mtime": 1787548699.6564708,
+    "ast_hash": "5ad04476ddc7aa9523eaaf66402ceb4b",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-128.png": {
+    "mtime": 1787548699.6564708,
+    "ast_hash": "e427f41c29e71eaedb97ad83ca88da99",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-16.png": {
+    "mtime": 1787548699.6564708,
+    "ast_hash": "2d74fce62ab7fa42c1fa47f2afb699f2",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-180.png": {
+    "mtime": 1787548699.6574707,
+    "ast_hash": "28be9561d5f9f2925d86b1649e0a0cfd",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-192.png": {
+    "mtime": 1787548699.6574707,
+    "ast_hash": "27a9de3879893a6d67ac9a6e2bcc56db",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-32.png": {
+    "mtime": 1787548699.6574707,
+    "ast_hash": "1b6846d3a5cf04d2c93fa72fda1bdda0",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-48.png": {
+    "mtime": 1787548699.6574707,
+    "ast_hash": "3749ad6b8f4dce672b1363634cf724e7",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-512.png": {
+    "mtime": 1787548699.6584709,
+    "ast_hash": "82096ae57295ff60caff51b69efa8d01",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/icon-64.png": {
+    "mtime": 1787548699.6584709,
+    "ast_hash": "1c5a589da3e4ad7644e3ba2ccfbc3883",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/logo.svg": {
+    "mtime": 1787548699.6584709,
+    "ast_hash": "72f7caf92598369241683250d2f32674",
+    "semantic_hash": ""
+  },
+  "shooting/apps/web/public/og-image.png": {
+    "mtime": 1787753174.721471,
+    "ast_hash": "2304a5fa23d3f32a3143919d17420731",
+    "semantic_hash": ""
+  },
+  "shooting/runs/detect/runs/yolo26s_bullets/train/labels.jpg": {
+    "mtime": 1788507624.6079166,
+    "ast_hash": "b99abd3005a4fafe4cfbccb67a1ac7c1",
+    "semantic_hash": ""
+  },
+  "shooting/runs/detect/runs/yolo26s_bullets/train/train_batch0.jpg": {
+    "mtime": 1788507800.113906,
+    "ast_hash": "5ea11e435b77678c938b22ffd90be534",
+    "semantic_hash": ""
+  },
+  "shooting/runs/detect/runs/yolo26s_bullets/train/train_batch1.jpg": {
+    "mtime": 1788508159.4010227,
+    "ast_hash": "95ff9e2c7d0ffd7664b9bb1535c3111e",
+    "semantic_hash": ""
+  },
+  "shooting/runs/detect/runs/yolo26s_bullets/train/train_batch2.jpg": {
+    "mtime": 1788508434.8386948,
+    "ast_hash": "3bf524533bb2e1b66192a656d175a3bc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.20 PM.jpeg": {
+    "mtime": 1787548699.6664724,
+    "ast_hash": "227d408124a2dced923b7cde312bfe46",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.21 PM (1).jpeg": {
+    "mtime": 1787548699.6664724,
+    "ast_hash": "4af39c3d204cdfe9aaf80f17f0138587",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.21 PM (2).jpeg": {
+    "mtime": 1787548699.6674721,
+    "ast_hash": "4eb697f71dcc3fe87d41cb2fb2167623",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.21 PM.jpeg": {
+    "mtime": 1787548699.668472,
+    "ast_hash": "af024ffc0392b8004232ba71536bbe7e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.22 PM.jpeg": {
+    "mtime": 1787548699.668472,
+    "ast_hash": "077c85ecb1c3b374495012e4626c0bc7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.24 PM.jpeg": {
+    "mtime": 1787548699.6694727,
+    "ast_hash": "0fdf7639c2ae04de6e2d6e2ed2e9cc37",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.25 PM (1).jpeg": {
+    "mtime": 1787548699.670473,
+    "ast_hash": "14fce6901b5ec7406c3e681dedc0a2a1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.25 PM.jpeg": {
+    "mtime": 1787548699.670473,
+    "ast_hash": "c12047d0d9e6485014459f10af1c8f14",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.26 PM (1).jpeg": {
+    "mtime": 1787548699.6717117,
+    "ast_hash": "f5da4f75ad87b2329957d79bb1df47c3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.26 PM (2).jpeg": {
+    "mtime": 1787548699.6722276,
+    "ast_hash": "26489184ecacaf841c125dbbd2c0ec16",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.26 PM.jpeg": {
+    "mtime": 1787548699.67275,
+    "ast_hash": "b057fbfec71f9f478d1944f1908ac252",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.27 PM (1).jpeg": {
+    "mtime": 1787548699.6737914,
+    "ast_hash": "5f57cb9ab97131e0690c72fa7e950b1a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.27 PM (2).jpeg": {
+    "mtime": 1787548699.6743095,
+    "ast_hash": "911f5374ad83fb57e494b9e185c0a8b8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.27 PM.jpeg": {
+    "mtime": 1787548699.6753457,
+    "ast_hash": "f92ad9ec229138f81a4ebb764fc1bb1c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.28 PM (1).jpeg": {
+    "mtime": 1787548699.6758664,
+    "ast_hash": "37fd62d7b32bc3c47684dca0edce9354",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.28 PM (2).jpeg": {
+    "mtime": 1787548699.6769097,
+    "ast_hash": "562d493e9f40ed1a3f5acda8c5dce657",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.28 PM.jpeg": {
+    "mtime": 1787548699.67797,
+    "ast_hash": "39e76e842bc5333a5d2bafa9ec017737",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.31 PM (1).jpeg": {
+    "mtime": 1787548699.6784916,
+    "ast_hash": "8d703fe7aef7493f916ea56a4a6a18e6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.31 PM.jpeg": {
+    "mtime": 1787548699.6795447,
+    "ast_hash": "7f24ad0e61ffa38c1f7ea74684a4635e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.32 PM.jpeg": {
+    "mtime": 1787548699.6800666,
+    "ast_hash": "c94efbb0fd9270922780d5a775b32bfd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.34 PM (1).jpeg": {
+    "mtime": 1787548699.680594,
+    "ast_hash": "769e7e6760476bc0906cde9eaff3fefd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.34 PM.jpeg": {
+    "mtime": 1787548699.681646,
+    "ast_hash": "8583bbd6fbc6865d1f97b7eed0178468",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.35 PM (1).jpeg": {
+    "mtime": 1787548699.6832082,
+    "ast_hash": "a67a92d56bc4fc263f1dcb6cc732b140",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.35 PM.jpeg": {
+    "mtime": 1787548699.6832082,
+    "ast_hash": "ae9e9aa51fa01f9fc2202f9dd8f75de0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.36 PM (1).jpeg": {
+    "mtime": 1787548699.6842065,
+    "ast_hash": "6b26698de140fee8ce2e5fb9237ef15a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.36 PM (2).jpeg": {
+    "mtime": 1787548699.685194,
+    "ast_hash": "d396c21d2481ecd24c0b0ece9f8bedb3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.36 PM.jpeg": {
+    "mtime": 1787548699.688815,
+    "ast_hash": "82f67d2dfee1a247ea0fc28faed557f9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.37 PM (1).jpeg": {
+    "mtime": 1787548699.689856,
+    "ast_hash": "4ac05ad90b7fd968808c73ff23de26d0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.37 PM (2).jpeg": {
+    "mtime": 1787548699.690374,
+    "ast_hash": "2e9a6efed29c08c4e482d16af95ca564",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.37 PM.jpeg": {
+    "mtime": 1787548699.6914296,
+    "ast_hash": "b0252ca93d985fbc9490812e7b184e50",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.38 PM (1).jpeg": {
+    "mtime": 1787548699.6919513,
+    "ast_hash": "8efb677329cda87a8ad6dbce406989bc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.38 PM (2).jpeg": {
+    "mtime": 1787548699.6930006,
+    "ast_hash": "33cef0cfe7eb50743b208b263dccd56d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.38 PM.jpeg": {
+    "mtime": 1787548699.6940675,
+    "ast_hash": "6ac7f35fbad50367c5a04e60cf09827a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.39 PM (1).jpeg": {
+    "mtime": 1787548699.6945896,
+    "ast_hash": "b9e803a682275a45ef567e3d370a975e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.39 PM.jpeg": {
+    "mtime": 1787548699.6956334,
+    "ast_hash": "a4444e0de4f857b899354824d201bd01",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.42 PM (1).jpeg": {
+    "mtime": 1787548699.6967127,
+    "ast_hash": "c1f4fc2b49fcc830a631ff9554d4df48",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.42 PM (2).jpeg": {
+    "mtime": 1787548699.6972356,
+    "ast_hash": "fbedc165509e0846fdfcb0c4b5a833bc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.42 PM.jpeg": {
+    "mtime": 1787548699.698268,
+    "ast_hash": "46d2e38e4207db4d9e016bb8607a7531",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.43 PM (1).jpeg": {
+    "mtime": 1787548699.6987932,
+    "ast_hash": "4bd82cce9aa68844afcb8ece85d1626b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.38.43 PM.jpeg": {
+    "mtime": 1787548699.6993148,
+    "ast_hash": "5e7cbf8bd2a54c89c7950cb91bf1609b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.18 PM.jpeg": {
+    "mtime": 1787548699.7003584,
+    "ast_hash": "6722e24043f7eeb60f16b29b504b8ab3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.19 PM (1).jpeg": {
+    "mtime": 1787548699.700881,
+    "ast_hash": "c704dcb021cd4887883f0e0c3a83066d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.19 PM.jpeg": {
+    "mtime": 1787548699.7019396,
+    "ast_hash": "9d8025ae060887564fed33f4feed3e7f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.20 PM (1).jpeg": {
+    "mtime": 1787548699.702469,
+    "ast_hash": "99a7d560deb1e115fa1241726bea1646",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.20 PM.jpeg": {
+    "mtime": 1787548699.7035172,
+    "ast_hash": "276d4ce3cfdb04a01e8f4607f0eca58e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.21 PM.jpeg": {
+    "mtime": 1787548699.7040384,
+    "ast_hash": "8c60ebcdc5fd7f06bfb009ecd0d656c3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.22 PM (1).jpeg": {
+    "mtime": 1787548699.7050807,
+    "ast_hash": "42f9ade82d783bf764cb7632a362a5c0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.22 PM.jpeg": {
+    "mtime": 1787548699.7056038,
+    "ast_hash": "d862729cf8ffb196b5ca7f1bea682c6c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.23 PM (1).jpeg": {
+    "mtime": 1787548699.7066286,
+    "ast_hash": "363a2fb612f52896cb84be7536bcda63",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.23 PM.jpeg": {
+    "mtime": 1787548699.7071707,
+    "ast_hash": "50ed5629ee9899295ce8bf102bf6cf39",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.24 PM.jpeg": {
+    "mtime": 1787548699.707728,
+    "ast_hash": "0df466756e4d865d7b7d26cb78ac88d8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.25 PM (1).jpeg": {
+    "mtime": 1787548699.7087955,
+    "ast_hash": "30638bdcca4dc56be4aec8b68a551001",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.25 PM.jpeg": {
+    "mtime": 1787548699.7093205,
+    "ast_hash": "a62ab5c96078b87b73d894df1e0f40f8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.26 PM (1).jpeg": {
+    "mtime": 1787548699.710371,
+    "ast_hash": "29d7e8255eb9d3b4de7e8f75b9214bb7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.26 PM.jpeg": {
+    "mtime": 1787548699.7114077,
+    "ast_hash": "446fad0ecb78c0661ab051584461b71a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.27 PM.jpeg": {
+    "mtime": 1787548699.7119257,
+    "ast_hash": "979e9a576097d19dff51adf97eb0f3a7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.28 PM (1).jpeg": {
+    "mtime": 1787548699.7124429,
+    "ast_hash": "56f3ba962a6e93fa8bc551609e146399",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.28 PM.jpeg": {
+    "mtime": 1787548699.7134967,
+    "ast_hash": "0d73595e9024c4d4fb1a24ef136ec5b3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.29 PM (1).jpeg": {
+    "mtime": 1787548699.7134967,
+    "ast_hash": "47577320df4e0a59b0aec66797e7628b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.29 PM.jpeg": {
+    "mtime": 1787548699.7144854,
+    "ast_hash": "be3799365b85c78a11ada9db13610caf",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.30 PM.jpeg": {
+    "mtime": 1787548699.7144854,
+    "ast_hash": "8bc986f6d4e680846aecc29475152c10",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.31 PM (1).jpeg": {
+    "mtime": 1787548699.716007,
+    "ast_hash": "5279e3f1d2e971fd7de559f82af63f74",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.31 PM.jpeg": {
+    "mtime": 1787548699.716007,
+    "ast_hash": "b4606e5036727153c2d211de16ef38e1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.32 PM (1).jpeg": {
+    "mtime": 1787548699.7170076,
+    "ast_hash": "a7cd3b2f7b3f78b1ce3f8acfe7249192",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.32 PM.jpeg": {
+    "mtime": 1787548699.718007,
+    "ast_hash": "263b9ed784a52f42401b511b85006159",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.33 PM.jpeg": {
+    "mtime": 1787548699.7190053,
+    "ast_hash": "41502ca3a89f701af29b7b9c4c94c3c4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.34 PM (1).jpeg": {
+    "mtime": 1787548699.7190053,
+    "ast_hash": "871f0c88b5d8f5a9bce7e55fb2c53dfa",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.34 PM.jpeg": {
+    "mtime": 1787548699.720008,
+    "ast_hash": "0ead3275a14a8e32e44e4688879d78f2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.35 PM (1).jpeg": {
+    "mtime": 1787548699.7210076,
+    "ast_hash": "4b2d1ccc1bcdd8456fafd994b8a65860",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.35 PM.jpeg": {
+    "mtime": 1787548699.7210076,
+    "ast_hash": "82c7bba7d214ed46c42cc662deb97766",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.36 PM.jpeg": {
+    "mtime": 1787548699.7220056,
+    "ast_hash": "321c285444f2d3b66a7602fca27c768f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.37 PM (1).jpeg": {
+    "mtime": 1787548699.7230046,
+    "ast_hash": "452d599cef2c064ee3cee308e39eaaa2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.37 PM.jpeg": {
+    "mtime": 1787548699.7230046,
+    "ast_hash": "ea9be24c00d31d62ef928d11dbb4fe93",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.38 PM (1).jpeg": {
+    "mtime": 1787548699.7240045,
+    "ast_hash": "472d5aea1be25d251b320773cc7a0a98",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.38 PM.jpeg": {
+    "mtime": 1787548699.725009,
+    "ast_hash": "8b83cabefb407cec5fdd1845d6ed31a5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.39 PM.jpeg": {
+    "mtime": 1787548699.7260082,
+    "ast_hash": "2f704e8fab323b223cba1d8a00dde4b0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.40 PM (1).jpeg": {
+    "mtime": 1787548699.7270086,
+    "ast_hash": "8bc6b8853081f57ac08868eb65320d47",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.40 PM.jpeg": {
+    "mtime": 1787548699.7270086,
+    "ast_hash": "85ce3f38713b9b97c24ad5bcb7543428",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.41 PM (1).jpeg": {
+    "mtime": 1787548699.7280052,
+    "ast_hash": "b881f87832a122ed1c5ceb8de276c420",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.41 PM.jpeg": {
+    "mtime": 1787548699.7290072,
+    "ast_hash": "1471fc5998a49c3ff052954ed9dbf4ad",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.42 PM.jpeg": {
+    "mtime": 1787548699.7300067,
+    "ast_hash": "be82e79dc41395bc89b1f0df1d6936c0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.43 PM (1).jpeg": {
+    "mtime": 1787548699.7300067,
+    "ast_hash": "5a869c47b914daf3e85967a760d3521e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.43 PM.jpeg": {
+    "mtime": 1787548699.7320054,
+    "ast_hash": "1b6d7b098a26599815509166844edbfe",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.44 PM (1).jpeg": {
+    "mtime": 1787548699.7320054,
+    "ast_hash": "1c8dddcf95cf2a2cce2382f35972a65e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.44 PM.jpeg": {
+    "mtime": 1787548699.733005,
+    "ast_hash": "aad477c2de8ad0ab1982b9cf6de12d13",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.45 PM.jpeg": {
+    "mtime": 1787548699.7340055,
+    "ast_hash": "f9ec475433a9ad4a28e6b781385b5df5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.46 PM (1).jpeg": {
+    "mtime": 1787548699.7340055,
+    "ast_hash": "acabd23fb91bd23fa1aaa09aa1287d9a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.46 PM.jpeg": {
+    "mtime": 1787548699.735006,
+    "ast_hash": "1040d66eb331710fc4defef43c636d0b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.47 PM (1).jpeg": {
+    "mtime": 1787548699.7360058,
+    "ast_hash": "bc907aca56384fdce418ed4e83174598",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.47 PM.jpeg": {
+    "mtime": 1787548699.737006,
+    "ast_hash": "f03595af8f515710d0332c15f32ca3c4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.48 PM.jpeg": {
+    "mtime": 1787548699.737006,
+    "ast_hash": "22686768a6af22bdca876b0c43ac389e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.49 PM (1).jpeg": {
+    "mtime": 1787548699.7380066,
+    "ast_hash": "e128d64e97ecc805ca00deb54546cd80",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.49 PM.jpeg": {
+    "mtime": 1787548699.7390065,
+    "ast_hash": "f9f38b786b172cd634db57cbccd444e4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.50 PM.jpeg": {
+    "mtime": 1787548699.7400064,
+    "ast_hash": "44dc844722a87fdd35078a7ed04dfe98",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.51 PM (1).jpeg": {
+    "mtime": 1787548699.7402601,
+    "ast_hash": "eb13e5a11236342e024d33dd14396e63",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 4.39.51 PM.jpeg": {
+    "mtime": 1787548699.7412999,
+    "ast_hash": "c19ece16d7d20d22651ba4b473495d4d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.03 PM (1).jpeg": {
+    "mtime": 1787548699.7418187,
+    "ast_hash": "0a83bb7e1ecc8958478aa9ee6021111a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.03 PM.jpeg": {
+    "mtime": 1787548699.7428663,
+    "ast_hash": "00fdf7241018341e8aef1489667a58de",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.04 PM (1).jpeg": {
+    "mtime": 1787548699.7439003,
+    "ast_hash": "3deba2cfc3fdb43d04152f6aad930f57",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.04 PM (2).jpeg": {
+    "mtime": 1787548699.7449412,
+    "ast_hash": "e0c9864c59a1f0ae873d9bc4e8751ee3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.04 PM.jpeg": {
+    "mtime": 1787548699.7454567,
+    "ast_hash": "fa9de912e8cc8d6092f879fb0a4e77aa",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.05 PM (1).jpeg": {
+    "mtime": 1787548699.7475398,
+    "ast_hash": "c8afb931ea3b1da2fe952d0f28ec6925",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.05 PM (2).jpeg": {
+    "mtime": 1787548699.7480567,
+    "ast_hash": "711e42737973ffa0f9029ee690ccc864",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.05 PM.jpeg": {
+    "mtime": 1787548699.7491238,
+    "ast_hash": "e001c7f00e4a3c2e97d00fdb4305e9c9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.06 PM (1).jpeg": {
+    "mtime": 1787548699.7501602,
+    "ast_hash": "efb36ecc8a639c1336abcb852bf71dbe",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.06 PM.jpeg": {
+    "mtime": 1787548699.7511938,
+    "ast_hash": "adcfe86aa3647c5b243be68e524590c8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.07 PM (1).jpeg": {
+    "mtime": 1787548699.7517421,
+    "ast_hash": "391d1ed4fde5842f20638d84ca1e2f44",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.07 PM (2).jpeg": {
+    "mtime": 1787548699.7527766,
+    "ast_hash": "316ad4b1d158168a9a7287c70e50f154",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.07 PM.jpeg": {
+    "mtime": 1787548699.7532923,
+    "ast_hash": "96e85905ddeccef9ca8634e57bd02ffe",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.08 PM (1).jpeg": {
+    "mtime": 1787548699.7543242,
+    "ast_hash": "2dd990cd16f6c818dff3ffcc8b8dd0cc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.08 PM.jpeg": {
+    "mtime": 1787548699.7553754,
+    "ast_hash": "138be39021b359b7d8f206372fff5168",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.09 PM (1).jpeg": {
+    "mtime": 1787548699.7564113,
+    "ast_hash": "8f469db0e1b1462de63b392c165faca3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.09 PM (2).jpeg": {
+    "mtime": 1787548699.756927,
+    "ast_hash": "b719f0288c5c64ad1f7e5b11b0c9fc3e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.09 PM.jpeg": {
+    "mtime": 1787548699.7579613,
+    "ast_hash": "4080f8f88658ad5454e8e778a4fb35c1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.10 PM (1).jpeg": {
+    "mtime": 1787548699.758989,
+    "ast_hash": "fd69413967d8a3daeacfffd7ec654a25",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.10 PM.jpeg": {
+    "mtime": 1787548699.7595153,
+    "ast_hash": "f4ceab46abbe59fe830b9e827eea7e34",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.11 PM (1).jpeg": {
+    "mtime": 1787548699.760556,
+    "ast_hash": "76d5dad62b2500900d9ec097bdc094bb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.11 PM.jpeg": {
+    "mtime": 1787548699.761585,
+    "ast_hash": "966c46bff045be1cc62fb60fa71aedc4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.12 PM (1).jpeg": {
+    "mtime": 1787548699.7621021,
+    "ast_hash": "c2ab2d427cb925ac7d9a14677fa01ded",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.12 PM (2).jpeg": {
+    "mtime": 1787548699.763214,
+    "ast_hash": "e8d212af574e6eac2a3a82ba0af3bd63",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.12 PM.jpeg": {
+    "mtime": 1787548699.764249,
+    "ast_hash": "1ea1d7983a99ff12c526216ba67b7051",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.13 PM (1).jpeg": {
+    "mtime": 1787548699.7647588,
+    "ast_hash": "89fbeddd4a26d105f5e3d74b259d345a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.13 PM.jpeg": {
+    "mtime": 1787548699.7657948,
+    "ast_hash": "2830837bef83fc6891fa2e6f6fed5ff4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.14 PM (1).jpeg": {
+    "mtime": 1787548699.7668438,
+    "ast_hash": "495ad0b14ca749f932a1f6808f8941e3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.14 PM (2).jpeg": {
+    "mtime": 1787548699.767362,
+    "ast_hash": "dad832d3267c51b325a2bad0c94a1a66",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.14 PM.jpeg": {
+    "mtime": 1787548699.768402,
+    "ast_hash": "31ae0bcb1719f4efc1384de9999284d6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.15 PM (1).jpeg": {
+    "mtime": 1787548699.7693925,
+    "ast_hash": "5e51495a4d359a2ceb0dc712a6b07dca",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.15 PM.jpeg": {
+    "mtime": 1787548699.7703924,
+    "ast_hash": "e3653cade78721764a1aab9cbf13380a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.16 PM (1).jpeg": {
+    "mtime": 1787548699.770927,
+    "ast_hash": "47bb446a3772902c080a79beb8ce44ae",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.16 PM (2).jpeg": {
+    "mtime": 1787548699.7729118,
+    "ast_hash": "6c259a44557ce048c9121826a0ad864e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.16 PM.jpeg": {
+    "mtime": 1787548699.7739122,
+    "ast_hash": "dd430b847d9858c9cef1ea64c0078bac",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.17 PM (1).jpeg": {
+    "mtime": 1787548699.7739122,
+    "ast_hash": "c575162b341811a13c196f72bf5a50c2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.17 PM.jpeg": {
+    "mtime": 1787548699.7749124,
+    "ast_hash": "0fce796309681858192fd2720f53093b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.18 PM (1).jpeg": {
+    "mtime": 1787548699.775913,
+    "ast_hash": "a2248c4e32ff9e3bb37d7ac63243a781",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.18 PM (2).jpeg": {
+    "mtime": 1787548699.7769132,
+    "ast_hash": "96290b6696e0ab54a47029635bffb3b6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.18 PM.jpeg": {
+    "mtime": 1787548699.7779126,
+    "ast_hash": "640478773b3a3170f82c019d01ef5b33",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.19 PM (1).jpeg": {
+    "mtime": 1787548699.778913,
+    "ast_hash": "0bdfd2e90db47ef0f2edf9b62dc8e83e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.19 PM (2).jpeg": {
+    "mtime": 1787548699.7799122,
+    "ast_hash": "e82b6e199dd1a1ffbcf7f49e602abfba",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.19 PM.jpeg": {
+    "mtime": 1787548699.7809124,
+    "ast_hash": "263b5cc588b89dd22c4c1da045cdb310",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.20 PM (1).jpeg": {
+    "mtime": 1787548699.7819128,
+    "ast_hash": "c696e41247e7ce1e4d28d2a0f62802cc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.20 PM (2).jpeg": {
+    "mtime": 1787548699.7829132,
+    "ast_hash": "97f1655cbcd8bc7c2cee8fe4a85b5054",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.20 PM.jpeg": {
+    "mtime": 1787548699.7839122,
+    "ast_hash": "eef17493b5166ac9a8b1360913d9f2ac",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.21 PM (1).jpeg": {
+    "mtime": 1787548699.7849143,
+    "ast_hash": "d6043f72642bac33a7876802c8831985",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.21 PM (2).jpeg": {
+    "mtime": 1787548699.7859142,
+    "ast_hash": "35437c385cc78b06971c87cb1ed83f48",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.21 PM.jpeg": {
+    "mtime": 1787548699.7869139,
+    "ast_hash": "bb3a3f7d65eb47fc96116a82870693a5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.22 PM (1).jpeg": {
+    "mtime": 1787548699.8129199,
+    "ast_hash": "5a5c439632ad05b25b51f9ed0e46e97a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.22 PM (2).jpeg": {
+    "mtime": 1787548699.8139174,
+    "ast_hash": "33b0a956b0f4effd8b66713e85d5208a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.22 PM.jpeg": {
+    "mtime": 1787548699.8159177,
+    "ast_hash": "abaf49add1a9843f399e634a9a31801e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.23 PM (1).jpeg": {
+    "mtime": 1787548699.8169198,
+    "ast_hash": "50d474ecb8eb20d3c109f1d53c93476b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.23 PM (2).jpeg": {
+    "mtime": 1787548699.819919,
+    "ast_hash": "c3decf8b573aaf69515112365ada9f9d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.23 PM.jpeg": {
+    "mtime": 1787548699.8209207,
+    "ast_hash": "629adf26b24eace6953f6acfc240b0e0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.24 PM (1).jpeg": {
+    "mtime": 1787548699.82292,
+    "ast_hash": "578c495f8521daf7c918ea1176239064",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.24 PM (2).jpeg": {
+    "mtime": 1787548699.8239198,
+    "ast_hash": "8e1216d147c5c45328af182a44138c51",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.24 PM.jpeg": {
+    "mtime": 1787548699.8259208,
+    "ast_hash": "ea4f0297a1c403eebe642cb8b035c7a2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.25 PM (1).jpeg": {
+    "mtime": 1787548699.826921,
+    "ast_hash": "491969b73a2c704ac0f4e84af42d11da",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.25 PM (2).jpeg": {
+    "mtime": 1787548699.8279207,
+    "ast_hash": "51413ce7f0cae2e0ee507f20dd88cf6a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.25 PM.jpeg": {
+    "mtime": 1787548699.8289206,
+    "ast_hash": "bcacfd4a1917db3a04b9302120441185",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.26 PM (1).jpeg": {
+    "mtime": 1787548699.8299203,
+    "ast_hash": "71938378ec1225c095a6f8b555b992d3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.26 PM.jpeg": {
+    "mtime": 1787548699.8319201,
+    "ast_hash": "16dc2a38bcd1bed0059aed614bf7c154",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.27 PM (1).jpeg": {
+    "mtime": 1787548699.83292,
+    "ast_hash": "1c860a34ce30aa34b3402487182a0f96",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.27 PM (2).jpeg": {
+    "mtime": 1787548699.8339205,
+    "ast_hash": "b862bfef9a481c0b5323906ec98a8e22",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.27 PM (3).jpeg": {
+    "mtime": 1787548699.8359215,
+    "ast_hash": "98f25f4f9f2a6bf5bdf530e43aeb17ea",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.27 PM.jpeg": {
+    "mtime": 1787548699.8369217,
+    "ast_hash": "e8e94fa96feb2f9ada31ff5541365e3b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.28 PM (1).jpeg": {
+    "mtime": 1787548699.8379211,
+    "ast_hash": "95b31953a215fe78f80d6003dabb08d4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.28 PM (2).jpeg": {
+    "mtime": 1787548699.8389213,
+    "ast_hash": "4989e23f5ef2b261c2c59279b86701e2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.28 PM.jpeg": {
+    "mtime": 1787548699.839922,
+    "ast_hash": "826fb2fde440942f13fad3771d37e60c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.29 PM (1).jpeg": {
+    "mtime": 1787548699.8419213,
+    "ast_hash": "cd6712a3801f150af8c2c1ae6a285090",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.29 PM (2).jpeg": {
+    "mtime": 1787548699.8429227,
+    "ast_hash": "c09771c1a8c9b25c02909d87cb826b0c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.29 PM.jpeg": {
+    "mtime": 1787548699.8449223,
+    "ast_hash": "444562c277f5c6ac5c53f90b43286764",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.30 PM (1).jpeg": {
+    "mtime": 1787548699.8459215,
+    "ast_hash": "4765ce8412aa3c4c231ff5b931ee28b5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.30 PM.jpeg": {
+    "mtime": 1787548699.8469226,
+    "ast_hash": "0177814950e7e9d9fc3410748fef8f2a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.31 PM (1).jpeg": {
+    "mtime": 1787548699.8479218,
+    "ast_hash": "e1ed77262885db139c341721cea2c3f2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.31 PM (2).jpeg": {
+    "mtime": 1787548699.8489203,
+    "ast_hash": "b0250c06e4101405f32fdf9a9f641037",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.31 PM (3).jpeg": {
+    "mtime": 1787548699.8499222,
+    "ast_hash": "5be5e1d8dfcabd3fb4f0f857bba19125",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.31 PM.jpeg": {
+    "mtime": 1787548699.850922,
+    "ast_hash": "aa3df5c7ac26389fd1570d0f1d4c350d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.32 PM (1).jpeg": {
+    "mtime": 1787548699.851923,
+    "ast_hash": "8d0b9154dfa584edaaf7825eb8bbae4c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.32 PM (2).jpeg": {
+    "mtime": 1787548699.8529224,
+    "ast_hash": "492a9ae20e0cc9ef7d0ca714cb52e155",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.32 PM.jpeg": {
+    "mtime": 1787548699.853922,
+    "ast_hash": "a8abdc97f5c1c18db7ba59a338a0adaf",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.33 PM (1).jpeg": {
+    "mtime": 1787548699.8549213,
+    "ast_hash": "3f7729b3bbd50dd86a13f9e8fa0afc2f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.33 PM (2).jpeg": {
+    "mtime": 1787548699.8559234,
+    "ast_hash": "1dfe911b5660556830d4991c2dd50284",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.33 PM.jpeg": {
+    "mtime": 1787548699.856923,
+    "ast_hash": "6ee568862fbab7b094fc94a33f6d13c9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.34 PM (1).jpeg": {
+    "mtime": 1787548699.8579223,
+    "ast_hash": "596936fef6827f405436482055fba668",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.34 PM (2).jpeg": {
+    "mtime": 1787548699.8589225,
+    "ast_hash": "75985b3677d61f286510b11b2089f1bb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.34 PM.jpeg": {
+    "mtime": 1787548699.8599226,
+    "ast_hash": "ed25cf5bd03dafaa8e5e41f607989f99",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.35 PM (1).jpeg": {
+    "mtime": 1787548699.8599226,
+    "ast_hash": "b2585e8f2c4e20a1b33aca120af34f41",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.35 PM (2).jpeg": {
+    "mtime": 1787548699.8609223,
+    "ast_hash": "65bf194ec8bb7f6d1e9746d8e6431d16",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.35 PM.jpeg": {
+    "mtime": 1787548699.8619218,
+    "ast_hash": "8138f9f560d372256da57b954e4ee15f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.36 PM (1).jpeg": {
+    "mtime": 1787548699.8629227,
+    "ast_hash": "b8667266296bb6ddf3ebb0b772a8a1fd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.36 PM (2).jpeg": {
+    "mtime": 1787548699.8639233,
+    "ast_hash": "cf15ebeef5d7849fcb5d4bfc976d2f9b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.36 PM.jpeg": {
+    "mtime": 1787548699.8649232,
+    "ast_hash": "fe7a275fbd541bc9f4cffa5a09641bc7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.37 PM (1).jpeg": {
+    "mtime": 1787548699.8659232,
+    "ast_hash": "5c36f7f33f7fa3947a088b31331166a2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/pistol/WhatsApp Image 2026-03-21 at 5.06.37 PM.jpeg": {
+    "mtime": 1787548699.866925,
+    "ast_hash": "4cbf918881c861f528fcfa1e1edc4715",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.43 PM (1).jpeg": {
+    "mtime": 1787548699.866925,
+    "ast_hash": "a09b17553a6df5f875ee0f44c2ae9599",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.43 PM (2).jpeg": {
+    "mtime": 1787548699.8679247,
+    "ast_hash": "11b13345733b9b88ca9044f1ba79e929",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.43 PM.jpeg": {
+    "mtime": 1787548699.868923,
+    "ast_hash": "be4ce67dd241c490b3a7ed1914be1949",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.44 PM (1).jpeg": {
+    "mtime": 1787548699.869925,
+    "ast_hash": "1aa6a4f5aef4243d574ba6ca3d2479ce",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.44 PM (2).jpeg": {
+    "mtime": 1787548699.869925,
+    "ast_hash": "e33e87f8a14a0bcec20d362dc95cae1a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.44 PM (3).jpeg": {
+    "mtime": 1787548699.8709257,
+    "ast_hash": "df162d85de5d1b5b48af532da644ff83",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.44 PM.jpeg": {
+    "mtime": 1787548699.8719256,
+    "ast_hash": "a24e12ab1cb6c2a42f29df263351184a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.45 PM (1).jpeg": {
+    "mtime": 1787548699.8729248,
+    "ast_hash": "e1888dcf3046c29eb580eaf8b51ffa17",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.45 PM (2).jpeg": {
+    "mtime": 1787548699.873924,
+    "ast_hash": "89cf610a71235e8f739866fda9b2ad42",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.45 PM.jpeg": {
+    "mtime": 1787548699.873924,
+    "ast_hash": "f8f31ac6404ae68c5525b9cbe846f07e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.46 PM (1).jpeg": {
+    "mtime": 1787548699.8749237,
+    "ast_hash": "7910c31d58c941d4089ffc657521874a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.46 PM (2).jpeg": {
+    "mtime": 1787548699.8759246,
+    "ast_hash": "8bffd81892d685711226418302ffb56f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.46 PM.jpeg": {
+    "mtime": 1787548699.8759246,
+    "ast_hash": "035d655db116abac73a418fcd2818ade",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.47 PM (1).jpeg": {
+    "mtime": 1787548699.8769252,
+    "ast_hash": "2473fe364017278b50bca5107fabf763",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.47 PM (2).jpeg": {
+    "mtime": 1787548699.8779244,
+    "ast_hash": "24d818baa16e7fe5658360208f5ec120",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.47 PM.jpeg": {
+    "mtime": 1787548699.878925,
+    "ast_hash": "1bf702b2cdb16caab620ae5e0c2a38a3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.48 PM (1).jpeg": {
+    "mtime": 1787548699.8799243,
+    "ast_hash": "2e832ad5b2d992ed40ecbbe006eec32a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.48 PM (2).jpeg": {
+    "mtime": 1787548699.8799243,
+    "ast_hash": "28d459caa00ba86165d109d17d4ba235",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.48 PM.jpeg": {
+    "mtime": 1787548699.8809247,
+    "ast_hash": "d2375ec8210de54b9a8b14464c9ac99e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.49 PM (1).jpeg": {
+    "mtime": 1787548699.8819246,
+    "ast_hash": "c87bbea350bd90cac04325ce68e87993",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.49 PM (2).jpeg": {
+    "mtime": 1787548699.8819246,
+    "ast_hash": "e1fa9ab3c177c6be206f357d12d0ed6b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.49 PM.jpeg": {
+    "mtime": 1787548699.8829274,
+    "ast_hash": "de3f13f4210b2f71a7f10daaef8c2c7a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.50 PM (1).jpeg": {
+    "mtime": 1787548699.8839254,
+    "ast_hash": "01faeae316dfecd122ef7b007cc102b2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.50 PM (2).jpeg": {
+    "mtime": 1787548699.884927,
+    "ast_hash": "7652512d6c1cf4cec803233981959293",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.50 PM (3).jpeg": {
+    "mtime": 1787548699.8859277,
+    "ast_hash": "0b647d653962c3e89010c762d2c3a083",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.50 PM.jpeg": {
+    "mtime": 1787548699.8859277,
+    "ast_hash": "096e16bd653a5d6c1f7ccb87415bf593",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.51 PM (1).jpeg": {
+    "mtime": 1787548699.8869255,
+    "ast_hash": "305d2e03e0e09621e106e78e02855c73",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.51 PM (2).jpeg": {
+    "mtime": 1787548699.8879256,
+    "ast_hash": "ae20c408653a7f4d2e34b5590e9ca6c1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.51 PM.jpeg": {
+    "mtime": 1787548699.8879256,
+    "ast_hash": "06d24970091aa16a5ed11512a09e6553",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.52 PM (1).jpeg": {
+    "mtime": 1787548699.8889263,
+    "ast_hash": "8c0bac738cf1f6c0ed801691ef56d8ae",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.52 PM (2).jpeg": {
+    "mtime": 1787548699.889926,
+    "ast_hash": "2871655b29a89d62366e072726500c5a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.52 PM.jpeg": {
+    "mtime": 1787548699.8909297,
+    "ast_hash": "da25c76b34f6dfdd034eadda3af4d8b5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.53 PM (1).jpeg": {
+    "mtime": 1787548699.8921602,
+    "ast_hash": "4f60c431087fa5d003d30653dab385a5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.53 PM.jpeg": {
+    "mtime": 1787548699.8926926,
+    "ast_hash": "c107c109ad0ae852dabe563c408e585d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.54 PM (1).jpeg": {
+    "mtime": 1787548699.8937602,
+    "ast_hash": "42412e89c139017606ce554a02977e91",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.54 PM (2).jpeg": {
+    "mtime": 1787548699.8942833,
+    "ast_hash": "89efa1b86448f85b624abb8e00e4c29e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.54 PM (3).jpeg": {
+    "mtime": 1787548699.8953254,
+    "ast_hash": "976079faaafcc2428e03b90a9cbd3091",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.54 PM.jpeg": {
+    "mtime": 1787548699.8958466,
+    "ast_hash": "4c0795aa2f16ec1a032aba19cb111648",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.55 PM (1).jpeg": {
+    "mtime": 1787548699.8963668,
+    "ast_hash": "30ec783763d9f737f5a41a4a6dc474f3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.55 PM (2).jpeg": {
+    "mtime": 1787548699.8974297,
+    "ast_hash": "81adbe4087e561348cae2762dc128200",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.55 PM.jpeg": {
+    "mtime": 1787548699.8984773,
+    "ast_hash": "7d8c15ea1770b1e4ea390ae0b5102387",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.56 PM (1).jpeg": {
+    "mtime": 1787548699.8995323,
+    "ast_hash": "3bd99227cf7ebccadd46e30988d6123f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.56 PM (2).jpeg": {
+    "mtime": 1787548699.9005868,
+    "ast_hash": "b3972cbc8a5e5acab1eb14b3fc13b7fe",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.56 PM.jpeg": {
+    "mtime": 1787548699.9016378,
+    "ast_hash": "cdafdd13c526ae14bce61817bd5b3649",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.57 PM (1).jpeg": {
+    "mtime": 1787548699.9021626,
+    "ast_hash": "31d4aff974c2307560c808dea7f6fac0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.57 PM.jpeg": {
+    "mtime": 1787548699.9031992,
+    "ast_hash": "95ef4b37d83e6856b3d0f62e524b6701",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.58 PM (1).jpeg": {
+    "mtime": 1787548699.9037466,
+    "ast_hash": "09e955289d9b9fd0ebef8da305d318ea",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.58 PM (2).jpeg": {
+    "mtime": 1787548699.904266,
+    "ast_hash": "85ff255b8e07ba33f651cf3ff9cdb8b5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.58 PM.jpeg": {
+    "mtime": 1787548699.9052954,
+    "ast_hash": "5b58bdabdc6eeca314ddd672c7da0f17",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.59 PM (1).jpeg": {
+    "mtime": 1787548699.9058185,
+    "ast_hash": "7b9d449c2ac4713f807d77378f89d468",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.59 PM (2).jpeg": {
+    "mtime": 1787548699.9068582,
+    "ast_hash": "caf998cb54b06ee48d34b472ab39207b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.59 PM (3).jpeg": {
+    "mtime": 1787548699.9073794,
+    "ast_hash": "72b9ab000310b8ddc16f4de5f446c22d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 3.59.59 PM.jpeg": {
+    "mtime": 1787548699.9084203,
+    "ast_hash": "b5d62a3387b1273733baba23db037d68",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.00 PM (1).jpeg": {
+    "mtime": 1787548699.909462,
+    "ast_hash": "cfd3e9f6131efe725003a63123757b52",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.00 PM (2).jpeg": {
+    "mtime": 1787548699.910621,
+    "ast_hash": "153d1f8caa30db79635c0bee52ff4b6e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.00 PM.jpeg": {
+    "mtime": 1787548699.9111516,
+    "ast_hash": "00c8648a54eefc27b3c2f14fa3117c73",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.01 PM (1).jpeg": {
+    "mtime": 1787548699.9122047,
+    "ast_hash": "0dcfe5e9c9acdbf4316d3d3821b5edbb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.01 PM (2).jpeg": {
+    "mtime": 1787548699.9127543,
+    "ast_hash": "8f9129065a3dc89dcb523d30c8b5c0aa",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.01 PM.jpeg": {
+    "mtime": 1787548699.913818,
+    "ast_hash": "4c3ead4079a656b5f50d2aa3ac9729b0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.02 PM (1).jpeg": {
+    "mtime": 1787548699.9143465,
+    "ast_hash": "cf874c2426a9b009ea560533589f03a3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.02 PM (2).jpeg": {
+    "mtime": 1787548699.9149032,
+    "ast_hash": "1724983b38abbae2af3cd172dce13b7e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.02 PM (3).jpeg": {
+    "mtime": 1787548699.9159608,
+    "ast_hash": "9aa8eb967aae0e71a1f5f65ffb0a2bc6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.02 PM.jpeg": {
+    "mtime": 1787548699.91649,
+    "ast_hash": "91a92662270e16be14b2f47f6032a236",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.03 PM (1).jpeg": {
+    "mtime": 1787548699.9175477,
+    "ast_hash": "162d73e8a456c205172956439d1d9ec7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.03 PM (2).jpeg": {
+    "mtime": 1787548699.9180748,
+    "ast_hash": "3de1578c8cc4bca8e0466a1d434a4521",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.03 PM.jpeg": {
+    "mtime": 1787548699.9191358,
+    "ast_hash": "fa9b08a77b8dabb8f200269178dc7886",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.04 PM (1).jpeg": {
+    "mtime": 1787548699.9196608,
+    "ast_hash": "ac36b07e77244c0f60ddcee70d6c694f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.04 PM (2).jpeg": {
+    "mtime": 1787548699.9207172,
+    "ast_hash": "75a0f50656ed03a9bd481020fe248dfe",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.04 PM.jpeg": {
+    "mtime": 1787548699.9212441,
+    "ast_hash": "6f8f63d4fe07dc3a2d8493b4974b03a2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.05 PM (1).jpeg": {
+    "mtime": 1787548699.9222336,
+    "ast_hash": "b239583cd4d4f4ddb0ce5ee8e24a31f0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.05 PM (2).jpeg": {
+    "mtime": 1787548699.9222336,
+    "ast_hash": "49598e1e92340589fb97009f670863d6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.05 PM.jpeg": {
+    "mtime": 1787548699.9232368,
+    "ast_hash": "52ecb36a1bfcec1ad1c5d03b3565fc4e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.06 PM (1).jpeg": {
+    "mtime": 1787548699.9242368,
+    "ast_hash": "31717c61385894e1bc7aa357d284e47d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.06 PM (2).jpeg": {
+    "mtime": 1787548699.9252374,
+    "ast_hash": "b642b9b1c9e303cd597956a01409cb1b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.06 PM (3).jpeg": {
+    "mtime": 1787548699.9252374,
+    "ast_hash": "762e6caad9826f2937bf6c2633fb02b3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.06 PM.jpeg": {
+    "mtime": 1787548699.9262366,
+    "ast_hash": "2ec0040592b68641e1564a184f5086c4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.07 PM (1).jpeg": {
+    "mtime": 1787548699.9272375,
+    "ast_hash": "91ac6b095e049e7aaa5c5cdc5685c75e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.07 PM (2).jpeg": {
+    "mtime": 1787548699.9282343,
+    "ast_hash": "98a2690b828c9133af6157d2343cff40",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.07 PM.jpeg": {
+    "mtime": 1787548699.9292367,
+    "ast_hash": "d0d8f2b34453ce846048c2ea7e2d3fdb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.08 PM (1).jpeg": {
+    "mtime": 1787548699.9302363,
+    "ast_hash": "18f30f4975f1b7ab517ebb71d921c683",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.08 PM (2).jpeg": {
+    "mtime": 1787548699.9302363,
+    "ast_hash": "c59d8788e2e25943008ffc7489f6140a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.08 PM.jpeg": {
+    "mtime": 1787548699.9312346,
+    "ast_hash": "21fcc9c284f6b75ae9333f3c33b65d49",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.09 PM (1).jpeg": {
+    "mtime": 1787548699.932236,
+    "ast_hash": "0db355d2828bcc64573ca4690fc4b852",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.09 PM (2).jpeg": {
+    "mtime": 1787548699.933235,
+    "ast_hash": "340453653a9307726e06f3874cf19c4f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.09 PM.jpeg": {
+    "mtime": 1787548699.933235,
+    "ast_hash": "838bf167fcc75b78f2023b61aebabd9c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.10 PM (1).jpeg": {
+    "mtime": 1787548699.9342375,
+    "ast_hash": "2ec9fbab43a5f8b516b88fc32e26ef05",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.10 PM (2).jpeg": {
+    "mtime": 1787548699.9352386,
+    "ast_hash": "d69c81b93a636a88040461766c188847",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.10 PM.jpeg": {
+    "mtime": 1787548699.9362388,
+    "ast_hash": "0e6ed2a0f610e78b34745cc3167a8c24",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.11 PM (1).jpeg": {
+    "mtime": 1787548699.9362388,
+    "ast_hash": "14c26959591b1c7581df9dcefac94463",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.11 PM (2).jpeg": {
+    "mtime": 1787548699.9402368,
+    "ast_hash": "01f3c4662af40c425246d19db00cf3b9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.11 PM.jpeg": {
+    "mtime": 1787548699.9412396,
+    "ast_hash": "2683e8ff874abbc42f7584daed914eac",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.12 PM (1).jpeg": {
+    "mtime": 1787548699.9422376,
+    "ast_hash": "9710d505c7198211bcb586b647c81ee9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.12 PM (2).jpeg": {
+    "mtime": 1787548699.9422376,
+    "ast_hash": "a163114c2cb6a4d0854faacf8f9aa6a5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.12 PM.jpeg": {
+    "mtime": 1787548699.9432373,
+    "ast_hash": "6cb5030eaf86234b85bee5ffdae691e1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.13 PM (1).jpeg": {
+    "mtime": 1787548699.9442372,
+    "ast_hash": "3b38d778d6918177c8a02aa001b5e95e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 4.00.13 PM.jpeg": {
+    "mtime": 1787548699.9452581,
+    "ast_hash": "d3338b52079da1d70632fdacdd6de5a1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.08 PM.jpeg": {
+    "mtime": 1787548699.9452581,
+    "ast_hash": "3992d4762bfe5648d96be4c473755afc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.09 PM (1).jpeg": {
+    "mtime": 1787548699.9462576,
+    "ast_hash": "831f19353a12f584d230a867e8471d8a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.09 PM.jpeg": {
+    "mtime": 1787548699.9472587,
+    "ast_hash": "d04272d915b0ccce80608e2bb9917407",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.10 PM (1).jpeg": {
+    "mtime": 1787548699.948254,
+    "ast_hash": "f4a0b7edd460351aeb4634faf0061e51",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.10 PM (2).jpeg": {
+    "mtime": 1787548699.948254,
+    "ast_hash": "8f8262a039f5398b32d1b864016fd69a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.10 PM.jpeg": {
+    "mtime": 1787548699.9492538,
+    "ast_hash": "dbd9b2607f0af7a6b4ab5a9c2b458e89",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.11 PM (1).jpeg": {
+    "mtime": 1787548699.9502778,
+    "ast_hash": "cf63678f104a81ca2e9814ae86bdce1d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.11 PM (2).jpeg": {
+    "mtime": 1787548699.95132,
+    "ast_hash": "2280b587826d88520485c03186d87a4f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.11 PM.jpeg": {
+    "mtime": 1787548699.951838,
+    "ast_hash": "645ddbcaa21f395d1ab5e232aba4f48f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.12 PM (1).jpeg": {
+    "mtime": 1787548699.9523575,
+    "ast_hash": "57bbeec186fcee7aeafe848eb929f8e4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.12 PM (2).jpeg": {
+    "mtime": 1787548699.9533992,
+    "ast_hash": "2a132686904b30d9a2eac2b10ee1c28e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.12 PM.jpeg": {
+    "mtime": 1787548699.953915,
+    "ast_hash": "fd14cc1e9f03de064695bb60c2fed981",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.13 PM (1).jpeg": {
+    "mtime": 1787548699.9549642,
+    "ast_hash": "6c980859389123b8d8fc63c21df4b108",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.13 PM (2).jpeg": {
+    "mtime": 1787548699.9554825,
+    "ast_hash": "63701c825e2001fd1c56821a6755a39e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.13 PM.jpeg": {
+    "mtime": 1787548699.956539,
+    "ast_hash": "d868008464bd22ddf627df519d1fef84",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.14 PM (1).jpeg": {
+    "mtime": 1787548699.9570646,
+    "ast_hash": "6a4c4394581c5b69e290d16ab1d82a40",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.14 PM.jpeg": {
+    "mtime": 1787548699.958107,
+    "ast_hash": "5acdf10c6f3e8af57a51c55c3b0c3a2b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.15 PM (1).jpeg": {
+    "mtime": 1787548699.958633,
+    "ast_hash": "2ee2eed1c798a069f7360696e490ef27",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.15 PM (2).jpeg": {
+    "mtime": 1787548699.9597154,
+    "ast_hash": "61e88f28c771712844c106c569d7b15c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.15 PM.jpeg": {
+    "mtime": 1787548699.9603195,
+    "ast_hash": "3996c8329603d7feccb7fe0d94cd1e3f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.16 PM (1).jpeg": {
+    "mtime": 1787548699.9613721,
+    "ast_hash": "8bd7d94e0cb13b322730198bc2ce11c9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.16 PM (2).jpeg": {
+    "mtime": 1787548699.9618926,
+    "ast_hash": "e0f88328a999f7b7fbac2f38a917f468",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.16 PM.jpeg": {
+    "mtime": 1787548699.9624166,
+    "ast_hash": "0a556452131dce65498440694ffc1494",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.17 PM (1).jpeg": {
+    "mtime": 1787548699.9634635,
+    "ast_hash": "45222a02161739967a9138ff6558f0bc",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.17 PM (2).jpeg": {
+    "mtime": 1787548699.9639893,
+    "ast_hash": "d9434a9f2255305523672434d1264d90",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.17 PM.jpeg": {
+    "mtime": 1787548699.9650326,
+    "ast_hash": "d337de94c11d78add2dc2b598788c152",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.18 PM (1).jpeg": {
+    "mtime": 1787548699.9655561,
+    "ast_hash": "96b017af0c6231bbef5e86bde93eeb88",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.18 PM (2).jpeg": {
+    "mtime": 1787548699.9666204,
+    "ast_hash": "db1a2f67497ad4e4987006d04ff7278f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.18 PM.jpeg": {
+    "mtime": 1787548699.9671452,
+    "ast_hash": "f7856fea30616d476070837eb7736a1d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.19 PM (1).jpeg": {
+    "mtime": 1787548699.968179,
+    "ast_hash": "b841ca435657d504d02394a6c92a58af",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.19 PM.jpeg": {
+    "mtime": 1787548699.9691784,
+    "ast_hash": "bdc88b9aadc6b79f32d752400ef56872",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.20 PM (1).jpeg": {
+    "mtime": 1787548699.9691784,
+    "ast_hash": "a461226176084003feb98e184e8af7bb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.20 PM (2).jpeg": {
+    "mtime": 1787548699.9701786,
+    "ast_hash": "bc7f6bf211f03f9a1c72bf43f8513820",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.20 PM.jpeg": {
+    "mtime": 1787548699.9711773,
+    "ast_hash": "d6b42a06c7a573048b07f52686ef1c3a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.21 PM (1).jpeg": {
+    "mtime": 1787548699.972178,
+    "ast_hash": "890d31904aa08f30609b08e21304ab1f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.21 PM (2).jpeg": {
+    "mtime": 1787548699.972178,
+    "ast_hash": "105218fe6ba54cde1e891d7c20883660",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.21 PM.jpeg": {
+    "mtime": 1787548699.9731798,
+    "ast_hash": "ae19cac8b05aba3fed9dfb8d894cf0f3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.22 PM (1).jpeg": {
+    "mtime": 1787548699.9742887,
+    "ast_hash": "683f4eca89c46d8cf86081cadd85812c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.22 PM.jpeg": {
+    "mtime": 1787548699.9748163,
+    "ast_hash": "5ae641cea20bfea41a7fa128f0be89f9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.23 PM (1).jpeg": {
+    "mtime": 1787548699.9764307,
+    "ast_hash": "fdd189392e8712da6c3f1aa942c9de1b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.23 PM (2).jpeg": {
+    "mtime": 1787548699.9774706,
+    "ast_hash": "de30a6694ab456e11738b0ca78eda6b4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.23 PM.jpeg": {
+    "mtime": 1787548699.978025,
+    "ast_hash": "b1c7371eb7afc38645c609af32055005",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.24 PM (1).jpeg": {
+    "mtime": 1787548699.9790802,
+    "ast_hash": "2f5b6d48fc6da386bcc94095240c3e89",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.24 PM.jpeg": {
+    "mtime": 1787548699.979601,
+    "ast_hash": "8457c13e3b458049bb32435844833ac5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.25 PM (1).jpeg": {
+    "mtime": 1787548699.9801197,
+    "ast_hash": "4dd0a755503cea2843a51c98af2c8c05",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.25 PM (2).jpeg": {
+    "mtime": 1787548699.9811728,
+    "ast_hash": "1b44c2346fe54f8ed04da0fc3a44ccbb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.25 PM.jpeg": {
+    "mtime": 1787548699.9816952,
+    "ast_hash": "c2722b883b1ee4a04bbb42d3c092472e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.26 PM (1).jpeg": {
+    "mtime": 1787548699.9827352,
+    "ast_hash": "ae003a3bdce056a568d65f59b076dd3a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.26 PM (2).jpeg": {
+    "mtime": 1787548699.983258,
+    "ast_hash": "9b7645f3beb2691f5298a7d7dd87c536",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.26 PM.jpeg": {
+    "mtime": 1787548699.9842968,
+    "ast_hash": "73572e2d4c8979447c03da59789a6ae7",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.27 PM (1).jpeg": {
+    "mtime": 1787548699.984817,
+    "ast_hash": "6a095b0eb161ce378c457a9d53d5b011",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.27 PM.jpeg": {
+    "mtime": 1787548699.985864,
+    "ast_hash": "7622d6985ed18c3b8210742824da563d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.28 PM (1).jpeg": {
+    "mtime": 1787548699.9863844,
+    "ast_hash": "55a922298dbed11f043d66c14cf946d0",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.28 PM (2).jpeg": {
+    "mtime": 1787548699.9874434,
+    "ast_hash": "9057e159b628656aa1bd8b54da3846f5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.28 PM.jpeg": {
+    "mtime": 1787548699.988522,
+    "ast_hash": "11e98655dde317a761d752d610daa793",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.29 PM (1).jpeg": {
+    "mtime": 1787548699.989042,
+    "ast_hash": "151517068c7e2d0ae9b9dc887d3aba54",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.29 PM (2).jpeg": {
+    "mtime": 1787548699.9900815,
+    "ast_hash": "0a14c167b1a4c4c9c3f3b9f17190864d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.29 PM.jpeg": {
+    "mtime": 1787548699.9911594,
+    "ast_hash": "e255638205e7abb4a4ad26f95d752807",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.30 PM (1).jpeg": {
+    "mtime": 1787548699.9916809,
+    "ast_hash": "6d888d8838521aa68c001c3c4b98baa1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.30 PM.jpeg": {
+    "mtime": 1787548699.992746,
+    "ast_hash": "4e22df7b1a1391511f972f53ce8e0179",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.31 PM (1).jpeg": {
+    "mtime": 1787548699.9938037,
+    "ast_hash": "0a8ab9f54e01f1a2dadab41c9f3efc21",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.31 PM (2).jpeg": {
+    "mtime": 1787548699.9943416,
+    "ast_hash": "cdbd17c91b9677439cc20d0991113764",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.31 PM.jpeg": {
+    "mtime": 1787548699.9953918,
+    "ast_hash": "709bdeda6f0bc91004c0e2cc9c845e80",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.32 PM (1).jpeg": {
+    "mtime": 1787548699.9964368,
+    "ast_hash": "fe8b5a53c72709b3ec3459a7377fdc21",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.32 PM (2).jpeg": {
+    "mtime": 1787548699.996958,
+    "ast_hash": "388ae2904ad4c30c19e67ecbab82c17c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.32 PM.jpeg": {
+    "mtime": 1787548699.997475,
+    "ast_hash": "7b844b6a4386184341f8e25ceaeabbbf",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.33 PM (1).jpeg": {
+    "mtime": 1787548699.9985063,
+    "ast_hash": "d2ef738d962056e660498afa34ef7864",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.33 PM.jpeg": {
+    "mtime": 1787548699.9990287,
+    "ast_hash": "b79db747553b98f80db2c27116e3e451",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.34 PM (1).jpeg": {
+    "mtime": 1787548700.0000675,
+    "ast_hash": "2cba5d33e8b1b2fe90aa3a4f38e2eb33",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.34 PM (2).jpeg": {
+    "mtime": 1787548700.0011067,
+    "ast_hash": "2abc900ae34571f86c040220b7eb82e4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.34 PM.jpeg": {
+    "mtime": 1787548700.002154,
+    "ast_hash": "86a8a443cfabbf2074762709d2fc4b09",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.35 PM (1).jpeg": {
+    "mtime": 1787548700.0027215,
+    "ast_hash": "9ce6a8aecda76382a34fa56c90055782",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.35 PM (2).jpeg": {
+    "mtime": 1787548700.0027215,
+    "ast_hash": "0512c593388b94de672c8ff612af689e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.35 PM.jpeg": {
+    "mtime": 1787548700.0036676,
+    "ast_hash": "01fe0bd434a38ba10843ed6400864e61",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.36 PM (1).jpeg": {
+    "mtime": 1787548700.0046666,
+    "ast_hash": "069fa3bf2cd0ab2fc08f0afda63c3e56",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.36 PM (2).jpeg": {
+    "mtime": 1787548700.0056667,
+    "ast_hash": "d2cf8bcae5bcb698f3c27441d3b6c7fa",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.36 PM.jpeg": {
+    "mtime": 1787548700.0066671,
+    "ast_hash": "5d2359810a8b4becbbadd2b66f0fa60c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.37 PM (1).jpeg": {
+    "mtime": 1787548700.0076704,
+    "ast_hash": "13d2a68b9e420342ded7954d71454e62",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.37 PM.jpeg": {
+    "mtime": 1787548700.0086682,
+    "ast_hash": "1afe9e25a214da1d6af40cc0e90619d2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.38 PM (1).jpeg": {
+    "mtime": 1787548700.0096703,
+    "ast_hash": "269e00afe277014e3ac25d08a0542819",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.38 PM (2).jpeg": {
+    "mtime": 1787548700.0106692,
+    "ast_hash": "075eb11c7a4dd15e015b907df802e02a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.38 PM.jpeg": {
+    "mtime": 1787548700.011669,
+    "ast_hash": "c79ac9013164f07f5e26795944d20dad",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.39 PM (1).jpeg": {
+    "mtime": 1787548700.0126717,
+    "ast_hash": "a64eae1732cef08ea99335378fe92c61",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.39 PM (2).jpeg": {
+    "mtime": 1787548700.013673,
+    "ast_hash": "aedf8ed58aa18d633e09b7b95cf6a190",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.39 PM.jpeg": {
+    "mtime": 1787548700.0146694,
+    "ast_hash": "ea8df6157ff5cf6cbb53c217bf6fb56b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.40 PM (1).jpeg": {
+    "mtime": 1787548700.0146694,
+    "ast_hash": "ff262320720a76f066aa1878cb6ff154",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.40 PM.jpeg": {
+    "mtime": 1787548700.0156853,
+    "ast_hash": "5220c980f9f426ecd24a35e73de0a433",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.41 PM (1).jpeg": {
+    "mtime": 1787548700.0166857,
+    "ast_hash": "9d8981940e1dcfbb1dec3eba767f9980",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.41 PM (2).jpeg": {
+    "mtime": 1787548700.0176852,
+    "ast_hash": "3d46e8bae2c458672f283f9043e3b654",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.41 PM.jpeg": {
+    "mtime": 1787548700.0186882,
+    "ast_hash": "539bd0b8ab83482ef9e106410385a5c5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.42 PM (1).jpeg": {
+    "mtime": 1787548700.0193918,
+    "ast_hash": "23f3e4ca1c2109504f2e10d4cd64b157",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.42 PM.jpeg": {
+    "mtime": 1787548700.0199127,
+    "ast_hash": "ed709019a1972c0da615d0028697dac8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.43 PM (1).jpeg": {
+    "mtime": 1787548700.0209458,
+    "ast_hash": "41c441937f86d8314c42b95b16137e27",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.43 PM (2).jpeg": {
+    "mtime": 1787548700.021472,
+    "ast_hash": "252392782b877e8d2a17a668b7d48506",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.43 PM.jpeg": {
+    "mtime": 1787548700.0225177,
+    "ast_hash": "2fea5446e11daf7f73d4e4319c198e0c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.44 PM (1).jpeg": {
+    "mtime": 1787548700.0230362,
+    "ast_hash": "d167506086e5cd9284d7fa69c9ca533a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.44 PM (2).jpeg": {
+    "mtime": 1787548700.0240686,
+    "ast_hash": "b18bd6507f48698fcdef4609f7255bff",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.44 PM.jpeg": {
+    "mtime": 1787548700.024585,
+    "ast_hash": "0725e02a4990e0c615803b37e709c6ff",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.56.45 PM.jpeg": {
+    "mtime": 1787548700.0251062,
+    "ast_hash": "401261efc71dca694e3c2348e468210f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.10 PM (1).jpeg": {
+    "mtime": 1787548700.0261643,
+    "ast_hash": "a64bb30130618a7bb4f4ba6a59d9515f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.10 PM (2).jpeg": {
+    "mtime": 1787548700.0277696,
+    "ast_hash": "752dadc998b27d2daf8fd5f72d4c2079",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.10 PM.jpeg": {
+    "mtime": 1787548700.0287962,
+    "ast_hash": "a30dfd3f2efd271a8019182d675e66ab",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.11 PM (1).jpeg": {
+    "mtime": 1787548700.0293307,
+    "ast_hash": "e2191ce052ec444c75fb1d4de0c2b591",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.11 PM (2).jpeg": {
+    "mtime": 1787548700.030372,
+    "ast_hash": "a8b8e04b55f81b5e846b88d9a6aa96b8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.11 PM.jpeg": {
+    "mtime": 1787548700.0308964,
+    "ast_hash": "9a629dd50eda7483858c485b36110479",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.12 PM (1).jpeg": {
+    "mtime": 1787548700.0319364,
+    "ast_hash": "803374eb09948abeae98c2788a1fbc0c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.12 PM (2).jpeg": {
+    "mtime": 1787548700.0324528,
+    "ast_hash": "0f41960584da0139d5649aaa0fd102cd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.12 PM.jpeg": {
+    "mtime": 1787548700.0329742,
+    "ast_hash": "95a21f21a8f470af0c547be6cda3f9ac",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.13 PM (1).jpeg": {
+    "mtime": 1787548700.0340178,
+    "ast_hash": "63edd91f19eadfbda0d7e64bf9fbe0c6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.13 PM.jpeg": {
+    "mtime": 1787548700.0345755,
+    "ast_hash": "1c7edb871d6df0eca5d096ca2d68df5a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.14 PM (1).jpeg": {
+    "mtime": 1787548700.0356197,
+    "ast_hash": "f85168b499a4ffd620cf3bbf68c3f1f4",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.14 PM (2).jpeg": {
+    "mtime": 1787548700.0361378,
+    "ast_hash": "f4ac817ffb42f2dd14ecaf2bc98b4467",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.14 PM.jpeg": {
+    "mtime": 1787548700.037197,
+    "ast_hash": "60dc15abccc2fdcb3cafb60722edc61c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.15 PM (1).jpeg": {
+    "mtime": 1787548700.0382397,
+    "ast_hash": "38472bc2ba38ded153af5c6444c19132",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.15 PM (2).jpeg": {
+    "mtime": 1787548700.0387616,
+    "ast_hash": "becea8c5fe64d5694e7c976c16edc32e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.15 PM.jpeg": {
+    "mtime": 1787548700.0398054,
+    "ast_hash": "728b657313aba6df2df99d20ac7a5fdd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.16 PM (1).jpeg": {
+    "mtime": 1787548700.0403268,
+    "ast_hash": "14192f422cda87b0bb372682788aa3f1",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.16 PM.jpeg": {
+    "mtime": 1787548700.041362,
+    "ast_hash": "42943f43f64228298f6f1196b6180810",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.17 PM (1).jpeg": {
+    "mtime": 1787548700.041883,
+    "ast_hash": "fab8612208e716c15194a9e6c054e5d5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.17 PM (2).jpeg": {
+    "mtime": 1787548700.0429275,
+    "ast_hash": "f99d3433430e546a788eaab073ba177a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.17 PM.jpeg": {
+    "mtime": 1787548700.0434582,
+    "ast_hash": "5219d82520fdf2a9a3bedffd00e6eee2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.18 PM (1).jpeg": {
+    "mtime": 1787548700.044505,
+    "ast_hash": "4ec023fb696b2a56ee2a7e44068b4f99",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.18 PM.jpeg": {
+    "mtime": 1787548700.0450225,
+    "ast_hash": "296c2399d559158b879674e04fab6c17",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.19 PM (1).jpeg": {
+    "mtime": 1787548700.0460496,
+    "ast_hash": "b363ba448ca46e6f9d4013b99fdaac86",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.19 PM (2).jpeg": {
+    "mtime": 1787548700.0470495,
+    "ast_hash": "31e38311402b296241b55eda5fba427f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.19 PM.jpeg": {
+    "mtime": 1787548700.0470495,
+    "ast_hash": "4f24c104ab1a87ac11ee8f51b2ec4580",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.20 PM (1).jpeg": {
+    "mtime": 1787548700.0480492,
+    "ast_hash": "0e3e698df61bf5801f6ea4337ba60e37",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.20 PM.jpeg": {
+    "mtime": 1787548700.0490494,
+    "ast_hash": "813f6447d3f59489001132e48833f420",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.21 PM (1).jpeg": {
+    "mtime": 1787548700.0500498,
+    "ast_hash": "d6fbbbce126a3f27015f90e3340e9d7f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.21 PM.jpeg": {
+    "mtime": 1787548700.05105,
+    "ast_hash": "99102d9327d4a423877c32909555574c",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.22 PM (1).jpeg": {
+    "mtime": 1787548700.05105,
+    "ast_hash": "2211e05b3b2ac1a12b87349e24c7e415",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.22 PM (2).jpeg": {
+    "mtime": 1787548700.0520756,
+    "ast_hash": "0af8da0eb840327e1036a3e0b7277cd9",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.22 PM.jpeg": {
+    "mtime": 1787548700.0530522,
+    "ast_hash": "c77843e9992c9b1862e422f5c5d6f5e3",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.23 PM (1).jpeg": {
+    "mtime": 1787548700.0540497,
+    "ast_hash": "74a4d40f6baa89808ca14115dd436a7a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.23 PM.jpeg": {
+    "mtime": 1787548700.0550508,
+    "ast_hash": "22520dc847289328cb0d1e7e7f78d6f5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.24 PM (1).jpeg": {
+    "mtime": 1787548700.0550508,
+    "ast_hash": "cdf329265a2c3014668627dd2763f492",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.24 PM.jpeg": {
+    "mtime": 1787548700.0560508,
+    "ast_hash": "23ae1da863f1605ab75eac781309d724",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.25 PM (1).jpeg": {
+    "mtime": 1787548700.0570507,
+    "ast_hash": "2086e216734ed4afa4fb04675e706435",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.25 PM (2).jpeg": {
+    "mtime": 1787548700.0580506,
+    "ast_hash": "72fd6efb882a34fd6e3042b8b85a5f62",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.25 PM.jpeg": {
+    "mtime": 1787548700.0580506,
+    "ast_hash": "c7ac978aafe9b664d4e32fc972c28812",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.26 PM (1).jpeg": {
+    "mtime": 1787548700.0590525,
+    "ast_hash": "c4d21f76e4d2b8bb1eb9f52caf9884de",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.26 PM.jpeg": {
+    "mtime": 1787548700.0600553,
+    "ast_hash": "843eb09027452c38ae1efd9faae51c1b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.27 PM (1).jpeg": {
+    "mtime": 1787548700.0610528,
+    "ast_hash": "5d7227a9296b57980c923f93663c162d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.27 PM (2).jpeg": {
+    "mtime": 1787548700.0620515,
+    "ast_hash": "5ad63bf07fb5157a0159e161957726a8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.27 PM.jpeg": {
+    "mtime": 1787548700.0633574,
+    "ast_hash": "5a363d5b2b7c6daf849c8730ea7cc396",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.28 PM (1).jpeg": {
+    "mtime": 1787548700.063885,
+    "ast_hash": "ddecdc67105365b7bec0f054c98ef64f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.28 PM.jpeg": {
+    "mtime": 1787548700.0649238,
+    "ast_hash": "6d614d2072339d90b98345a31a3c74a2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.29 PM (1).jpeg": {
+    "mtime": 1787548700.0654442,
+    "ast_hash": "7419ee525d7e3bbe4d9b5b4d6e68a4ab",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.29 PM.jpeg": {
+    "mtime": 1787548700.0664835,
+    "ast_hash": "825af60be78683fee80a63b15185d695",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.30 PM (1).jpeg": {
+    "mtime": 1787548700.0680723,
+    "ast_hash": "063abd84fe7531cbaffeaa592f8ca2bd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.30 PM (2).jpeg": {
+    "mtime": 1787548700.068601,
+    "ast_hash": "41c9d2b905905bfd0139194fb649f591",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.30 PM.jpeg": {
+    "mtime": 1787548700.0696476,
+    "ast_hash": "3f5ba0727b7042975975411cce0c1093",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.31 PM (1).jpeg": {
+    "mtime": 1787548700.0701778,
+    "ast_hash": "5e64ec60aeb5b6700d42f6694188297b",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.31 PM.jpeg": {
+    "mtime": 1787548700.071227,
+    "ast_hash": "a31fb75672adbfcb42bf5fb0f99c6f46",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.32 PM (1).jpeg": {
+    "mtime": 1787548700.0717528,
+    "ast_hash": "818f09b932625b110dc2b6a6c70908f6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.32 PM (2).jpeg": {
+    "mtime": 1787548700.0728016,
+    "ast_hash": "7d0f8c91c9345553db2b3c28520f96c5",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.32 PM.jpeg": {
+    "mtime": 1787548700.1006014,
+    "ast_hash": "bdccaa6859a776da299d947e7eae25cb",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.33 PM (1).jpeg": {
+    "mtime": 1787548700.101602,
+    "ast_hash": "7d40ab75be84333f272fbe0d5f4e832d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.33 PM.jpeg": {
+    "mtime": 1787548700.101602,
+    "ast_hash": "6422c7d3b034471c8a610ba8f91181db",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.34 PM (1).jpeg": {
+    "mtime": 1787548700.1026018,
+    "ast_hash": "27786127470cf7ff7fd8c7b42b967dac",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.34 PM (2).jpeg": {
+    "mtime": 1787548700.1036048,
+    "ast_hash": "653be8fe79b93b5c46096906430f4679",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.34 PM.jpeg": {
+    "mtime": 1787548700.104602,
+    "ast_hash": "ec91e8f79418bdce6b61580e06b1e977",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.35 PM (1).jpeg": {
+    "mtime": 1787548700.1056018,
+    "ast_hash": "ed5f67ff245c9c945ea8624b8cf8b7f8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.35 PM.jpeg": {
+    "mtime": 1787548700.106605,
+    "ast_hash": "d2231c355570444ef3d51788b063f0cd",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.36 PM (1).jpeg": {
+    "mtime": 1787548700.1076057,
+    "ast_hash": "b28a9f372dd042c416435eab0a08cb50",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.36 PM.jpeg": {
+    "mtime": 1787548700.1076057,
+    "ast_hash": "b38df913e5abf382d6a778bd3abb8faa",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.37 PM (1).jpeg": {
+    "mtime": 1787548700.1086268,
+    "ast_hash": "fce99bd9f95022be4d4f5d92f589ba3f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.37 PM (2).jpeg": {
+    "mtime": 1787548700.1096787,
+    "ast_hash": "1dcd98c42c30f01830e8cb876d8b7374",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.37 PM.jpeg": {
+    "mtime": 1787548700.1102078,
+    "ast_hash": "1d2bf795409aedffb0fdb48b36a6344a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.38 PM (1).jpeg": {
+    "mtime": 1787548700.1112537,
+    "ast_hash": "d0b61b1ebe0b0708b0ec2284a98d3b73",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.38 PM (2).jpeg": {
+    "mtime": 1787548700.1122975,
+    "ast_hash": "6e0e7fd929d0c4c121ee47eb5123ed23",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.38 PM.jpeg": {
+    "mtime": 1787548700.1128209,
+    "ast_hash": "2e01356e6eae2543df5338722a3e755d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.39 PM (1).jpeg": {
+    "mtime": 1787548700.1166897,
+    "ast_hash": "72471693c2f5f33190844d10165b3fda",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.39 PM.jpeg": {
+    "mtime": 1787548700.1177678,
+    "ast_hash": "6eff29030f8992821634f6d12420314d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.40 PM (1).jpeg": {
+    "mtime": 1787548700.1182957,
+    "ast_hash": "7f384632caaa7cae4d5c4386a971805e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.40 PM.jpeg": {
+    "mtime": 1787548700.1193547,
+    "ast_hash": "7e370a007976cee887fca3b7ae835c9f",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.41 PM (1).jpeg": {
+    "mtime": 1787548700.1198623,
+    "ast_hash": "865bdcc68a4e173d05cf707618edbf63",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.41 PM.jpeg": {
+    "mtime": 1787548700.1208737,
+    "ast_hash": "ef6e60df8d9c97a9881326e056189794",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.42 PM (1).jpeg": {
+    "mtime": 1787548700.1208737,
+    "ast_hash": "af236de47ce217d8fd5ee1a9d3da6d60",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.42 PM (2).jpeg": {
+    "mtime": 1787548700.121874,
+    "ast_hash": "d82106ec0f3de17f45e6c57ee539919d",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.42 PM.jpeg": {
+    "mtime": 1787548700.1228724,
+    "ast_hash": "1a19c89036577adb93598d8cde75c01e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.43 PM (1).jpeg": {
+    "mtime": 1787548700.123874,
+    "ast_hash": "20bd1793a2a27b5213ff5c4b44708e73",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.43 PM.jpeg": {
+    "mtime": 1787548700.1247385,
+    "ast_hash": "ca9012854b477d8b6d4df8814c1195c8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.44 PM (1).jpeg": {
+    "mtime": 1787548700.1252651,
+    "ast_hash": "545756b2b8d424f3f1a41b28d1f001f2",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.44 PM (2).jpeg": {
+    "mtime": 1787548700.126311,
+    "ast_hash": "e77a780cfc635bea02180f1da40446db",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.44 PM.jpeg": {
+    "mtime": 1787548700.12738,
+    "ast_hash": "e2766d6449f3d5a417971997a3318aa6",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.45 PM (1).jpeg": {
+    "mtime": 1787548700.1284204,
+    "ast_hash": "18f78bce5f172d0564d839c497b45c12",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.45 PM.jpeg": {
+    "mtime": 1787548700.1289446,
+    "ast_hash": "0c774e33afce3cd9e1f2fdef167fbbb8",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.46 PM (1).jpeg": {
+    "mtime": 1787548700.1300137,
+    "ast_hash": "1d47590cf33f3c607480bcca22a85589",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.46 PM (2).jpeg": {
+    "mtime": 1787548700.1310647,
+    "ast_hash": "633bfdb64346aaa965461fc165feb99e",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.46 PM.jpeg": {
+    "mtime": 1787548700.131587,
+    "ast_hash": "1e4ce7baba9d18575d3b704410df2914",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.47 PM (1).jpeg": {
+    "mtime": 1787548700.1326344,
+    "ast_hash": "09feb1e15a9e2e2247d6f22317a94507",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.47 PM.jpeg": {
+    "mtime": 1787548700.1331692,
+    "ast_hash": "7d500a582a3a75285254b54758acb2cf",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.48 PM (1).jpeg": {
+    "mtime": 1787548700.1342173,
+    "ast_hash": "fcf4aee93ec41ae225e13cc773fa676a",
+    "semantic_hash": ""
+  },
+  "shooting/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.48 PM.jpeg": {
+    "mtime": 1787548700.1347494,
+    "ast_hash": "15457f848d4570d1ac709b20286ae712",
+    "semantic_hash": ""
+  }
+}

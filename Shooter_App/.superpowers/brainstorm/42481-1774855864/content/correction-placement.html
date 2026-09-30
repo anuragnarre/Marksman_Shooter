@@ -1,0 +1,78 @@
+<h2>Where should shot correction live?</h2>
+<p class="subtitle">This decides the scope and user flow for the edit feature</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0E1118;padding:12px;border-radius:6px;font-family:monospace;font-size:11px">
+      <div style="background:#161B26;border-radius:4px;padding:8px;margin-bottom:6px;color:#F5A623;font-weight:bold">📷 Photo Analysis Flow</div>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <div style="flex:1;background:#0a0d14;border-radius:4px;padding:6px">
+          <div style="color:#4FC3F7;font-size:10px;margin-bottom:4px">Target photo + overlays</div>
+          <div style="width:100%;height:70px;background:#1a2030;border-radius:3px;border:1px solid #2a3448;display:flex;align-items:center;justify-content:center;color:#4a5568;font-size:10px">🎯 photo + detected dots</div>
+          <div style="display:flex;gap:3px;margin-top:4px">
+            <div style="flex:1;background:#1e2a1e;border:1px solid #00E5A0;border-radius:2px;padding:2px 4px;color:#00E5A0;font-size:9px;text-align:center">✓ Save shots</div>
+            <div style="flex:1;background:#1e1a1a;border:1px solid #FF4D6D;border-radius:2px;padding:2px 4px;color:#FF4D6D;font-size:9px;text-align:center">✗ Discard</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;padding-top:20px">
+          <div style="background:#161B26;border-radius:3px;padding:3px 6px;color:#aaa;font-size:9px">↕ drag shots</div>
+          <div style="background:#161B26;border-radius:3px;padding:3px 6px;color:#aaa;font-size:9px">+ add missed</div>
+          <div style="background:#161B26;border-radius:3px;padding:3px 6px;color:#aaa;font-size:9px">× remove false</div>
+        </div>
+      </div>
+      <div style="color:#6B7280;font-size:9px;margin-top:6px">Review & correct → then save</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Correct before saving</h3>
+      <p>After vision analysis, show an interactive overlay on the original photo. Drag/add/remove before the shots are persisted to the session.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0E1118;padding:12px;border-radius:6px;font-family:monospace;font-size:11px">
+      <div style="background:#161B26;border-radius:4px;padding:8px;margin-bottom:6px;color:#F5A623;font-weight:bold">📋 Session Detail Page</div>
+      <div style="display:flex;gap:6px">
+        <div style="flex:2;background:#0a0d14;border-radius:4px;padding:6px">
+          <div style="color:#4FC3F7;font-size:10px;margin-bottom:4px">TargetCanvas</div>
+          <div style="width:100%;height:70px;background:#1a2030;border-radius:3px;border:1px solid #2a3448;display:flex;align-items:center;justify-content:center;color:#4a5568;font-size:10px">🎯 ring diagram + editable dots</div>
+          <div style="background:#161B26;border:1px solid #F5A623;border-radius:2px;padding:2px 4px;color:#F5A623;font-size:9px;text-align:center;margin-top:4px">✎ Edit mode toggle</div>
+        </div>
+        <div style="flex:1;background:#0a0d14;border-radius:4px;padding:6px">
+          <div style="color:#aaa;font-size:9px;margin-bottom:3px">Shot list</div>
+          <div style="background:#161B26;border-radius:2px;padding:2px 4px;color:#aaa;font-size:8px">1 — 10.5</div>
+          <div style="background:#1e1a1a;border:1px solid #FF4D6D;border-radius:2px;padding:2px 4px;color:#FF4D6D;font-size:8px">2 — 8.1 ✗</div>
+          <div style="background:#161B26;border-radius:2px;padding:2px 4px;color:#aaa;font-size:8px">3 — 9.8</div>
+        </div>
+      </div>
+      <div style="color:#6B7280;font-size:9px;margin-top:6px">Edit already-saved shots from session view</div>
+    </div>
+    <div class="card-body">
+      <h3>B — Edit from session detail</h3>
+      <p>Add an "Edit" mode to the session page. Toggle it to drag shots on the ring diagram, or delete/add from the shot table. Edits update the saved records.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0E1118;padding:12px;border-radius:6px;font-family:monospace;font-size:11px">
+      <div style="background:#161B26;border-radius:4px;padding:8px;margin-bottom:6px;color:#F5A623;font-weight:bold">🔁 Both</div>
+      <div style="display:flex;gap:4px">
+        <div style="flex:1;background:#0a0d14;border-radius:3px;padding:4px;border:1px solid #4FC3F7">
+          <div style="color:#4FC3F7;font-size:8px">After photo analysis</div>
+          <div style="color:#888;font-size:8px;margin-top:2px">correct → save</div>
+        </div>
+        <div style="color:#888;font-size:10px;align-self:center">+</div>
+        <div style="flex:1;background:#0a0d14;border-radius:3px;padding:4px;border:1px solid #00E5A0">
+          <div style="color:#00E5A0;font-size:8px">Session detail</div>
+          <div style="color:#888;font-size:8px;margin-top:2px">edit anytime</div>
+        </div>
+      </div>
+      <div style="color:#6B7280;font-size:9px;margin-top:6px">Full correction capability at both stages</div>
+    </div>
+    <div class="card-body">
+      <h3>C — Both stages</h3>
+      <p>Correction canvas in the photo analysis flow <em>and</em> edit mode on the session page. Most flexible but more work to build.</p>
+    </div>
+  </div>
+
+</div>

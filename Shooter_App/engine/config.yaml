@@ -1,0 +1,98 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Marksman Range Engine — Hardware Configuration
+# Deploy this file on the range PC / Raspberry Pi / ESP32-CAM host.
+# Copy this file to engine/config.yaml and edit for your setup.
+# ─────────────────────────────────────────────────────────────────────────────
+
+engine:
+  # Unique ID for this range station (matches rangeId in the Marksman app)
+  range_id: "range-station-01"
+
+  # Human-readable name shown in the web dashboard
+  range_name: "Indoor 10m Lane 1"
+
+camera:
+  # Source options:
+  #   0, 1, 2 ...     USB webcam index (0 = default)
+  #   /dev/video0      Linux device path
+  #   http://192.168.x.x/video   ESP32-CAM MJPEG stream URL
+  #   rtsp://...      RTSP stream from IP camera
+  source: 0
+
+  # Resolution to request from the camera (actual may differ)
+  width: 1280
+  height: 720
+
+  # Frames per second for capture loop (5-15 recommended for analysis)
+  fps: 10
+
+  # Camera model for lens distortion correction: esp32 | android | none
+  camera_type: "none"
+
+  # If using ESP32-CAM over Wi-Fi, set the base URL here
+  # esp32_url: "http://192.168.1.100"
+
+target:
+  # Target type for scoring — must match one of the supported types:
+  #   air_rifle_10m | air_pistol_10m | air_rifle_50m | nr_50m | nr_25m
+  #   issf_300m_rifle | nra_b8_25yd | airgun_multi_bull | field_target_ft
+  type: "air_rifle_10m"
+
+  # Optional: capture an empty baseline image at startup for temporal differencing
+  # This greatly improves detection accuracy. Set to true for best results.
+  capture_baseline_on_start: true
+
+  # Seconds to wait after target placed before capturing baseline
+  baseline_delay_seconds: 3
+
+detection:
+  # Mode: continuous (analyse every N frames) | on_demand (triggered via API)
+  mode: "continuous"
+
+  # Analyse every Nth frame (skip frames to control CPU load)
+  # At 10 FPS, analyse_every=2 → ~5 analyses/second
+  analyse_every_n_frames: 2
+
+  # Minimum confidence to accept a shot detection (0.0 – 1.0)
+  min_shot_confidence: 0.4
+
+  # Debounce: ignore duplicate shots within this radius (mm from centre)
+  dedup_radius_mm: 3.0
+
+  # After detecting a shot, pause this many seconds before next analysis
+  # Prevents same hole being double-counted across frames
+  post_shot_pause_seconds: 1.5
+
+api:
+  # URL of the Marksman NestJS API server
+  url: "http://localhost:3001"
+
+  # API key or JWT token for authenticating engine requests
+  # Generate a long-lived token in the Marksman admin panel
+  # Leave empty to run without auth (local dev only)
+  api_key: ""
+
+  # WebSocket: the engine joins the live_range:{range_id} room
+  ws_url: "http://localhost:3001"
+
+  # Session to log shots against (can be set via API or command line)
+  # Leave empty to create a new session automatically
+  session_id: ""
+
+vision_service:
+  # URL of the FastAPI vision engine
+  # Default: same machine. Override if running vision on a different host.
+  url: "http://localhost:8000"
+
+stream:
+  # MJPEG preview stream — the web app subscribes to this for live preview
+  enabled: true
+  host: "0.0.0.0"
+  port: 8001
+
+  # Overlay detected shot positions on the MJPEG preview
+  draw_detections: true
+
+logging:
+  level: "INFO"   # DEBUG | INFO | WARNING | ERROR
+  log_file: ""    # Leave empty to log to stdout only

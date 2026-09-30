@@ -1,0 +1,933 @@
+"""
+Bullet-hole detection using disc-convolution matched filter.
+
+Approach (reverse-engineered from TargetScan):
+  1. Inpaint ring numbers at known cardinal positions (prevents false positives)
+  2. Build signal image:
+       - Black zone  → subtract dark background   → bright = light-through-hole
+       - Cream zone  → subtract from cream median → bright = dark-hole-in-cream
+  3. Convolve with a filled disc kernel of visible_hole_radius
+     (matched filter: peak response = circular signal of right size)
+  4. Find peaks in the accumulator via greedy NMS
+  5. Deduplicate across zones; remove ring-arc artefacts
+"""
+
+import math
+from typing import List, Optional, Tuple
+
+import cv2
+import numpy as np
+
+from .types import FusedHole, TargetCalibration
+
+
+# ─── public API ────────────────────────────────────────────────────────────────
+
+def detect_holes(
+    gray: np.ndarray,
+    calibration: TargetCalibration,
+    pellet_diameter_mm: float = 4.5,
+    diff_img: Optional[np.ndarray] = None,
+    dark_center_rings: int = 5,
+    target_type: str = "air_rifle_10m",
+) -> List[FusedHole]:
+    """Detect bullet holes using disc-convolution matched filter."""
+    cx, cy = calibration.center
+    radius = calibration.major_radius
+
+    if radius < 10:
+        return []
+
+    h, w = gray.shape[:2]
+    target_mask = _circle_mask(h, w, cx, cy, radius * 1.02)
+
+    # ── Scale calibration ──────────────────────────────────────────────────────
+    mm_per_pixel = calibration.mm_per_pixel
+    if mm_per_pixel < 0.005 or mm_per_pixel > 5.0:
+        from .target_specs import get_spec as _get_spec_fallback
+        _fallback_spec = _get_spec_fallback(target_type)
+        mm_per_pixel = _fallback_spec.outer_radius_mm / max(radius, 1)
+
+    pellet_radius_px = (pellet_diameter_mm / 2.0) / mm_per_pixel
+    pellet_radius_px = max(4.0, pellet_radius_px)
+
+    # Visible hole radius in each zone
+    # Black zone: torn paper → bright disc, visible ≈ 45% of physical pellet radius
+    # Cream zone: dark patch, visible ≈ 30% of physical pellet radius
+    visible_r_black = max(4.0, pellet_radius_px * 0.45)
+    visible_r_cream = max(4.0, pellet_radius_px * 0.30)
+
+    from .target_specs import get_spec as _get_spec_hd
+    _spec_hd = _get_spec_hd(target_type)
+    ring_width_px = _spec_hd.ring_width_mm / mm_per_pixel
+
+    # Ring boundary radii (for inpainting + filtering)
+    ring_radii_px = list(calibration.ring_radii)
+    if not ring_radii_px:
+        ring_radii_px = [_spec_hd.ring_radius_mm(n) / mm_per_pixel for n in range(1, _spec_hd.num_rings + 1)]
+
+    # ── Find black centre zone ─────────────────────────────────────────────────
+    # Compute the expected black/cream boundary fraction from the spec so the
+    # fallback inside _find_black_zone is accurate for all target types.
+    # Formula: black zone radius = outer_radius - dark_center_rings * ring_width
+    # Fraction relative to outer_radius gives the hint for the pixel space fallback.
+    _hint_fraction = (
+        (_spec_hd.outer_radius_mm - _spec_hd.dark_center_rings * _spec_hd.ring_width_mm)
+        / _spec_hd.outer_radius_mm
+    )
+    black_zone, black_radius = _find_black_zone(
+        gray, cx, cy, radius, target_mask, ring_width_px, dark_center_rings,
+        hint_fraction=_hint_fraction)
+    cream_zone = target_mask & ~black_zone
+
+    # ── Erode zone edges to avoid ring-boundary contamination ─────────────────
+    ek_b = max(3, int(visible_r_black * 0.30)) | 1
+    ek_c = max(3, int(visible_r_cream * 0.30)) | 1
+    black_roi = cv2.erode(black_zone.astype(np.uint8) * 255,
+                          cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ek_b, ek_b))) > 0
+    cream_roi = cv2.erode(cream_zone.astype(np.uint8) * 255,
+                          cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ek_c, ek_c))) > 0
+
+    # ── Inpaint ring numbers BEFORE detection ─────────────────────────────────
+    gray_clean = _inpaint_ring_features(gray, cx, cy, ring_radii_px, ring_width_px, black_radius)
+
+    # ── Fill ALL ring boundary lines (both zones) ──────────────────────────────
+    # Black zone: white ring arcs → fill with local dark background
+    # Cream zone: dark ring arcs → fill with local cream background
+    # Both detectors use gray_filled so neither sees ring lines as holes.
+    gray_filled = _fill_ring_lines(gray_clean, cx, cy, ring_radii_px, ring_width_px, black_radius)
+
+    # ── Detect holes via multi-scale disc convolution ─────────────────────────
+    candidates: List[FusedHole] = []
+
+    # Always run BOTH polarity modes for the black zone and merge.
+    #
+    # Rationale: CLAHE applied to dark/dim images dramatically raises the black
+    # zone median (e.g. raw p50=56 → post-CLAHE bz_med=193).  A threshold on
+    # the CLAHE image is unreliable: a "bright" post-CLAHE median does NOT mean
+    # holes are darker than surroundings — holes in the dark-ink zone are still
+    # lighter than the ink after CLAHE.  Running both modes costs one extra pass
+    # (< 20 ms on 1000-px images) and the dedup step merges duplicates.
+    _bz_ring_sup = visible_r_black * 0.30
+    _h_bright = _detect_disc_multiscale(
+        gray_filled, black_roi, cx, cy,
+        visible_r_black, pellet_radius_px, bright=True,
+        ring_radii_px=ring_radii_px,
+        ring_suppress_px=_bz_ring_sup,
+        diff_img=diff_img,
+    )
+    _h_dark = _detect_disc_multiscale(
+        gray_filled, black_roi, cx, cy,
+        visible_r_black, pellet_radius_px, bright=False,
+        ring_radii_px=ring_radii_px,
+        ring_suppress_px=_bz_ring_sup,
+        diff_img=diff_img,
+    )
+    holes_black = _deduplicate(_h_bright + _h_dark, visible_r_black * 0.8)
+    candidates.extend(holes_black)
+
+    # Ring suppression not needed: ring lines are already filled in gray_filled
+    holes_cream = _detect_disc_multiscale(
+        gray_filled, cream_roi, cx, cy,
+        visible_r_cream, pellet_radius_px, bright=False,
+        ring_radii_px=ring_radii_px,
+        ring_suppress_px=0.0,
+        diff_img=diff_img,
+    )
+    candidates.extend(holes_cream)
+
+    # ── Centre exclusion (printed 10-ring dot) ─────────────────────────────────
+    centre_excl = max(visible_r_black * 0.4, black_radius * 0.015)
+    candidates = [
+        c for c in candidates
+        if math.sqrt((c.x - cx) ** 2 + (c.y - cy) ** 2) > centre_excl
+    ]
+
+    # ── Deduplicate ────────────────────────────────────────────────────────────
+    merge_r = min(visible_r_black, visible_r_cream)
+    candidates = _deduplicate(candidates, merge_r)
+
+    # ── Boundary filter ────────────────────────────────────────────────────────
+    if ring_radii_px:
+        outer_r = ring_radii_px[0]  # ring 1 outer edge in pixels
+    else:
+        outer_r = radius
+    max_dist_sq = outer_r ** 2
+    candidates = [
+        c for c in candidates
+        if (c.x - cx) ** 2 + (c.y - cy) ** 2 <= max_dist_sq
+    ]
+
+    # ── Remove ring-arc patterns ───────────────────────────────────────────────
+    candidates = _filter_ring_artifacts(
+        candidates, cx, cy, min(visible_r_black, visible_r_cream),
+        ring_radii_px=ring_radii_px, ring_width_px=ring_width_px,
+        black_radius=black_radius,
+    )
+
+    return candidates
+
+
+# ─── zone helpers ──────────────────────────────────────────────────────────────
+
+def _circle_mask(h: int, w: int, cx: float, cy: float, r: float) -> np.ndarray:
+    yy, xx = np.ogrid[:h, :w]
+    return ((xx - cx) ** 2 + (yy - cy) ** 2) <= r ** 2
+
+
+def _find_black_zone(
+    gray: np.ndarray, cx: float, cy: float, radius: float,
+    target_mask: np.ndarray,
+    ring_width_px: float = 0.0,
+    dark_center_rings: int = 5,
+    hint_fraction: float = 0.50,
+) -> Tuple[np.ndarray, float]:
+    """
+    Locate the filled black centre zone.
+
+    Strategy: build a radial median brightness profile, then find the radius
+    where the profile first crosses from dark to cream.  The black/cream
+    boundary is the SUSTAINED brightness transition, not a single peak in the
+    gradient (which always picks an inner ring-line spike instead).
+
+    The search is anchored to the spec range [0.45, 0.70] × radius so that
+    inner ring-line transitions (at ~0.35–0.45 × r) cannot be mistaken for
+    the real black/cream boundary.
+    """
+    h, w = gray.shape[:2]
+    max_r = int(radius)
+    if max_r < 10:
+        return np.zeros((h, w), dtype=bool), 0.0
+
+    angles = np.linspace(0, 2 * np.pi, 72, endpoint=False)   # denser sampling
+    radii  = np.arange(0, max_r)
+    cos_a  = np.cos(angles)[:, None]
+    sin_a  = np.sin(angles)[:, None]
+    r_arr  = radii[None, :]
+    px_arr = np.clip((cx + r_arr * cos_a).astype(int), 0, w - 1)
+    py_arr = np.clip((cy + r_arr * sin_a).astype(int), 0, h - 1)
+    profile = np.median(gray[py_arr, px_arr].astype(np.float64), axis=0)
+
+    # Smooth the profile to suppress ring-line spikes (σ ≈ half a ring width)
+    smooth_k = max(5, int(ring_width_px * 0.5) | 1)
+    profile_s = np.convolve(profile, np.ones(smooth_k) / smooth_k, mode='same')
+
+    # Brightness threshold: midpoint between inner dark level and outer cream level
+    inner_dark  = float(np.median(profile_s[:max(1, int(max_r * 0.30))]))
+    outer_cream = float(np.median(profile_s[int(max_r * 0.70):]))
+    mid_thresh  = inner_dark + 0.45 * (outer_cream - inner_dark)
+
+    # Search for the first SUSTAINED crossing of mid_thresh in the plausible boundary zone.
+    # "Sustained" = ≥3 consecutive pixels above threshold: this skips single-pixel
+    # shot-hole spikes (which briefly exceed mid_thresh then drop back) and only
+    # triggers on the genuine black→cream transition (which stays bright).
+    # Start at 0.38× so the real boundary at ~0.44× radius is not missed.
+    s = max(1, int(max_r * 0.38))
+    e = min(len(profile_s), int(max_r * 0.72))
+    black_r = radius * hint_fraction   # fallback: spec-derived black zone fraction
+    if e > s:
+        run = 0  # consecutive pixels above threshold
+        for i in range(s, e):
+            if profile_s[i] >= mid_thresh:
+                run += 1
+                if run >= 3:
+                    black_r = float(i - 2)  # start of the run
+                    break
+            else:
+                run = 0
+
+    return _circle_mask(h, w, cx, cy, black_r), black_r
+
+
+# ─── ring number / line inpainting ────────────────────────────────────────────
+
+def _inpaint_ring_features(
+    gray: np.ndarray,
+    cx: float, cy: float,
+    ring_radii_px: List[float],
+    ring_width_px: float,
+    black_radius: float = 0.0,
+) -> np.ndarray:
+    """
+    Inpaint CREAM-ZONE ring number positions so they don't appear as holes.
+
+    Inpaints at two positions per ring band:
+      - Band midpoint (between two ring boundaries): where numbers are usually printed
+      - Ring boundary itself: some targets print numbers directly on the ring line
+    Only cream-zone positions (radius > black_radius) are inpainted.
+    Background is sampled from the same ring radius at ±45° offsets.
+    """
+    result = gray.astype(np.float32).copy()
+    h, w = gray.shape[:2]
+
+    num_r_mid = max(5, int(ring_width_px * 0.65))   # Inpaint radius at midpoint
+    num_r_bnd = max(4, int(ring_width_px * 0.40))   # Inpaint radius at boundary
+
+    angles_rad = [0, math.pi / 2, math.pi, 3 * math.pi / 2]  # 4 cardinal only (ISSF numbers at 12/3/6/9)
+
+    def _inpaint_at(ring_r: float, inpaint_r: int) -> None:
+        if ring_r <= black_radius * 1.15:  # wider guard (was 1.05) — protects shots near black/cream boundary
+            return
+        for angle in angles_rad:
+            nx = int(round(cx + ring_r * math.cos(angle)))
+            ny = int(round(cy + ring_r * math.sin(angle)))
+            if not (0 <= ny < h and 0 <= nx < w):
+                continue
+            bg_samples: List[float] = []
+            ss = max(4, inpaint_r // 2)
+            for off in (math.pi / 4, -math.pi / 4, 3 * math.pi / 4, -3 * math.pi / 4):
+                sa = angle + off
+                sx = int(round(cx + ring_r * math.cos(sa)))
+                sy = int(round(cy + ring_r * math.sin(sa)))
+                y1, y2 = max(0, sy - ss), min(h, sy + ss + 1)
+                x1, x2 = max(0, sx - ss), min(w, sx + ss + 1)
+                if y2 > y1 and x2 > x1:
+                    bg_samples.append(float(np.median(gray[y1:y2, x1:x2])))
+            bg_val = float(np.mean(bg_samples)) if bg_samples else float(np.median(gray))
+            cv2.circle(result, (nx, ny), inpaint_r, bg_val, -1)
+
+    # Midpoint of each ring band
+    for i in range(len(ring_radii_px) - 1):
+        mid_r = (ring_radii_px[i] + ring_radii_px[i + 1]) / 2.0
+        _inpaint_at(mid_r, num_r_mid)
+
+    # Ring boundary positions (numbers printed near ring lines on some targets)
+    for r_px in ring_radii_px:
+        _inpaint_at(r_px, num_r_bnd)
+
+    return result.astype(np.uint8)
+
+
+def _fill_ring_lines(
+    gray: np.ndarray,
+    cx: float, cy: float,
+    ring_radii_px: List[float],
+    ring_width_px: float,
+    black_radius: float,
+) -> np.ndarray:
+    """
+    Fill ALL ring boundary lines with local background before disc detection.
+
+    Ring lines are printed arcs at known radii:
+      - Inside black zone: WHITE arcs on dark BG → appear bright → bright detector false positives
+      - Inside cream zone: DARK arcs on cream BG → appear dark → dark detector false positives
+
+    For each ring boundary r_i, we sample the background from the two adjacent
+    ring-band midpoints (at r_i ± ring_width_px*0.45) and paint the ring line
+    pixels with that average.  This erases both white (black-zone) and dark
+    (cream-zone) ring lines so the disc filter only responds to actual holes.
+
+    Strategy (vectorised):
+      mask  = pixels where |dist_from_centre - r_i| ≤ half_w
+      fill  = average(gray at r_i - offset, gray at r_i + offset)
+    """
+    h, w = gray.shape[:2]
+    result = gray.astype(np.float32).copy()
+
+    yy, xx = np.ogrid[:h, :w]
+    dx = xx.astype(np.float32) - cx
+    dy = yy.astype(np.float32) - cy
+    dists = np.sqrt(dx ** 2 + dy ** 2)
+
+    safe_dists = np.where(dists > 0.5, dists, 1.0)
+    cos_a = dx / safe_dists
+    sin_a = dy / safe_dists
+
+    # Black-zone ring lines (white on dark): tight fill so adjacent shots aren't erased.
+    # ISSF ring line ≈ 0.3 mm = ~2-3 px at phone scale → ±2 px covers the line.
+    # Cream-zone ring lines (dark on cream): wider fill to cover the line + JPEG blur.
+    half_w_black = 3.5    # px — black zone: covers 0.3mm ring line + bilateral filter blur bleed (was 2.0)
+    half_w_cream = 5.0    # px — cream zone: wider — covers ring line + JPEG blur bleed
+    offset = ring_width_px * 0.45   # sample from ~centre of adjacent bands
+
+    for r in ring_radii_px:
+        is_black_zone_ring = r <= black_radius * 1.15
+        half_w = half_w_black if is_black_zone_ring else half_w_cream
+
+        mask = (np.abs(dists - r) <= half_w) & (dists > 0.5)
+        if not np.any(mask):
+            continue
+
+        # Inner band midpoint — always inside (darker) side
+        r_in = max(1.0, r - offset)
+        sx_in = np.clip(np.round(cx + r_in * cos_a).astype(int), 0, w - 1)
+        sy_in = np.clip(np.round(cy + r_in * sin_a).astype(int), 0, h - 1)
+
+        if is_black_zone_ring:
+            # Black-zone ring: fill with inner DARK sample only (no cream contamination)
+            fill = gray[sy_in, sx_in].astype(np.float32)
+        else:
+            # Cream-zone ring: average of inner and outer cream-band midpoints
+            r_out = r + offset
+            sx_out = np.clip(np.round(cx + r_out * cos_a).astype(int), 0, w - 1)
+            sy_out = np.clip(np.round(cy + r_out * sin_a).astype(int), 0, h - 1)
+            fill = (gray[sy_in, sx_in].astype(np.float32) +
+                    gray[sy_out, sx_out].astype(np.float32)) * 0.5
+
+        result[mask] = fill[mask]
+
+    return result.astype(np.uint8)
+
+
+# ─── disc convolution detector ─────────────────────────────────────────────────
+
+def _fill_ratio_check(signal: np.ndarray, cx: float, cy: float, r: float) -> float:
+    """
+    Fraction of pixels within disc-radius r around (cx, cy) where signal > 20% of disc peak.
+
+    Real holes are uniformly-filled dark (cream zone) or bright (black zone) discs
+    → fill ratio typically 0.55–0.85.
+
+    Ink strokes, ring-boundary arcs, and handwriting only partially cover the disc
+    → fill ratio typically 0.10–0.35.
+
+    Uses the pre-computed signal map (bg_local – img_f or img_f – bg_med) so the
+    check is invariant to global brightness and local illumination gradients.
+    """
+    h, w = signal.shape
+    ir = max(2, int(round(r)))
+    ix, iy = int(round(cx)), int(round(cy))
+    y1, y2 = max(0, iy - ir), min(h, iy + ir + 1)
+    x1, x2 = max(0, ix - ir), min(w, ix + ir + 1)
+    if y2 <= y1 or x2 <= x1:
+        return 0.0
+    patch = signal[y1:y2, x1:x2]
+    py0, px0 = iy - y1, ix - x1
+    yy, xx = np.ogrid[:patch.shape[0], :patch.shape[1]]
+    disc = (yy - py0) ** 2 + (xx - px0) ** 2 <= ir ** 2
+    if not np.any(disc):
+        return 0.0
+    vals = patch[disc]
+    peak = float(vals.max())
+    if peak <= 0:
+        return 0.0
+    return float(np.sum(vals > peak * 0.20)) / float(disc.sum())
+
+
+def _disc_kernel(radius_px: float) -> np.ndarray:
+    """Normalised filled disc kernel (matched filter for circular holes)."""
+    r = max(1, int(round(radius_px)))
+    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1)).astype(np.float32)
+    k /= k.sum()
+    return k
+
+
+def _find_acc_peaks(
+    acc: np.ndarray,
+    min_sep_px: float,
+    threshold: float,
+) -> List[Tuple[float, float]]:
+    """Greedy NMS on accumulator image; returns (x, y) list sorted by value."""
+    nms_sz = max(3, int(min_sep_px * 1.6) | 1)
+    dilated = cv2.dilate(acc, np.ones((nms_sz, nms_sz), np.float32))
+    local_max = (acc >= dilated - 1e-4) & (acc > threshold)
+    ys, xs = np.where(local_max)
+    if not len(ys):
+        return []
+    vals = sorted(
+        [(acc[y, x], float(x), float(y)) for y, x in zip(ys.tolist(), xs.tolist())],
+        reverse=True,
+    )
+    # Greedy NMS with min separation
+    min_sep_sq = min_sep_px ** 2
+    kept: List[Tuple[float, float, float]] = []
+    for v, px, py in vals:
+        if all((px - kx) ** 2 + (py - ky) ** 2 >= min_sep_sq for _, kx, ky in kept):
+            kept.append((v, px, py))
+    return [(px, py) for _, px, py in kept]
+
+
+def _suppress_ring_boundaries(
+    acc: np.ndarray,
+    cx: float, cy: float,
+    ring_radii_px: List[float],
+    suppress_px: float,
+) -> np.ndarray:
+    """Zero out accumulator values near known ring boundary radii."""
+    if not ring_radii_px or suppress_px <= 0:
+        return acc
+    h, w = acc.shape
+    yy, xx = np.ogrid[:h, :w]
+    dists = np.sqrt((xx.astype(np.float32) - cx) ** 2 +
+                    (yy.astype(np.float32) - cy) ** 2)
+    mask = np.zeros((h, w), dtype=bool)
+    for r in ring_radii_px:
+        mask |= np.abs(dists - r) <= suppress_px
+    result = acc.copy()
+    result[mask] = 0.0
+    return result
+
+
+def _detect_disc(
+    gray: np.ndarray,
+    zone_mask: np.ndarray,
+    cx: float, cy: float,
+    visible_r: float,
+    pellet_radius_px: float,
+    bright: bool,
+    max_holes: int = 50,
+    ring_radii_px: Optional[List[float]] = None,
+    ring_suppress_px: float = 0.0,
+    diff_img: Optional[np.ndarray] = None,
+) -> List[FusedHole]:
+    """
+    Detect holes using disc-matched-filter convolution.
+
+    bright=True  → black zone (holes are BRIGHTER than background)
+    bright=False → cream zone (holes are DARKER  than background)
+    """
+    if not np.any(zone_mask):
+        return []
+
+    h, w = gray.shape[:2]
+    zone_pixels = gray[zone_mask]
+    bg_med = float(np.median(zone_pixels))
+    bg_std = float(max(np.std(zone_pixels), 1.0))
+
+    if bright:
+        gray_smooth = cv2.bilateralFilter(gray, d=5, sigmaColor=25, sigmaSpace=5)
+        img_f = gray_smooth.astype(np.float32)
+        signal = np.where(zone_mask, np.clip(img_f - bg_med, 0.0, None), 0.0).astype(np.float32)
+        # Robust noise estimate: use ONLY pixels above the median so that
+        # bimodal distributions (dark ring-ink cluster at ~54 + bright
+        # background at ~188 after CLAHE on dark images) don't inflate std.
+        # After CLAHE on dim images bg_std can reach 60–70, making min_signal
+        # so large that real holes (acc_max ≈ 20–25) fail the early-return check.
+        zone_upper = zone_pixels[zone_pixels >= bg_med]
+        bg_std_robust = float(max(np.std(zone_upper), 1.0)) if len(zone_upper) > 4 else bg_std
+        min_signal = max(bg_std_robust * 2.5, 8.0)
+    else:
+        gray_smooth = cv2.GaussianBlur(gray, (5, 5), 1.5)
+        img_f = gray_smooth.astype(np.float32)
+        # Morphological opening: illumination-invariant background estimate.
+        # The structuring element is larger than any bullet hole, so opening
+        # removes the holes and preserves the gradual illumination gradient —
+        # correct under vignetting where Gaussian blur fails.
+        # Cap morph_r so the kernel doesn't extend beyond the cream zone width —
+        # a 44px kernel overlapping the dark center zone pulls bg_local to ~0
+        # throughout the cream zone, making signal=0 everywhere.
+        morph_r = max(5, min(int(pellet_radius_px * 1.5), 25))
+        kernel_open = cv2.getStructuringElement(
+            cv2.MORPH_ELLIPSE, (2 * morph_r + 1, 2 * morph_r + 1))
+        # Pre-fill pixels outside the cream zone with cream median so the dark
+        # centre zone doesn't suppress the morphological background estimate.
+        gray_fill = gray_smooth.copy().astype(np.float32)
+        gray_fill[~zone_mask] = bg_med
+        bg_local = cv2.morphologyEx(
+            np.clip(gray_fill, 0, 255).astype(np.uint8),
+            cv2.MORPH_OPEN, kernel_open,
+        ).astype(np.float32)
+        residual_pixels = (bg_local - img_f)[zone_mask]
+        bg_std = float(max(np.std(residual_pixels), 1.0))
+        signal = np.where(zone_mask, np.clip(bg_local - img_f, 0.0, None), 0.0).astype(np.float32)
+        min_signal = max(bg_std * 1.8, 12.0)
+
+    # Disc convolution (matched filter at visible_r)
+    kernel = _disc_kernel(visible_r)
+    acc = cv2.filter2D(signal, cv2.CV_32F, kernel)
+    acc = np.where(zone_mask, acc, 0.0).astype(np.float32)
+
+    # Blend with difference image when available (Bug 6 fix).
+    # diff_img highlights anomalies (holes) by subtracting a synthetic template,
+    # so it acts as a second independent evidence source.  Rescale to match the
+    # acc magnitude before blending: acc_combined = 0.7*acc + 0.3*diff_signal.
+    if diff_img is not None:
+        diff_f = diff_img.astype(np.float32) / 255.0
+        diff_signal = cv2.filter2D(diff_f, cv2.CV_32F, kernel)
+        diff_signal = np.where(zone_mask, diff_signal, 0.0).astype(np.float32)
+        acc_max_cur = float(acc.max()) + 1e-6
+        diff_max = float(diff_signal.max()) + 1e-6
+        diff_signal_scaled = diff_signal * (acc_max_cur / diff_max)
+        acc = (0.7 * acc + 0.3 * diff_signal_scaled).astype(np.float32)
+        acc = np.where(zone_mask, acc, 0.0).astype(np.float32)
+
+    # Suppress accumulator near ring boundaries
+    if ring_radii_px and ring_suppress_px > 0:
+        acc = _suppress_ring_boundaries(acc, cx, cy, ring_radii_px, ring_suppress_px)
+
+    acc_max = float(acc.max())
+    if acc_max < min_signal * 0.20:
+        return []
+
+    if bright:
+        # Black zone: lower threshold so weaker shots in a tight group aren't cut off.
+        # Smaller NMS separation so closely-spaced shots are found individually.
+        threshold = max(min_signal * 0.12, acc_max * 0.15)
+        nms_sep = visible_r * 0.9
+    else:
+        # Cream zone: lower threshold (0.20 from 0.35) so weaker shots aren't cut off.
+        # NMS separation 1.5× (from 1.8×) allows tighter shot groups to be resolved.
+        threshold = max(min_signal * 0.18, acc_max * 0.20)
+        nms_sep = visible_r * 1.5
+    peaks = _find_acc_peaks(acc, nms_sep, threshold)
+
+    # Saddle-split disabled: pure-Python O(n×16×12) loops are slow (~300ms/call)
+    # and the mid/near heuristic generates false positives from noise + ring remnants.
+    # if bright and len(peaks) > 0:
+    #     peaks = _find_saddle_splits(acc, peaks, visible_r)
+
+    # ── Cream-zone: precompute connected components for size-based rejection ──
+    # Real holes are small isolated blobs (~physical pellet area).
+    # Cursive writing forms enormous connected components (all letters join).
+    # The CC bounding box distinguishes: writing spans hundreds of pixels,
+    # holes span ~2× pellet diameter.
+    # Threshold is low (min_signal*0.4) because cream pixels between holes and
+    # ring lines have near-zero signal → holes and ring arcs are SEPARATE CCs.
+    if not bright:
+        _cc_thresh = min_signal * 0.40
+        _cc_bin = (signal > _cc_thresh).astype(np.uint8)
+        _, _cc_labels, _cc_stats, _ = cv2.connectedComponentsWithStats(_cc_bin, connectivity=8)
+        # Max bounding-box extent: real holes fit within 3× pellet diameter.
+        # Cursive writing / large marks span > 5× pellet diameter.
+        _max_cc_extent = pellet_radius_px * 2.5
+    else:
+        _cc_labels = None
+        _max_cc_extent = 0.0
+
+    holes: List[FusedHole] = []
+    for px, py in peaks[:max_holes]:
+        ipy, ipx = int(round(py)), int(round(px))
+        if not (0 <= ipy < h and 0 <= ipx < w):
+            continue
+        if not zone_mask[ipy, ipx]:
+            continue
+
+        # CC size check (cream zone): reject if peak belongs to a large connected
+        # dark region → connected handwriting, bold text, or large stain.
+        if _cc_labels is not None:
+            _lbl = _cc_labels[ipy, ipx]
+            if _lbl > 0:
+                _cc_w = _cc_stats[_lbl, cv2.CC_STAT_WIDTH]
+                _cc_h = _cc_stats[_lbl, cv2.CC_STAT_HEIGHT]
+                if max(_cc_w, _cc_h) > _max_cc_extent:
+                    continue
+
+        # Sub-pixel centroid refinement
+        r_patch = max(2, int(visible_r))
+        y0c = max(0, ipy - r_patch)
+        y1c = min(h, ipy + r_patch + 1)
+        x0c = max(0, ipx - r_patch)
+        x1c = min(w, ipx + r_patch + 1)
+        patch_s = signal[y0c:y1c, x0c:x1c]
+        if patch_s.sum() > 0:
+            Mc = cv2.moments(patch_s)
+            if Mc['m00'] > 0:
+                cx_ref = Mc['m10'] / Mc['m00'] + x0c
+                cy_ref = Mc['m01'] / Mc['m00'] + y0c
+                if (abs(cx_ref - px) < visible_r * 0.6 and
+                        abs(cy_ref - py) < visible_r * 0.6):
+                    px, py = cx_ref, cy_ref
+
+        # Post-refinement ring proximity rejection: centroid refinement (via
+        # signal moments) can pull a peak from just-outside-suppressed into the
+        # ring line. Reject here so the later fill check doesn't see these arc peaks.
+        if ring_radii_px and ring_suppress_px > 0:
+            dist_c_post = math.sqrt((px - cx) ** 2 + (py - cy) ** 2)
+            if any(abs(dist_c_post - rr) <= ring_suppress_px for rr in ring_radii_px):
+                continue
+
+        # Fill-ratio check: real holes are solid discs; ring-boundary arcs/lines
+        # only partially fill the matched disc → low fill ratio → rejected.
+        # Base thresholds: black zone lenient (torn paper → irregular patches),
+        # cream zone strict (ring arcs and handwriting are the main false positives).
+        # Near ANY known ring radius: use a stricter threshold for BOTH zones because
+        # ring lines (white in black zone, dark in cream zone) produce arc responses.
+        fill_min = 0.22 if bright else 0.38
+        if ring_radii_px:
+            dist_c = math.sqrt((px - cx) ** 2 + (py - cy) ** 2)
+            for _rr in ring_radii_px:
+                if abs(dist_c - _rr) < visible_r * 1.8:
+                    # Ring lines are already filled in gray_filled, so the main concern is
+                    # residual bleed from JPEG/bilateral filter near ring edges.
+                    # Keep threshold only slightly elevated — don't reject real shots.
+                    fill_min = 0.35 if bright else 0.55
+                    break
+        if _fill_ratio_check(signal, px, py, visible_r) < fill_min:
+            continue
+
+        # Radial gradient check: real holes have a brightness step at the
+        # boundary; ring-arc false positives are uniform arcs without a centred
+        # gradient.  Check is run on the original gray (not the signal map)
+        # so it is not confused by the background-subtraction artefacts.
+        if not _has_radial_gradient(gray, px, py, visible_r, bright):
+            continue
+
+        conf_ratio = acc[ipy, ipx] / (acc_max + 1e-6)
+        conf = min(0.92, 0.45 + float(conf_ratio) * 0.47)
+        holes.append(FusedHole(
+            x=float(px), y=float(py),
+            radius=visible_r,
+            confidence=conf,
+            methods_agreed=1,
+        ))
+
+    return holes
+
+
+# ─── multi-scale disc detection ────────────────────────────────────────────────
+
+def _detect_disc_multiscale(
+    gray: np.ndarray,
+    zone_mask: np.ndarray,
+    cx: float, cy: float,
+    visible_r: float,
+    pellet_radius_px: float,
+    bright: bool,
+    **kwargs,
+) -> List[FusedHole]:
+    """
+    Run disc detection at three scales and merge results.
+
+    The visible hole size varies ±25% due to paper quality, tear geometry,
+    and lighting angle.  Running at 0.80×, 1.00×, 1.25× visible_r and merging
+    candidates ensures we detect holes that deviate from the nominal radius.
+    """
+    scales = [0.80, 1.00, 1.25]
+    all_candidates: List[FusedHole] = []
+    for s in scales:
+        candidates = _detect_disc(
+            gray, zone_mask, cx, cy,
+            visible_r * s, pellet_radius_px,
+            bright=bright, **kwargs,
+        )
+        all_candidates.extend(candidates)
+    # Merge candidates within 0.8 × visible_r of each other (weighted centroid)
+    return _deduplicate(all_candidates, visible_r * 0.8)
+
+
+def _has_radial_gradient(
+    gray: np.ndarray,
+    cx: float, cy: float,
+    r: float,
+    bright: bool,
+) -> bool:
+    """
+    Validate that a candidate hole shows the expected radial brightness step.
+
+    Real holes have a clear brightness contrast between the centre disc and the
+    surrounding annulus.  Ring-arc false positives are uniform arcs without a
+    centred radial gradient.
+
+    Args:
+        gray:   Grayscale image.
+        cx, cy: Candidate centre.
+        r:      Visible hole radius in pixels.
+        bright: True for black zone (hole is brighter than surround),
+                False for cream zone (hole is darker than surround).
+
+    Returns:
+        True if the gradient is in the expected direction (keep candidate).
+        Returns True when the check cannot be performed (don't over-reject).
+    """
+    h, w = gray.shape[:2]
+    outer = int(r * 1.6) + 1
+    ix, iy = int(round(cx)), int(round(cy))
+    y1 = max(0, iy - outer)
+    y2 = min(h, iy + outer + 1)
+    x1 = max(0, ix - outer)
+    x2 = min(w, ix + outer + 1)
+    if y2 <= y1 or x2 <= x1:
+        return True  # can't check → don't reject
+
+    yy, xx = np.ogrid[y1:y2, x1:x2]
+    dist_sq = ((xx.astype(np.float32) - cx) ** 2 +
+               (yy.astype(np.float32) - cy) ** 2)
+
+    inner_mask = dist_sq <= (r * 0.5) ** 2
+    annulus_mask = (dist_sq > (r * 0.5) ** 2) & (dist_sq <= (r * 1.5) ** 2)
+    patch = gray[y1:y2, x1:x2].astype(np.float32)
+
+    if not np.any(inner_mask) or not np.any(annulus_mask):
+        return True
+
+    inner_mean = float(patch[inner_mask].mean())
+    annulus_mean = float(patch[annulus_mask].mean())
+    dr = int(gray.max()) - int(gray.min())
+    if dr < 10:
+        return True  # image has no dynamic range — gradient is meaningless
+
+    delta = inner_mean - annulus_mean
+    # Require ≥ 3% of dynamic range (lowered from 6%).
+    # 6% was too strict for faint holes (borderline JPEG compression, subtle
+    # contrast) — real holes were failing with delta=9-13 when need=14+ on
+    # high-DR images.  3% still rules out noise (delta≈0) while accepting
+    # low-contrast-but-real holes.  Shape is already confirmed by fill_ratio.
+    min_delta = max(dr * 0.03, 4.0)
+    if bright:
+        return delta >= min_delta   # hole is lighter than surround
+    else:
+        return delta <= -min_delta  # hole is darker than surround
+
+
+def _find_saddle_splits(
+    acc: np.ndarray,
+    peaks: List[Tuple[float, float]],
+    visible_r: float,
+) -> List[Tuple[float, float]]:
+    """
+    Detect closely-grouped shots that merged into a single accumulator peak.
+
+    When two shots are within 1.2×–2.0× visible_r they produce one merged
+    accumulator peak.  This function searches radially from each peak for a
+    secondary local maximum separated by a saddle, and appends it as an
+    additional candidate.
+    """
+    h, w = acc.shape
+    min_sep = visible_r * 1.2
+    max_sep = visible_r * 2.0
+    n_dirs = 16
+    n_samples = 12
+    result = list(peaks)
+    new_pts: List[Tuple[float, float]] = []
+
+    for px, py in peaks:
+        for a in np.linspace(0, 2 * math.pi, n_dirs, endpoint=False):
+            radii_test = np.linspace(min_sep, max_sep, n_samples)
+            vals: List[float] = []
+            coords: List[Tuple[float, float]] = []
+            for r_t in radii_test:
+                sx = px + r_t * math.cos(a)
+                sy = py + r_t * math.sin(a)
+                ix_, iy_ = int(round(sx)), int(round(sy))
+                if 0 <= iy_ < h and 0 <= ix_ < w:
+                    vals.append(float(acc[iy_, ix_]))
+                    coords.append((sx, sy))
+
+            if len(vals) < 4:
+                continue
+
+            # Detect: values rise from min → local max → drop (saddle-peak-... not needed)
+            # Simple: is the mid-range section higher than the near-range section?
+            mid_start = len(vals) // 3
+            near_mean = float(np.mean(vals[:mid_start]))
+            mid_mean = float(np.mean(vals[mid_start:]))
+            if mid_mean > near_mean * 1.25:
+                # Secondary peak found in this direction
+                best_idx = int(np.argmax(vals[mid_start:])) + mid_start
+                new_pts.append(coords[best_idx])
+
+    # Deduplicate new candidates against existing peaks and each other
+    min_sep_sq = (visible_r * 0.9) ** 2
+    for cand in new_pts:
+        if all((cand[0] - kp[0]) ** 2 + (cand[1] - kp[1]) ** 2 >= min_sep_sq
+               for kp in result):
+            result.append(cand)
+
+    return result
+
+
+# ─── post-processing ────────────────────────────────────────────────────────────
+
+def _deduplicate(holes: List[FusedHole], merge_r: float) -> List[FusedHole]:
+    """Weighted-average merge of detections within merge_r * 1.6 of each other."""
+    if len(holes) <= 1:
+        return holes
+    merge_dsq = (merge_r * 1.6) ** 2
+    holes.sort(key=lambda h: h.confidence, reverse=True)
+    result: List[FusedHole] = []
+    used = [False] * len(holes)
+
+    for i, h in enumerate(holes):
+        if used[i]:
+            continue
+        used[i] = True
+        gx, gy, gw = h.x * h.confidence, h.y * h.confidence, h.confidence
+        for j in range(i + 1, len(holes)):
+            if used[j]:
+                continue
+            if (h.x - holes[j].x) ** 2 + (h.y - holes[j].y) ** 2 < merge_dsq:
+                used[j] = True
+                gx += holes[j].x * holes[j].confidence
+                gy += holes[j].y * holes[j].confidence
+                gw += holes[j].confidence
+        result.append(FusedHole(
+            x=gx / gw, y=gy / gw,
+            radius=h.radius,
+            confidence=min(1.0, h.confidence + 0.05),
+            methods_agreed=h.methods_agreed,
+        ))
+    return result
+
+
+def _filter_ring_artifacts(
+    holes: List[FusedHole], cx: float, cy: float, visible_r: float,
+    ring_radii_px: Optional[List[float]] = None,
+    ring_width_px: float = 0.0,
+    black_radius: float = 0.0,
+) -> List[FusedHole]:
+    """Remove circular arc patterns (ring-line false positives).
+
+    Three strategies (in order):
+
+    1. Multiple detections at the SAME known ring-boundary radius in the CREAM
+       ZONE → all are arc responses.  Black-zone ring lines are filled with dark
+       background before detection, so they don't produce false positives there.
+       Cream-zone ring lines may still slip through, but a single bullet cannot
+       appear at two angular positions on the same ring → remove ALL if ≥ 2 found
+       at the same cream-zone ring radius (within ±4 px).
+
+    2. Groups of ≥ 3 at the same radius (without knowing ring radii) →
+       keep only the top-2 by confidence.
+
+    3. Diametrically-opposed pairs at the same radius → ring lines generate
+       symmetric ghosts 180° apart; remove the weaker one (or both if
+       medium-confidence).
+    """
+    if len(holes) <= 1:
+        return holes
+
+    dists = [math.sqrt((h.x - cx) ** 2 + (h.y - cy) ** 2) for h in holes]
+    angles = [math.atan2(h.y - cy, h.x - cx) for h in holes]
+    tol = max(3.0, visible_r * 0.6)
+    artifacts: set = set()
+
+    # ── Strategy 1: cream-zone clusters at known ring radii ────────────────────
+    # Apply only to cream-zone detections (dist > black_radius).  Black-zone ring
+    # lines are filled → no arc responses there.  Tight snap=4px: ring-arc peaks
+    # appear within 1-2px of the ring boundary; real shots are at pellet_radius
+    # (30+ px) away from the boundary they score against.
+    if ring_radii_px and ring_width_px > 0:
+        snap = 4.0
+        for ring_r in ring_radii_px:
+            at_ring = [i for i, d in enumerate(dists)
+                       if abs(d - ring_r) <= snap and d > black_radius]
+            if len(at_ring) >= 2:
+                # 2+ cream-zone holes at one ring boundary → arc ghosts; remove all
+                for i in at_ring:
+                    artifacts.add(i)
+
+    # ── Strategies 2 & 3: radius-grouping heuristics ──────────────────────────
+    sorted_idx = sorted(range(len(dists)), key=lambda i: dists[i])
+
+    i = 0
+    while i < len(sorted_idx):
+        group = [sorted_idx[i]]
+        j = i + 1
+        while j < len(sorted_idx) and dists[sorted_idx[j]] - dists[sorted_idx[i]] < tol:
+            group.append(sorted_idx[j])
+            j += 1
+
+        if len(group) >= 3:
+            # Arc cluster: keep only top-2 by confidence
+            group.sort(key=lambda idx: holes[idx].confidence, reverse=True)
+            for idx in group[2:]:
+                artifacts.add(idx)
+        elif len(group) == 2:
+            # Check if the pair is diametrically opposed (angle diff ≈ 180°)
+            a, b = group
+            diff = abs(angles[a] - angles[b])
+            if diff > math.pi:
+                diff = 2 * math.pi - diff
+            if abs(diff - math.pi) < 0.35:  # within ~20° of exact opposite
+                # If both are medium-confidence → likely symmetric ring artifacts, remove both
+                if holes[a].confidence < 0.75 and holes[b].confidence < 0.75:
+                    artifacts.add(a)
+                    artifacts.add(b)
+                else:
+                    # One is high-confidence (likely real) → only remove the weaker ghost
+                    loser = a if holes[a].confidence <= holes[b].confidence else b
+                    artifacts.add(loser)
+
+        i = j
+
+    return [h for i, h in enumerate(holes) if i not in artifacts]
