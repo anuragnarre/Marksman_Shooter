@@ -1,5 +1,6 @@
 // apps/api/src/shots/shots.service.ts
 import {
+  Logger,
   Injectable,
   NotFoundException,
   ForbiddenException,
@@ -16,6 +17,8 @@ import { VisionService } from './vision.service';
 
 @Injectable()
 export class ShotsService {
+  private readonly logger = new Logger(ShotsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventsGateway: EventsGateway,
@@ -301,7 +304,7 @@ export class ShotsService {
         }
       } catch (err) {
         // Non-fatal: still emit WS event even if DB save fails
-        console.error('[shots] DB save failed for live frame:', err);
+        this.logger.error('[shots] DB save failed for live frame:', err.stack);
       }
     }
 
@@ -315,7 +318,7 @@ export class ShotsService {
       targetType: payload.targetType,
       confidence: payload.confidence ?? 1.0,
       timestamp: payload.timestamp ?? Date.now(),
-    } as any);
+    });
 
     return { saved: !!shot.id, shot };
   }

@@ -1,0 +1,4 @@
+🎯 **What:** Removed an unnecessary `as any` type cast in `apps/api/src/shots/shots.service.ts` line 318 when emitting a `shot_detected` event. Also changed an unmanaged `console.error` to use NestJS's `Logger` at line 304 to follow the codebase's logging conventions.
+💡 **Why:** By removing `as any`, we allow TypeScript to properly strictly check the types of the object being emitted. This improves type safety and code maintainability, and prevents future typing mismatch issues from going unnoticed. Changing to use the built-in `Logger` ensures logging consistency across the application.
+✅ **Verification:** Verified the code successfully built (`npm run build:api`) and verified via `tsc` checks. No compilation or typing errors remain. The payload properties strictly conform to what `EventsGateway.emitShotDetected` expects.
+✨ **Result:** A safer, more strictly typed API without arbitrary `any` casts, and improved logging consistency.
