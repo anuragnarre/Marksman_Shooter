@@ -110,7 +110,7 @@ export class AnalyticsService {
     // Series Analysis: split shots into groups of 10, compute avg per group
     // Reveals endurance-related score drift across a long session
     const seriesAverages = chunk(shots, 10).map((group) => {
-      const groupScores = group.map((s) => s.score);
+      const groupScores = group.map((s: any) => s.score);
       return groupScores.reduce((sum, s) => sum + s, 0) / groupScores.length;
     });
 
