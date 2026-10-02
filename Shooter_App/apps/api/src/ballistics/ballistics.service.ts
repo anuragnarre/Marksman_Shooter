@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 /** Pure ballistics math (no external deps needed) */
-function computeTrajectory(profile: {
+export function computeTrajectory(profile: {
   muzzleVelocityFps: number;
   pelletWeightGrains: number;
   ballisticCoef: number;
