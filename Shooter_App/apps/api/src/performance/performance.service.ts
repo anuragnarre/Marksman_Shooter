@@ -7,10 +7,11 @@ import {
 } from '@nestjs/common';
 import { GoogleGenAI } from '@google/genai';
 import { ConfigService } from '@nestjs/config';
+import { Prisma, TrainingPlan as PrismaTrainingPlan } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SessionContextDto } from './dto/session-context.dto';
-import { DeepAnalysis, TrainingPlan, UserRole } from '@shooting-platform/shared-types';
+import { DeepAnalysis, TrainingPlan, TrainingPlanContent, UserRole } from '@shooting-platform/shared-types';
 
 const MODEL = 'gemini-3.1-pro';
 
@@ -229,7 +230,7 @@ Generate a 4-week progressive training plan. Return ONLY a valid JSON object in 
 
 Each week should have 3-4 training sessions. Progress from foundational to advanced across the 4 weeks.`;
 
-    let planContent: any;
+    let planContent: Partial<TrainingPlanContent> = {};
     if (!this.ai) {
       throw new InternalServerErrorException(
         'AI Training Plans require a GEMINI_API_KEY.',
@@ -257,7 +258,7 @@ Each week should have 3-4 training sessions. Progress from foundational to advan
     const saved = await this.prisma.trainingPlan.create({
       data: {
         userId: targetShooterId,
-        content: planContent,
+        content: planContent as unknown as Prisma.InputJsonValue,
         weekStart,
         focusAreas: planContent.focusAreas ?? [],
       },
@@ -319,8 +320,8 @@ Each week should have 3-4 training sessions. Progress from foundational to advan
 
   // ── Private Helpers ────────────────────────────────────────────────────────
 
-  private formatPlan(plan: any): TrainingPlan {
-    const content = plan.content as any;
+  private formatPlan(plan: PrismaTrainingPlan): TrainingPlan {
+    const content = plan.content as unknown as TrainingPlanContent;
     return {
       id: plan.id,
       generatedAt: plan.generatedAt.toISOString(),

@@ -500,6 +500,13 @@ export interface TrainingPlanWeek {
   sessions: TrainingPlanSession[];
 }
 
+export interface TrainingPlanContent {
+  coachingNote?: string;
+  focusAreas?: string[];
+  weeks?: TrainingPlanWeek[];
+}
+
+
 export interface TrainingPlan {
   id: string;
   generatedAt: string;
