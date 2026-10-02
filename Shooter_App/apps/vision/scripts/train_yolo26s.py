@@ -26,6 +26,10 @@ import os
 import shutil
 import sys
 
+import logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
 import cv2
 import numpy as np
 
@@ -114,9 +118,9 @@ def generate_yolo_dataset(
             f.write("\n".join(lines))
 
         if i > 0 and i % 50 == 0:
-            print(f"  Synthetic: {i} images written...")
+            logger.info(f"  Synthetic: {i} images written...")
 
-    print(f"  Synthetic: done.")
+    logger.info("  Synthetic: done.")
     # Optionally add real images with auto-generated labels from the CV pipeline
     if real_images_dir and os.path.isdir(real_images_dir):
         _add_real_images_with_autolabel(out_dir, real_images_dir, spec, target_type, val_fraction)
@@ -133,7 +137,7 @@ def generate_yolo_dataset(
 
     train_count = len(os.listdir(os.path.join(out_dir, "images", "train")))
     val_count   = len(os.listdir(os.path.join(out_dir, "images", "val")))
-    print(f"Dataset: {train_count} train, {val_count} val -> {yaml_path}")
+    logger.info(f"Dataset: {train_count} train, {val_count} val -> {yaml_path}")
     return yaml_path
 
 
@@ -206,11 +210,11 @@ def _add_real_images_with_autolabel(
             errors += 1
 
         if (i + 1) % 25 == 0:
-            print(f"  Real images: {i + 1}/{len(real_images)} processed "
-                  f"(labeled={labeled} bg={background} err={errors})")
+            logger.info(f"  Real images: {i + 1}/{len(real_images)} processed "
+                    f"(labeled={labeled} bg={background} err={errors})")
 
-    print(f"Real images: {labeled} labeled, {background} background, "
-          f"{errors} errors -> {len(real_images)} total")
+    logger.info(f"Real images: {labeled} labeled, {background} background, "
+            f"{errors} errors -> {len(real_images)} total")
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +293,7 @@ def train(
     try:
         from ultralytics import YOLO
     except ImportError:
-        print("ERROR: ultralytics not installed. Run: pip install ultralytics>=8.3.0")
+        logger.error("ultralytics not installed. Run: pip install ultralytics>=8.3.0")
         sys.exit(1)
 
     os.makedirs(os.path.dirname(output_model) or ".", exist_ok=True)
@@ -303,7 +307,7 @@ def train(
     
     try:
         if last_pt.exists():
-            print(f"Resuming training from {last_pt}...")
+            logger.info(f"Resuming training from {last_pt}...")
             model = YOLO(str(last_pt))
             results = model.train(resume=True)
         else:
@@ -345,9 +349,9 @@ def train(
     best_pt = results.save_dir / "weights" / "best.pt"
     if best_pt.exists():
         shutil.copy2(str(best_pt), output_model)
-        print(f"\nBest model saved -> {output_model}")
+        logger.info(f"\nBest model saved -> {output_model}")
     else:
-        print(f"WARNING: best.pt not found at {best_pt}")
+        logger.warning(f"best.pt not found at {best_pt}")
         return
 
     if export_onnx:
@@ -361,9 +365,9 @@ def train(
         )
         onnx_path = output_model.replace(".pt", ".onnx")
         if os.path.exists(onnx_path):
-            print(f"ONNX exported -> {onnx_path}")
+            logger.info(f"ONNX exported -> {onnx_path}")
         else:
-            print("ONNX export path may differ — check the ultralytics output above")
+            logger.info("ONNX export path may differ — check the ultralytics output above")
 
 
 # ---------------------------------------------------------------------------
@@ -387,7 +391,7 @@ if __name__ == "__main__":
                         help="Only generate dataset, do not train")
     args = parser.parse_args()
 
-    print(f"Generating dataset for {args.target}…")
+    logger.info(f"Generating dataset for {args.target}…")
     yaml = generate_yolo_dataset(
         out_dir=args.dataset_dir,
         target_type=args.target,
@@ -395,6 +399,6 @@ if __name__ == "__main__":
     )
 
     if not args.no_train:
-        print(f"\nTraining YOLO26-S for {args.epochs} epochs…")
+        logger.info(f"\nTraining YOLO26-S for {args.epochs} epochs…")
         train(yaml, epochs=args.epochs, batch=args.batch,
               output_model=args.output, export_onnx=args.export)
