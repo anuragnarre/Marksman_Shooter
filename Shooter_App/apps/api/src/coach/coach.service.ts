@@ -153,7 +153,7 @@ export class CoachService {
       include: { shooter: { select: USER_SELECT } },
       orderBy: { createdAt: 'desc' },
     });
-    return connections.map((c) => this.mapConnection(c));
+    return connections.map((c: PrismaConnection) => this.mapConnection(c));
   }
 
   // ── Coach-initiated flow ──────────────────────────────────────────────────
@@ -212,7 +212,7 @@ export class CoachService {
       include: { shooter: { select: USER_SELECT } },
       orderBy: { createdAt: 'desc' },
     });
-    return connections.map((c) => this.mapConnection(c));
+    return connections.map((c: PrismaConnection) => this.mapConnection(c));
   }
 
   /** Coach cancels a pending outgoing invite. */
@@ -235,7 +235,7 @@ export class CoachService {
       include: { coach: { select: USER_SELECT } },
       orderBy: { createdAt: 'desc' },
     });
-    return connections.map((c) => this.mapConnection(c));
+    return connections.map((c: PrismaConnection) => this.mapConnection(c));
   }
 
   /** Shooter approves a coach-initiated invite. */
@@ -294,7 +294,7 @@ export class CoachService {
       select: USER_SELECT,
       orderBy: { name: 'asc' },
     });
-    return coaches.map((c) => ({
+    return coaches.map((c: any) => ({
       id: c.id, name: c.name, email: c.email, role: c.role, createdAt: c.createdAt,
     }));
   }
@@ -306,7 +306,7 @@ export class CoachService {
       include: { coach: { select: USER_SELECT } },
       orderBy: { createdAt: 'desc' },
     });
-    return connections.map((c) => this.mapConnection(c));
+    return connections.map((c: PrismaConnection) => this.mapConnection(c));
   }
 
   /** Coach lists their approved shooters. */
@@ -395,15 +395,15 @@ export class CoachService {
     let xRingCount = 0;
 
     for (const session of sessions) {
-      const scores = session.shots.map((shot) => shot.score);
+      const scores = session.shots.map((shot: any) => shot.score);
       const sessionShotCount = scores.length;
-      const sessionScoreSum = scores.reduce((sum, score) => sum + score, 0);
+      const sessionScoreSum = scores.reduce((sum: number, score: number) => sum + score, 0);
       const sessionAvg = sessionShotCount ? sessionScoreSum / sessionShotCount : 0;
       const groupRadius = this.computeGroupRadius(session.shots);
 
       totalShots += sessionShotCount;
       totalScore += sessionScoreSum;
-      xRingCount += scores.filter((score) => score >= 10.5).length;
+      xRingCount += scores.filter((score: number) => score >= 10.5).length;
 
       recentSessions.push({
         sessionId: session.id,
@@ -477,7 +477,7 @@ export class CoachService {
       })
       .sort((a, b) => b.averageScore - a.averageScore);
 
-    const schedule: CoachDashboardScheduleItem[] = events.slice(0, 12).map((event) => ({
+    const schedule: CoachDashboardScheduleItem[] = events.slice(0, 12).map((event: any) => ({
       eventId: event.id,
       title: event.title,
       eventType: event.eventType,
@@ -485,15 +485,15 @@ export class CoachService {
       end: event.end.toISOString(),
       allDay: event.allDay,
       assigneeCount: event.assignees.length,
-      shooterNames: Array.from(new Set(event.assignees.map((assignee) => assignee.shooter.name))),
+      shooterNames: Array.from(new Set(event.assignees.map((assignee: any) => assignee.shooter.name))),
     }));
 
     const activeShooters30d = shooterSummaries.filter(
       (summary) => shooterStats.get(summary.shooterId)?.active30d,
     ).length;
-    const upcomingItems7d = events.filter((event) => event.start >= now && event.start <= next7Days).length;
+    const upcomingItems7d = events.filter((event: any) => event.start >= now && event.start <= next7Days).length;
     const plannedTasks = events.filter(
-      (event) => event.start >= now && (event.eventType === 'TASK' || event.eventType === 'PLAN'),
+      (event: any) => event.start >= now && (event.eventType === 'TASK' || event.eventType === 'PLAN'),
     ).length;
 
     return {
@@ -523,7 +523,7 @@ export class CoachService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return profiles.map((profile) => ({
+    return profiles.map((profile: any) => ({
       ...this.mapUser(profile.user),
       shooterProfile: this.mapShooterProfile(profile),
     }));
@@ -546,7 +546,7 @@ export class CoachService {
     const pseudoEmail = await this.buildUniqueManagedEmail(dto.name);
     const passwordHash = await bcrypt.hash(randomUUID(), BCRYPT_SALT_ROUNDS);
 
-    const created = await this.prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx: any) => {
       const shooterUser = await tx.user.create({
         data: {
           name: dto.name.trim(),
@@ -611,7 +611,7 @@ export class CoachService {
       }
     }
 
-    const updated = await this.prisma.$transaction(async (tx) => {
+    const updated = await this.prisma.$transaction(async (tx: any) => {
       const user = dto.name
         ? await tx.user.update({
             where: { id: shooterId },
@@ -694,7 +694,7 @@ export class CoachService {
     const totalShots = await this.prisma.shot.count({ where: { sessionId } });
     this.eventsGateway.emitSessionUpdated(sessionId, totalShots);
 
-    return created.map((shot) => ({
+    return created.map((shot: any) => ({
       id: shot.id,
       sessionId: shot.sessionId,
       shotNumber: shot.shotNumber,
@@ -738,10 +738,10 @@ export class CoachService {
       orderBy: { sessionDate: 'desc' },
     });
 
-    const shots = sessions.flatMap((session) => session.shots);
+    const shots = sessions.flatMap((session: any) => session.shots);
     const totalShots = shots.length;
     const averageScore = totalShots
-      ? shots.reduce((sum, shot) => sum + shot.score, 0) / totalShots
+      ? shots.reduce((sum: number, shot: any) => sum + shot.score, 0) / totalShots
       : 0;
 
     return {
@@ -749,7 +749,7 @@ export class CoachService {
       totalSessions: sessions.length,
       totalShots,
       averageScore: Number(averageScore.toFixed(3)),
-      bestScore: totalShots ? Math.max(...shots.map((shot) => shot.score)) : 0,
+      bestScore: totalShots ? Math.max(...shots.map((shot: any) => shot.score)) : 0,
       lastSessionDate: sessions[0]?.sessionDate.toISOString() ?? null,
     };
   }
@@ -767,7 +767,7 @@ export class CoachService {
       orderBy: { sessionDate: 'desc' },
     });
 
-    return sessions.map((s) => ({
+    return sessions.map((s: any) => ({
       id: s.id,
       shooterId: s.shooterId,
       discipline: s.discipline,
@@ -778,7 +778,7 @@ export class CoachService {
       trainingMode: s.trainingMode,
       createdAt: s.createdAt,
       deletedAt: s.deletedAt ?? undefined,
-      shots: s.shots.map((shot) => ({
+      shots: s.shots.map((shot: any) => ({
         id: shot.id,
         sessionId: shot.sessionId,
         shotNumber: shot.shotNumber,
