@@ -185,7 +185,7 @@ export class RangeOperationsService {
       where: { rangeId, startTime: { gte: today, lt: tomorrow } },
       select: { id: true }
     });
-    const slotIds = slots.map(s => s.id);
+    const slotIds = slots.map((s: { id: string }) => s.id);
 
     if (slotIds.length === 0) return [];
 
@@ -214,7 +214,7 @@ export class RangeOperationsService {
       where: { rangeId, startTime: { gte: today, lt: tomorrow } },
       select: { id: true }
     });
-    const slotIds = slots.map(s => s.id);
+    const slotIds = slots.map((s: { id: string }) => s.id);
     const waitlistDepth = slotIds.length > 0 
       ? await this.prisma.waitlist.count({ where: { slotId: { in: slotIds }, notifiedAt: null } })
       : 0;
@@ -287,7 +287,7 @@ export class RangeOperationsService {
       take: 5
     });
 
-    const result = await Promise.all(users.map(async (user) => {
+    const result = await Promise.all(users.map(async (user: any) => {
       const sub = await this.prisma.membershipSubscription.findFirst({
         where: { userId: user.id, status: 'ACTIVE' },
         include: { tier: true }
