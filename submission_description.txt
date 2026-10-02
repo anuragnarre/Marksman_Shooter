@@ -1,0 +1,3 @@
+🎯 **What:** I added tests for the `detect_holes_yolo` logic in `yolo_detector.py` and mocked the ONNX Runtime session to test it reliably without model files. Additionally, I fixed a shape validation bug in `_parse_yolov8_output`.
+📊 **Coverage:** Tests now cover both formats of YOLO model exports (format A and B), successfully handle logic flow without YOLO models, and cover the core hole detection loop in overlapping tiles.
+✨ **Result:** Improved test coverage over the core YOLO logic for detecting target holes, and fixed an issue causing inference shape dimension mismatch for YOLO models exported with standard ultralytics settings.

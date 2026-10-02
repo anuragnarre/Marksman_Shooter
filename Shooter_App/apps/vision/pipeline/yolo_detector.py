@@ -322,7 +322,7 @@ def _parse_yolov8_output(
     """
     pred = raw[0]
     if pred.ndim == 2:
-        anchors = pred if pred.shape[1] >= 5 else pred.T
+        anchors = pred if pred.shape[1] < pred.shape[0] else pred.T
     else:
         return []
 
