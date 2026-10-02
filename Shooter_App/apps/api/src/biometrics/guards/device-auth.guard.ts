@@ -1,6 +1,7 @@
 // apps/api/src/biometrics/guards/device-auth.guard.ts
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class DeviceAuthGuard implements CanActivate {
@@ -19,15 +20,31 @@ export class DeviceAuthGuard implements CanActivate {
       throw new UnauthorizedException('Missing X-Device-Key header or deviceId');
     }
 
-    // Try lookup by apiKey first, then by device id (legacy)
+    const hashedApiKey = crypto.createHash('sha256').update(apiKey).digest('hex');
+
+    // Try lookup by hashed apiKey first
     let device = await this.prisma.deviceRegistration.findUnique({
-      where: { apiKey },
+      where: { apiKey: hashedApiKey },
     });
 
     if (!device) {
+      // Fallback: try lookup by plaintext apiKey (legacy)
       device = await this.prisma.deviceRegistration.findUnique({
-        where: { id: apiKey },
+        where: { apiKey },
       });
+
+      if (device) {
+        // Migrate to hashed apiKey
+        await this.prisma.deviceRegistration.update({
+          where: { id: device.id },
+          data: { apiKey: hashedApiKey },
+        });
+      } else {
+        // Fallback: try lookup by device id (legacy)
+        device = await this.prisma.deviceRegistration.findUnique({
+          where: { id: apiKey },
+        });
+      }
     }
 
     if (!device || !device.isActive) {
