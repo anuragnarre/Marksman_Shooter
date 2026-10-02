@@ -25,9 +25,7 @@ async function bootstrap(): Promise<void> {
       if (!origin) return callback(null, true);
       // Localhost variants — always allow (Next.js dev server, same-machine tools)
       if (
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.startsWith('http://[::1]')
+        /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(origin)
       ) {
         return callback(null, true);
       }
