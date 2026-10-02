@@ -47,17 +47,7 @@ export class AnalyticsService {
     return this.computeWeaponSummary(targetShooterId);
   }
 
-  async computeForSession(sessionId: string): Promise<AnalyticsResult> {
-    const session = await this.prisma.session.findFirst({
-      where: { id: sessionId, deletedAt: null },
-      include: { shots: { orderBy: { shotNumber: 'asc' } } },
-    });
-
-    if (!session) {
-      throw new NotFoundException(`Session ${sessionId} not found`);
-    }
-
-    const shots = session.shots;
+  computeForSessionData(sessionId: string, shots: any[]): AnalyticsResult {
     if (shots.length === 0) {
       return {
         sessionId,
@@ -125,6 +115,20 @@ export class AnalyticsService {
       minScore: Math.min(...scores),
       maxScore: Math.max(...scores),
     };
+  }
+
+  async computeForSession(sessionId: string): Promise<AnalyticsResult> {
+    const session = await this.prisma.session.findFirst({
+      where: { id: sessionId, deletedAt: null },
+      include: { shots: { orderBy: { shotNumber: 'asc' } } },
+    });
+
+    if (!session) {
+      throw new NotFoundException(`Session ${sessionId} not found`);
+    }
+
+    const shots = session.shots;
+    return this.computeForSessionData(sessionId, shots);
   }
   async computeWeaponSummary(shooterId: string): Promise<WeaponPerformance[]> {
     const sessions = await this.prisma.session.findMany({

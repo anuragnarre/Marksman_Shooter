@@ -390,7 +390,7 @@ Please analyse this session and provide coaching feedback in the required JSON f
 
     for (const session of sessions) {
       if (session.shots.length === 0) continue;
-      const analytics = await this.analyticsService.computeForSession(session.id);
+      const analytics = this.analyticsService.computeForSessionData(session.id, session.shots);
       const scores = session.shots.map(s => s.score);
 
       sessionAnalytics.push({
