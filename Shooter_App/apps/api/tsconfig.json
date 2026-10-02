@@ -18,6 +18,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "rootDir": "./src",
+    "types": ["node", "jest", "multer"],
     "paths": {
       "@shooting-platform/shared-types": ["src/shared-types"]
     }
