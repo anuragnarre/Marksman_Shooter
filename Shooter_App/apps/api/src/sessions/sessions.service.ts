@@ -46,7 +46,7 @@ export class SessionsService {
       where: { shooterId: targetShooterId, deletedAt: null },
       orderBy: { sessionDate: 'desc' },
     });
-    return sessions.map((s) => this.mapSession(s));
+    return sessions.map((s: any) => this.mapSession(s));
   }
 
   async findOneWithShotsForActor(
