@@ -1,0 +1,30 @@
+FROM node:20-bullseye-slim
+
+WORKDIR /app
+
+# Copy root configurations
+COPY package.json package-lock.json ./
+# Copy workspace packages
+COPY apps/web/package.json apps/web/
+COPY packages/shared-types/package.json packages/shared-types/
+
+# Install dependencies (including dev deps required for building Next.js)
+RUN npm ci
+
+# Copy source code
+COPY packages/shared-types/ packages/shared-types/
+COPY apps/web/ apps/web/
+
+# Build shared types
+RUN npm run build:shared
+# Build Next.js app
+RUN cd apps/web && npm run build
+
+WORKDIR /app/apps/web
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]

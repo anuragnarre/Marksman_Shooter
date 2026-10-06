@@ -1,10 +1,12 @@
+version: '3.8'
+
 services:
-  # ── PostgreSQL ───────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: marksman-db
     restart: unless-stopped
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shooting_platform
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -18,24 +20,10 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Vision Service (FastAPI) ──────────────────────────────────────────────────
-  vision:
-    build:
-      context: ./apps/vision
-      dockerfile: Dockerfile
-    container_name: marksman-vision
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
-    profiles: ["full"]        # only started with: docker compose --profile full up
-
-  # ── NestJS API ───────────────────────────────────────────────────────────────
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.api
     container_name: marksman-api
     restart: unless-stopped
     ports:
@@ -52,7 +40,38 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    profiles: ["full"]
+
+  vision:
+    build:
+      context: ./apps/vision
+      dockerfile: Dockerfile
+    container_name: marksman-vision
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    deploy:
+      resources:
+        limits:
+          memory: 4G # Critical: YOLO inference needs 2-4GB RAM minimum
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: marksman-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - INTERNAL_API_URL=http://api:3001
+      - INTERNAL_VISION_URL=http://vision:8000
+    depends_on:
+      - api
+      - vision
 
 volumes:
   shooting_db_data:

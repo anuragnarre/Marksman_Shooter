@@ -1,3 +1,5 @@
 Version_1_Core_App exclude from ai scans this is and old build not in use.rar
 node_modules/
 .env
+
+*.zip

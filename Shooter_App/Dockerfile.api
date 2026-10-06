@@ -1,0 +1,55 @@
+FROM node:20-bullseye-slim AS builder
+
+WORKDIR /app
+
+# Copy root configurations
+COPY package.json package-lock.json ./
+# Copy workspace packages
+COPY apps/api/package.json apps/api/
+COPY packages/shared-types/package.json packages/shared-types/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY packages/shared-types/ packages/shared-types/
+COPY apps/api/ apps/api/
+
+# Generate prisma client
+RUN cd apps/api && npx prisma generate
+
+# Build shared-types and api
+RUN npm run build:shared
+RUN cd apps/api && npm run build
+
+# Production image
+FROM node:20-bullseye-slim
+
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root configurations
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/
+COPY packages/shared-types/package.json packages/shared-types/
+
+# Install production dependencies
+RUN npm ci --omit=dev
+
+# Copy built code
+COPY --from=builder /app/packages/shared-types/dist packages/shared-types/dist
+COPY --from=builder /app/apps/api/dist apps/api/dist
+COPY --from=builder /app/apps/api/prisma apps/api/prisma
+
+WORKDIR /app/apps/api
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+
+EXPOSE 3001
+
+# Run Prisma migrations and start server
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
