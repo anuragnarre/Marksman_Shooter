@@ -1,0 +1,333 @@
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateRangeDto, CreateLaneDto, WalkInGuestDto, BookLaneDto } from './dto/range.dto';
+export declare class RangesService {
+    private prisma;
+    constructor(prisma: PrismaService);
+    private generateRangeCode;
+    createRange(userId: string, dto: CreateRangeDto): Promise<{
+        name: string;
+        id: string;
+        createdAt: Date;
+        description: string | null;
+        updatedAt: Date;
+        code: string;
+        rangeStatus: string;
+        ownerId: string;
+        address: string | null;
+        phone: string | null;
+        gpsCoordinates: string | null;
+        maxLanes: number | null;
+        isActive: boolean;
+        organizationId: string | null;
+    }>;
+    getMyRanges(userId: string): Promise<({
+        lanes: {
+            name: string | null;
+            id: string;
+            createdAt: Date;
+            rangeId: string;
+            updatedAt: Date;
+            status: string;
+            notes: string | null;
+            laneNumber: number;
+            deviceId: string | null;
+            activeSessionId: string | null;
+            targetFrameType: string | null;
+            maxCaliber: string | null;
+            supportedDistances: number[];
+            lastInspectedAt: Date | null;
+        }[];
+    } & {
+        name: string;
+        id: string;
+        createdAt: Date;
+        description: string | null;
+        updatedAt: Date;
+        code: string;
+        rangeStatus: string;
+        ownerId: string;
+        address: string | null;
+        phone: string | null;
+        gpsCoordinates: string | null;
+        maxLanes: number | null;
+        isActive: boolean;
+        organizationId: string | null;
+    })[]>;
+    getRangeDetails(rangeId: string): Promise<{
+        bookings: ({
+            user: {
+                name: string;
+                email: string;
+                role: import(".prisma/client").$Enums.Role;
+                id: string;
+                googleId: string | null;
+                claimToken: string | null;
+                passwordHash: string | null;
+                createdAt: Date;
+                totpSecret: string | null;
+                isTwoFactorEnabled: boolean;
+                isGuest: boolean;
+                managedByRangeId: string | null;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            userId: string;
+            rangeId: string;
+            updatedAt: Date;
+            laneId: string | null;
+            startTime: Date;
+            endTime: Date;
+            amount: number;
+            paymentStatus: string;
+        })[];
+        lanes: ({
+            device: {
+                apiKey: string;
+                id: string;
+                createdAt: Date;
+                userId: string;
+                isActive: boolean;
+                deviceName: string;
+                deviceType: import(".prisma/client").$Enums.DeviceType;
+                lastSeenAt: Date | null;
+                metadata: import("@prisma/client/runtime/library").JsonValue | null;
+            } | null;
+            activeSession: ({
+                shooter: {
+                    name: string;
+                    email: string;
+                    role: import(".prisma/client").$Enums.Role;
+                    id: string;
+                    googleId: string | null;
+                    claimToken: string | null;
+                    passwordHash: string | null;
+                    createdAt: Date;
+                    totpSecret: string | null;
+                    isTwoFactorEnabled: boolean;
+                    isGuest: boolean;
+                    managedByRangeId: string | null;
+                };
+            } & {
+                id: string;
+                createdAt: Date;
+                shooterId: string;
+                discipline: string;
+                distance: number;
+                weaponType: string;
+                numberOfShots: number;
+                sessionDate: Date;
+                trainingMode: string | null;
+                deletedAt: Date | null;
+                rangeId: string | null;
+                competitionEntryId: string | null;
+            }) | null;
+        } & {
+            name: string | null;
+            id: string;
+            createdAt: Date;
+            rangeId: string;
+            updatedAt: Date;
+            status: string;
+            notes: string | null;
+            laneNumber: number;
+            deviceId: string | null;
+            activeSessionId: string | null;
+            targetFrameType: string | null;
+            maxCaliber: string | null;
+            supportedDistances: number[];
+            lastInspectedAt: Date | null;
+        })[];
+        managedGuests: {
+            name: string;
+            email: string;
+            role: import(".prisma/client").$Enums.Role;
+            id: string;
+            googleId: string | null;
+            claimToken: string | null;
+            passwordHash: string | null;
+            createdAt: Date;
+            totpSecret: string | null;
+            isTwoFactorEnabled: boolean;
+            isGuest: boolean;
+            managedByRangeId: string | null;
+        }[];
+    } & {
+        name: string;
+        id: string;
+        createdAt: Date;
+        description: string | null;
+        updatedAt: Date;
+        code: string;
+        rangeStatus: string;
+        ownerId: string;
+        address: string | null;
+        phone: string | null;
+        gpsCoordinates: string | null;
+        maxLanes: number | null;
+        isActive: boolean;
+        organizationId: string | null;
+    }>;
+    createLane(rangeId: string, dto: CreateLaneDto): Promise<{
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    }>;
+    registerWalkInGuest(rangeId: string, dto: WalkInGuestDto): Promise<{
+        name: string;
+        email: string;
+        role: import(".prisma/client").$Enums.Role;
+        id: string;
+        googleId: string | null;
+        claimToken: string | null;
+        passwordHash: string | null;
+        createdAt: Date;
+        totpSecret: string | null;
+        isTwoFactorEnabled: boolean;
+        isGuest: boolean;
+        managedByRangeId: string | null;
+    }>;
+    linkSessionToLane(laneId: string, sessionId: string): Promise<{
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    }>;
+    clearLane(laneId: string): Promise<{
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    }>;
+    updateLane(laneId: string, data: any): Promise<{
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    }>;
+    updateLaneStatus(laneId: string, status: string): Promise<{
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    }>;
+    getLanes(rangeId: string): Promise<({
+        device: {
+            apiKey: string;
+            id: string;
+            createdAt: Date;
+            userId: string;
+            isActive: boolean;
+            deviceName: string;
+            deviceType: import(".prisma/client").$Enums.DeviceType;
+            lastSeenAt: Date | null;
+            metadata: import("@prisma/client/runtime/library").JsonValue | null;
+        } | null;
+        activeSession: ({
+            shooter: {
+                name: string;
+                id: string;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            shooterId: string;
+            discipline: string;
+            distance: number;
+            weaponType: string;
+            numberOfShots: number;
+            sessionDate: Date;
+            trainingMode: string | null;
+            deletedAt: Date | null;
+            rangeId: string | null;
+            competitionEntryId: string | null;
+        }) | null;
+    } & {
+        name: string | null;
+        id: string;
+        createdAt: Date;
+        rangeId: string;
+        updatedAt: Date;
+        status: string;
+        notes: string | null;
+        laneNumber: number;
+        deviceId: string | null;
+        activeSessionId: string | null;
+        targetFrameType: string | null;
+        maxCaliber: string | null;
+        supportedDistances: number[];
+        lastInspectedAt: Date | null;
+    })[]>;
+    logLaneInspection(laneId: string, rsoId: string, data: any): Promise<{
+        id: string;
+        status: string;
+        notes: string | null;
+        laneId: string;
+        inspectionDate: Date;
+        photos: string[];
+        rsoId: string;
+    }>;
+    bookLane(rangeId: string, dto: BookLaneDto): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        rangeId: string;
+        updatedAt: Date;
+        laneId: string | null;
+        startTime: Date;
+        endTime: Date;
+        amount: number;
+        paymentStatus: string;
+    }>;
+}

@@ -1,0 +1,397 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.marksman.rangeapp"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="36" />
+10
+11    <!-- Permissions -->
+12
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:40:5-67
+13-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:40:22-64
+14
+15    <queries>
+15-->[:capacitor-camera] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-11:15
+16        <intent>
+16-->[:capacitor-camera] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-10:18
+17            <action android:name="android.media.action.IMAGE_CAPTURE" />
+17-->[:capacitor-camera] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-73
+17-->[:capacitor-camera] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-70
+18        </intent>
+19
+20        <package android:name="com.google.android.apps.healthdata" />
+20-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:51:9-70
+20-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:51:18-67
+21    </queries>
+22
+23    <uses-permission android:name="android.permission.VIBRATE" />
+23-->[:capacitor-haptics] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-66
+23-->[:capacitor-haptics] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\haptics\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-63
+24    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+24-->[:capacitor-network] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-79
+24-->[:capacitor-network] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-76
+25    <uses-permission android:name="android.permission.health.READ_STEPS" />
+25-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-76
+25-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-73
+26    <uses-permission android:name="android.permission.health.WRITE_STEPS" />
+26-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-77
+26-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:22-74
+27    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
+27-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-79
+27-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:22-76
+28    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" />
+28-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:5-80
+28-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:22-77
+29    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+29-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-93
+29-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:22-90
+30    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" />
+30-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-94
+30-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-91
+31    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+31-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-81
+31-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-78
+32    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" />
+32-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:5-82
+32-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:22-79
+33    <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+33-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:5-77
+33-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:22-74
+34    <uses-permission android:name="android.permission.health.WRITE_WEIGHT" />
+34-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:5-78
+34-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:22-75
+35    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+35-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:5-76
+35-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:22-73
+36    <uses-permission android:name="android.permission.health.WRITE_SLEEP" />
+36-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:5-77
+36-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:22-74
+37    <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" />
+37-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:5-87
+37-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:22-84
+38    <uses-permission android:name="android.permission.health.WRITE_RESPIRATORY_RATE" />
+38-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:5-88
+38-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:22-85
+39    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
+39-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:5-88
+39-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:22-85
+40    <uses-permission android:name="android.permission.health.WRITE_OXYGEN_SATURATION" />
+40-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:5-89
+40-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:22-86
+41    <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
+41-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:5-89
+41-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:22-86
+42    <uses-permission android:name="android.permission.health.WRITE_RESTING_HEART_RATE" />
+42-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:5-90
+42-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:22-87
+43    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY" />
+43-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:5-93
+43-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:22-90
+44    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE_VARIABILITY" />
+44-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:5-94
+44-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:22-91
+45    <uses-permission android:name="android.permission.health.READ_BLOOD_PRESSURE" />
+45-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:5-85
+45-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:22-82
+46    <uses-permission android:name="android.permission.health.WRITE_BLOOD_PRESSURE" />
+46-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:5-86
+46-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:22-83
+47    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
+47-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:5-84
+47-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:22-81
+48    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
+48-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:5-85
+48-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:22-82
+49    <uses-permission android:name="android.permission.health.READ_BODY_TEMPERATURE" />
+49-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:31:5-87
+49-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:31:22-84
+50    <uses-permission android:name="android.permission.health.WRITE_BODY_TEMPERATURE" />
+50-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:32:5-88
+50-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:32:22-85
+51    <uses-permission android:name="android.permission.health.READ_HEIGHT" />
+51-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:33:5-77
+51-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:33:22-74
+52    <uses-permission android:name="android.permission.health.WRITE_HEIGHT" />
+52-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:5-78
+52-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:22-75
+53    <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED" />
+53-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:35:5-85
+53-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:35:22-82
+54    <uses-permission android:name="android.permission.health.WRITE_FLOORS_CLIMBED" />
+54-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:36:5-86
+54-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:36:22-83
+55    <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
+55-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:37:5-79
+55-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:37:22-76
+56    <uses-permission android:name="android.permission.health.WRITE_BODY_FAT" />
+56-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:38:5-80
+56-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:38:22-77
+57    <uses-permission android:name="android.permission.health.READ_BASAL_BODY_TEMPERATURE" />
+57-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:39:5-93
+57-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:39:22-90
+58    <uses-permission android:name="android.permission.health.WRITE_BASAL_BODY_TEMPERATURE" />
+58-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:40:5-94
+58-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:40:22-91
+59    <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE" />
+59-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:41:5-91
+59-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:41:22-88
+60    <uses-permission android:name="android.permission.health.WRITE_BASAL_METABOLIC_RATE" />
+60-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:42:5-92
+60-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:42:22-89
+61    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" />
+61-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:43:5-92
+61-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:43:22-89
+62    <uses-permission android:name="android.permission.health.WRITE_TOTAL_CALORIES_BURNED" />
+62-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:44:5-93
+62-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:44:22-90
+63    <uses-permission android:name="android.permission.health.READ_MINDFULNESS" />
+63-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:45:5-82
+63-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:45:22-79
+64    <uses-permission android:name="android.permission.health.WRITE_MINDFULNESS" />
+64-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:46:5-83
+64-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:46:22-80
+65    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
+65-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:47:5-79
+65-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:47:22-76
+66    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+66-->[:codetrix-studio-capacitor-google-auth] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-74
+66-->[:codetrix-studio-capacitor-google-auth] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-71
+67
+68    <permission
+68-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+69        android:name="com.marksman.rangeapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+69-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+70        android:protectionLevel="signature" />
+70-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+71
+72    <uses-permission android:name="com.marksman.rangeapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+72-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+72-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+73
+74    <application
+74-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:4:5-36:19
+75        android:allowBackup="true"
+75-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:5:9-35
+76        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+76-->[androidx.core:core:1.17.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
+77        android:debuggable="true"
+78        android:extractNativeLibs="false"
+79        android:icon="@mipmap/ic_launcher"
+79-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:6:9-43
+80        android:label="@string/app_name"
+80-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:7:9-41
+81        android:roundIcon="@mipmap/ic_launcher_round"
+81-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:8:9-54
+82        android:supportsRtl="true"
+82-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:9:9-35
+83        android:theme="@style/AppTheme" >
+83-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:10:9-40
+84        <activity
+84-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:12:9-25:20
+85            android:name="com.marksman.rangeapp.MainActivity"
+85-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:14:13-41
+86            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+86-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:13:13-148
+87            android:exported="true"
+87-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:18:13-36
+88            android:label="@string/title_activity_main"
+88-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:15:13-56
+89            android:launchMode="singleTask"
+89-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:17:13-44
+90            android:theme="@style/AppTheme.NoActionBarLaunch" >
+90-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:16:13-62
+91            <intent-filter>
+91-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:20:13-23:29
+92                <action android:name="android.intent.action.MAIN" />
+92-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:21:17-69
+92-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:21:25-66
+93
+94                <category android:name="android.intent.category.LAUNCHER" />
+94-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:22:17-77
+94-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:22:27-74
+95            </intent-filter>
+96        </activity>
+97
+98        <provider
+99            android:name="androidx.core.content.FileProvider"
+99-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:28:13-62
+100            android:authorities="com.marksman.rangeapp.fileprovider"
+100-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:29:13-64
+101            android:exported="false"
+101-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:30:13-37
+102            android:grantUriPermissions="true" >
+102-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:31:13-47
+103            <meta-data
+103-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:32:13-34:64
+104                android:name="android.support.FILE_PROVIDER_PATHS"
+104-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:33:17-67
+105                android:resource="@xml/file_paths" />
+105-->D:\App and Hardware Project\App\Marksman\Range_App\apps\web\android\app\src\main\AndroidManifest.xml:34:17-51
+106        </provider>
+107        <!-- Activity to display privacy policy rationale for Health Connect permissions (Android 13 and earlier) -->
+108        <activity
+108-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:57:9-64:20
+109            android:name="app.capgo.plugin.health.PermissionsRationaleActivity"
+109-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:58:13-80
+110            android:exported="true"
+110-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:59:13-36
+111            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" >
+111-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:60:13-81
+112            <intent-filter>
+112-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:61:13-63:29
+113                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+113-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:62:17-92
+113-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:62:25-89
+114            </intent-filter>
+115        </activity> <!-- Activity alias for Android 14+ (API 34+) permission usage view -->
+116        <activity-alias
+116-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:65:9-75:26
+117            android:name="app.capgo.plugin.health.ViewPermissionUsageActivity"
+117-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:66:13-79
+118            android:exported="true"
+118-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:67:13-36
+119            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
+119-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:68:13-80
+120            android:targetActivity="app.capgo.plugin.health.PermissionsRationaleActivity" >
+120-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:69:13-90
+121            <intent-filter>
+121-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:70:13-74:29
+122                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+122-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:71:17-86
+122-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:71:25-83
+123
+124                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+124-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:73:17-87
+124-->[:capgo-capacitor-health] D:\App and Hardware Project\App\Marksman\Range_App\node_modules\@capgo\capacitor-health\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:73:27-84
+125            </intent-filter>
+126        </activity-alias>
+127
+128        <activity
+128-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:23:9-27:75
+129            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+129-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:24:13-93
+130            android:excludeFromRecents="true"
+130-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:25:13-46
+131            android:exported="false"
+131-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:26:13-37
+132            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+132-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:27:13-72
+133        <!--
+134            Service handling Google Sign-In user revocation. For apps that do not integrate with
+135            Google Sign-In, this service will never be started.
+136        -->
+137        <service
+137-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:33:9-37:51
+138            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+138-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:34:13-89
+139            android:exported="true"
+139-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:35:13-36
+140            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+140-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:36:13-107
+141            android:visibleToInstantApps="true" />
+141-->[com.google.android.gms:play-services-auth:18.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:37:13-48
+142
+143        <activity
+143-->[com.google.android.gms:play-services-base:17.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:23:9-26:75
+144            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+144-->[com.google.android.gms:play-services-base:17.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:24:13-79
+145            android:exported="false"
+145-->[com.google.android.gms:play-services-base:17.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:25:13-37
+146            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+146-->[com.google.android.gms:play-services-base:17.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:26:13-72
+147
+148        <meta-data
+148-->[com.google.android.gms:play-services-basement:17.1.1] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:23:9-25:69
+149            android:name="com.google.android.gms.version"
+149-->[com.google.android.gms:play-services-basement:17.1.1] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:24:13-58
+150            android:value="@integer/google_play_services_version" />
+150-->[com.google.android.gms:play-services-basement:17.1.1] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:25:13-66
+151
+152        <service
+152-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:24:9-32:19
+153            android:name="androidx.health.platform.client.impl.sdkservice.HealthDataSdkService"
+153-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:25:13-96
+154            android:enabled="true"
+154-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:26:13-35
+155            android:exported="true" >
+155-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:27:13-36
+156            <intent-filter>
+156-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:29:13-31:29
+157                <action android:name="androidx.health.platform.client.ACTION_BIND_SDK_SERVICE" />
+157-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:30:17-98
+157-->[androidx.health.connect:connect-client:1.1.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\e94ff7c453897fca8290be1e0305a0a9\transformed\connect-client-1.1.0\AndroidManifest.xml:30:25-95
+158            </intent-filter>
+159        </service>
+160
+161        <provider
+161-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+162            android:name="androidx.startup.InitializationProvider"
+162-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+163            android:authorities="com.marksman.rangeapp.androidx-startup"
+163-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+164            android:exported="false" >
+164-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+165            <meta-data
+165-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+166                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+166-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+167                android:value="androidx.startup" />
+167-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+168            <meta-data
+168-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+169                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+169-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+170                android:value="androidx.startup" />
+170-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+171            <meta-data
+171-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+172                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+172-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+173                android:value="androidx.startup" />
+173-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+174        </provider>
+175
+176        <receiver
+176-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+177            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+177-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+178            android:directBootAware="false"
+178-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+179            android:enabled="true"
+179-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+180            android:exported="true"
+180-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+181            android:permission="android.permission.DUMP" >
+181-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+182            <intent-filter>
+182-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+183                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+183-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+183-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+184            </intent-filter>
+185            <intent-filter>
+185-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+186                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+186-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+186-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+187            </intent-filter>
+188            <intent-filter>
+188-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+189                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+189-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+189-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+190            </intent-filter>
+191            <intent-filter>
+191-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+192                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+192-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+192-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Anurag\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+193            </intent-filter>
+194        </receiver>
+195    </application>
+196
+197</manifest>
