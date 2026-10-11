@@ -26,8 +26,10 @@ Version_1_Core_App exclude from ai scans this is and old build not in use.rar
 
 # Android / Mobile build caches
 .gradle/
-android/.gradle/
-android/app/build/
+**/.gradle/
+**/build/
+**/.cxx/
+**/local.properties
 android/capacitor-cordova-android-plugins/.gradle/
 android/capacitor-cordova-android-plugins/build/
 
