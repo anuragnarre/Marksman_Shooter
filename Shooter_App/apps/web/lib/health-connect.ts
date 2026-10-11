@@ -77,9 +77,15 @@ export async function checkPermissions(): Promise<string[]> {
 
 // ── Data readers ───────────────────────────────────────────────────────────────
 
+export interface HealthSample {
+  startDate?: string;
+  date?: string;
+  value?: number;
+}
+
 async function readSamples(
   dataType: string, start: Date, end: Date, limit = 500,
-): Promise<any[]> {
+): Promise<HealthSample[]> {
   try {
     const mod = await loadPlugin();
     if (!mod) return [];
@@ -99,7 +105,7 @@ export async function readHeartRate(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; heartRate: number }>> {
   const samples = await readSamples('heartRate', start, end);
-  return samples.map((s: any) => ({
+  return samples.map((s) => ({
     timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
     heartRate: Math.round(s.value ?? 0),
   }));
@@ -109,17 +115,20 @@ export async function readBloodOxygen(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; spo2: number }>> {
   const samples = await readSamples('oxygenSaturation', start, end);
-  return samples.map((s: any) => ({
-    timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
-    spo2: Math.round((s.value ?? 0) * (s.value <= 1 ? 100 : 1)), // normalize 0-1 or 0-100
-  }));
+  return samples.map((s) => {
+    const val = s.value ?? 0;
+    return {
+      timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
+      spo2: Math.round(val * (val <= 1 ? 100 : 1)), // normalize 0-1 or 0-100
+    };
+  });
 }
 
 export async function readRespiratoryRate(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; respiratoryRate: number }>> {
   const samples = await readSamples('respiratoryRate', start, end);
-  return samples.map((s: any) => ({
+  return samples.map((s) => ({
     timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
     respiratoryRate: Math.round(s.value ?? 0),
   }));
@@ -129,7 +138,7 @@ export async function readHrv(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; hrv: number }>> {
   const samples = await readSamples('heartRateVariability', start, end);
-  return samples.map((s: any) => ({
+  return samples.map((s) => ({
     timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
     hrv: Math.round(s.value ?? 0),
   }));
@@ -139,7 +148,7 @@ export async function readSteps(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; steps: number }>> {
   const samples = await readSamples('steps', start, end);
-  return samples.map((s: any) => ({
+  return samples.map((s) => ({
     timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
     steps: Math.round(s.value ?? 0),
   }));
@@ -149,7 +158,7 @@ export async function readCalories(
   start: Date, end: Date,
 ): Promise<Array<{ timestamp: string; calories: number }>> {
   const samples = await readSamples('calories', start, end);
-  return samples.map((s: any) => ({
+  return samples.map((s) => ({
     timestamp: s.startDate ?? s.date ?? new Date().toISOString(),
     calories: Math.round(s.value ?? 0),
   }));

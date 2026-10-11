@@ -16,10 +16,11 @@ export class BiometricsService {
 
   async registerDevice(userId: string, deviceName: string, deviceType: string) {
     const apiKey = crypto.randomBytes(32).toString('hex');
+    const hashedApiKey = crypto.createHash('sha256').update(apiKey).digest('hex');
     const device = await this.prisma.deviceRegistration.create({
-      data: { userId, deviceName, deviceType: deviceType as any, apiKey },
+      data: { userId, deviceName, deviceType: deviceType as any, apiKey: hashedApiKey },
     });
-    return { ...device, apiKey }; // apiKey shown once
+    return { ...device, apiKey }; // apiKey shown once to the client
   }
 
   async listDevices(userId: string) {
@@ -117,12 +118,13 @@ export class BiometricsService {
 
     if (!device) {
       const apiKey = crypto.randomBytes(32).toString('hex');
+      const hashedApiKey = crypto.createHash('sha256').update(apiKey).digest('hex');
       device = await this.prisma.deviceRegistration.create({
         data: {
           userId,
           deviceName: 'Health Connect',
           deviceType: 'HEALTH_CONNECT',
-          apiKey,
+          apiKey: hashedApiKey,
           isActive: true,
         },
       });

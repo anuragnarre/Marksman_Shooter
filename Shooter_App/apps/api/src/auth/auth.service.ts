@@ -1,6 +1,7 @@
 // apps/api/src/auth/auth.service.ts
 import {
   Injectable,
+  Logger,
   ConflictException,
   UnauthorizedException,
   BadRequestException,
@@ -21,6 +22,7 @@ const BCRYPT_SALT_ROUNDS = 12;
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly googleClient: OAuth2Client;
 
   constructor(
@@ -103,7 +105,7 @@ export class AuthService {
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
-      console.error('[login] Error:', err);
+      this.logger.error('[login] Error:', err);
       throw new InternalServerErrorException(
         err instanceof Error ? err.message : 'Database connection failed or internal error',
       );
@@ -127,7 +129,7 @@ export class AuthService {
         audience: googleClientId,
       });
     } catch (err) {
-      console.error('[googleLogin] verifyIdToken failed:', err);
+      this.logger.error('[googleLogin] verifyIdToken failed:', err);
       throw new UnauthorizedException('Invalid Google token');
     }
 
@@ -178,7 +180,7 @@ export class AuthService {
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
-      console.error('[googleLogin] DB/token error:', err);
+      this.logger.error('[googleLogin] DB/token error:', err);
       throw new InternalServerErrorException(
         (err as Error)?.message ?? 'Google login failed',
       );

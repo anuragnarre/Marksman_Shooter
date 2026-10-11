@@ -19,27 +19,36 @@ async function bootstrap(): Promise<void> {
     .map((o) => o.trim())
     .filter(Boolean);
 
+  const isDev = process.env.NODE_ENV !== 'production';
+  // Strict regex for loopback addresses on any port (protects against attacker-localhost.com)
+  const LOCALHOST_REGEX = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+  // RFC 1918 private subnets for downrange Target Camera phones & shooting line tablets on range Wi-Fi
+  const PRIVATE_LAN_REGEX = /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/;
+
   app.enableCors({
     origin: (origin, callback) => {
-      // No origin = server-to-server request (Next.js proxy, curl, etc.) — always allow
+      // Server-to-server requests (Next.js server actions, curl, background workers)
       if (!origin) return callback(null, true);
-      // Localhost variants — always allow (Next.js dev server, same-machine tools)
-      if (
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.startsWith('http://[::1]')
-      ) {
+
+      // Localhost variants (Shooter App :3000, Range Ops App :3002, Vite dev tools)
+      if (LOCALHOST_REGEX.test(origin)) {
         return callback(null, true);
       }
-      // Explicitly configured origins (set CORS_ORIGINS env var for admin/WS)
+
+      // LAN private networks in dev or local range networks (Camera phone, Range tablet)
+      if (isDev && PRIVATE_LAN_REGEX.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Explicitly configured production origins (e.g. from CORS_ORIGINS)
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      // Reject everything else — port 3001 is internal only
+
       callback(new Error(`CORS blocked: ${origin}`));
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Operation-Id'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Operation-Id', 'X-Device-Key', 'X-Device-Id'],
     credentials: true,
   });
 

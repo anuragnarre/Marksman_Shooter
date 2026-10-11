@@ -1,6 +1,7 @@
 // apps/api/src/biometrics/biometrics-ai.service.ts
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
   InternalServerErrorException,
@@ -50,7 +51,9 @@ Provide 3-6 insights. Reference specific numbers from the data.`;
 
 @Injectable()
 export class BiometricsAiService {
-  private ai: GoogleGenAI | null = null;
+  private readonly logger = new Logger(BiometricsAiService.name);
+  private readonly ai: GoogleGenAI;
+  private readonly hasApiKey: boolean;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -59,6 +62,10 @@ export class BiometricsAiService {
     private readonly configService: ConfigService,
   ) {
     const envKey = this.configService.get<string>('GEMINI_API_KEY');
+    this.hasApiKey = Boolean(envKey && envKey.trim().length > 0 && !envKey.startsWith('dummy'));
+    if (!this.hasApiKey) {
+      this.logger.warn('GEMINI_API_KEY is not configured; AI biometric insights will alert that configuration is missing.');
+    }
     const apiKey = envKey || '';
     this.ai = new GoogleGenAI({ apiKey });
   }
@@ -88,7 +95,7 @@ export class BiometricsAiService {
     }
 
     const summary = await this.biometricsService.getSessionSummary(sessionId, userId);
-    const analytics = await this.analyticsService.computeForSession(sessionId);
+    const analytics = this.analyticsService.computeForSessionData(sessionId, session.shots);
 
     // Build time-aligned data
     const shotData = session.shots.slice(0, 60).map(s => ({
@@ -128,7 +135,7 @@ ${bioData.map(r => `HR=${r.hr ?? '-'} SpO2=${r.spo2 ?? '-'}% RR=${r.rr ?? '-'} [
 
 Analyse the biometric-performance correlation and provide insights in the required JSON format.`;
 
-    if (!this.ai) {
+    if (!this.hasApiKey) {
       throw new InternalServerErrorException(
         'AI biometric analysis is not configured. Add a GEMINI_API_KEY to enable it.',
       );
@@ -144,6 +151,7 @@ Analyse the biometric-performance correlation and provide insights in the requir
       });
       raw = response.text ?? '';
     } catch (err) {
+      this.logger.error('AI Biometric Analysis generation failed:', err);
       throw new InternalServerErrorException(
         `AI Biometric Analysis unavailable: ${(err as Error).message}`,
       );
@@ -364,7 +372,7 @@ ${readings.slice(0, 50).map(r =>
 
 Generate comprehensive advanced insights across all four domains. Reference specific numbers. Be actionable and specific to precision shooting.`;
 
-    if (!this.ai) {
+    if (!this.hasApiKey) {
       throw new InternalServerErrorException(
         'AI advanced insights are not configured. Add a GEMINI_API_KEY to enable them.',
       );
@@ -380,6 +388,7 @@ Generate comprehensive advanced insights across all four domains. Reference spec
       });
       raw = response.text ?? '';
     } catch (err) {
+      this.logger.error('AI Advanced Analysis generation failed:', err);
       throw new InternalServerErrorException(
         `AI Advanced Analysis unavailable: ${(err as Error).message}`,
       );

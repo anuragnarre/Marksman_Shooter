@@ -1,6 +1,7 @@
 // apps/api/src/ai-coach/ai-coach.service.ts
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
   InternalServerErrorException,
@@ -175,7 +176,9 @@ Provide 4-5 technique insights, 3-5 performance patterns, 3-4 mental recommendat
 
 @Injectable()
 export class AiCoachService {
+  private readonly logger = new Logger(AiCoachService.name);
   private readonly ai: GoogleGenAI;
+  private readonly hasApiKey: boolean;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -183,6 +186,10 @@ export class AiCoachService {
     private readonly configService: ConfigService,
   ) {
     const envKey = this.configService.get<string>('GEMINI_API_KEY');
+    this.hasApiKey = Boolean(envKey && envKey.trim().length > 0 && !envKey.startsWith('dummy'));
+    if (!this.hasApiKey) {
+      this.logger.warn('GEMINI_API_KEY is not configured; AI coaching endpoints will return a configuration alert.');
+    }
     const apiKey = envKey || '';
     this.ai = new GoogleGenAI({ apiKey });
   }
@@ -313,9 +320,9 @@ ${biometricSection}
 Please analyse this session and provide coaching feedback in the required JSON format.`;
 
     // ── 5. Call Gemini ─────────────────────────────────────────────────────────
-    if (!this.ai) {
+    if (!this.hasApiKey) {
       throw new InternalServerErrorException(
-        'AI Coach requires a GEMINI_API_KEY.',
+        'AI Coach requires a GEMINI_API_KEY configured in server environment.',
       );
     }
     let raw: string;
@@ -329,6 +336,7 @@ Please analyse this session and provide coaching feedback in the required JSON f
       });
       raw = response.text ?? '';
     } catch (err) {
+      this.logger.error('AI Coach generation failed:', err);
       throw new InternalServerErrorException(
         `AI Coach unavailable: ${(err as Error).message}`,
       );
@@ -390,7 +398,7 @@ Please analyse this session and provide coaching feedback in the required JSON f
 
     for (const session of sessions) {
       if (session.shots.length === 0) continue;
-      const analytics = await this.analyticsService.computeForSession(session.id);
+      const analytics = this.analyticsService.computeForSessionData(session.id, session.shots);
       const scores = session.shots.map(s => s.score);
 
       sessionAnalytics.push({
@@ -482,9 +490,9 @@ SCORE TREND (newest first): ${allAvgScores.map(s => s.toFixed(2)).join(' → ')}
 
 Analyse this shooter's complete history and provide the comprehensive performance assistant response in the required JSON format.`;
 
-    if (!this.ai) {
+    if (!this.hasApiKey) {
       throw new InternalServerErrorException(
-        'AI Performance Assistant requires a GEMINI_API_KEY.',
+        'AI Performance Assistant requires a GEMINI_API_KEY configured in server environment.',
       );
     }
     let raw: string;
@@ -499,6 +507,7 @@ Analyse this shooter's complete history and provide the comprehensive performanc
       });
       raw = response.text ?? '';
     } catch (err) {
+      this.logger.error('AI Performance Assistant generation failed:', err);
       throw new InternalServerErrorException(
         `AI Performance Assistant unavailable: ${(err as Error).message}`,
       );
