@@ -8,6 +8,7 @@ import {
 import { GoogleGenAI } from '@google/genai';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { Session, Shot } from '@prisma/client';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SessionContextDto } from './dto/session-context.dto';
 import { DeepAnalysis, TrainingPlan, UserRole } from '@shooting-platform/shared-types';
@@ -30,24 +31,23 @@ export class PerformanceService {
 
   // ── Deep Analysis ──────────────────────────────────────────────────────────
 
-  async getDeepAnalysis(
+
+  async getDeepAnalysisBySession(
+    session: Session & { shots: Shot[] } | null,
     userId: string,
-    sessionId: string,
     role: UserRole = 'SHOOTER',
     shooterIdHint?: string,
   ): Promise<DeepAnalysis> {
-    const session = await this.prisma.session.findFirst({
-      where: { id: sessionId, deletedAt: null },
-      include: { shots: { orderBy: { shotNumber: 'asc' } } },
-    });
-    if (!session) throw new NotFoundException(`Session ${sessionId} not found`);
+    if (!session) throw new NotFoundException('Session not found');
 
     if (shooterIdHint && shooterIdHint !== session.shooterId) {
       throw new ForbiddenException('Session does not belong to the requested shooter');
     }
     await this.assertActorCanAccessShooter(userId, role, session.shooterId);
 
-    const shots = session.shots;
+    const shots = session.shots || [];
+    const sessionId = session.id;
+
     if (shots.length === 0) {
       return {
         sessionId,
@@ -68,19 +68,19 @@ export class PerformanceService {
     const fatigueIndex = this.computeSlope(seriesAverages);
 
     // Focus Score: Spearman rank correlation between shot# and score, scaled 0–100
-    const scores = shots.map((s) => s.score);
-    const shotNums = shots.map((_, i) => i + 1);
+    const scores = shots.map((s: Shot) => s.score);
+    const shotNums = shots.map((_: any, i: number) => i + 1);
     const spearman = this.spearmanCorrelation(shotNums, scores);
     const focusScore = Math.round(Math.max(0, Math.min(100, (spearman + 1) * 50)));
 
     // Outlier shots: shot numbers where score < mean - 2*stdDev
     const threshold = averageScore - 2 * stdDev;
     const outlierShots = shots
-      .filter((s) => s.score < threshold)
-      .map((s) => s.shotNumber);
+      .filter((s: Shot) => s.score < threshold)
+      .map((s: Shot) => s.shotNumber);
 
     // Cluster count: simplified k-means elbow on (x, y)
-    const points = shots.map((s) => [s.x, s.y] as [number, number]);
+    const points = shots.map((s: Shot) => [s.x, s.y] as [number, number]);
     const clusterCount = this.estimateClusters(points);
 
     // Warmup shots: index where rolling 5-shot avg first exceeds overall mean
@@ -102,6 +102,19 @@ export class PerformanceService {
       peakSeriesIndex,
       peakSeriesAvg: Math.round(peakSeriesAvg * 100) / 100,
     };
+  }
+
+  async getDeepAnalysis(
+    userId: string,
+    sessionId: string,
+    role: UserRole = 'SHOOTER',
+    shooterIdHint?: string,
+  ): Promise<DeepAnalysis> {
+    const session = await this.prisma.session.findFirst({
+      where: { id: sessionId, deletedAt: null },
+      include: { shots: { orderBy: { shotNumber: 'asc' } } },
+    });
+    return this.getDeepAnalysisBySession(session, userId, role, shooterIdHint);
   }
 
   // ── Session Context ────────────────────────────────────────────────────────
@@ -155,7 +168,7 @@ export class PerformanceService {
     const analyses: DeepAnalysis[] = [];
     for (const s of sessions) {
       try {
-        const da = await this.getDeepAnalysis(userId, s.id, role, targetShooterId);
+        const da = await this.getDeepAnalysisBySession(s, userId, role, targetShooterId);
         analyses.push(da);
       } catch {
         // skip sessions we can't analyze
