@@ -1,4 +1,4 @@
-export type UserRole = 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR';
+export type UserRole = 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR' | 'RANGE_ADMIN' | 'RSO' | 'STAFF' | 'PARENT_GUARDIAN';
 export type ConnectionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export interface User {
     id: string;

@@ -46,7 +46,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/performance/competitions', label: 'Competitions', icon: <GoalIcon /> },
     ],
   },
-  { href: '/docs', label: 'Docs & Guides', icon: <DocsIcon /> },
+  { href: '/docs', label: 'User Manual & Guides', icon: <DocsIcon /> },
   { href: '/connect', label: 'Connect', icon: <LinkIcon /> },
   { href: '/settings', label: 'Settings', icon: <SettingsIcon /> },
 ];

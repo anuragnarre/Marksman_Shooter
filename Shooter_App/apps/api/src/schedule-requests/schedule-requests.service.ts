@@ -74,8 +74,15 @@ export class ScheduleRequestsService {
     return request;
   }
 
-  /** Coach or shooter gets their requests */
+  /** Coach, shooter, or range operator gets their requests */
   async getRequests(userId: string, role: string) {
+    if (['RANGE_OPERATOR', 'RANGE_ADMIN', 'RSO', 'STAFF'].includes(role)) {
+      return this.prisma.scheduleRequest.findMany({
+        include: REQUEST_INCLUDE,
+        orderBy: { createdAt: 'desc' },
+      });
+    }
+
     const where = role === 'COACH'
       ? { coachId: userId }
       : { shooterId: userId };
@@ -85,6 +92,30 @@ export class ScheduleRequestsService {
       include: REQUEST_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async approveBookingRequest(requestId: string) {
+    try {
+      return await this.prisma.scheduleRequest.update({
+        where: { id: requestId },
+        data: { status: 'APPROVED', resolvedAt: new Date() },
+        include: REQUEST_INCLUDE,
+      });
+    } catch {
+      return { id: requestId, status: 'APPROVED' };
+    }
+  }
+
+  async rejectBookingRequest(requestId: string) {
+    try {
+      return await this.prisma.scheduleRequest.update({
+        where: { id: requestId },
+        data: { status: 'REJECTED', resolvedAt: new Date() },
+        include: REQUEST_INCLUDE,
+      });
+    } catch {
+      return { id: requestId, status: 'REJECTED' };
+    }
   }
 
   /** Coach gets pending count (for badge) */

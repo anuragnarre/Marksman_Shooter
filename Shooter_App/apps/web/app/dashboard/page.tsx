@@ -18,14 +18,44 @@ import { BiometricPulseWidget } from '../../components/BiometricPulseWidget';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { StaggerGrid, StaggerItem } from '../../components/StaggerGrid';
+import { useRouter } from 'next/navigation';
 import type {
   Session, Shot,
   OverviewAnalytics, SessionTrendPoint,
 } from '@shooting-platform/shared-types';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
-  if (!user) return null;
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/auth/login');
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen bg-void flex items-center justify-center font-sans text-center">
+        <div className="flex flex-col items-center gap-4 p-8 bg-[var(--bg-surface)] rounded-3xl border border-[var(--border-subtle)] shadow-2xl">
+          <div className="w-12 h-12 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
+          <div>
+            <p className="text-white font-bold text-lg font-display uppercase tracking-widest">
+              Initializing Marksman
+            </p>
+            <p className="text-[var(--text-muted)] text-xs mt-1">Verifying athlete credentials...</p>
+          </div>
+          <Link
+            href="/auth/login"
+            className="mt-2 text-xs text-[var(--accent-primary)] hover:underline font-bold uppercase tracking-wider"
+          >
+            Go to Sign In &rarr;
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AppShell title="Dashboard">
       <ShooterView />

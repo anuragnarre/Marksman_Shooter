@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Material Symbols Font Rule ────────────────────────── */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+}
+
+/* ── Tokens ────────────────────────────────────────────────────── */
+:root {
+  /* Stitch Light Tokens (Harmonized Precision Facility Theme) */
+  --stitch-surface:                      #f8f9ff;
+  --stitch-surface-dim:                  #cbdbf5;
+  --stitch-surface-bright:               #f8f9ff;
+  --stitch-surface-container-lowest:     #ffffff;
+  --stitch-surface-container-low:        #eff4ff;
+  --stitch-surface-container:            #e5eeff;
+  --stitch-surface-container-high:       #dce9ff;
+  --stitch-surface-container-highest:    #d3e4fe;
+  --stitch-on-surface:                   #0b1c30;
+  --stitch-on-surface-variant:           #45464d;
+  
+  --stitch-primary:                      #0f172a;
+  --stitch-primary-container:            #131b2e;
+  --stitch-on-primary:                   #ffffff;
+  --stitch-on-primary-container:         #dae2fd;
+  --stitch-primary-fixed:                #dae2fd;
+  --stitch-primary-fixed-dim:            #bec6e0;
+  --stitch-on-primary-fixed:             #131b2e;
+
+  --stitch-secondary:                    #904d00;
+  --stitch-secondary-container:          #fe932c;
+  --stitch-on-secondary:                 #ffffff;
+  --stitch-on-secondary-container:       #663500;
+  --stitch-secondary-fixed:              #ffdcc3;
+  --stitch-secondary-fixed-dim:          #ffb77d;
+  --stitch-on-secondary-fixed:           #2f1500;
+
+  --stitch-tertiary:                     #0284c7;
+  --stitch-tertiary-container:           #e0f2fe;
+  --stitch-on-tertiary:                  #ffffff;
+  --stitch-on-tertiary-container:        #0369a1;
+  --stitch-tertiary-fixed:               #85f8c4;
+  --stitch-tertiary-fixed-dim:           #68dba9;
+  --stitch-on-tertiary-fixed:            #002114;
+
+  --stitch-outline:                      #76777d;
+  --stitch-outline-variant:              #c6c6cd;
+  --stitch-error:                        #ba1a1a;
+  --stitch-error-container:              #ffdad6;
+  --stitch-on-error:                     #ffffff;
+  --stitch-on-error-container:           #93000a;
+
+  /* Legacy UI tokens for light mode */
+  --bg-void:                             #f8fafc;
+  --bg-surface:                          #f1f5f9;
+  --bg-elevated:                         #ffffff;
+  --bg-subtle:                           #f1f5f9;
+  --bg-overlay:                          rgba(255, 255, 255, 0.85);
+  --text-primary:                        #0b1c30;
+  --text-secondary:                      #45464d;
+  --text-muted:                          #76777d;
+  --accent-primary:                      #f59e0b;
+  --accent-primary-hover:                #d97706;
+  --accent-glow:                         rgba(245, 158, 11, 0.15);
+  --border-subtle:                       rgba(0, 0, 0, 0.08);
+  --border-default:                      rgba(0, 0, 0, 0.15);
+  --border-accent:                       rgba(245, 158, 11, 0.40);
+  --glass-bg:                            rgba(255, 255, 255, 0.85);
+  --glass-heavy-bg:                      rgba(255, 255, 255, 0.92);
+  --glass-border:                        rgba(0, 0, 0, 0.08);
+  --shadow-glass:                        0 8px 32px rgba(0, 0, 0, 0.06);
+  --chip-bg:                             rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  /* Stitch Dark Tokens (Tactical Command Precision Theme) */
+  --stitch-surface:                      #0b1326;
+  --stitch-surface-dim:                  #0b1326;
+  --stitch-surface-bright:               #31394d;
+  --stitch-surface-container-lowest:     #060e20;
+  --stitch-surface-container-low:        #131b2e;
+  --stitch-surface-container:            #171f33;
+  --stitch-surface-container-high:       #222a3d;
+  --stitch-surface-container-highest:    #2d3449;
+  --stitch-on-surface:                   #dae2fd;
+  --stitch-on-surface-variant:           #d8c3ad;
+
+  --stitch-primary:                      #f59e0b;
+  --stitch-primary-container:            #f59e0b;
+  --stitch-on-primary:                   #472a00;
+  --stitch-on-primary-container:         #613b00;
+  --stitch-primary-fixed:                #ffddb8;
+  --stitch-primary-fixed-dim:            #ffb95f;
+  --stitch-on-primary-fixed:             #2a1700;
+
+  --stitch-secondary:                    #ffb3ad;
+  --stitch-secondary-container:          #a40217;
+  --stitch-on-secondary:                 #68000a;
+  --stitch-on-secondary-container:       #ffaea8;
+  --stitch-secondary-fixed:              #ffdad7;
+  --stitch-secondary-fixed-dim:          #ffb3ad;
+  --stitch-on-secondary-fixed:           #410004;
+
+  --stitch-tertiary:                     #54ddfc;
+  --stitch-tertiary-container:           #29c1df;
+  --stitch-on-tertiary:                  #003640;
+  --stitch-on-tertiary-container:        #004b58;
+  --stitch-tertiary-fixed:               #acedff;
+  --stitch-tertiary-fixed-dim:           #4cd7f6;
+  --stitch-on-tertiary-fixed:            #001f26;
+
+  --stitch-outline:                      #a08e7a;
+  --stitch-outline-variant:              #534434;
+  --stitch-error:                        #ffb4ab;
+  --stitch-error-container:              #93000a;
+  --stitch-on-error:                     #690005;
+  --stitch-on-error-container:           #ffdad6;
+
+  /* Legacy UI tokens for dark mode */
+  --bg-void:                             #080A0F;
+  --bg-surface:                          #0E1118;
+  --bg-elevated:                         #161B26;
+  --bg-subtle:                           #131B2E;
+  --bg-overlay:                          #1E2535;
+  --text-primary:                        #F0F2F5;
+  --text-secondary:                      #8B92A5;
+  --text-muted:                          #6A7188;
+  --accent-primary:                      #F5A623;
+  --accent-primary-hover:                #E8941A;
+  --accent-glow:                         rgba(245, 166, 35, 0.15);
+  --border-subtle:                       rgba(255, 255, 255, 0.08);
+  --border-default:                      rgba(255, 255, 255, 0.12);
+  --border-accent:                       rgba(245, 166, 35, 0.40);
+  --glass-bg:                            rgba(11, 19, 38, 0.85);
+  --glass-heavy-bg:                      rgba(11, 19, 38, 0.92);
+  --glass-border:                        rgba(255, 255, 255, 0.08);
+  --shadow-glass:                        0 8px 32px rgba(0, 0, 0, 0.5);
+  --chip-bg:                             rgba(255, 255, 255, 0.05);
+}
+
+/* ── Base ──────────────────────────────────────────────────────── */
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+html { 
+  scroll-behavior: smooth; 
+  overflow-x: hidden; 
+}
+
+body {
+  background-color: var(--stitch-surface);
+  color: var(--stitch-on-surface);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* ── Scrollbars ─────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--stitch-surface-container-high);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--stitch-primary);
+}
+
+/* ── Utility Classes ───────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--stitch-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.field {
+  width: 100%;
+  background-color: var(--stitch-surface-container-low);
+  border: 1px solid var(--stitch-outline-variant);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--stitch-on-surface);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--stitch-primary);
+  box-shadow: 0 0 0 1px var(--stitch-primary);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  outline: none;
+}
+.btn-primary {
+  background-color: var(--stitch-primary);
+  color: var(--stitch-on-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+.card {
+  background-color: var(--stitch-surface-container-lowest);
+  border-radius: 0.75rem;
+  border: 1px solid var(--stitch-outline-variant);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}

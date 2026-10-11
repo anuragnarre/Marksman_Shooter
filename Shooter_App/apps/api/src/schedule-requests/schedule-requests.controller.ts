@@ -45,6 +45,20 @@ export class ScheduleRequestsController {
     return this.service.resolveRequest(user.sub, id, dto);
   }
 
+  /** Range Operator / Staff: 1-click approve booking request */
+  @Post(':id/approve')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'COACH', 'RSO')
+  approve(@Param('id') id: string) {
+    return this.service.approveBookingRequest(id);
+  }
+
+  /** Range Operator / Staff: 1-click reject booking request */
+  @Post(':id/reject')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'COACH', 'RSO')
+  reject(@Param('id') id: string) {
+    return this.service.rejectBookingRequest(id);
+  }
+
   /** Shooter: cancel a pending request */
   @Delete(':id')
   @Roles('SHOOTER')

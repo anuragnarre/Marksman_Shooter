@@ -28,30 +28,35 @@ interface NavItem {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  role?: "SHOOTER" | "COACH" | "RANGE_OPERATOR" | "RANGE_ADMIN";
+  role?: "SHOOTER" | "COACH";
 }
 
 const SHOOTER_NAV: NavItem[] = [
   { name: "Overview", href: "/dashboard", icon: Activity },
   { name: "My Sessions", href: "/sessions", icon: Target },
-  { name: "Armory", href: "/armory", icon: Crosshair },
-  { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Profile", href: "/profile", icon: User },
+  { name: "Digital Pass", href: "/pass", icon: ShieldCheck },
+  { name: "Book Range", href: "/ranges", icon: MapPin },
+  { name: "Live Analysis", href: "/live-analysis", icon: Crosshair },
+  { name: "Performance", href: "/performance", icon: Activity },
+  { name: "Training Plan", href: "/planning", icon: Calendar },
+  { name: "Ballistics", href: "/ballistics", icon: Crosshair },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-const RANGE_OPERATOR_NAV: NavItem[] = [
-  { name: "Command Center", href: "/operator/dashboard", icon: Activity },
-  { name: "Lanes & Live", href: "/operator/lanes", icon: Target },
-  { name: "Memberships", href: "/operator/memberships", icon: Users },
-  { name: "Safety & Logs", href: "/operator/safety", icon: ShieldAlert },
-  { name: "Range Settings", href: "/operator/settings", icon: Settings },
+const COACH_NAV: NavItem[] = [
+  { name: "Overview", href: "/dashboard", icon: Activity },
+  { name: "Shooter Connect", href: "/connect", icon: Users },
+  { name: "Live Analysis", href: "/live-analysis", icon: Crosshair },
+  { name: "Performance Radar", href: "/performance", icon: Activity },
+  { name: "Calendar & Drills", href: "/planning", icon: Calendar },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function DashboardLayout({ children, role = "SHOOTER" }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const navigation = (role === "RANGE_OPERATOR" || role === "RANGE_ADMIN") ? RANGE_OPERATOR_NAV : SHOOTER_NAV;
+  const navigation = role === "COACH" ? COACH_NAV : SHOOTER_NAV;
 
   return (
     <div className="flex h-screen w-full bg-[var(--bg-void)] text-[var(--text-primary)]">

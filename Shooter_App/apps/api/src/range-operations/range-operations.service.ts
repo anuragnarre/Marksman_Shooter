@@ -1,13 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { addDays, isBefore } from 'date-fns';
+import { EventsGateway } from '../gateway/events.gateway';
 
 @Injectable()
 export class RangeOperationsService {
   private readonly logger = new Logger(RangeOperationsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly eventsGateway?: EventsGateway,
+  ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async checkWaitlistCapacity() {
@@ -162,7 +166,7 @@ export class RangeOperationsService {
       updateData.activeSessionId = null;
     }
     
-    return this.prisma.rangeLane.update({
+    const updated = await this.prisma.rangeLane.update({
       where: { id: laneId },
       data: updateData,
       include: {
@@ -173,6 +177,15 @@ export class RangeOperationsService {
         }
       }
     });
+
+    if (this.eventsGateway && updated.rangeId) {
+      this.eventsGateway.emitLaneStatusUpdated(updated.rangeId, laneId, {
+        status: updated.status,
+        shooter: updated.activeSession?.shooter
+      });
+    }
+
+    return updated;
   }
 
   async getWaitlist(rangeId: string) {
@@ -268,6 +281,14 @@ export class RangeOperationsService {
       where: { id: rangeId },
       data: { rangeStatus: status }
     });
+    if (this.eventsGateway) {
+      this.eventsGateway.emitRangeCeasefire(
+        rangeId,
+        status === 'COLD',
+        status === 'COLD' ? 'Master All-Range Cease-Fire Engaged by Range Operator' : undefined,
+        'Range Operator'
+      );
+    }
     return { success: true, status: range.rangeStatus };
   }
 
@@ -344,6 +365,17 @@ export class RangeOperationsService {
           where: { id: availableSlot.lane.id },
           data: { status: 'OCCUPIED' }
         });
+
+        if (this.eventsGateway) {
+          const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, role: true }
+          });
+          this.eventsGateway.emitLaneStatusUpdated(rangeId, availableSlot.lane.id, {
+            status: 'OCCUPIED',
+            shooter: user
+          });
+        }
       }
 
       return { status: 'CHECKED_IN', laneNumber: availableSlot.lane?.laneNumber, bookingId: booking.id };

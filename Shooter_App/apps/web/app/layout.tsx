@@ -8,6 +8,7 @@ import { ToastProvider } from '../contexts/toast-context';
 import { CursorGlow } from '../components/CursorGlow';
 import { SwRegister } from './sw-register';
 import { ConflictToast } from '../components/ConflictToast';
+import { RangeEmergencyBanner } from '../components/RangeEmergencyBanner';
 
 const THEME_INIT_SCRIPT = `
 (function(){
@@ -86,6 +87,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning className="bg-void text-text-primary antialiased font-body">
+        <RangeEmergencyBanner />
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider>{children}</ToastProvider>

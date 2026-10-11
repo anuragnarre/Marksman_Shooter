@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { loadGoogleScript, googleSignIn, nativeGoogleSignIn } from '../lib/google-auth';
-import type { User } from '@shooting-platform/shared-types';
+import type { User, UserRole } from '@shooting-platform/shared-types';
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 
@@ -15,7 +15,7 @@ interface GoogleSignInButtonProps {
   onSuccess: (user: User) => void;
   onError: (message: string) => void;
   text?: 'signin_with' | 'signup_with' | 'continue_with';
-  role?: 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR';
+  role?: UserRole;
 }
 
 export function GoogleSignInButton(props: GoogleSignInButtonProps) {

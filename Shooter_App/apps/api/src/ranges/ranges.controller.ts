@@ -16,9 +16,16 @@ export class RangesController {
     return this.rangesService.createRange(req.user.id, dto);
   }
 
+  @Get('discover')
+  discoverRanges() {
+    return this.rangesService.getAllPublicRanges();
+  }
+
   @Get()
-  @Roles('RANGE_OPERATOR')
   getMyRanges(@Request() req: any) {
+    if (req.user?.role === 'SHOOTER' || !req.user?.role) {
+      return this.rangesService.getAllPublicRanges();
+    }
     return this.rangesService.getMyRanges(req.user.id);
   }
 

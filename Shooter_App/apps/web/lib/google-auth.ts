@@ -8,7 +8,7 @@
 import { Capacitor } from '@capacitor/core';
 import { apiFetch } from './api';
 import { persistUser } from './auth';
-import type { AuthResponse, User } from '@shooting-platform/shared-types';
+import type { AuthResponse, User, UserRole } from '@shooting-platform/shared-types';
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 
@@ -74,7 +74,7 @@ export function loadGoogleScript(onLoad: () => void): void {
  */
 export async function googleSignIn(
   credential: string,
-  role?: 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR',
+  role?: UserRole,
 ): Promise<{ access_token: string; user: User }> {
   const body: Record<string, string> = { credential };
   if (role) body.role = role;
@@ -99,7 +99,7 @@ const NATIVE_SERVER_CLIENT_ID = '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.a
  * DEVELOPER_ERROR (code 10).
  */
 export async function nativeGoogleSignIn(
-  role?: 'SHOOTER' | 'COACH' | 'RANGE_OPERATOR',
+  role?: UserRole,
 ): Promise<{ access_token: string; user: User }> {
   const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
 

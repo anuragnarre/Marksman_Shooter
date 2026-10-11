@@ -112,8 +112,6 @@ export default function BiometricsPage() {
     setAdvancedLoading(false);
   }
 
-  if (!user) return null;
-
   return (
     <AppShell title="Health">
       <div className="space-y-6 max-w-6xl mx-auto">

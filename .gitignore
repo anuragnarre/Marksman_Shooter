@@ -1,5 +1,43 @@
-Version_1_Core_App exclude from ai scans this is and old build not in use.rar
+# Dependencies
 node_modules/
-.env
+.pnp
+.pnp.js
 
+# Build outputs
+.next/
+dist/
+build/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archives and old backups
+Version_1_Core_App exclude from ai scans this is and old build not in use.rar
 *.zip
+*.tar.gz
+*.rar
+
+# Android / Mobile build caches
+.gradle/
+android/.gradle/
+android/app/build/
+android/capacitor-cordova-android-plugins/.gradle/
+android/capacitor-cordova-android-plugins/build/
+
+# Graphify / AI tool cache
+graphify-out/cache/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

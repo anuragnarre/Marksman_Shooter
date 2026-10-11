@@ -23,6 +23,8 @@ import {
     origin: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
+      'http://localhost:3002',
+      'http://127.0.0.1:3002',
     ],
     credentials: true,
   },
@@ -138,6 +140,56 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   emitLaneStatusUpdated(rangeId: string, laneId: string, payload: any): void {
     this.server.to(`range_monitor:${rangeId}`).emit('lane_status_updated', { laneId, ...payload });
+    this.server.to(`live_range:${rangeId}`).emit('lane_status_updated', { laneId, ...payload });
+  }
+
+  // ── Range Emergency Ceasefire (Cross-App Safety) ─────────────────────────
+
+  @SubscribeMessage('broadcastCeasefire')
+  handleBroadcastCeasefire(
+    @MessageBody() payload: { rangeId: string; reason?: string; initiatedBy?: string; active?: boolean },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.rangeId) return;
+    const ceasefireEvent = {
+      rangeId: payload.rangeId,
+      active: payload.active !== false,
+      reason: payload.reason || 'Emergency Ceasefire ordered by Range Safety Officer',
+      initiatedBy: payload.initiatedBy || 'Range Safety Officer',
+      timestamp: Date.now(),
+    };
+    this.server.to(`range_monitor:${payload.rangeId}`).emit('range_ceasefire', ceasefireEvent);
+    this.server.to(`live_range:${payload.rangeId}`).emit('range_ceasefire', ceasefireEvent);
+    this.server.emit('range_ceasefire', ceasefireEvent);
+  }
+
+  @SubscribeMessage('clearCeasefire')
+  handleClearCeasefire(
+    @MessageBody() payload: { rangeId: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.rangeId) return;
+    const event = {
+      rangeId: payload.rangeId,
+      active: false,
+      timestamp: Date.now(),
+    };
+    this.server.to(`range_monitor:${payload.rangeId}`).emit('range_ceasefire', event);
+    this.server.to(`live_range:${payload.rangeId}`).emit('range_ceasefire', event);
+    this.server.emit('range_ceasefire', event);
+  }
+
+  emitRangeCeasefire(rangeId: string, active: boolean, reason?: string, initiatedBy?: string): void {
+    const event = {
+      rangeId,
+      active,
+      reason: reason || 'Emergency Ceasefire ordered by Range Safety Officer',
+      initiatedBy: initiatedBy || 'Range Safety Officer',
+      timestamp: Date.now(),
+    };
+    this.server.to(`range_monitor:${rangeId}`).emit('range_ceasefire', event);
+    this.server.to(`live_range:${rangeId}`).emit('range_ceasefire', event);
+    this.server.emit('range_ceasefire', event);
   }
 
   // ── Session events ────────────────────────────────────────────────────────
