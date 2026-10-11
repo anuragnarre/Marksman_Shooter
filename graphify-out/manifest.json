@@ -2805,8 +2805,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/gateway/events.gateway.ts": {
-    "mtime": 1791710369.0249934,
-    "ast_hash": "6c53b126917731160205c070957c35f3",
+    "mtime": 1791740419.2530982,
+    "ast_hash": "41269d84837fef10f4ceddc590dc0265",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/gateway/gateway.module.ts": {
@@ -3570,8 +3570,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/api/feedback/route.ts": {
-    "mtime": 1791709580.5203664,
-    "ast_hash": "b4529b3e1aa56eca7d025d8353e2a8fd",
+    "mtime": 1791716954.0245159,
+    "ast_hash": "7e0158e79864f307ab76cd12018a5af7",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/api/vitals/route.ts": {
@@ -3580,8 +3580,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/auth/login/page.tsx": {
-    "mtime": 1791209672.6337483,
-    "ast_hash": "09ecdd208317401455ce44b840f8c66b",
+    "mtime": 1791715086.6779196,
+    "ast_hash": "84a8c2e0d3d387fe9982e8b663e79b8e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/auth/register/page.tsx": {
@@ -3600,8 +3600,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/checkin/page.tsx": {
-    "mtime": 1791711456.1288536,
-    "ast_hash": "52a5f8dfb38b9d50c97d2c800dab734b",
+    "mtime": 1791718777.9980648,
+    "ast_hash": "b85478ea2095ea273484772f7412c655",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/connect/page.tsx": {
@@ -3610,8 +3610,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/dashboard/page.tsx": {
-    "mtime": 1791170767.013584,
-    "ast_hash": "a951b529a1be70100beb80a95289da53",
+    "mtime": 1791718698.1226766,
+    "ast_hash": "d0a9e6876cd6b1e5ecdc2d06b090e758",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/delete-account/page.tsx": {
@@ -3620,8 +3620,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/docs/page.tsx": {
-    "mtime": 1787763618.9039922,
-    "ast_hash": "ec8a4f29a066e388c913bd9a7872e108",
+    "mtime": 1791736086.3875718,
+    "ast_hash": "cbcbae96d239835759bd666542f13a96",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/equipment/page.tsx": {
@@ -3650,13 +3650,13 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/layout.tsx": {
-    "mtime": 1791151005.4744413,
-    "ast_hash": "9821cc2a6511f946ca43f2122b33bb73",
+    "mtime": 1791715707.671425,
+    "ast_hash": "41a612e34a16d46ed7fde1dfb325ee46",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/live-analysis/LiveAnalysisDashboard.tsx": {
-    "mtime": 1787581818.5385752,
-    "ast_hash": "2e81f125c4c450b1933900c04ac64d2a",
+    "mtime": 1791737034.2543,
+    "ast_hash": "9b8decd4b32c94c1b6ad675946b35a81",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/live-analysis/page.tsx": {
@@ -3750,18 +3750,18 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/range-operator/bookings/page.tsx": {
-    "mtime": 1790789150.3084471,
-    "ast_hash": "7fc6fcc6fe44a08e9297d2a15a6b00c0",
+    "mtime": 1791737170.2536368,
+    "ast_hash": "0a931f00576d549acb30f1a4b1cd594b",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/range-operator/dashboard/page.tsx": {
-    "mtime": 1790789150.3084471,
-    "ast_hash": "042bfaa3fe5345bf2d3dd811fea52790",
+    "mtime": 1791737083.6246772,
+    "ast_hash": "10d8340513b7e39f49ae96948da5161d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/range-operator/walk-in/page.tsx": {
-    "mtime": 1790789150.3094473,
-    "ast_hash": "8b359104e4f47939a63ccd5a18682c25",
+    "mtime": 1791737127.4224167,
+    "ast_hash": "acc8d745627994c1bbc820e8e945026f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/ranges/page.tsx": {
@@ -3810,8 +3810,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/settings/page.tsx": {
-    "mtime": 1791125647.823531,
-    "ast_hash": "a31ed77fbe79b6fa72a781c9a7ffac39",
+    "mtime": 1791716798.5931115,
+    "ast_hash": "5e2565e943cfb1e88e820401d45e816e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/staff/dashboard/page.tsx": {
@@ -3985,8 +3985,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/Sidebar.tsx": {
-    "mtime": 1789124412.0642502,
-    "ast_hash": "c7a8ee76ef5415c1c97d98e3410f7c5c",
+    "mtime": 1791736284.063378,
+    "ast_hash": "cd7e0e6bc544ebf030ce16d4aa4bd432",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/StaggerGrid.tsx": {
@@ -4015,18 +4015,18 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/bookings/BookingsDark.tsx": {
-    "mtime": 1790342562.1556525,
-    "ast_hash": "8c1e75d4866df8d234d807b822d98e7c",
+    "mtime": 1791717081.9574592,
+    "ast_hash": "881d0d20eb46a23ee3f25efb22be28dd",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/bookings/BookingsLight.tsx": {
-    "mtime": 1790342578.4416533,
-    "ast_hash": "6ed4e454b0d2f89d3d4435ce688dddf1",
+    "mtime": 1791717069.793181,
+    "ast_hash": "3c6343fe591243a81bb124274db0d2eb",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/config/CameraConfigDark.tsx": {
-    "mtime": 1791709520.2826657,
-    "ast_hash": "5b64ce8027372282be90a6342a62ce5b",
+    "mtime": 1791741421.6572554,
+    "ast_hash": "9ae7dbf8214964fe5bd110c73f02e58f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/config/CameraConfigLight.tsx": {
@@ -4040,8 +4040,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/dashboard/CommandCenterLight.tsx": {
-    "mtime": 1790189225.406526,
-    "ast_hash": "dbacef8ae2d238a059ef9293d8704be0",
+    "mtime": 1791714741.3698459,
+    "ast_hash": "044e90fecaa3d278c936222f4289f6a6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/dashboard/KpiGrid.tsx": {
@@ -4050,8 +4050,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/dashboard/LaneMatrix.tsx": {
-    "mtime": 1790187909.8290334,
-    "ast_hash": "97bf4893236d4bf56ceb6052c3b900ac",
+    "mtime": 1791718605.8055172,
+    "ast_hash": "890599da9ec3efb6a2ee86c1eac43e94",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/dashboard/RightPanel.tsx": {
@@ -4065,8 +4065,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/layouts/DashboardLayout.tsx": {
-    "mtime": 1791709492.9442594,
-    "ast_hash": "afbaf6dbbc5518eec3cf7cd435c1a340",
+    "mtime": 1791717384.729118,
+    "ast_hash": "875b03ba91cc46ef5e940d5fa9216991",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/live-analysis/LiveTargetSelector.tsx": {
@@ -4115,8 +4115,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/safety/SafetyDark.tsx": {
-    "mtime": 1790342517.6822088,
-    "ast_hash": "f8bdddcb1cec811ac04d970a33d7042b",
+    "mtime": 1791737307.1849198,
+    "ast_hash": "ccc8b54600c711f4084893aab36cba48",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/safety/SafetyLight.tsx": {
@@ -4185,8 +4185,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/vision/LiveVisionDark.tsx": {
-    "mtime": 1791709658.2175193,
-    "ast_hash": "422d006c375ae075c87141010c2cd10b",
+    "mtime": 1791741394.815202,
+    "ast_hash": "7c3f287e7b073661c2b5c254364bbea4",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/vision/LiveVisionLight.tsx": {
@@ -4195,13 +4195,13 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/contexts/auth-context.tsx": {
-    "mtime": 1788620493.069669,
-    "ast_hash": "0709109eed23d890c0d01f67c47ea587",
+    "mtime": 1791716735.6650116,
+    "ast_hash": "db3ba5a89a97e20f4946835efb067ed1",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/contexts/theme-context.tsx": {
-    "mtime": 1788671845.6078973,
-    "ast_hash": "98c6ff939970bdc582dfe2faa6ee4d78",
+    "mtime": 1791714490.3311656,
+    "ast_hash": "1799979d04ddda10bfaa29c111373f5f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/contexts/toast-context.tsx": {
@@ -4370,8 +4370,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/tailwind.config.ts": {
-    "mtime": 1788283828.7380652,
-    "ast_hash": "f3e2dbe5f8da768292e4c636fbce5599",
+    "mtime": 1791714541.4197893,
+    "ast_hash": "320d95006d789aa878367f5f20aa9ee4",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/tsconfig.json": {
@@ -4390,8 +4390,8 @@
     "semantic_hash": ""
   },
   "Range_Management/packages/shared-types/index.ts": {
-    "mtime": 1791708902.4504135,
-    "ast_hash": "0e17c03c40ca90d0e63444d00079b015",
+    "mtime": 1791739726.6125512,
+    "ast_hash": "70a3ce815afd99cf715f79af1fd2088f",
     "semantic_hash": ""
   },
   "Range_Management/packages/shared-types/package.json": {
@@ -4405,8 +4405,8 @@
     "semantic_hash": ""
   },
   "ServerController.ps1": {
-    "mtime": 1791254336.7451036,
-    "ast_hash": "a66ec93f3496ec2dc05c40159d5b9626",
+    "mtime": 1791719013.2981095,
+    "ast_hash": "966e5dc0a2e9bf2c78ce7c4a6b561cb0",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/fix.js": {
@@ -4835,8 +4835,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/gateway/events.gateway.ts": {
-    "mtime": 1791710385.609192,
-    "ast_hash": "6c53b126917731160205c070957c35f3",
+    "mtime": 1791740434.7192392,
+    "ast_hash": "41269d84837fef10f4ceddc590dc0265",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/gateway/gateway.module.ts": {
@@ -5445,8 +5445,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/auth/login/page.tsx": {
-    "mtime": 1789298665.574963,
-    "ast_hash": "28cc881b3ba12883db1b600a2e103b1f",
+    "mtime": 1791715103.656816,
+    "ast_hash": "bdf485e786b5c202e640c995cf8f722d",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/auth/register/page.tsx": {
@@ -5465,13 +5465,13 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/dashboard/page.tsx": {
-    "mtime": 1789122229.04984,
-    "ast_hash": "f7d2cc45c9975221735347bd661ce290",
+    "mtime": 1791713578.4297438,
+    "ast_hash": "cc667413f2bb7226e16ba054c61e5f63",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/docs/page.tsx": {
-    "mtime": 1787763618.9039922,
-    "ast_hash": "ec8a4f29a066e388c913bd9a7872e108",
+    "mtime": 1791736251.4630775,
+    "ast_hash": "e9e91db2b87d4549340bf5e16370f28a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/error.tsx": {
@@ -5485,8 +5485,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/live-analysis/LiveAnalysisDashboard.tsx": {
-    "mtime": 1791711075.766193,
-    "ast_hash": "9219ac2433ebfee67d093fd854b35237",
+    "mtime": 1791741246.7714012,
+    "ast_hash": "2d5f81ee0fa1ec96671fd40332f875f6",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/live-analysis/page.tsx": {
@@ -5530,8 +5530,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/performance/ai-coach/page.tsx": {
-    "mtime": 1787548699.6223838,
-    "ast_hash": "683f5989cb8591a7a0380bc6864f9973",
+    "mtime": 1791737417.5881078,
+    "ast_hash": "ac3d8c3c5c4e212308a548c22180c67a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/performance/competitions/page.tsx": {
@@ -5540,8 +5540,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/performance/health/page.tsx": {
-    "mtime": 1787548699.6233838,
-    "ast_hash": "6231cacd80bb2a061b91447ec980d761",
+    "mtime": 1791713671.9948602,
+    "ast_hash": "7b497c50ead3f7e920d7a25e2a5c77e1",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/performance/page.tsx": {
@@ -5585,8 +5585,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/sessions/new/page.tsx": {
-    "mtime": 1787548699.6263838,
-    "ast_hash": "e1588065e8f3d7d03bc11a80bd7ba494",
+    "mtime": 1791737333.491915,
+    "ast_hash": "cd7b07740fb29aba9916c76308cd0ecf",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/sessions/page.tsx": {
@@ -5750,8 +5750,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/RangeEmergencyBanner.tsx": {
-    "mtime": 1791710953.560314,
-    "ast_hash": "e5c2ef6657fadded2e2baedc465f7068",
+    "mtime": 1791718657.5591679,
+    "ast_hash": "1e23ffb0f4ce48758d1ac25ee77fd66b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/ShotCorrectionCanvas.tsx": {
@@ -5775,8 +5775,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/Sidebar.tsx": {
-    "mtime": 1788008032.7298808,
-    "ast_hash": "c7a8ee76ef5415c1c97d98e3410f7c5c",
+    "mtime": 1791736301.9514134,
+    "ast_hash": "37c5983a65c81debe0d8a74957fbb6ca",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/StaggerGrid.tsx": {
@@ -6175,8 +6175,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/packages/shared-types/index.ts": {
-    "mtime": 1791708908.4993296,
-    "ast_hash": "0e17c03c40ca90d0e63444d00079b015",
+    "mtime": 1791739714.3113856,
+    "ast_hash": "70a3ce815afd99cf715f79af1fd2088f",
     "semantic_hash": ""
   },
   "Shooter_App/packages/shared-types/package.json": {
@@ -6215,8 +6215,8 @@
     "semantic_hash": ""
   },
   "Target_Camera_App/App.tsx": {
-    "mtime": 1790435159.7078643,
-    "ast_hash": "31d2049d0f3ddedcb01851155a049102",
+    "mtime": 1791748926.1302176,
+    "ast_hash": "116f5b1e3fe3372d868bf37b9622b070",
     "semantic_hash": ""
   },
   "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/arm64-v8a/.cmake/api/v1/reply/cache-v2-4fd34c9fed4e8f71d807.json": {
@@ -9065,8 +9065,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1790794690.3173,
-    "ast_hash": "787be945dfc100f55c18f337eb324433",
+    "mtime": 1791736325.261392,
+    "ast_hash": "acc526a5cae3da293d53cfcd9c8a650d",
     "semantic_hash": ""
   },
   "Range_App.md": {
@@ -10635,8 +10635,8 @@
     "semantic_hash": ""
   },
   "conversation_checkpoint.md": {
-    "mtime": 1790453181.8785932,
-    "ast_hash": "96cf320d744e1533342e849479329697",
+    "mtime": 1791735428.1452813,
+    "ast_hash": "867893310552e404499a5069a73e7c03",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -10645,18 +10645,18 @@
     "semantic_hash": ""
   },
   "session_notes/COMPLETED_TASKS.md": {
-    "mtime": 1788682179.5799394,
-    "ast_hash": "30d80bcb95171696ac443e3a327a08d7",
+    "mtime": 1791747122.4915137,
+    "ast_hash": "7c6cbd3560da84735a1335f1d29b1c10",
     "semantic_hash": ""
   },
   "session_notes/NEXT_SESSION_ACTION_PLAN.md": {
-    "mtime": 1788683874.8603563,
-    "ast_hash": "d63452b85825f7b3cfe7f65975971d5a",
+    "mtime": 1791745774.1723874,
+    "ast_hash": "164d0702ee396ea5997dbd76e3cfe936",
     "semantic_hash": ""
   },
   "session_notes/REMAINING_TASKS.md": {
-    "mtime": 1788683738.8892176,
-    "ast_hash": "37921930d87943d58980f3f4bc564a25",
+    "mtime": 1791747141.2614267,
+    "ast_hash": "477bb9c4000b9ae3c289bcb3f04af480",
     "semantic_hash": ""
   },
   "Range_App/Shooter_App/apps/web/android/app/src/main/res/drawable-land-hdpi/splash.png": {
@@ -19542,6 +19542,181 @@
   "Version_2_Range_Ops/shoot/rifle/WhatsApp Image 2026-03-19 at 5.57.48 PM.jpeg": {
     "mtime": 1789124414.6561782,
     "ast_hash": "15457f848d4570d1ac709b20286ae712",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/components/dashboard/RangeConsoleHeader.tsx": {
+    "mtime": 1791714650.2127411,
+    "ast_hash": "da4f6de8c388d19eaa9b2179d1ef06b4",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/components/dashboard/RangeConsoleSidebar.tsx": {
+    "mtime": 1791714635.0598218,
+    "ast_hash": "4879fc56eea060b48e56530760a9339d",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/components/vision/StreamTunerModal.tsx": {
+    "mtime": 1791740008.2165956,
+    "ast_hash": "bdd69e1ae93a3a92abf638143f92493d",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/lib/stream-optimizer.ts": {
+    "mtime": 1791740936.535261,
+    "ast_hash": "e16789c7d35518e13515937102f17164",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/next-env.d.ts": {
+    "mtime": 1791712700.141359,
+    "ast_hash": "90426577ad8f38459f3e566411c85589",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/components/live-analysis/MultiCameraTargetView.tsx": {
+    "mtime": 1791741208.5709102,
+    "ast_hash": "fb5cd7216efeb67e84351f42edcf37c1",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/components/live-analysis/StreamTunerModal.tsx": {
+    "mtime": 1791740586.909972,
+    "ast_hash": "ac424176de513d802d533d09c3bc0a0b",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/lib/stream-optimizer.ts": {
+    "mtime": 1791740969.672863,
+    "ast_hash": "fe5b6c06e9cc981e540817d72e6a6da0",
+    "semantic_hash": ""
+  },
+  "Target_Camera_App/src/components/CameraControls.tsx": {
+    "mtime": 1791740316.7447505,
+    "ast_hash": "f409310901d18131cb3c203e9c510fb8",
+    "semantic_hash": ""
+  },
+  "Target_Camera_App/src/components/ShotStatsHud.tsx": {
+    "mtime": 1791748813.195045,
+    "ast_hash": "b71ace633bf8e7e239500360afa0e3ec",
+    "semantic_hash": ""
+  },
+  "Target_Camera_App/src/components/TargetOverlay.tsx": {
+    "mtime": 1791718444.2773774,
+    "ast_hash": "24a74701e57d4e1097d365fde1d76719",
+    "semantic_hash": ""
+  },
+  "Target_Camera_App/src/types/target.ts": {
+    "mtime": 1791748764.2876713,
+    "ast_hash": "367fcff9eb8eeb362ff40a908de5dd0b",
+    "semantic_hash": ""
+  },
+  "Target_Camera_App/src/utils/scoringEngine.ts": {
+    "mtime": 1791718413.5660203,
+    "ast_hash": "d57327510ddb2347bd93849e561d4ac4",
+    "semantic_hash": ""
+  },
+  "Presenstation/FEATURE_AND_FUNCTION_CATALOG.md": {
+    "mtime": 1791747093.947142,
+    "ast_hash": "ff4e000400442dfbbd62e0df234ba3ac",
+    "semantic_hash": ""
+  },
+  "Presenstation/advertisement.html": {
+    "mtime": 1791746819.1360455,
+    "ast_hash": "b768401b1500c3230ca22b2e4edc7068",
+    "semantic_hash": ""
+  },
+  "Presenstation/index.html": {
+    "mtime": 1791747041.3367875,
+    "ast_hash": "61e2266dac0e81dedfc78ca5d0db3d9e",
+    "semantic_hash": ""
+  },
+  "Presentation/FEATURE_AND_FUNCTION_CATALOG.md": {
+    "mtime": 1791747093.947142,
+    "ast_hash": "ff4e000400442dfbbd62e0df234ba3ac",
+    "semantic_hash": ""
+  },
+  "Presentation/advertisement.html": {
+    "mtime": 1791746819.1360455,
+    "ast_hash": "b768401b1500c3230ca22b2e4edc7068",
+    "semantic_hash": ""
+  },
+  "Presentation/index.html": {
+    "mtime": 1791747041.3367875,
+    "ast_hash": "61e2266dac0e81dedfc78ca5d0db3d9e",
+    "semantic_hash": ""
+  },
+  "docs/HARDWARE_AND_TARGET_CAMERA_GUIDE.md": {
+    "mtime": 1791739405.1625037,
+    "ast_hash": "1b206219c88d5e67ffbb82eada5babda",
+    "semantic_hash": ""
+  },
+  "docs/LEGAL_COMPLIANCE_AND_STANDARDS.md": {
+    "mtime": 1791735861.216926,
+    "ast_hash": "50a2b6e74167337ae429d7c2f6c95369",
+    "semantic_hash": ""
+  },
+  "docs/RANGE_OPERATOR_AND_RSO_MANUAL.md": {
+    "mtime": 1791735894.965142,
+    "ast_hash": "1cad1a966736f9c48afa2f3a94ff018c",
+    "semantic_hash": ""
+  },
+  "docs/SHOOTER_ATHLETE_USER_MANUAL.md": {
+    "mtime": 1791735921.1157813,
+    "ast_hash": "a9add23cf88dfced90685c0e240024e3",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/airgun_target_box.jpg": {
+    "mtime": 1791744790.2525132,
+    "ast_hash": "04bce91b6acc08db0e605a76e75c0343",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/camera_hardware.jpg": {
+    "mtime": 1791744325.6658204,
+    "ast_hash": "65dbeb8b360c5a8ece0b37bdec630b88",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/command_hud.jpg": {
+    "mtime": 1791744355.9778776,
+    "ast_hash": "9cd24598a57c80add87b539591310a27",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/hero_banner.jpg": {
+    "mtime": 1791744298.326118,
+    "ast_hash": "5228c02360086605fbbe544e529afedb",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/olympic_pistol.jpg": {
+    "mtime": 1791744759.9878838,
+    "ast_hash": "b35b24b0f363cfd081e9732d7874554b",
+    "semantic_hash": ""
+  },
+  "Presenstation/assets/olympic_rifle_hero.jpg": {
+    "mtime": 1791744731.3091295,
+    "ast_hash": "3d3e17975ec8bb80834d96b61982401b",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/airgun_target_box.jpg": {
+    "mtime": 1791744790.2525132,
+    "ast_hash": "04bce91b6acc08db0e605a76e75c0343",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/camera_hardware.jpg": {
+    "mtime": 1791744325.6658204,
+    "ast_hash": "65dbeb8b360c5a8ece0b37bdec630b88",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/command_hud.jpg": {
+    "mtime": 1791744355.9778776,
+    "ast_hash": "9cd24598a57c80add87b539591310a27",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/hero_banner.jpg": {
+    "mtime": 1791744298.326118,
+    "ast_hash": "5228c02360086605fbbe544e529afedb",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/olympic_pistol.jpg": {
+    "mtime": 1791744759.9878838,
+    "ast_hash": "b35b24b0f363cfd081e9732d7874554b",
+    "semantic_hash": ""
+  },
+  "Presentation/assets/olympic_rifle_hero.jpg": {
+    "mtime": 1791744731.3091295,
+    "ast_hash": "3d3e17975ec8bb80834d96b61982401b",
     "semantic_hash": ""
   }
 }

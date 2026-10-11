@@ -1,16 +1,16 @@
-# Graph Report - Marksman  (2026-10-11)
+# Graph Report - Marksman  (2026-10-12)
 
 ## Corpus Check
-- 1874 files · ~7,668,288 words
+- 1653 files · ~7,818,870 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 15016 nodes · 16537 edges · 1916 communities (1154 shown, 762 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 274 edges (avg confidence: 0.61)
+- 13267 nodes · 15000 edges · 1704 communities (943 shown, 761 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 291 edges (avg confidence: 0.62)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a815d345`
+- Built from commit: `bd2b8990`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -249,26 +249,10 @@
 - [[_COMMUNITY_Community 235|Community 235]]
 - [[_COMMUNITY_Community 236|Community 236]]
 - [[_COMMUNITY_Community 237|Community 237]]
-- [[_COMMUNITY_Community 238|Community 238]]
-- [[_COMMUNITY_Community 239|Community 239]]
-- [[_COMMUNITY_Community 240|Community 240]]
-- [[_COMMUNITY_Community 241|Community 241]]
-- [[_COMMUNITY_Community 242|Community 242]]
-- [[_COMMUNITY_Community 243|Community 243]]
-- [[_COMMUNITY_Community 244|Community 244]]
-- [[_COMMUNITY_Community 245|Community 245]]
 - [[_COMMUNITY_Community 246|Community 246]]
 - [[_COMMUNITY_Community 247|Community 247]]
 - [[_COMMUNITY_Community 248|Community 248]]
 - [[_COMMUNITY_Community 249|Community 249]]
-- [[_COMMUNITY_Community 250|Community 250]]
-- [[_COMMUNITY_Community 251|Community 251]]
-- [[_COMMUNITY_Community 252|Community 252]]
-- [[_COMMUNITY_Community 253|Community 253]]
-- [[_COMMUNITY_Community 254|Community 254]]
-- [[_COMMUNITY_Community 255|Community 255]]
-- [[_COMMUNITY_Community 256|Community 256]]
-- [[_COMMUNITY_Community 257|Community 257]]
 - [[_COMMUNITY_Community 258|Community 258]]
 - [[_COMMUNITY_Community 259|Community 259]]
 - [[_COMMUNITY_Community 260|Community 260]]
@@ -412,7 +396,6 @@
 - [[_COMMUNITY_Community 402|Community 402]]
 - [[_COMMUNITY_Community 403|Community 403]]
 - [[_COMMUNITY_Community 404|Community 404]]
-- [[_COMMUNITY_Community 405|Community 405]]
 - [[_COMMUNITY_Community 406|Community 406]]
 - [[_COMMUNITY_Community 407|Community 407]]
 - [[_COMMUNITY_Community 408|Community 408]]
@@ -422,14 +405,6 @@
 - [[_COMMUNITY_Community 412|Community 412]]
 - [[_COMMUNITY_Community 413|Community 413]]
 - [[_COMMUNITY_Community 414|Community 414]]
-- [[_COMMUNITY_Community 415|Community 415]]
-- [[_COMMUNITY_Community 416|Community 416]]
-- [[_COMMUNITY_Community 417|Community 417]]
-- [[_COMMUNITY_Community 418|Community 418]]
-- [[_COMMUNITY_Community 419|Community 419]]
-- [[_COMMUNITY_Community 420|Community 420]]
-- [[_COMMUNITY_Community 421|Community 421]]
-- [[_COMMUNITY_Community 422|Community 422]]
 - [[_COMMUNITY_Community 423|Community 423]]
 - [[_COMMUNITY_Community 424|Community 424]]
 - [[_COMMUNITY_Community 425|Community 425]]
@@ -444,14 +419,6 @@
 - [[_COMMUNITY_Community 434|Community 434]]
 - [[_COMMUNITY_Community 435|Community 435]]
 - [[_COMMUNITY_Community 436|Community 436]]
-- [[_COMMUNITY_Community 437|Community 437]]
-- [[_COMMUNITY_Community 438|Community 438]]
-- [[_COMMUNITY_Community 439|Community 439]]
-- [[_COMMUNITY_Community 440|Community 440]]
-- [[_COMMUNITY_Community 441|Community 441]]
-- [[_COMMUNITY_Community 442|Community 442]]
-- [[_COMMUNITY_Community 443|Community 443]]
-- [[_COMMUNITY_Community 444|Community 444]]
 - [[_COMMUNITY_Community 445|Community 445]]
 - [[_COMMUNITY_Community 446|Community 446]]
 - [[_COMMUNITY_Community 447|Community 447]]
@@ -484,30 +451,6 @@
 - [[_COMMUNITY_Community 475|Community 475]]
 - [[_COMMUNITY_Community 476|Community 476]]
 - [[_COMMUNITY_Community 477|Community 477]]
-- [[_COMMUNITY_Community 478|Community 478]]
-- [[_COMMUNITY_Community 479|Community 479]]
-- [[_COMMUNITY_Community 480|Community 480]]
-- [[_COMMUNITY_Community 481|Community 481]]
-- [[_COMMUNITY_Community 482|Community 482]]
-- [[_COMMUNITY_Community 483|Community 483]]
-- [[_COMMUNITY_Community 484|Community 484]]
-- [[_COMMUNITY_Community 485|Community 485]]
-- [[_COMMUNITY_Community 486|Community 486]]
-- [[_COMMUNITY_Community 487|Community 487]]
-- [[_COMMUNITY_Community 488|Community 488]]
-- [[_COMMUNITY_Community 489|Community 489]]
-- [[_COMMUNITY_Community 490|Community 490]]
-- [[_COMMUNITY_Community 491|Community 491]]
-- [[_COMMUNITY_Community 492|Community 492]]
-- [[_COMMUNITY_Community 493|Community 493]]
-- [[_COMMUNITY_Community 494|Community 494]]
-- [[_COMMUNITY_Community 495|Community 495]]
-- [[_COMMUNITY_Community 496|Community 496]]
-- [[_COMMUNITY_Community 497|Community 497]]
-- [[_COMMUNITY_Community 498|Community 498]]
-- [[_COMMUNITY_Community 499|Community 499]]
-- [[_COMMUNITY_Community 500|Community 500]]
-- [[_COMMUNITY_Community 501|Community 501]]
 - [[_COMMUNITY_Community 502|Community 502]]
 - [[_COMMUNITY_Community 503|Community 503]]
 - [[_COMMUNITY_Community 504|Community 504]]
@@ -540,30 +483,6 @@
 - [[_COMMUNITY_Community 533|Community 533]]
 - [[_COMMUNITY_Community 534|Community 534]]
 - [[_COMMUNITY_Community 535|Community 535]]
-- [[_COMMUNITY_Community 536|Community 536]]
-- [[_COMMUNITY_Community 537|Community 537]]
-- [[_COMMUNITY_Community 538|Community 538]]
-- [[_COMMUNITY_Community 539|Community 539]]
-- [[_COMMUNITY_Community 540|Community 540]]
-- [[_COMMUNITY_Community 541|Community 541]]
-- [[_COMMUNITY_Community 542|Community 542]]
-- [[_COMMUNITY_Community 543|Community 543]]
-- [[_COMMUNITY_Community 544|Community 544]]
-- [[_COMMUNITY_Community 545|Community 545]]
-- [[_COMMUNITY_Community 546|Community 546]]
-- [[_COMMUNITY_Community 547|Community 547]]
-- [[_COMMUNITY_Community 548|Community 548]]
-- [[_COMMUNITY_Community 549|Community 549]]
-- [[_COMMUNITY_Community 550|Community 550]]
-- [[_COMMUNITY_Community 551|Community 551]]
-- [[_COMMUNITY_Community 552|Community 552]]
-- [[_COMMUNITY_Community 553|Community 553]]
-- [[_COMMUNITY_Community 554|Community 554]]
-- [[_COMMUNITY_Community 555|Community 555]]
-- [[_COMMUNITY_Community 556|Community 556]]
-- [[_COMMUNITY_Community 557|Community 557]]
-- [[_COMMUNITY_Community 558|Community 558]]
-- [[_COMMUNITY_Community 559|Community 559]]
 - [[_COMMUNITY_Community 560|Community 560]]
 - [[_COMMUNITY_Community 561|Community 561]]
 - [[_COMMUNITY_Community 562|Community 562]]
@@ -623,7 +542,6 @@
 - [[_COMMUNITY_Community 617|Community 617]]
 - [[_COMMUNITY_Community 618|Community 618]]
 - [[_COMMUNITY_Community 619|Community 619]]
-- [[_COMMUNITY_Community 620|Community 620]]
 - [[_COMMUNITY_Community 621|Community 621]]
 - [[_COMMUNITY_Community 622|Community 622]]
 - [[_COMMUNITY_Community 623|Community 623]]
@@ -776,14 +694,6 @@
 - [[_COMMUNITY_Community 772|Community 772]]
 - [[_COMMUNITY_Community 773|Community 773]]
 - [[_COMMUNITY_Community 774|Community 774]]
-- [[_COMMUNITY_Community 775|Community 775]]
-- [[_COMMUNITY_Community 776|Community 776]]
-- [[_COMMUNITY_Community 777|Community 777]]
-- [[_COMMUNITY_Community 778|Community 778]]
-- [[_COMMUNITY_Community 779|Community 779]]
-- [[_COMMUNITY_Community 780|Community 780]]
-- [[_COMMUNITY_Community 781|Community 781]]
-- [[_COMMUNITY_Community 782|Community 782]]
 - [[_COMMUNITY_Community 783|Community 783]]
 - [[_COMMUNITY_Community 784|Community 784]]
 - [[_COMMUNITY_Community 785|Community 785]]
@@ -823,14 +733,6 @@
 - [[_COMMUNITY_Community 819|Community 819]]
 - [[_COMMUNITY_Community 820|Community 820]]
 - [[_COMMUNITY_Community 821|Community 821]]
-- [[_COMMUNITY_Community 822|Community 822]]
-- [[_COMMUNITY_Community 823|Community 823]]
-- [[_COMMUNITY_Community 824|Community 824]]
-- [[_COMMUNITY_Community 825|Community 825]]
-- [[_COMMUNITY_Community 826|Community 826]]
-- [[_COMMUNITY_Community 827|Community 827]]
-- [[_COMMUNITY_Community 828|Community 828]]
-- [[_COMMUNITY_Community 829|Community 829]]
 - [[_COMMUNITY_Community 830|Community 830]]
 - [[_COMMUNITY_Community 831|Community 831]]
 - [[_COMMUNITY_Community 832|Community 832]]
@@ -1030,14 +932,6 @@
 - [[_COMMUNITY_Community 1041|Community 1041]]
 - [[_COMMUNITY_Community 1042|Community 1042]]
 - [[_COMMUNITY_Community 1043|Community 1043]]
-- [[_COMMUNITY_Community 1044|Community 1044]]
-- [[_COMMUNITY_Community 1045|Community 1045]]
-- [[_COMMUNITY_Community 1046|Community 1046]]
-- [[_COMMUNITY_Community 1047|Community 1047]]
-- [[_COMMUNITY_Community 1048|Community 1048]]
-- [[_COMMUNITY_Community 1049|Community 1049]]
-- [[_COMMUNITY_Community 1050|Community 1050]]
-- [[_COMMUNITY_Community 1051|Community 1051]]
 - [[_COMMUNITY_Community 1052|Community 1052]]
 - [[_COMMUNITY_Community 1053|Community 1053]]
 - [[_COMMUNITY_Community 1054|Community 1054]]
@@ -1098,14 +992,6 @@
 - [[_COMMUNITY_Community 1111|Community 1111]]
 - [[_COMMUNITY_Community 1112|Community 1112]]
 - [[_COMMUNITY_Community 1113|Community 1113]]
-- [[_COMMUNITY_Community 1114|Community 1114]]
-- [[_COMMUNITY_Community 1115|Community 1115]]
-- [[_COMMUNITY_Community 1116|Community 1116]]
-- [[_COMMUNITY_Community 1117|Community 1117]]
-- [[_COMMUNITY_Community 1118|Community 1118]]
-- [[_COMMUNITY_Community 1119|Community 1119]]
-- [[_COMMUNITY_Community 1120|Community 1120]]
-- [[_COMMUNITY_Community 1121|Community 1121]]
 - [[_COMMUNITY_Community 1122|Community 1122]]
 - [[_COMMUNITY_Community 1123|Community 1123]]
 - [[_COMMUNITY_Community 1124|Community 1124]]
@@ -1189,7 +1075,6 @@
 - [[_COMMUNITY_Community 1210|Community 1210]]
 - [[_COMMUNITY_Community 1211|Community 1211]]
 - [[_COMMUNITY_Community 1212|Community 1212]]
-- [[_COMMUNITY_Community 1215|Community 1215]]
 - [[_COMMUNITY_Community 1216|Community 1216]]
 - [[_COMMUNITY_Community 1217|Community 1217]]
 - [[_COMMUNITY_Community 1218|Community 1218]]
@@ -1415,6 +1300,7 @@
 - [[_COMMUNITY_Community 1536|Community 1536]]
 - [[_COMMUNITY_Community 1537|Community 1537]]
 - [[_COMMUNITY_Community 1538|Community 1538]]
+- [[_COMMUNITY_Community 1551|Community 1551]]
 - [[_COMMUNITY_Community 1556|Community 1556]]
 - [[_COMMUNITY_Community 1572|Community 1572]]
 - [[_COMMUNITY_Community 1573|Community 1573]]
@@ -1551,11 +1437,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1916 total, 762 thin omitted)
-
-### Community 0 - "Community 0"
-Cohesion: 0.04
-Nodes (44): iE(), ix(), lU(), lW(), o0(), oK(), oL(), q() (+36 more)
+## Communities (1704 total, 761 thin omitted)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.02
@@ -1563,19 +1445,19 @@ Nodes (89): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightIte
 
 ### Community 2 - "Community 2"
 Cohesion: 0.02
-Nodes (89): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+81 more)
+Nodes (97): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+89 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.02
-Nodes (89): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+81 more)
+Nodes (97): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+89 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.02
 Nodes (89): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+81 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.04
-Nodes (78): _(), a_(), a2(), a3(), ab(), ac(), ad(), af() (+70 more)
+Cohesion: 0.05
+Nodes (60): _(), a_(), a2(), a3(), ab(), ac(), ad(), af() (+52 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.02
@@ -1595,19 +1477,19 @@ Nodes (80): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightIte
 
 ### Community 10 - "Community 10"
 Cohesion: 0.05
-Nodes (51): _(), A(), aN(), ap(), aT(), b(), C(), ec() (+43 more)
+Nodes (44): _(), A(), aN(), ap(), aT(), b(), C(), h() (+36 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.09
 Nodes (33): _(), a(), b(), c(), d(), E(), ee(), ei() (+25 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.07
-Nodes (62): aa(), ar(), at(), cn(), e_(), eF(), iv(), j() (+54 more)
+Cohesion: 0.10
+Nodes (42): aa(), ae(), ar(), at(), j(), K(), l_(), l7() (+34 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.08
-Nodes (50): ae(), az(), e5(), e7(), e9(), eY(), i(), l6() (+42 more)
+Cohesion: 0.11
+Nodes (38): cf(), eN(), id(), iF(), lD(), lO(), o1(), o2() (+30 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.04
@@ -1619,7 +1501,7 @@ Nodes (46): dependencies, @capacitor/android, @capacitor/camera, @capacitor/cli,
 
 ### Community 16 - "Community 16"
 Cohesion: 0.04
-Nodes (44): 1. Install dependencies, 1. Range App (Range Operations & Management), 2. Configure environment, 2. Shooter App (Analytics & AI Coaching), 3. Set up the database, 3. Target Camera App (Hardware Interface), 4. Version 2 Range Ops (Next-Gen Infrastructure), AI Coach (+36 more)
+Nodes (45): 1. Install dependencies, 1. Range App (Range Operations & Management), 2. Configure environment, 2. Shooter App (Analytics & AI Coaching), 3. Set up the database, 3. Target Camera App (Hardware Interface), 4. Version 2 Range Ops (Next-Gen Infrastructure), 5. Official Standards, Legal Compliance & Operational Manuals (+37 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.10
@@ -1703,7 +1585,7 @@ Nodes (36): ndarray, bench_throughput(), _col(), _img_bytes(), main(), _match_sh
 
 ### Community 38 - "Community 38"
 Cohesion: 0.09
-Nodes (37): ea(), ee(), ei(), ek(), em(), en(), eo(), er() (+29 more)
+Nodes (34): ec(), ef(), ek(), eL(), eo(), eP(), es(), et() (+26 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.08
@@ -1722,12 +1604,12 @@ Cohesion: 0.06
 Nodes (13): AddShotsTab, directionColor(), disciplineToTargetType(), InteractiveTab(), PageTab, PhotoMode, PhotoState, PlacedShot (+5 more)
 
 ### Community 43 - "Community 43"
-Cohesion: 0.11
-Nodes (34): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ax() (+26 more)
+Cohesion: 0.10
+Nodes (35): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ax() (+27 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.13
-Nodes (34): al(), eD(), eE(), eL(), eN(), ex(), ib(), ic() (+26 more)
+Cohesion: 0.11
+Nodes (45): al(), eD(), eE(), eL(), ex(), i(), ib(), ic() (+37 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.06
@@ -1766,76 +1648,68 @@ Cohesion: 0.06
 Nodes (31): Architecture, Backend: add `?save=false` to `POST /shots/analyze-photo`, Canvas draw, Context, Coordinate transform, `DELETE /shots/:id`, Detection Accuracy & Shot Correction UI — Design Spec, Fix 1 — EXIF Orientation (Critical) (+23 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.10
+Nodes (26): e_(), e4(), e6(), e8(), eF(), iJ(), ll(), lt() (+18 more)
 
 ### Community 55 - "Community 55"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.16
+Nodes (23): e5(), e7(), eY(), na(), ni(), nl(), nm(), nn() (+15 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.15
+Nodes (6): a(), c(), i(), n(), o(), r
 
 ### Community 57 - "Community 57"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.09
+Nodes (21): 1. Operational Hierarchy & Responsibilities, 2.1 Phase 1 — Pre-Opening Facility Inspection (T-minus 60 Minutes), 2.2 Phase 2 — Active Range Firing Operations, 2.3 Phase 3 — Post-Closing Decontamination & Armory Reconciliation, 2. Daily Operational Checklists, 3. Universal Firing Line Commands & Procedures, 4.1 Hangfire (Delayed Ignition), 4.2 Squib Load (Insufficient Powder / Stuck Projectile) (+13 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.09
+Nodes (21): 1.1 Creating Your Account & Authentication, 1.2 Athlete Profile & Firearm Licenses (`/shooter/profile`), 1. Getting Started & Account Setup, 2.1 Accessing Your Digital Card (`/shooter/membership`), 2.2 Booking a Lane Slot (`/bookings`), 2. Facility Access & Digital Membership Card, 3.1 Live Session Initialization (`/sessions/new`), 3.2 Target Camera Edge Synchronization (`/live-analysis`) (+13 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.20
+Nodes (4): B(), d(), q(), W()
 
 ### Community 60 - "Community 60"
 Cohesion: 0.11
 Nodes (17): 1. Prerequisites, 2. Configure, 3. Start the vision service (on the same machine), 4. Run the engine, Architecture, Camera Sources, Dedicated Windows PC, Environment Variables (optional) (+9 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.12
+Nodes (15): 1. Regulatory Framework & Standards Alignment, 2.1 Lead Management & Airborne Contaminants (OSHA 29 CFR 1910.1025), 2.2 Occupational Noise Exposure & Hearing Conservation (OSHA 29 CFR 1910.95), 2.3 EPA Lead Management for Outdoor Ranges (EPA-902-B-01-001), 2. Occupational Safety & Environmental Health Regulations, 3.1 ATF Compliance & Rental Armory Recordkeeping (27 CFR Part 478), 3.2 Ammunition Lot Tracking & Safety (`AmmoLot`), 3. Armory, Firearms & Ammunition Compliance (+7 more)
 
 ### Community 62 - "Community 62"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.26
+Nodes (10): $(), ei(), en(), eo(), er(), et(), eu(), K() (+2 more)
 
 ### Community 63 - "Community 63"
 Cohesion: 0.06
 Nodes (31): Architecture, Backend: add `?save=false` to `POST /shots/analyze-photo`, Canvas draw, Context, Coordinate transform, `DELETE /shots/:id`, Detection Accuracy & Shot Correction UI — Design Spec, Fix 1 — EXIF Orientation (Critical) (+23 more)
 
 ### Community 64 - "Community 64"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.15
+Nodes (12): 1. System Architecture Overview, 2.1 Armor Plate Specifications, 2.2 Stand-off Distances & Rig Placement, 2. Ballistic Armor Shielding & Physical Enclosure, 3. Optical Setup & Illumination Requirements, 4. Local LAN & Standalone Network Architecture, 5. Target Homography & Calibration Procedure, 6. Daily Technician Checklist & Diagnostics (+4 more)
 
 ### Community 65 - "Community 65"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.15
+Nodes (12): 10. Safety, Regulatory Compliance & Legal Architecture, 11.1 Mathematical Physics & Chronograph Formulation, 11. Acoustic-Optical Sensor Fusion (Smart Phone Mic Trigger & Chronograph), 12. 10m Olympic Airgun Target Hardware Box Specifications, 15.1 Pilot Academy Cohort Details, 15. Product Development Roadmap & Academy Pilot Program, 1. Ecosystem Overview & Topology, 8. Downrange Optical Impact Verification & Snapshot Protocol (+4 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.15
+Nodes (12): 10. Safety, Regulatory Compliance & Legal Architecture, 11.1 Mathematical Physics & Chronograph Formulation, 11. Acoustic-Optical Sensor Fusion (Smart Phone Mic Trigger & Chronograph), 12. 10m Olympic Airgun Target Hardware Box Specifications, 15.1 Pilot Academy Cohort Details, 15. Product Development Roadmap & Academy Pilot Program, 1. Ecosystem Overview & Topology, 8. Downrange Optical Impact Verification & Snapshot Protocol (+4 more)
 
 ### Community 67 - "Community 67"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.30
+Nodes (9): e(), f(), h(), l(), m(), p(), ready(), s() (+1 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 69 - "Community 69"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 70 - "Community 70"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.22
+Nodes (11): ea(), ee(), ei(), em(), en(), er(), ev(), ew() (+3 more)
 
 ### Community 71 - "Community 71"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.25
+Nodes (8): 2.1 Overview & Architecture, 2.2 Key User Interface Routes, 2.3 Detailed Features & Mathematical Working, 2. Application 1: Shooter App (Athlete & Coaching Portal), A. Mean Point of Impact (MPI) & Dispersion Analytics, B. Algorithmic ELO Rating System, C. AI Coach Intelligence (Groq & Google GenAI Integration), D. Turnstile Gate Digital Access Card
 
 ### Community 72 - "Community 72"
 Cohesion: 0.13
@@ -1895,11 +1769,11 @@ Nodes (10): Common Mistakes → Corrections, Design Token System, globals.css �
 
 ### Community 91 - "Community 91"
 Cohesion: 0.11
-Nodes (28): c(), cp(), cz(), d(), eB(), eM(), eW(), f() (+20 more)
+Nodes (30): c(), cp(), cz(), d(), eB(), eM(), eW(), f() (+22 more)
 
 ### Community 92 - "Community 92"
-Cohesion: 0.11
-Nodes (28): a0(), a1(), a2(), a3(), ad(), la(), lb(), lj() (+20 more)
+Cohesion: 0.13
+Nodes (25): a0(), a1(), a2(), a3(), ad(), af(), la(), lj() (+17 more)
 
 ### Community 93 - "Community 93"
 Cohesion: 0.07
@@ -2142,68 +2016,72 @@ Cohesion: 0.12
 Nodes (22): b(), d(), e4(), e5(), f(), na(), nb(), ng() (+14 more)
 
 ### Community 162 - "Community 162"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.25
+Nodes (8): 3.1 Overview & Architecture, 3.2 Key User Interface Routes, 3.3 Detailed Features & Operational Working, 3. Application 2: Range Management App (Operator & RSO Command), A. Multi-Facility Management Architecture, B. 1-Hour Time Slot Booking Matrix, C. Cross-Application Emergency Ceasefire System, D. Environmental Telemetry & Crosswind Analysis
 
 ### Community 163 - "Community 163"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.25
+Nodes (8): 2.1 Overview & Architecture, 2.2 Key User Interface Routes, 2.3 Detailed Features & Mathematical Working, 2. Application 1: Shooter App (Athlete & Coaching Portal), A. Mean Point of Impact (MPI) & Dispersion Analytics, B. Algorithmic ELO Rating System, C. AI Coach Intelligence (Groq & Google GenAI Integration), D. Turnstile Gate Digital Access Card
 
 ### Community 164 - "Community 164"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.25
+Nodes (8): 3.1 Overview & Architecture, 3.2 Key User Interface Routes, 3.3 Detailed Features & Operational Working, 3. Application 2: Range Management App (Operator & RSO Command), A. Multi-Facility Management Architecture, B. 1-Hour Time Slot Booking Matrix, C. Cross-Application Emergency Ceasefire System, D. Environmental Telemetry & Crosswind Analysis
 
 ### Community 165 - "Community 165"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.32
+Nodes (7): ndarray, compute_difference_image(), Difference imaging: subtract synthetic template from real image to isolate bulle, Create a boolean mask for pixels within the target boundary., Compute a difference image that isolates bullet holes.      1. Render syntheti, _target_mask(), TargetCalibration
 
 ### Community 166 - "Community 166"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.29
+Nodes (7): 5.1 Overview & Scope, 5.2 Key Modules & Capabilities, 5. Application 4: Version 2 Range Ops (Next-Gen Infrastructure), A. Full-Screen TV Kiosk Mode (`/competitions/[id]/kiosk`), B. Squad & Team Training Management, C. Armory Registry & Handloading Tracker, D. Immutable Security Audit Trail (`AuditLog`)
 
 ### Community 167 - "Community 167"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.29
+Nodes (7): 5.1 Overview & Scope, 5.2 Key Modules & Capabilities, 5. Application 4: Version 2 Range Ops (Next-Gen Infrastructure), A. Full-Screen TV Kiosk Mode (`/competitions/[id]/kiosk`), B. Squad & Team Training Management, C. Armory Registry & Handloading Tracker, D. Immutable Security Audit Trail (`AuditLog`)
 
 ### Community 168 - "Community 168"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.50
+Nodes (4): 4.1 Overview & Architecture, 4.2 Hardware & Optical Specifications, 4.3 Operational Working, 4. Application 3: Target Camera App (Downrange Hardware Interface)
 
 ### Community 169 - "Community 169"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.50
+Nodes (4): 4.1 Overview & Architecture, 4.2 Hardware & Optical Specifications, 4.3 Operational Working, 4. Application 3: Target Camera App (Downrange Hardware Interface)
+
+### Community 171 - "Community 171"
+Cohesion: 0.08
+Nodes (4): SectionId, SectionMeta, GuidanceSection, SECTIONS
 
 ### Community 174 - "Community 174"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 13.1 Hardware Capital Comparison (Per Lane), 13.2 Software Subscription Tiers (Monthly / Annual), 13. Commercial Pricing & Academy ROI Model (INR ₹)
 
 ### Community 175 - "Community 175"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 14.1 Launch Commands, 14.2 Pre-Configured Demo Test Accounts, 14. Local Development, Orchestration & Credentials
 
 ### Community 176 - "Community 176"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 6.1 Architecture, 6.2 Computer Vision Pipeline, 6. Microservice: Computer Vision & Shot Detection Engine
 
 ### Community 177 - "Community 177"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 7.1 Five Standard Stream Profiles, 7.2 Real-Time Network Quality Metric Calculation, 7. High-Performance Wireless Streaming & ABR Engine
 
 ### Community 178 - "Community 178"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 13.1 Hardware Capital Comparison (Per Lane), 13.2 Software Subscription Tiers (Monthly / Annual), 13. Commercial Pricing & Academy ROI Model (INR ₹)
 
 ### Community 179 - "Community 179"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 14.1 Launch Commands, 14.2 Pre-Configured Demo Test Accounts, 14. Local Development, Orchestration & Credentials
 
 ### Community 180 - "Community 180"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 6.1 Architecture, 6.2 Computer Vision Pipeline, 6. Microservice: Computer Vision & Shot Detection Engine
 
 ### Community 181 - "Community 181"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+Cohesion: 0.67
+Nodes (3): 7.1 Five Standard Stream Profiles, 7.2 Real-Time Network Quality Metric Calculation, 7. High-Performance Wireless Streaming & ABR Engine
 
 ### Community 184 - "Community 184"
 Cohesion: 0.13
@@ -2342,8 +2220,8 @@ Cohesion: 0.12
 Nodes (11): avgScoreColor(), AXIS, C, fmtDate(), radiusColor(), SCORE_BINS, ScoreBin, SessionRow() (+3 more)
 
 ### Community 222 - "Community 222"
-Cohesion: 0.14
-Nodes (18): to(), aA(), ac(), aE(), af(), ag(), aI(), aL() (+10 more)
+Cohesion: 0.15
+Nodes (17): to(), aA(), ac(), aE(), ag(), aI(), aL(), am() (+9 more)
 
 ### Community 223 - "Community 223"
 Cohesion: 0.13
@@ -2385,38 +2263,6 @@ Nodes (16): calculate_decimal_score(), get_black_area_radius_mm(), get_decimal_s
 Cohesion: 0.12
 Nodes (16): 1. 📱 Mobile UI/UX Overhaul & Transparency Fixes, 1. Range Operator Dashboard, 1. 🎯 Range Operator Onboarding & Authentication, 2. Core Application Bug Fixing & Polish, 2. 📐 Mobile Aspect Ratio Layout Optimizations (320px – 640px), 2. 🌱 Test Data Seeding, 3. 🔔 Mobile Notification System (YouTube / Facebook Bottom-Sheet Pattern), 3. 🔒 Security & Code Cleanup (+8 more)
 
-### Community 238 - "Community 238"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 239 - "Community 239"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 240 - "Community 240"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 241 - "Community 241"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 242 - "Community 242"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 243 - "Community 243"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 244 - "Community 244"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 245 - "Community 245"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
 ### Community 248 - "Community 248"
 Cohesion: 0.17
 Nodes (16): calculate_decimal_score(), get_black_area_radius_mm(), get_decimal_score(), get_mm_per_pixel(), _get_spec(), _ISSFSpec, Calibration engine: ISSF-exact scoring and mm/px ratios.  All physical dimensi, Result returned by get_decimal_score(). (+8 more)
@@ -2424,38 +2270,6 @@ Nodes (16): calculate_decimal_score(), get_black_area_radius_mm(), get_decimal_s
 ### Community 249 - "Community 249"
 Cohesion: 0.12
 Nodes (16): 1. 📱 Mobile UI/UX Overhaul & Transparency Fixes, 1. Range Operator Dashboard, 1. 🎯 Range Operator Onboarding & Authentication, 2. Core Application Bug Fixing & Polish, 2. 📐 Mobile Aspect Ratio Layout Optimizations (320px – 640px), 2. 🌱 Test Data Seeding, 3. 🔔 Mobile Notification System (YouTube / Facebook Bottom-Sheet Pattern), 3. 🔒 Security & Code Cleanup (+8 more)
-
-### Community 250 - "Community 250"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 251 - "Community 251"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 252 - "Community 252"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 253 - "Community 253"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 254 - "Community 254"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 255 - "Community 255"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 256 - "Community 256"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
-
-### Community 257 - "Community 257"
-Cohesion: 0.12
-Nodes (16): abi, artifactName, output, runtimeFiles, toolchain, buildFiles, buildTargetsCommandComponents, cFileExtensions (+8 more)
 
 ### Community 259 - "Community 259"
 Cohesion: 0.17
@@ -2474,8 +2288,8 @@ Cohesion: 0.29
 Nodes (11): b(), f(), g(), h(), m(), p(), S(), v() (+3 more)
 
 ### Community 267 - "Community 267"
-Cohesion: 0.19
-Nodes (15): a8(), ld(), lg(), lh(), lm(), lp(), lv(), ly() (+7 more)
+Cohesion: 0.15
+Nodes (18): a8(), lb(), ld(), lg(), lh(), lk(), lm(), lp() (+10 more)
 
 ### Community 270 - "Community 270"
 Cohesion: 0.15
@@ -2522,8 +2336,8 @@ Cohesion: 0.14
 Nodes (14): Component Patterns, Country Ticker — fixes issue #14, Feature Card Tier Badges — fixes issue #11, Ghost Button, Input Field, Live Indicator Dot, Metric Card (KPI), Nav Item (Sidebar — app shell) (+6 more)
 
 ### Community 294 - "Community 294"
-Cohesion: 0.22
-Nodes (4): LaneData, LiveVisionDark(), LaneData, LiveVisionLight()
+Cohesion: 0.09
+Nodes (14): useLiveVision(), ShotData, CameraConfigDark(), CameraConfigLight(), CameraConfigDark(), CameraConfigLight(), LaneCameraData, LaneData (+6 more)
 
 ### Community 295 - "Community 295"
 Cohesion: 0.16
@@ -2578,8 +2392,8 @@ Cohesion: 0.15
 Nodes (12): add_shot_overlay(), clear_overlay(), generate_mjpeg(), engine/stream.py — MJPEG Preview Stream Server  Runs on a configurable port (d, Start the MJPEG HTTP server in the current thread.     Call from a daemon threa, Called by the capture loop to push a new frame into the stream buffer.     Opti, Add a detected shot to the MJPEG overlay., Clear all shot overlays (call between sessions). (+4 more)
 
 ### Community 323 - "Community 323"
-Cohesion: 0.18
-Nodes (3): fmtShort(), ShooterView(), useGreeting()
+Cohesion: 0.11
+Nodes (7): RangeConsoleHeader(), RangeConsoleHeaderProps, RangeConsoleSidebar(), RangeConsoleSidebarProps, fmtShort(), ShooterView(), useGreeting()
 
 ### Community 324 - "Community 324"
 Cohesion: 0.15
@@ -2618,7 +2432,7 @@ Cohesion: 0.19
 Nodes (9): _add_real_images_with_autolabel(), generate_yolo_dataset(), LiveReporter, Train YOLO26-S on synthetic bullet-hole data.  Usage -----     # From apps/v, Auto-label real photos using the CV pipeline and add them to the dataset.     I, Fine-tune YOLO26-S and save to output_model., Generate a YOLO-format dataset from synthetic cases.      Directory layout:, train() (+1 more)
 
 ### Community 340 - "Community 340"
-Cohesion: 0.18
+Cohesion: 0.16
 Nodes (3): fmtShort(), ShooterView(), useGreeting()
 
 ### Community 341 - "Community 341"
@@ -2758,8 +2572,8 @@ Cohesion: 0.18
 Nodes (10): compilerOptions, declaration, declarationMap, esModuleInterop, module, outDir, skipLibCheck, strict (+2 more)
 
 ### Community 389 - "Community 389"
-Cohesion: 0.18
-Nodes (10): Category 1: API Hardening & Technical Debt, Category 2: Range Operations & Management, Category 3: Player / Shooter Module Enhancement, Category 4: Coach Module Enhancement, Category 5: Competition & Scoreboard, Category 6: Equipment & Armory Module, Category 7 & 8: Safety & Compliance Audit Log, 🛠️ Launch & Verification Instructions (+2 more)
+Cohesion: 0.17
+Nodes (11): Category 9: Commercial Showcase, Acoustic Sensors & Presentation, Category 1: API Hardening & Technical Debt, Category 2: Range Operations & Management, Category 3: Player / Shooter Module Enhancement, Category 4: Coach Module Enhancement, Category 5: Competition & Scoreboard, Category 6: Equipment & Armory Module, Category 7 & 8: Safety & Compliance Audit Log (+3 more)
 
 ### Community 392 - "Community 392"
 Cohesion: 0.29
@@ -2801,10 +2615,6 @@ Nodes (7): CeasefireState, RangeEmergencyBanner(), dmSans, jetbrainsMono, metada
 Cohesion: 0.31
 Nodes (5): a(), c(), i(), o(), s()
 
-### Community 405 - "Community 405"
-Cohesion: 0.33
-Nodes (5): useLiveVision(), CameraConfigDark(), CameraConfigLight(), CameraConfigDark(), CameraConfigLight()
-
 ### Community 406 - "Community 406"
 Cohesion: 0.29
 Nodes (5): a(), l(), o(), s(), u()
@@ -2833,38 +2643,6 @@ Nodes (7): computeStats(), DISC_COLOR, discColor(), groupByMonth(), monthKey(), 
 Cohesion: 0.20
 Nodes (5): ApiWsClient, engine/ws_client.py — WebSocket Client to Marksman API  Maintains a persistent, Emit a shot_detected event to all clients watching this range., Thin wrapper around a websockets connection to the NestJS Socket.io server., Connect to the API Socket.io server and join the live range room.
 
-### Community 415 - "Community 415"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 416 - "Community 416"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 417 - "Community 417"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 418 - "Community 418"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 419 - "Community 419"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 420 - "Community 420"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 421 - "Community 421"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 422 - "Community 422"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
 ### Community 423 - "Community 423"
 Cohesion: 0.20
 Nodes (10): scripts, build, lint, start, start:debug, start:dev, start:prod, test (+2 more)
@@ -2874,8 +2652,8 @@ Cohesion: 0.29
 Nodes (7): computeStats(), DISC_COLOR, discColor(), groupByMonth(), monthKey(), SessionRow(), SessionsPage()
 
 ### Community 428 - "Community 428"
-Cohesion: 0.20
-Nodes (9): 1. Workspace Restoration & Build Fixes, 2. Multi-Range Facility Management for Range Operators, 3. Verification & Branding Onboarding Flow, 4. Auth UI Refinement & Test Account Login Notifications, 5. Booking & Scheduling System (Task 2.2), 6. Digital Membership & Access Control System (Task 2.3), 🚀 Key Accomplishments & Features Implemented, Marksman Version 2 — Completed Tasks Log (+1 more)
+Cohesion: 0.18
+Nodes (10): 7. Olympic 10m Airgun Commercial Showcase & Acoustic Sensor Fusion, 1. Workspace Restoration & Build Fixes, 2. Multi-Range Facility Management for Range Operators, 3. Verification & Branding Onboarding Flow, 4. Auth UI Refinement & Test Account Login Notifications, 5. Booking & Scheduling System (Task 2.2), 6. Digital Membership & Access Control System (Task 2.3), 🚀 Key Accomplishments & Features Implemented (+2 more)
 
 ### Community 429 - "Community 429"
 Cohesion: 0.20
@@ -2896,38 +2674,6 @@ Nodes (7): computeStats(), DISC_COLOR, discColor(), groupByMonth(), monthKey(), 
 ### Community 436 - "Community 436"
 Cohesion: 0.20
 Nodes (5): ApiWsClient, engine/ws_client.py — WebSocket Client to Marksman API  Maintains a persistent S, Emit a shot_detected event to all clients watching this range., Thin wrapper around a websockets connection to the NestJS Socket.io server., Connect to the API Socket.io server and join the live range room.
-
-### Community 437 - "Community 437"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 438 - "Community 438"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 439 - "Community 439"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 440 - "Community 440"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 441 - "Community 441"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 442 - "Community 442"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 443 - "Community 443"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
-
-### Community 444 - "Community 444"
-Cohesion: 0.20
-Nodes (9): abi, artifactName, output, runtimeFiles, buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries (+1 more)
 
 ### Community 447 - "Community 447"
 Cohesion: 0.29
@@ -3021,102 +2767,6 @@ Nodes (9): 4.1 — Coach Profile & Credentials, 4.2 — Squad / Team Management,
 Cohesion: 0.22
 Nodes (8): devDependencies, typescript, main, name, scripts, build, types, version
 
-### Community 478 - "Community 478"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 479 - "Community 479"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 480 - "Community 480"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 481 - "Community 481"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 482 - "Community 482"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 483 - "Community 483"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 484 - "Community 484"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 485 - "Community 485"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 486 - "Community 486"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 487 - "Community 487"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 488 - "Community 488"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 489 - "Community 489"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 490 - "Community 490"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 491 - "Community 491"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 492 - "Community 492"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 493 - "Community 493"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 494 - "Community 494"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 495 - "Community 495"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 496 - "Community 496"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 497 - "Community 497"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 498 - "Community 498"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 499 - "Community 499"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 500 - "Community 500"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 501 - "Community 501"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
 ### Community 508 - "Community 508"
 Cohesion: 0.22
 Nodes (3): Props, ReadingPoint, TrendMode
@@ -3130,8 +2780,8 @@ Cohesion: 0.22
 Nodes (4): ImgRect, ShotCorrectionCanvasProps, TARGET_RENDER_SPECS, TargetRenderSpec
 
 ### Community 512 - "Community 512"
-Cohesion: 0.22
-Nodes (4): ResolvedTheme, Theme, ThemeContext, ThemeContextValue
+Cohesion: 0.20
+Nodes (5): DashboardTheme, ResolvedTheme, Theme, ThemeContext, ThemeContextValue
 
 ### Community 513 - "Community 513"
 Cohesion: 0.22
@@ -3146,8 +2796,8 @@ Cohesion: 0.22
 Nodes (8): devDependencies, typescript, main, name, scripts, build, types, version
 
 ### Community 516 - "Community 516"
-Cohesion: 0.22
-Nodes (8): 📌 CATEGORY 1: API HARDENING & TECHNICAL DEBT, 🏢 CATEGORY 2: RANGE MANAGEMENT MODULE, 🎯 CATEGORY 3: PLAYER / SHOOTER MODULE ENHANCEMENT, 👨‍🏫 CATEGORY 4: COACH MODULE ENHANCEMENT, 🏆 CATEGORY 5: COMPETITION & TOURNAMENT MANAGEMENT, 🔫 CATEGORY 6: EQUIPMENT & ARMORY MODULE, 🛡️ CATEGORY 7 & 8: SAFETY, COMPLIANCE & AUDIT LOG, Marksman — Master Improvement Plan Completion Log
+Cohesion: 0.18
+Nodes (10): 🎯 CATEGORY 9: COMMERCIAL SHOWCASE, ACOUSTIC SENSORS & PRESENTATION, 📌 CATEGORY 1: API HARDENING & TECHNICAL DEBT, 🏢 CATEGORY 2: RANGE MANAGEMENT MODULE, 🎯 CATEGORY 3: PLAYER / SHOOTER MODULE ENHANCEMENT, 👨‍🏫 CATEGORY 4: COACH MODULE ENHANCEMENT, 🏆 CATEGORY 5: COMPETITION & TOURNAMENT MANAGEMENT, 🔫 CATEGORY 6: EQUIPMENT & ARMORY MODULE, 🛡️ CATEGORY 7 & 8: SAFETY, COMPLIANCE & AUDIT LOG (+2 more)
 
 ### Community 520 - "Community 520"
 Cohesion: 0.22
@@ -3196,102 +2846,6 @@ Nodes (9): 4.1 — Coach Profile & Credentials, 4.2 — Squad / Team Management,
 ### Community 535 - "Community 535"
 Cohesion: 0.22
 Nodes (8): devDependencies, typescript, main, name, scripts, build, types, version
-
-### Community 536 - "Community 536"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 537 - "Community 537"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 538 - "Community 538"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 539 - "Community 539"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 540 - "Community 540"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 541 - "Community 541"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 542 - "Community 542"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 543 - "Community 543"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 544 - "Community 544"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 545 - "Community 545"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 546 - "Community 546"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 547 - "Community 547"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 548 - "Community 548"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 549 - "Community 549"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 550 - "Community 550"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 551 - "Community 551"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 552 - "Community 552"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 553 - "Community 553"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 554 - "Community 554"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 555 - "Community 555"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 556 - "Community 556"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 557 - "Community 557"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 558 - "Community 558"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 559 - "Community 559"
-Cohesion: 0.22
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
 
 ### Community 562 - "Community 562"
 Cohesion: 0.22
@@ -3425,10 +2979,6 @@ Nodes (7): 1. Recoil & Cycle Dynamics (Heavy-Duty IMU), 2. Bluetooth Shot Timer 
 Cohesion: 0.25
 Nodes (7): ndarray, calibrate_and_undistort(), get_default_esp32_intrinsics(), get_generic_android_intrinsics(), Returns rough estimate intrinsic matrix and distortion coefficients      for a t, Returns rough estimate intrinsic matrix and distortion coefficients     for an o, Applies standard lens distortion correction (undistort) using camera intrinsics.
 
-### Community 620 - "Community 620"
-Cohesion: 0.32
-Nodes (7): ndarray, compute_difference_image(), Difference imaging: subtract synthetic template from real image to isolate bulle, Create a boolean mask for pixels within the target boundary., Compute a difference image that isolates bullet holes.      1. Render syntheti, _target_mask(), TargetCalibration
-
 ### Community 621 - "Community 621"
 Cohesion: 0.39
 Nodes (6): ExportSessionModalProps, fmtDate(), getDistribution(), getThemeColors(), renderExport(), roundRect()
@@ -3454,8 +3004,8 @@ Cohesion: 0.25
 Nodes (7): 1. Recoil & Cycle Dynamics (Heavy-Duty IMU), 2. Bluetooth Shot Timer Integration, 3. Doppler Radar / Chronograph Integration, 4. Smart Steel Targets (Acoustic / Impact), 5. Smart Optics & Rangefinder Sync, 6. Environmental & Ballistic Weather Sync, Real Firearm Live Session Tracking & Hardware Integration Plan
 
 ### Community 630 - "Community 630"
-Cohesion: 0.29
-Nodes (6): 1. Native APK Builds Completed, 2. Infrastructure Setup, 3. Google Authentication Integration (Fully Configured), 4. Current Status & Where to Pick Up Next, Marksman Platform — Progress Checkpoint, When You Return:
+Cohesion: 0.20
+Nodes (9): 1. Native APK Builds Completed, 2. Infrastructure Setup, 3. Google Authentication Integration (Fully Configured), 4. Current Status: ALL ECOSYSTEM SERVICES ACTIVE & VERIFIED, 4. Current Status & Where to Pick Up Next, Marksman Platform — Progress Checkpoint, Next Recommended Verifications:, Seed Accounts Ready for Login: (+1 more)
 
 ### Community 631 - "Community 631"
 Cohesion: 0.29
@@ -3769,38 +3319,6 @@ Nodes (6): 18.1 — National Federation Integration, 18.2 — Video Analysis Int
 Cohesion: 0.53
 Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman Range Engine Entrypoint  Usage:   python start.py, setup_logging()
 
-### Community 775 - "Community 775"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 776 - "Community 776"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 777 - "Community 777"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 778 - "Community 778"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 779 - "Community 779"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 780 - "Community 780"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 781 - "Community 781"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 782 - "Community 782"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
 ### Community 789 - "Community 789"
 Cohesion: 0.33
 Nodes (3): BASE_COMMANDS, Command, CommandPaletteProps
@@ -3892,38 +3410,6 @@ Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman R
 ### Community 821 - "Community 821"
 Cohesion: 0.33
 Nodes (5): Building with EAS, Commands, Expo has changed — do not trust your training data, Navigation & Routing, Rules
-
-### Community 822 - "Community 822"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 823 - "Community 823"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 824 - "Community 824"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 825 - "Community 825"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 826 - "Community 826"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 827 - "Community 827"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 828 - "Community 828"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 829 - "Community 829"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
 
 ### Community 832 - "Community 832"
 Cohesion: 0.40
@@ -4144,6 +3630,10 @@ Nodes (4): name, prisma, seed, version
 ### Community 917 - "Community 917"
 Cohesion: 0.40
 Nodes (4): BookLaneDto, CreateLaneDto, CreateRangeDto, WalkInGuestDto
+
+### Community 924 - "Community 924"
+Cohesion: 0.33
+Nodes (3): DEFAULT_LANES, Lane, LaneMatrixProps
 
 ### Community 926 - "Community 926"
 Cohesion: 0.60
@@ -4369,38 +3859,6 @@ Nodes (4): 5.1 — Competition Setup, 5.2 — Live Scoring System, 5.3 — Post-
 Cohesion: 0.50
 Nodes (3): Coach Account, Marksman Test Accounts, Shooter Account
 
-### Community 1044 - "Community 1044"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1045 - "Community 1045"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1046 - "Community 1046"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1047 - "Community 1047"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1048 - "Community 1048"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1049 - "Community 1049"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1050 - "Community 1050"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1051 - "Community 1051"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
 ### Community 1056 - "Community 1056"
 Cohesion: 0.50
 Nodes (3): CreateEventDto, EventType, RecurringType
@@ -4410,8 +3868,8 @@ Cohesion: 0.50
 Nodes (3): CreateLaneDto, LaneStatus, UpdateLaneStatusDto
 
 ### Community 1061 - "Community 1061"
-Cohesion: 0.83
-Nodes (3): ensureTable(), GET(), POST()
+Cohesion: 0.60
+Nodes (4): memoryFeedback, ensureTable(), GET(), POST()
 
 ### Community 1082 - "Community 1082"
 Cohesion: 0.50
@@ -4457,38 +3915,6 @@ Nodes (4): 5.1 — Competition Setup, 5.2 — Live Scoring System, 5.3 — Post-
 Cohesion: 0.50
 Nodes (3): Coach Account, Marksman Test Accounts, Shooter Account
 
-### Community 1114 - "Community 1114"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1115 - "Community 1115"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1116 - "Community 1116"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1117 - "Community 1117"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1118 - "Community 1118"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1119 - "Community 1119"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1120 - "Community 1120"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
-### Community 1121 - "Community 1121"
-Cohesion: 0.50
-Nodes (3): enabled, packages, prefabPath
-
 ### Community 1122 - "Community 1122"
 Cohesion: 0.50
 Nodes (3): compilerOptions, strict, extends
@@ -4529,33 +3955,41 @@ Nodes (4): 5.1 — Competition Setup, 5.2 — Live Scoring System, 5.3 — Post-
 Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
 
+### Community 1251 - "Community 1251"
+Cohesion: 0.19
+Nodes (9): CameraAngle, MultiCameraTargetView(), MultiCameraTargetViewProps, OpticalFilter, ShotImpactSnapshot, ViewLayout, StreamTunerModal(), StreamTunerModalProps (+1 more)
+
 ### Community 1267 - "Community 1267"
 Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
+
+### Community 1268 - "Community 1268"
+Cohesion: 0.16
+Nodes (24): CameraControls(), CameraControlsProps, styles, ShotStatsHud(), ShotStatsHudProps, styles, styles, TargetOverlay() (+16 more)
 
 ### Community 1303 - "Community 1303"
 Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
 
 ## Knowledge Gaps
-- **5535 isolated node(s):** `recommendations`, `java.jdt.ls.vmargs`, `fs`, `path`, `srcDir` (+5530 more)
+- **4455 isolated node(s):** `recommendations`, `java.jdt.ls.vmargs`, `fs`, `path`, `srcDir` (+4450 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **762 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **761 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TargetSpec` connect `Community 104` to `Community 35`, `Community 36`, `Community 37`, `Community 106`, `Community 332`, `Community 141`, `Community 620`, `Community 339`, `Community 150`, `Community 22`, `Community 313`, `Community 155`, `Community 124`, `Community 127`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `TargetCalibration` connect `Community 20` to `Community 262`, `Community 104`, `Community 361`, `Community 106`, `Community 204`, `Community 620`, `Community 46`, `Community 47`, `Community 433`, `Community 50`, `Community 51`, `Community 411`, `Community 370`, `Community 210`, `Community 347`, `Community 124`, `Community 127`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `_()` connect `Community 10` to `Community 131`, `Community 38`, `Community 267`, `Community 17`, `Community 92`, `Community 222`?**
+- **Why does `_()` connect `Community 5` to `Community 43`, `Community 12`, `Community 13`, `Community 44`, `Community 54`, `Community 55`, `Community 91`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `_()` connect `Community 10` to `Community 131`, `Community 68`, `Community 38`, `Community 267`, `Community 17`, `Community 92`, `Community 222`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `TargetCalibration` connect `Community 20` to `Community 165`, `Community 262`, `Community 104`, `Community 361`, `Community 106`, `Community 204`, `Community 46`, `Community 47`, `Community 433`, `Community 50`, `Community 51`, `Community 411`, `Community 370`, `Community 210`, `Community 347`, `Community 124`, `Community 127`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **Are the 60 inferred relationships involving `TargetCalibration` (e.g. with `AnalysisResponse` and `TargetCalibration`) actually correct?**
   _`TargetCalibration` has 60 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `i()` (e.g. with `iw()` and `u_()`) actually correct?**
   _`i()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `recommendations`, `java.jdt.ls.vmargs`, `fs` to the rest of the system?**
-  _6015 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4935 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.04294249439880508 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09686609686609686 - nodes in this community are weakly interconnected._
