@@ -1,16 +1,16 @@
 # Graph Report - Marksman  (2026-10-12)
 
 ## Corpus Check
-- 1653 files · ~7,818,870 words
+- 1653 files · ~7,819,142 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 13267 nodes · 15000 edges · 1704 communities (943 shown, 761 thin omitted)
+- 13270 nodes · 15005 edges · 1705 communities (944 shown, 761 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 291 edges (avg confidence: 0.62)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bd2b8990`
+- Built from commit: `eee57593`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -249,6 +249,7 @@
 - [[_COMMUNITY_Community 235|Community 235]]
 - [[_COMMUNITY_Community 236|Community 236]]
 - [[_COMMUNITY_Community 237|Community 237]]
+- [[_COMMUNITY_Community 239|Community 239]]
 - [[_COMMUNITY_Community 246|Community 246]]
 - [[_COMMUNITY_Community 247|Community 247]]
 - [[_COMMUNITY_Community 248|Community 248]]
@@ -1437,7 +1438,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1704 total, 761 thin omitted)
+## Communities (1705 total, 761 thin omitted)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.02
@@ -1449,15 +1450,15 @@ Nodes (97): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightIte
 
 ### Community 3 - "Community 3"
 Cohesion: 0.02
-Nodes (97): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+89 more)
+Nodes (98): TrainingPlanContent, AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding (+90 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.02
 Nodes (89): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightItem, AiBiometricAnalysis, AiCoachAnalysis, AiCoachCategory, AiCoachFinding, AiCoachSeverity (+81 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.05
-Nodes (60): _(), a_(), a2(), a3(), ab(), ac(), ad(), af() (+52 more)
+Cohesion: 0.06
+Nodes (52): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+44 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.02
@@ -1477,7 +1478,7 @@ Nodes (80): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightIte
 
 ### Community 10 - "Community 10"
 Cohesion: 0.05
-Nodes (44): _(), A(), aN(), ap(), aT(), b(), C(), h() (+36 more)
+Nodes (51): _(), A(), aN(), ap(), aT(), b(), C(), ec() (+43 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.09
@@ -1488,8 +1489,8 @@ Cohesion: 0.10
 Nodes (42): aa(), ae(), ar(), at(), j(), K(), l_(), l7() (+34 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.11
-Nodes (38): cf(), eN(), id(), iF(), lD(), lO(), o1(), o2() (+30 more)
+Cohesion: 0.13
+Nodes (29): cf(), eN(), id(), iF(), lD(), lO(), o1(), o2() (+21 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.04
@@ -1585,7 +1586,7 @@ Nodes (36): ndarray, bench_throughput(), _col(), _img_bytes(), main(), _match_sh
 
 ### Community 38 - "Community 38"
 Cohesion: 0.09
-Nodes (34): ec(), ef(), ek(), eL(), eo(), eP(), es(), et() (+26 more)
+Nodes (37): ea(), ee(), ei(), ek(), em(), en(), eo(), er() (+29 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.08
@@ -1652,8 +1653,8 @@ Cohesion: 0.10
 Nodes (26): e_(), e4(), e6(), e8(), eF(), iJ(), ll(), lt() (+18 more)
 
 ### Community 55 - "Community 55"
-Cohesion: 0.16
-Nodes (23): e5(), e7(), eY(), na(), ni(), nl(), nm(), nn() (+15 more)
+Cohesion: 0.13
+Nodes (25): e5(), e7(), eB(), i0(), na(), ni(), nk(), nl() (+17 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.15
@@ -1704,8 +1705,8 @@ Cohesion: 0.30
 Nodes (9): e(), f(), h(), l(), m(), p(), ready(), s() (+1 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.22
-Nodes (11): ea(), ee(), ei(), em(), en(), er(), ev(), ew() (+3 more)
+Cohesion: 0.20
+Nodes (20): eY(), nr(), o7(), r4(), sB(), sd(), sh(), sJ() (+12 more)
 
 ### Community 71 - "Community 71"
 Cohesion: 0.25
@@ -1768,12 +1769,12 @@ Cohesion: 0.18
 Nodes (10): Common Mistakes → Corrections, Design Token System, globals.css — Full Contents, MARKSMAN — Claude Code Design System Guide, Mobile Rules (Capacitor), New Component Checklist, Project Overview, Quick Command Reference (+2 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.11
-Nodes (30): c(), cp(), cz(), d(), eB(), eM(), eW(), f() (+22 more)
+Cohesion: 0.18
+Nodes (17): c(), cp(), cz(), d(), eM(), eW(), f(), lf() (+9 more)
 
 ### Community 92 - "Community 92"
-Cohesion: 0.13
-Nodes (25): a0(), a1(), a2(), a3(), ad(), af(), la(), lj() (+17 more)
+Cohesion: 0.11
+Nodes (28): a0(), a1(), a2(), a3(), ad(), la(), lb(), lj() (+20 more)
 
 ### Community 93 - "Community 93"
 Cohesion: 0.07
@@ -2160,8 +2161,8 @@ Cohesion: 0.12
 Nodes (10): C, DISCIPLINES, DiscPbRow(), fmtDate(), GoalBar(), GoalCard(), GoalEntry, GoalsSection() (+2 more)
 
 ### Community 207 - "Community 207"
-Cohesion: 0.20
-Nodes (18): checkPermissions(), getOrRegisterMarksmanPulse(), isAvailable(), loadPlugin(), MarksmanPulseDevice, READ_TYPES, readBloodOxygen(), readCalories() (+10 more)
+Cohesion: 0.19
+Nodes (19): HealthSample, checkPermissions(), getOrRegisterMarksmanPulse(), isAvailable(), loadPlugin(), MarksmanPulseDevice, READ_TYPES, readBloodOxygen() (+11 more)
 
 ### Community 208 - "Community 208"
 Cohesion: 0.10
@@ -2220,8 +2221,8 @@ Cohesion: 0.12
 Nodes (11): avgScoreColor(), AXIS, C, fmtDate(), radiusColor(), SCORE_BINS, ScoreBin, SessionRow() (+3 more)
 
 ### Community 222 - "Community 222"
-Cohesion: 0.15
-Nodes (17): to(), aA(), ac(), aE(), ag(), aI(), aL(), am() (+9 more)
+Cohesion: 0.14
+Nodes (18): to(), aA(), ac(), aE(), af(), ag(), aI(), aL() (+10 more)
 
 ### Community 223 - "Community 223"
 Cohesion: 0.13
@@ -2263,6 +2264,10 @@ Nodes (16): calculate_decimal_score(), get_black_area_radius_mm(), get_decimal_s
 Cohesion: 0.12
 Nodes (16): 1. 📱 Mobile UI/UX Overhaul & Transparency Fixes, 1. Range Operator Dashboard, 1. 🎯 Range Operator Onboarding & Authentication, 2. Core Application Bug Fixing & Polish, 2. 📐 Mobile Aspect Ratio Layout Optimizations (320px – 640px), 2. 🌱 Test Data Seeding, 3. 🔔 Mobile Notification System (YouTube / Facebook Bottom-Sheet Pattern), 3. 🔒 Security & Code Cleanup (+8 more)
 
+### Community 239 - "Community 239"
+Cohesion: 0.32
+Nodes (8): ab(), ak(), av(), ay(), eC(), ez(), ia(), iR()
+
 ### Community 248 - "Community 248"
 Cohesion: 0.17
 Nodes (16): calculate_decimal_score(), get_black_area_radius_mm(), get_decimal_score(), get_mm_per_pixel(), _get_spec(), _ISSFSpec, Calibration engine: ISSF-exact scoring and mm/px ratios.  All physical dimensi, Result returned by get_decimal_score(). (+8 more)
@@ -2288,8 +2293,8 @@ Cohesion: 0.29
 Nodes (11): b(), f(), g(), h(), m(), p(), S(), v() (+3 more)
 
 ### Community 267 - "Community 267"
-Cohesion: 0.15
-Nodes (18): a8(), lb(), ld(), lg(), lh(), lk(), lm(), lp() (+10 more)
+Cohesion: 0.19
+Nodes (15): a8(), ld(), lg(), lh(), lm(), lp(), lv(), ly() (+7 more)
 
 ### Community 270 - "Community 270"
 Cohesion: 0.15
@@ -3972,16 +3977,16 @@ Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
 
 ## Knowledge Gaps
-- **4455 isolated node(s):** `recommendations`, `java.jdt.ls.vmargs`, `fs`, `path`, `srcDir` (+4450 more)
+- **4457 isolated node(s):** `recommendations`, `java.jdt.ls.vmargs`, `fs`, `path`, `srcDir` (+4452 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **761 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `_()` connect `Community 5` to `Community 43`, `Community 12`, `Community 13`, `Community 44`, `Community 54`, `Community 55`, `Community 91`?**
+- **Why does `_()` connect `Community 5` to `Community 68`, `Community 43`, `Community 12`, `Community 44`, `Community 13`, `Community 239`, `Community 54`, `Community 55`, `Community 91`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `_()` connect `Community 10` to `Community 131`, `Community 68`, `Community 38`, `Community 267`, `Community 17`, `Community 92`, `Community 222`?**
+- **Why does `_()` connect `Community 10` to `Community 131`, `Community 38`, `Community 267`, `Community 17`, `Community 92`, `Community 222`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **Why does `TargetCalibration` connect `Community 20` to `Community 165`, `Community 262`, `Community 104`, `Community 361`, `Community 106`, `Community 204`, `Community 46`, `Community 47`, `Community 433`, `Community 50`, `Community 51`, `Community 411`, `Community 370`, `Community 210`, `Community 347`, `Community 124`, `Community 127`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
@@ -3990,6 +3995,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 2 inferred relationships involving `i()` (e.g. with `iw()` and `u_()`) actually correct?**
   _`i()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `recommendations`, `java.jdt.ls.vmargs`, `fs` to the rest of the system?**
-  _4935 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4937 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.09686609686609686 - nodes in this community are weakly interconnected._

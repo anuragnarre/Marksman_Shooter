@@ -4520,8 +4520,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/ai-coach/ai-coach.service.ts": {
-    "mtime": 1789303660.4714303,
-    "ast_hash": "197a8d5370de93edced69cfe65a0f3b8",
+    "mtime": 1791750765.4222617,
+    "ast_hash": "e232c47e023c0daf241f6e47e0a80d94",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/ai-coach/dto/analyze-session.dto.ts": {
@@ -4540,8 +4540,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/analytics/analytics.service.ts": {
-    "mtime": 1787548698.583215,
-    "ast_hash": "11faeadc24eb30548a46c857a5cd6c8f",
+    "mtime": 1791750509.6528943,
+    "ast_hash": "124f8805c0f3622099938bae2e0c82b2",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/app.module.ts": {
@@ -4560,8 +4560,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/auth/auth.service.ts": {
-    "mtime": 1788671899.196406,
-    "ast_hash": "b6e6e0c09577539ae386d337f01779a2",
+    "mtime": 1791750659.632854,
+    "ast_hash": "e9e1b4dd0cad2cb692f8d8bebfd95269",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/auth/decorators/current-user.decorator.ts": {
@@ -4630,8 +4630,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/biometrics/biometrics-ai.service.ts": {
-    "mtime": 1789303671.3736005,
-    "ast_hash": "9f6f01cd9641f23cc143d21a4675336e",
+    "mtime": 1791750835.5345993,
+    "ast_hash": "6941252cfa14a52ecd49001a2f6141ce",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/biometrics/biometrics.controller.ts": {
@@ -4645,8 +4645,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/biometrics/biometrics.service.ts": {
-    "mtime": 1787548698.5911794,
-    "ast_hash": "fd9b26e2657ff0c5cf455779ceea5469",
+    "mtime": 1791750442.3727381,
+    "ast_hash": "e988420a7e0e75f2510bffe60f77a0a0",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/biometrics/dto/health-connect-sync.dto.ts": {
@@ -4665,8 +4665,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/biometrics/guards/device-auth.guard.ts": {
-    "mtime": 1787548698.5931756,
-    "ast_hash": "498163cfcde49474cb4d54c22d5aee9b",
+    "mtime": 1791750465.3277154,
+    "ast_hash": "f6e4349b82666aaddda26818234b5e37",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/calendar/calendar.controller.ts": {
@@ -4845,8 +4845,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/main.ts": {
-    "mtime": 1789140468.5404677,
-    "ast_hash": "49d869320d4b8bb302291cde9454c141",
+    "mtime": 1791750364.9882014,
+    "ast_hash": "d15c62862de149408960c3492f367c80",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/memberships/memberships.controller.ts": {
@@ -5115,8 +5115,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/shots/shots.service.ts": {
-    "mtime": 1789308466.0663164,
-    "ast_hash": "a5cb227dd8b1e5d8dcaef56afaaa479d",
+    "mtime": 1791750624.8493052,
+    "ast_hash": "f414ad685b87972803f2a854eeaec037",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/shots/vision.service.ts": {
@@ -6015,8 +6015,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/health-connect.ts": {
-    "mtime": 1787548699.651469,
-    "ast_hash": "4a73607a3ec2eaf0beb87b940bb8faea",
+    "mtime": 1791750868.224043,
+    "ast_hash": "99e8d9558218c05252977bc3be53c2e2",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/image-store.ts": {
@@ -6175,8 +6175,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/packages/shared-types/index.ts": {
-    "mtime": 1791739714.3113856,
-    "ast_hash": "70a3ce815afd99cf715f79af1fd2088f",
+    "mtime": 1791750594.8451636,
+    "ast_hash": "0f7ccb2173a77a5f3ab36455b34015df",
     "semantic_hash": ""
   },
   "Shooter_App/packages/shared-types/package.json": {
@@ -10090,8 +10090,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/docker-compose.yml": {
-    "mtime": 1791254336.7471957,
-    "ast_hash": "1aa2e17f7b8cc5286ce6df573c7eb503",
+    "mtime": 1791750388.3252237,
+    "ast_hash": "7a824b67a6ef9b21d3ed5486069528f8",
     "semantic_hash": ""
   },
   "Shooter_App/docs/AIRGUN_LIVE_TRACKING_PLAN.md": {
