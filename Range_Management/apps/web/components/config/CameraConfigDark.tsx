@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useLiveVision } from '@/hooks/useLiveVision';
+import { StreamTunerModal } from '@/components/vision/StreamTunerModal';
+import { CameraStreamConfig } from '@shooting-platform/shared-types';
+import { loadStreamConfig, saveStreamConfig } from '@/lib/stream-optimizer';
 
 export function CameraConfigDark() {
   const { lanes, isLoading, selectedLaneId, setSelectedLaneId } = useLiveVision("1");
   const selectedLane = lanes.find((l: any) => l.id === selectedLaneId) || lanes[0];
 
+  const [isStreamTunerOpen, setIsStreamTunerOpen] = useState(false);
+  const [streamConfig, setStreamConfig] = useState<CameraStreamConfig>(() => loadStreamConfig(selectedLaneId));
   const [glareThreshold, setGlareThreshold] = useState(68);
+
   const [contrast, setContrast] = useState(82);
   const [edgeSensitivity, setEdgeSensitivity] = useState(15); // 0.15mm as 15
   const [diameter, setDiameter] = useState(45); // 4.5mm as 45
@@ -34,7 +40,15 @@ export function CameraConfigDark() {
         Manage range physical lanes, assign camera sources (USB, Webcams, Android IP Stream), and calibrate target detection matrices.
       </p>
 </div>
-<div className="flex items-center gap-space-md flex-shrink-0">
+<div className="flex flex-wrap items-center gap-space-md flex-shrink-0">
+<button
+  onClick={() => setIsStreamTunerOpen(true)}
+  className="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 transition-colors shadow-sm font-label-caps text-label-caps uppercase font-bold"
+  type="button"
+>
+<span className="material-symbols-outlined text-[18px]">tune</span>
+<span>⚡ Stream &amp; Wireless Optimizer</span>
+</button>
 <button className="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface transition-colors shadow-sm font-label-caps text-label-caps uppercase" type="button">
 <span className="material-symbols-outlined text-[18px] text-tertiary">science</span>
 <span>Run Global Calibration Test</span>
@@ -44,6 +58,7 @@ export function CameraConfigDark() {
 <span>+ Add New Lane</span>
 </button>
 </div>
+
 </div>
 {/* Main Split Layout (45% / 55%) */}
 <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
@@ -303,6 +318,18 @@ export function CameraConfigDark() {
 </div>
 </div>
 
+      <StreamTunerModal
+        isOpen={isStreamTunerOpen}
+        onClose={() => setIsStreamTunerOpen(false)}
+        config={streamConfig}
+        onConfigChange={(newCfg) => {
+          setStreamConfig(newCfg);
+          saveStreamConfig(newCfg, selectedLaneId);
+        }}
+        laneName={selectedLane?.name || 'Selected Lane'}
+        laneId={selectedLaneId}
+      />
     </div>
   );
 }
+

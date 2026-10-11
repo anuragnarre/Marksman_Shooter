@@ -143,6 +143,87 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`live_range:${rangeId}`).emit('lane_status_updated', { laneId, ...payload });
   }
 
+  // ── High-Speed Wireless Video & Hardware Stream Management ───────────────
+
+  @SubscribeMessage('start_camera_stream')
+  handleStartCameraStream(
+    @MessageBody() payload: { laneId: string; initialConfig?: any },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId) return;
+    const room = `lane_stream:${payload.laneId}`;
+    void client.join(room);
+    client.emit('stream_started', { laneId: payload.laneId, timestamp: Date.now() });
+    this.server.to(room).emit('camera_status', { laneId: payload.laneId, isStreaming: true });
+  }
+
+  @SubscribeMessage('stop_camera_stream')
+  handleStopCameraStream(
+    @MessageBody() payload: { laneId: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId) return;
+    const room = `lane_stream:${payload.laneId}`;
+    this.server.to(room).emit('camera_status', { laneId: payload.laneId, isStreaming: false });
+  }
+
+  @SubscribeMessage('subscribe_lane_feed')
+  handleSubscribeLaneFeed(
+    @MessageBody() payload: { laneId: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId) return;
+    void client.join(`lane_stream:${payload.laneId}`);
+    client.emit('lane_feed_subscribed', { laneId: payload.laneId });
+  }
+
+  @SubscribeMessage('camera_frame')
+  handleCameraFrame(
+    @MessageBody() payload: {
+      laneId: string;
+      frame: string;
+      targetType?: string;
+      seq?: number;
+      timestamp?: number;
+    },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId || !payload?.frame) return;
+    const enrichedFrame = {
+      ...payload,
+      relayedAt: Date.now(),
+    };
+    // Relay frame to viewers of this lane stream room
+    this.server.to(`lane_stream:${payload.laneId}`).emit('camera_frame', enrichedFrame);
+  }
+
+  @SubscribeMessage('update_stream_config')
+  handleUpdateStreamConfig(
+    @MessageBody() payload: { laneId: string; config: any },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId || !payload?.config) return;
+    // Broadcast config update to hardware camera publisher and viewers
+    this.server.to(`lane_stream:${payload.laneId}`).emit('stream_config_updated', {
+      laneId: payload.laneId,
+      config: payload.config,
+      updatedBy: client.id,
+      timestamp: Date.now(),
+    });
+  }
+
+  @SubscribeMessage('stream_ping')
+  handleStreamPing(
+    @MessageBody() payload: { clientTimestamp: number; laneId?: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    client.emit('stream_pong', {
+      clientTimestamp: payload?.clientTimestamp || Date.now(),
+      serverTimestamp: Date.now(),
+    });
+  }
+
+
   // ── Range Emergency Ceasefire (Cross-App Safety) ─────────────────────────
 
   @SubscribeMessage('broadcastCeasefire')

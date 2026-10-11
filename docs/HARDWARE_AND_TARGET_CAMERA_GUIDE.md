@@ -96,3 +96,30 @@ Before a session begins, the camera must map its perspective angle to true Carte
 - [ ] Verify battery charging level or constant USB-C power delivery (minimum 5V/2.4A).
 - [ ] Confirm camera device temperature is within operating limits (<45°C) inside the armor housing.
 - [ ] Conduct test shot on calibration lane to verify sub-200ms latency on the Range Operator console.
+
+---
+
+## 7. High-Speed Wireless Video Optimization & Custom Stream Tuning SOP
+
+### 7.1 Bandwidth Engineering Matrix
+Video bitrate must match the physical transmission medium:
+
+| Profile Preset | Resolution | Target FPS | Bitrate Cap | Jitter Buffer | Network Target | Recommended Deployment |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **AUTO_ADAPTIVE** | Dynamic 480p–1080p | 15–45 FPS | 900–3500 kbps | 60ms | Any Wi-Fi / LTE | **Default for all lanes**; auto-senses packet drops & throttles dynamically |
+| **LAN_ULTRA_LOW_LAT** | 1080p (1920×1080) | 60 FPS | 6000 kbps | 0ms | Gigabit LAN / 5GHz Wi-Fi 6 | Olympic Finals, ISSF rapid fire, zero-latency downrange feedback |
+| **BALANCED_WIRELESS** | 720p (1280×720) | 30 FPS | 2500 kbps | 50ms | Standard 5GHz Wi-Fi | Standard indoor range training bays with high visual fidelity |
+| **BANDWIDTH_SAVER** | 480p (854×480) | 15 FPS | 800 kbps | 100ms | Constrained / ~5-6 Mbps links | Cellular hotspots, outdoor ranges, or multiple lanes on a ~5.9 Mbps link |
+| **ECO_BATTERY** | 360p (640×360) | 10 FPS | 400 kbps | 150ms | Solar / Battery stand | Hot outdoor bays (>38°C) to prevent lithium battery thermal throttling |
+| **CUSTOM** | User-configured | 10–60 FPS | 250–8000 kbps | 0–300ms | Custom | Operator fine-tuned for specialized industrial IP cameras / RTSP rigs |
+
+### 7.2 Custom Operator & Athlete Stream Tuner Controls
+Both the **Range Management RSO Console** (`/live-analysis` and `/lanes/config`) and the **Shooter Athlete App** (`/live-analysis`) feature an interactive **Stream Tuner Modal**:
+1. **Resolution Override:** Select between 1080p, 720p, 480p, 360p, or custom width x height.
+2. **Frame Rate Slider:** 10 to 60 FPS with immediate broadcast to camera hardware over WebSockets (`update_stream_config`).
+3. **Drop-Late Concurrency Protection:** Camera hardware discards frames that cannot be processed immediately rather than buffering them, ensuring live video never accumulates latency or lags behind physical firing.
+4. **Hardware Acceleration Backend:**
+   - **WebGL 2.0 GPU Blit:** Renders video frames via GPU texture shaders with near-zero CPU consumption.
+   - **OffscreenCanvas Worker:** Offloads frame unpacking from the main browser thread to eliminate UI stutter during rapid strings of fire.
+5. **Sensor Thermal Safety Cutoff:** When ambient temperature inside the downrange steel armor box climbs above the configured threshold (default 42°C), the sensor automatically drops to 5 FPS and turns off auxiliary lighting to preserve hardware longevity.
+

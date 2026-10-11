@@ -1,8 +1,12 @@
 // apps/web/components/vision/LiveVisionDark.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { StreamTunerModal } from './StreamTunerModal';
+import { CameraStreamConfig, StreamTelemetryMetrics } from '@shooting-platform/shared-types';
+import { loadStreamConfig, saveStreamConfig, STREAM_PRESETS, StreamTelemetryTracker } from '@/lib/stream-optimizer';
+
 
 export interface LaneCameraData {
   id: string;
@@ -94,7 +98,34 @@ export function LiveVisionDark({
   const [isCeasefireActive, setIsCeasefireActive] = useState<boolean>(false);
   const [simulatedShots, setSimulatedShots] = useState<{ x: number; y: number; score: number }[]>([]);
 
+  // High-Speed Stream Optimization & Hardware Tuning State
+  const [isStreamTunerOpen, setIsStreamTunerOpen] = useState(false);
+  const [streamConfig, setStreamConfig] = useState<CameraStreamConfig>(() => loadStreamConfig(selectedLaneId));
+  const trackerRef = useRef<StreamTelemetryTracker>(new StreamTelemetryTracker());
+  const [telemetryMetrics, setTelemetryMetrics] = useState<StreamTelemetryMetrics>(() =>
+    trackerRef.current.getMetrics(streamConfig.targetFps, streamConfig.profile)
+  );
+
+  // Sync config when lane changes
+  useEffect(() => {
+    setStreamConfig(loadStreamConfig(selectedLaneId));
+  }, [selectedLaneId]);
+
+  // Live telemetry pulse loop
+  useEffect(() => {
+    const tracker = trackerRef.current;
+    // Simulate slight natural RTT and frame rate variations
+    const interval = setInterval(() => {
+      const simulatedRtt = Math.max(10, Math.floor(14 + Math.random() * 8));
+      tracker.registerRtt(simulatedRtt);
+      tracker.registerFrame(Math.floor((streamConfig.bitrateCapKbps * 1000) / 8 / streamConfig.targetFps));
+      setTelemetryMetrics(tracker.getMetrics(streamConfig.targetFps, streamConfig.profile));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [streamConfig]);
+
   const activeLane = activeLanes.find((l) => l.id === selectedLaneId) || activeLanes[0];
+
 
   const shotsToRender = [...(activeLane.recentShots || []), ...simulatedShots];
 
@@ -256,8 +287,20 @@ export function LiveVisionDark({
               </p>
             </div>
 
-            {/* Camera View Switcher Buttons */}
-            <div className="flex items-center gap-2">
+            {/* Camera View Switcher Buttons & Optimizer Trigger */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Active Stream Profile Pill */}
+              <button
+                onClick={() => setIsStreamTunerOpen(true)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/10 border border-[#00E5A0]/30 text-[#00E5A0] hover:bg-[#00E5A0]/20 flex items-center gap-1.5 transition-all shadow-sm"
+                title="Click to open Advanced Stream & Hardware Optimizer"
+              >
+                <span className="material-symbols-outlined text-[15px]">bolt</span>
+                <span>{streamConfig.profile.replace('_', ' ')}</span>
+                <span className="text-[10px] text-text-muted">({telemetryMetrics.currentFps} FPS • {streamConfig.resolution})</span>
+              </button>
+
+              {/* View Switchers */}
               {[
                 { id: 'target', label: 'Cam 1: Target', icon: '🎯' },
                 { id: 'stance', label: 'Cam 2: Stance', icon: '🥋' },
@@ -276,8 +319,19 @@ export function LiveVisionDark({
                   <span>{c.label}</span>
                 </button>
               ))}
+
+              {/* Speed & Stream Tuner Config Button */}
+              <button
+                onClick={() => setIsStreamTunerOpen(true)}
+                className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#0F172A] hover:bg-white/10 text-white border border-white/20 flex items-center gap-1.5 transition-all"
+                title="Configure Video Stream Bitrate, Latency & Sensors"
+              >
+                <span className="material-symbols-outlined text-[16px] text-[#00E5A0]">tune</span>
+                <span>Stream Tuner</span>
+              </button>
             </div>
           </div>
+
 
           {/* Interactive Multi-Feed Viewport */}
           <div className="relative flex-1 min-h-[440px] bg-[#070A12] rounded-xl overflow-hidden border border-white/10 flex items-center justify-center p-4">
@@ -396,6 +450,21 @@ export function LiveVisionDark({
           </div>
         </div>
       </div>
+
+      {/* Advanced High-Speed Wireless & Hardware Stream Tuner Modal */}
+      <StreamTunerModal
+        isOpen={isStreamTunerOpen}
+        onClose={() => setIsStreamTunerOpen(false)}
+        config={streamConfig}
+        onConfigChange={(newCfg) => {
+          setStreamConfig(newCfg);
+          saveStreamConfig(newCfg, selectedLaneId);
+        }}
+        telemetry={telemetryMetrics}
+        laneName={`Lane ${activeLane.number ?? '1'}`}
+        laneId={selectedLaneId}
+      />
     </div>
   );
 }
+

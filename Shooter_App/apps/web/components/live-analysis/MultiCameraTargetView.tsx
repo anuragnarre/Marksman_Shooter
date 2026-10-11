@@ -4,6 +4,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { TargetSpec, ShotCoordinates, ShotResult } from '../../lib/target-specs';
 import { TargetCanvas } from './TargetCanvas';
+import { StreamTunerModal } from './StreamTunerModal';
+import { CameraStreamConfig, StreamTelemetryMetrics } from '@shooting-platform/shared-types';
+import { loadStreamConfig, saveStreamConfig, STREAM_PRESETS, StreamTelemetryTracker } from '@/lib/stream-optimizer';
 
 export type CameraAngle = 'target' | 'stance' | 'trigger' | 'bay';
 export type ViewLayout = 'pip' | 'split' | 'quad';
@@ -29,6 +32,26 @@ export function MultiCameraTargetView({
   const [isWebcamActive, setIsWebcamActive] = useState(false);
   const [heartRate, setHeartRate] = useState(72);
   const [holdStability, setHoldStability] = useState(94);
+
+  // High-Speed Wireless Video & Hardware Stream Optimization
+  const [isStreamTunerOpen, setIsStreamTunerOpen] = useState(false);
+  const [streamConfig, setStreamConfig] = useState<CameraStreamConfig>(() => loadStreamConfig('shooter-main'));
+  const trackerRef = useRef<StreamTelemetryTracker>(new StreamTelemetryTracker());
+  const [telemetryMetrics, setTelemetryMetrics] = useState<StreamTelemetryMetrics>(() =>
+    trackerRef.current.getMetrics(streamConfig.targetFps, streamConfig.profile)
+  );
+
+  useEffect(() => {
+    const tracker = trackerRef.current;
+    const interval = setInterval(() => {
+      const simulatedRtt = Math.max(8, Math.floor(12 + Math.random() * 6));
+      tracker.registerRtt(simulatedRtt);
+      tracker.registerFrame(Math.floor((streamConfig.bitrateCapKbps * 1000) / 8 / streamConfig.targetFps));
+      setTelemetryMetrics(tracker.getMetrics(streamConfig.targetFps, streamConfig.profile));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [streamConfig]);
+
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -311,8 +334,20 @@ export function MultiCameraTargetView({
           >
             🎯 Reticle
           </button>
+
+          {/* Performance & Stream Tuner Trigger Button */}
+          <button
+            onClick={() => setIsStreamTunerOpen(true)}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/10 border border-[#00E5A0]/30 text-[#00E5A0] hover:bg-[#00E5A0]/20 flex items-center gap-1.5 transition-all shadow-sm"
+            title="Configure Video Stream Bitrate, Latency & Sensor GPU Acceleration"
+          >
+            <span className="material-symbols-outlined text-[15px]">tune</span>
+            <span className="hidden sm:inline">Stream Tuner</span>
+            <span className="text-[10px] text-text-muted">({telemetryMetrics.currentFps} FPS)</span>
+          </button>
         </div>
       </div>
+
 
       {/* Synchronized Biometrics & Sensor Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -439,6 +474,22 @@ export function MultiCameraTargetView({
           </div>
         )}
       </div>
+
+
+      {/* High-Speed Wireless Stream Optimizer & Hardware Tuner Modal */}
+      <StreamTunerModal
+        isOpen={isStreamTunerOpen}
+        onClose={() => setIsStreamTunerOpen(false)}
+        config={streamConfig}
+        onConfigChange={(newCfg) => {
+          setStreamConfig(newCfg);
+          saveStreamConfig(newCfg, 'shooter-main');
+        }}
+        telemetry={telemetryMetrics}
+        laneName="Downrange Optical Cam"
+        laneId="shooter-main"
+      />
     </div>
   );
 }
+

@@ -118,7 +118,7 @@ export function LiveAnalysisDashboard() {
       }
     }
 
-    const innerTens = shots.filter(s => s.isInnerTen || s.decimalScore >= 10.3).length;
+    const innerTens = shots.filter(s => s.isInnerTen || s.score >= 10.3).length;
 
     return {
       meanRadius: Number(meanRadius.toFixed(2)),
@@ -177,8 +177,9 @@ export function LiveAnalysisDashboard() {
 
     const result = calculateScore({ x, y }, selectedTarget);
     setShots(prev => [...prev, { x, y, ...result }]);
-    playShotFeedback(result.decimalScore);
+    playShotFeedback(result.score);
   };
+
 
   const clearSession = () => {
     setShots([]);

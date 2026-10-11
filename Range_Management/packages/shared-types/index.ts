@@ -816,3 +816,54 @@ export interface AdvancedBiometricInsights {
   generatedAt: string;
   model: string;
 }
+
+// ── Stream & Hardware Video Optimization Types ────────────────────────────
+
+export type StreamProfilePreset =
+  | 'AUTO_ADAPTIVE'       // Dynamically tunes resolution, FPS, and quality based on network RTT and drop rates
+  | 'LAN_ULTRA_LOW_LAT'   // 1080p @ 60 FPS, 0ms buffer, 6000 kbps (Gigabit Range LAN)
+  | 'BALANCED_WIRELESS'   // 720p @ 30 FPS, 50ms buffer, 2500 kbps (Standard 5GHz Wi-Fi / LTE)
+  | 'BANDWIDTH_SAVER'     // 480p @ 15 FPS, 120ms buffer, 800 kbps (Constrained links / <6 Mbps upload)
+  | 'ECO_BATTERY'         // 360p @ 10 FPS, 200ms buffer, 400 kbps, sensor power save
+  | 'CUSTOM';             // User / Operator manual override
+
+export type VideoTransportProtocol = 'WEBSOCKET_BINARY' | 'WEBRTC_DATA' | 'RTSP_OVER_WS' | 'MJPEG_HTTP';
+export type VideoHardwareAcceleration = 'WEBGL2' | 'CANVAS_2D' | 'OFFSCREEN_WORKER';
+export type CongestionPolicy = 'DROP_LATE' | 'SMOOTH_JITTER' | 'ADAPTIVE_DOWNSCALE';
+
+export interface CameraStreamConfig {
+  profile: StreamProfilePreset;
+  resolution: '1080p' | '720p' | '480p' | '360p' | 'custom';
+  customWidth?: number;
+  customHeight?: number;
+  targetFps: number; // e.g. 10 - 60
+  bitrateCapKbps: number; // e.g. 250 - 10000
+  qualityFactor: number; // 0.15 - 0.95
+  protocol: VideoTransportProtocol;
+  hardwareAcceleration: VideoHardwareAcceleration;
+  congestionPolicy: CongestionPolicy;
+  jitterBufferMs: number; // 0 to 500ms
+  keyframeIntervalSec: number; // 0.5 to 5.0
+  autoExposureLock: boolean;
+  auxTorchEnabled: boolean;
+  thermalThrottleTempC: number; // e.g. 42
+  customRtspUrl?: string;
+  laneId?: string;
+}
+
+export interface StreamTelemetryMetrics {
+  currentFps: number;
+  targetFps: number;
+  rttMs: number;
+  jitterMs: number;
+  bandwidthKbps: number;
+  droppedFramesCount: number;
+  dropRatePercent: number;
+  networkQuality: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
+  batteryPercent?: number;
+  batteryTempC?: number;
+  isThrottled: boolean;
+  activeProfile: StreamProfilePreset;
+  timestamp: number;
+}
+
