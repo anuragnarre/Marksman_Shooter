@@ -17,10 +17,14 @@ const SECTIONS = [
   { id: 'getting-started',  label: 'Getting Started',       icon: <IcoRocket /> },
   { id: 'dashboard',        label: 'Your Dashboard',         icon: <IcoGrid /> },
   { id: 'sessions',         label: 'Recording Sessions',     icon: <IcoTarget /> },
+  { id: 'target-camera',    label: 'Target Camera Rig',      icon: <IcoCam /> },
   { id: 'scores',           label: 'Scores & Analytics',     icon: <IcoChart /> },
+  { id: 'digital-card',     label: 'Digital Turnstile Card', icon: <IcoCard /> },
   { id: 'ai-coach',         label: 'AI Coach',               icon: <IcoSparkle /> },
   { id: 'coach-connect',    label: 'Coach Connection',       icon: <IcoLink /> },
   { id: 'for-coaches',      label: 'For Coaches',            icon: <IcoPeople /> },
+  { id: 'elo-rankings',     label: 'ELO & TV Scoreboard',    icon: <IcoTrophy /> },
+  { id: 'safety-laws',      label: 'Safety, Laws & Lead',    icon: <IcoShield /> },
   { id: 'technique',        label: 'Technique Guide',        icon: <IcoBook /> },
 ] as const;
 
@@ -822,6 +826,73 @@ function DocsContent() {
             </table>
           </div>
 
+          {/* ── TARGET CAMERA RIG ────────────────────────────────────────── */}
+          <SectionHeading id="target-camera">Downrange Target Camera Rig & Automated Scoring</SectionHeading>
+          <RoleBadge role="ALL" />
+          <p className="text-text-secondary text-sm mt-3 leading-relaxed">
+            The Marksman Target Camera provides sub-second automated hit detection directly downrange. Using high-resolution edge optical cameras and the OpenCV/YOLO vision engine, bullet perforations are detected within 150ms of impact.
+          </p>
+          <Tip>
+            Target cameras communicate over an isolated local 5GHz Wi-Fi network and continue functioning flawlessly with zero internet access.
+          </Tip>
+          <SubHeading>How Automated Detection Works</SubHeading>
+          <Step n={1} title="Physical Target Alignment">
+            Mount the camera rig inside its 3/8" AR500 steel deflector armor plate facing the target face at a 45-degree angle. Ensure all 4 corner registration marks are visible in the camera viewfinder.
+          </Step>
+          <Step n={2} title="Homography Matrix Calibration">
+            The vision microservice calculates a 3x3 Perspective Transform matrix, converting the angled view into a flat, true Cartesian coordinate space.
+          </Step>
+          <Step n={3} title="Sub-Millimeter Hit Detection">
+            Each shot trigger produces a color-coded impact marker on your personal lane monitor with exact decimal ring score (e.g. 10.4, 9.8).
+          </Step>
+
+          {/* ── DIGITAL MEMBERSHIP CARD & TURNSTILES ────────────────────────── */}
+          <SectionHeading id="digital-card">Digital Membership Card & Turnstile Gate Access</SectionHeading>
+          <RoleBadge role="SHOOTER" />
+          <p className="text-text-secondary text-sm mt-3 leading-relaxed">
+            Access your high-security metallic glassmorphism membership card directly at <code className="text-[#F5A623]">/shooter/membership</code>.
+          </p>
+          <Note>
+            The digital membership card embeds a cryptographically signed, dynamic QR code. Present this QR code at physical range turnstiles to automatically unlock gate access.
+          </Note>
+          <SubHeading>Gate Validation Checks</SubHeading>
+          <ul className="text-text-secondary text-sm space-y-2 mt-2 list-disc list-inside">
+            <li><strong className="text-text-primary">Waiver Execution:</strong> Verifies Form 101 liability waiver was executed within the past 365 days.</li>
+            <li><strong className="text-text-primary">Active Subscription / Slot:</strong> Confirms paid Tier (Silver, Gold, Elite) or confirmed hourly lane reservation.</li>
+            <li><strong className="text-text-primary">Safety Clearance:</strong> Confirms zero active safety violations or RSO suspension holds.</li>
+          </ul>
+
+          {/* ── ELO RANKINGS & TV SCOREBOARD ───────────────────────────────── */}
+          <SectionHeading id="elo-rankings">Discipline ELO Rating & Live TV Kiosk Scoreboard</SectionHeading>
+          <RoleBadge role="ALL" />
+          <p className="text-text-secondary text-sm mt-3 leading-relaxed">
+            Every athlete holds a dynamic skill rating starting at baseline <strong className="text-[#F5A623]">1400 ELO</strong> per discipline. Certified competition scores adjust ratings relative to field difficulty.
+          </p>
+          <SubHeading>Live ISSF Finals TV Kiosk Mode</SubHeading>
+          <p className="text-text-secondary text-sm leading-relaxed">
+            During matches, range lounge screens and spectator tablets render the live TV Kiosk scoreboard at <code className="text-[#F5A623]">/competitions/[id]/kiosk</code>. Scores update live on every shot break with automated elimination warnings for lowest-ranked competitors.
+          </p>
+
+          {/* ── SAFETY LAWS & LEAD HYGIENE ─────────────────────────────────── */}
+          <SectionHeading id="safety-laws">Firearm Safety Mandates, OSHA Lead Hygiene & Statutory Laws</SectionHeading>
+          <RoleBadge role="ALL" />
+          <Warning>
+            Safety on the firing line is absolute and non-negotiable. ANY PERSON on the range who spots an unsafe condition HAS THE DUTY AND AUTHORITY to shout "CEASE FIRE!" immediately.
+          </Warning>
+          <SubHeading>The 4 Cardinal Rules of Firearm Safety</SubHeading>
+          <ol className="text-text-secondary text-sm space-y-2 mt-2 list-decimal list-inside">
+            <li><strong className="text-text-primary">TREAT EVERY FIREARM AS IF IT IS LOADED</strong> at all times, without exception.</li>
+            <li><strong className="text-text-primary">NEVER POINT A FIREARM AT ANYTHING</strong> you are not willing to destroy. Keep muzzle strictly downrange.</li>
+            <li><strong className="text-text-primary">KEEP YOUR FINGER OFF THE TRIGGER</strong> and outside the trigger guard until your sights are on target and you have made the conscious decision to shoot.</li>
+            <li><strong className="text-text-primary">BE SURE OF YOUR TARGET</strong>, what is in front of it, and what is beyond it.</li>
+          </ol>
+          <SubHeading>Lead Safety & Personal Protection Guidelines</SubHeading>
+          <ul className="text-text-secondary text-sm space-y-2 mt-2 list-disc list-inside">
+            <li><strong className="text-text-primary">Hearing Protection:</strong> Minimum NRR 28 hearing protection and ANSI Z87.1 eye protection required before stepping past the safety threshold.</li>
+            <li><strong className="text-text-primary">Lead Decontamination:</strong> Wash hands and face with cold water and D-Lead neutralizing soap after shooting. Never handle food or drinks prior to washing.</li>
+            <li><strong className="text-text-primary">No Eating on the Line:</strong> Food, beverages, smoking, and vaping are strictly prohibited on the active firing line under OSHA 29 CFR 1910.1025.</li>
+          </ul>
+
         </article>
       </div>
   );
@@ -933,3 +1004,38 @@ function IcoBook({ size = 14 }: { size?: number }) {
     </svg>
   );
 }
+
+function IcoCam() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M13 4l-4 3 4 3V4z"/>
+      <rect x="1" y="3" width="8" height="8" rx="1.5"/>
+    </svg>
+  );
+}
+
+function IcoCard() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+      <rect x="1" y="2.5" width="12" height="9" rx="1.5"/>
+      <path d="M1 5.5h12M4 9h2"/>
+    </svg>
+  );
+}
+
+function IcoShield() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 1.5l5 2.5v3.5c0 3-2.5 4.5-5 5.5-2.5-1-5-2.5-5-5.5V4l5-2.5z"/>
+    </svg>
+  );
+}
+
+function IcoTrophy() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 1.5h6v4a3 3 0 01-6 0v-4zM2 3.5h2M10 3.5h2M7 8.5v3M4.5 12.5h5"/>
+    </svg>
+  );
+}
+

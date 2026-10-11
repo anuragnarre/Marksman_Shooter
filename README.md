@@ -61,3 +61,18 @@ The `Target_Camera_App` is the edge hardware interface deployed at the target li
 - **YOLO Vision Integration:** Transitioning from basic OpenCV scoring to advanced YOLO machine learning models for superior hit detection, including training scripts.
 - **Advanced Telemetry:** Deep environmental logging via OpenMeteo APIs combined with hardware edge engine scripts (sensors).
 - **Dynamic KPI Dashboards:** Enhanced Next.js 15 UI for live administrative range monitoring and physical hardware status.
+
+---
+
+## 5. Official Standards, Legal Compliance & Operational Manuals
+
+The platform includes an enterprise-grade regulatory, compliance, and training documentation suite:
+
+* **[Legal, Regulatory & Compliance Standards](docs/LEGAL_COMPLIANCE_AND_STANDARDS.md):** OSHA 29 CFR 1910.1025 lead air standards (50–75 fpm laminar flow, negative pressure, HEPA), OSHA 1910.95 acoustic protection (140 dB ceiling, NRR 28+), ATF 27 CFR Part 478 serialized armory custody, GDPR/CCPA target camera privacy, and Form 101 liability waiver framework.
+* **[Range Operator & RSO Manual (SOP)](docs/RANGE_OPERATOR_AND_RSO_MANUAL.md):** Standard line commands ("Range is Active", "CEASE FIRE!", "Unload and Show Clear"), stoppage clearance (squibs, hangfires), TCCC MARCH trauma protocol for traumatic wounds, and 100-point RSO certification rubric.
+* **[Athlete & Shooter User Manual](docs/SHOOTER_ATHLETE_USER_MANUAL.md):** Profile verification, digital turnstile membership card usage, real-time target camera pairing, group dispersion metrics (Extreme Spread, Mean Radius), AI Coach integration, and competitive ELO matchmaking.
+* **[Target Camera Hardware & Edge Guide](docs/HARDWARE_AND_TARGET_CAMERA_GUIDE.md):** 3/8" AR500 steel deflector armor mounting (45-degree angle), 1000–1500 Lux DC constant-voltage LED flicker-free illumination, sacrificial polycarbonate lenses, and homography matrix calibration.
+* **In-App Training Portals:**
+  - Range Operator & RSO Training Portal: `http://localhost:3002/docs`
+  - Athlete User Manual & Guides: `http://localhost:3000/docs`
+

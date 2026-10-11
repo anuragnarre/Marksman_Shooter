@@ -128,11 +128,37 @@ export default function NewSessionPage() {
           </div>
         </div>
 
+        {/* Live Vision vs Manual Shot Logging Selector Banner */}
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-[#0F172A] to-[#1E293B] border border-[#F5A623]/40 shadow-xl mb-6 animate-slide-up flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#F5A623]">
+                HIGH-ACCURACY COMPUTER VISION RIG
+              </span>
+            </div>
+            <h2 className="text-lg font-bold font-display text-white">
+              Live Multi-Camera Auto-Scoring Session
+            </h2>
+            <p className="text-xs text-text-secondary">
+              Synchronize Downrange Target Cam & Stance Biomechanics for automated sub-mm shot detection.
+            </p>
+          </div>
+
+          <Link
+            href="/live-analysis"
+            className="px-5 py-3 rounded-xl bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-display font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#F5A623]/20 shrink-0 flex items-center gap-2"
+          >
+            <span>🎯</span>
+            <span>Launch Live Vision →</span>
+          </Link>
+        </div>
+
         <div className="card p-6 animate-slide-up stagger-1">
           <div className="mb-6">
-            <h1 className="font-display font-bold text-2xl text-text-primary">New Training Session</h1>
+            <h1 className="font-display font-bold text-2xl text-text-primary">Manual / Paper Target Session</h1>
             <p className="text-text-secondary text-sm mt-1">
-              Define the session parameters. You'll add shots on the next screen.
+              Define custom session parameters for manual shot entry or dry-fire recording.
             </p>
           </div>
 

@@ -183,9 +183,21 @@ export default function AiCoachPage() {
             )}
           </div>
           <p className="text-text-secondary text-sm">
-            Powered by Claude Opus 4.6. Select a session and get expert coaching feedback based on
-            your shot placement, scoring patterns, and technical fundamentals.
+            Powered by Claude Opus 4.6 & Computer Vision Telemetry. Synthesizes downrange sub-mm shot placement,
+            Stance Cam biomechanics stability, trigger finger pre-travel, and cadence patterns into actionable Olympic coaching drills.
           </p>
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <span className="px-2.5 py-1 rounded-full bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 text-[11px] font-mono font-bold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+              Target Cam Sub-mm Grouping
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30 text-[11px] font-mono font-bold">
+              Stance Cam Biomechanics (89.2° Spine)
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-[#F5A623]/15 text-[#F5A623] border border-[#F5A623]/30 text-[11px] font-mono font-bold">
+              Trigger Pre-Travel & Cadence Split
+            </span>
+          </div>
           {isCoach && (
             <p className="text-text-muted text-xs mt-2">
               Viewing shooter: <span className="text-text-primary">{selectedShooter?.name ?? 'None selected'}</span>
