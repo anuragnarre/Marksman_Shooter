@@ -223,6 +223,39 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage('shot_impact_snapshot')
+  handleShotImpactSnapshot(
+    @MessageBody() payload: {
+      rangeId?: string;
+      laneId: string;
+      shotNumber: number;
+      score: number;
+      xMm: number;
+      yMm: number;
+      image: string;
+      timestamp?: number;
+    },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId || !payload?.image) return;
+    const enriched = {
+      ...payload,
+      relayedAt: Date.now(),
+    };
+    this.server.to(`lane_stream:${payload.laneId}`).emit('shot_impact_snapshot', enriched);
+    const rangeId = payload.rangeId || 'main-range-1';
+    this.server.to(`range_monitor:${rangeId}`).emit('shot_impact_snapshot', enriched);
+  }
+
+  @SubscribeMessage('stream_telemetry')
+  handleStreamTelemetry(
+    @MessageBody() payload: any,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!payload?.laneId) return;
+    this.server.to(`lane_stream:${payload.laneId}`).emit('stream_telemetry', payload);
+  }
+
 
   // ── Range Emergency Ceasefire (Cross-App Safety) ─────────────────────────
 

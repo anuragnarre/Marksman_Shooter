@@ -830,6 +830,8 @@ export type StreamProfilePreset =
 export type VideoTransportProtocol = 'WEBSOCKET_BINARY' | 'WEBRTC_DATA' | 'RTSP_OVER_WS' | 'MJPEG_HTTP';
 export type VideoHardwareAcceleration = 'WEBGL2' | 'CANVAS_2D' | 'OFFSCREEN_WORKER';
 export type CongestionPolicy = 'DROP_LATE' | 'SMOOTH_JITTER' | 'ADAPTIVE_DOWNSCALE';
+export type WiFiFrequencyBand = '2.4GHz' | '5GHz' | '6GHz+' | 'AUTO_DETECT';
+export type VideoComputationMode = 'SERVER_VISION' | 'ON_DEVICE_EDGE' | 'HYBRID_EDGE_STREAM';
 
 export interface CameraStreamConfig {
   profile: StreamProfilePreset;
@@ -842,6 +844,9 @@ export interface CameraStreamConfig {
   protocol: VideoTransportProtocol;
   hardwareAcceleration: VideoHardwareAcceleration;
   congestionPolicy: CongestionPolicy;
+  wifiBand: WiFiFrequencyBand;
+  computationMode: VideoComputationMode;
+  sendImpactSnapshot: boolean;
   jitterBufferMs: number; // 0 to 500ms
   keyframeIntervalSec: number; // 0.5 to 5.0
   autoExposureLock: boolean;
@@ -864,6 +869,10 @@ export interface StreamTelemetryMetrics {
   batteryTempC?: number;
   isThrottled: boolean;
   activeProfile: StreamProfilePreset;
+  wifiBand?: WiFiFrequencyBand;
+  computationMode?: VideoComputationMode;
+  onDeviceCalculationTimeMs?: number;
   timestamp: number;
 }
+
 

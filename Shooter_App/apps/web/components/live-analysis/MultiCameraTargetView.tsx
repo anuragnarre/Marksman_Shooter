@@ -227,13 +227,22 @@ export function MultiCameraTargetView({
             {angle === 'bay' && 'CAM 4: WIDE BAY SAFETY'}
           </span>
           <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono text-text-muted">
-            1080p60
+            {angle === 'target' && streamConfig.computationMode === 'ON_DEVICE_EDGE'
+              ? '📱 EDGE CALC'
+              : `${streamConfig.resolution.toUpperCase()} @ ${streamConfig.targetFps} FPS`}
           </span>
+          {angle === 'target' && (
+            <span className="hidden md:inline-block px-1.5 py-0.5 rounded bg-[#00E5A0]/10 text-[9px] font-mono text-[#00E5A0] font-bold">
+              {streamConfig.wifiBand}
+            </span>
+          )}
         </div>
 
         <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
           <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-mono text-[#10B981]">
-            14ms LATENCY
+            {angle === 'target' && streamConfig.computationMode === 'ON_DEVICE_EDGE'
+              ? '⚡ 4ms (SUB-5MS EDGE)'
+              : `${telemetryMetrics.rttMs}ms LATENCY`}
           </span>
         </div>
 

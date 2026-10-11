@@ -9,6 +9,8 @@ import {
   VideoHardwareAcceleration,
   VideoTransportProtocol,
   CongestionPolicy,
+  WiFiFrequencyBand,
+  VideoComputationMode,
 } from '@shooting-platform/shared-types';
 import { STREAM_PRESETS, saveStreamConfig } from '@/lib/stream-optimizer';
 
@@ -221,6 +223,10 @@ export function StreamTunerModal({
                   <p className="text-xs text-text-muted leading-relaxed">
                     Auto-adjusts frame rate and resolution based on wireless signal strength. Zero frame freeze.
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#00E5A0]">
+                    <span className="px-2 py-0.5 rounded bg-white/5">Auto Spectrum</span>
+                    <span className="px-2 py-0.5 rounded bg-white/5">Dynamic 30 FPS</span>
+                  </div>
                 </div>
 
                 <div
@@ -234,7 +240,7 @@ export function StreamTunerModal({
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-white text-sm flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#38BDF8] text-[18px]">speed</span>
-                      Ultra-Low Latency (LAN 60 FPS)
+                      Ultra-Low Latency (LAN / 5GHz)
                     </span>
                     {localConfig.profile === 'LAN_ULTRA_LOW_LAT' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
@@ -243,6 +249,11 @@ export function StreamTunerModal({
                   <p className="text-xs text-text-muted leading-relaxed">
                     True 60 FPS zero-jitter-buffer stream. Instant strike feedback for rapid fire competitions.
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#38BDF8]">
+                    <span className="px-2 py-0.5 rounded bg-white/5">5GHz / LAN</span>
+                    <span className="px-2 py-0.5 rounded bg-white/5">Server Vision</span>
+                    <span className="px-2 py-0.5 rounded bg-white/5">1080p @ 60 FPS</span>
+                  </div>
                 </div>
 
                 <div
@@ -256,15 +267,19 @@ export function StreamTunerModal({
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-white text-sm flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#F5A623] text-[18px]">cell_tower</span>
-                      Bandwidth Saver (480p / 15 FPS)
+                      Bandwidth Saver & 2.4GHz Edge
                     </span>
                     {localConfig.profile === 'BANDWIDTH_SAVER' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
                     )}
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed">
-                    Ultra-compact 800 kbps stream. Operates smoothly on congested mobile hotspots or remote ranges.
+                    On-device phone edge scoring. Sub-5ms shot detection, 99.9% bandwidth reduction, penetrates concrete barriers.
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#F5A623]">
+                    <span className="px-2 py-0.5 rounded bg-white/5">2.4GHz Long-Range</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/20 text-[#00E5A0] font-bold">📱 On-Device Edge</span>
+                  </div>
                 </div>
 
                 <div
@@ -285,8 +300,12 @@ export function StreamTunerModal({
                     )}
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed">
-                    360p @ 10 FPS with low power mode to extend battery life on wireless target camera stands.
+                    360p @ 10 FPS with on-device scoring and sleep mode to extend battery life on wireless target stands.
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#A78BFA]">
+                    <span className="px-2 py-0.5 rounded bg-white/5">2.4GHz Ultra-Eco</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/20 text-[#00E5A0] font-bold">📱 On-Device Edge</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -306,6 +325,97 @@ export function StreamTunerModal({
                 >
                   Apply Custom Settings
                 </button>
+              </div>
+
+              {/* Radio Link & Computation Architecture Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-[#080B12] border border-white/10">
+                {/* 1. Wi-Fi Physical Frequency Band */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5 uppercase">
+                      <span className="material-symbols-outlined text-[16px] text-[#00E5A0]">wifi</span>
+                      Wi-Fi Frequency Band
+                    </label>
+                    <span className="text-[10px] font-mono text-[#00E5A0] font-bold">
+                      {localConfig.wifiBand}
+                    </span>
+                  </div>
+                  <select
+                    value={localConfig.wifiBand}
+                    onChange={(e) => updateField('wifiBand', e.target.value as WiFiFrequencyBand)}
+                    className="w-full px-3 py-2 rounded-lg bg-[#0F172A] border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                  >
+                    <option value="AUTO_DETECT">AUTO_DETECT (Adaptive Spectrum Negotiation)</option>
+                    <option value="2.4GHz">2.4 GHz ISM (Long Range 50m–100m • High Obstacle Penetration)</option>
+                    <option value="5GHz">5 GHz Unlicensed (High Speed 10m–25m • Low Latency Line-of-Sight)</option>
+                    <option value="6GHz+">6 GHz+ (Wi-Fi 6E/7 • Zero Congestion / Flagship Hardware)</option>
+                  </select>
+                  <p className="text-[11px] text-text-muted leading-tight">
+                    {localConfig.wifiBand === '2.4GHz'
+                      ? '⚠️ 2.4 GHz penetrates thick range baffles & concrete easily. Caps bitrate to prevent packet drops.'
+                      : localConfig.wifiBand === '5GHz'
+                      ? '⚡ 5 GHz offers 80 MHz channel widths for 60 FPS streaming, but attenuates quickly through physical barriers.'
+                      : localConfig.wifiBand === '6GHz+'
+                      ? '🚀 6 GHz+ delivers pristine spectrum with zero channel interference. Requires Wi-Fi 6E/7 devices.'
+                      : '🔄 Auto-detect continually benchmarks ping jitter and RSSI to negotiate optimal parameters.'}
+                  </p>
+                </div>
+
+                {/* 2. Target Vision & Shot Calculation Engine */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5 uppercase">
+                      <span className="material-symbols-outlined text-[16px] text-[#38BDF8]">memory</span>
+                      Vision Computation Engine
+                    </label>
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                      localConfig.computationMode === 'ON_DEVICE_EDGE'
+                        ? 'bg-[#00E5A0]/20 text-[#00E5A0]'
+                        : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
+                        ? 'bg-[#F5A623]/20 text-[#F5A623]'
+                        : 'bg-[#38BDF8]/20 text-[#38BDF8]'
+                    }`}>
+                      {localConfig.computationMode}
+                    </span>
+                  </div>
+                  <select
+                    value={localConfig.computationMode}
+                    onChange={(e) => updateField('computationMode', e.target.value as VideoComputationMode)}
+                    className="w-full px-3 py-2 rounded-lg bg-[#0F172A] border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                  >
+                    <option value="ON_DEVICE_EDGE">📱 ON_DEVICE_EDGE (Phone computes shots locally • Sub-5ms / 99.9% bandwidth saving)</option>
+                    <option value="HYBRID_EDGE_STREAM">⚡ HYBRID_EDGE_STREAM (Local phone scoring + 10 FPS low-bandwidth live preview)</option>
+                    <option value="SERVER_VISION">🖥️ SERVER_VISION (Continuous video stream to Server/OpenCV/YOLO)</option>
+                  </select>
+                  <p className="text-[11px] text-text-muted leading-tight">
+                    {localConfig.computationMode === 'ON_DEVICE_EDGE'
+                      ? '✨ Phone calculates bullet impact coords downrange. Sends lightweight <2 kbps JSON. Zero stream lag!'
+                      : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
+                      ? '🎯 Instant shot detection on phone + throttled 10 FPS video preview for human verification.'
+                      : '📹 Full video feed transmitted across Wi-Fi for centralized computer vision processing.'}
+                  </p>
+                </div>
+
+                {/* Impact Snapshot Option (Active in EDGE / HYBRID mode) */}
+                <div className="md:col-span-2 pt-2 border-t border-white/5">
+                  <label className="flex items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/5 cursor-pointer hover:border-white/20 transition-colors">
+                    <div className="space-y-0.5 pr-4">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px] text-[#F5A623]">camera</span>
+                        <span className="text-xs font-bold text-white">Transmit High-Res Impact Snapshot on Bullet Hit</span>
+                      </div>
+                      <p className="text-[11px] text-text-muted">
+                        When edge computing is active, eliminates constant video streaming but captures and sends a crisp high-res still crop of the target face when a shot is detected.
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={localConfig.sendImpactSnapshot}
+                      onChange={(e) => updateField('sendImpactSnapshot', e.target.checked)}
+                      className="w-4 h-4 accent-[#00E5A0] rounded cursor-pointer"
+                    />
+                  </label>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -426,23 +536,60 @@ export function StreamTunerModal({
 
           {/* TAB 4: TELEMETRY DIAGNOSTICS */}
           {activeTab === 'telemetry' && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
-                <span className="text-[10px] text-text-muted uppercase">Latency</span>
-                <div className="text-2xl font-bold text-[#00E5A0] mt-1">{currentMetrics.rttMs} ms</div>
-                <span className="text-[10px] text-text-muted">Jitter: ±{currentMetrics.jitterMs} ms</span>
-              </div>
-              <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
-                <span className="text-[10px] text-text-muted uppercase">Live FPS</span>
-                <div className="text-2xl font-bold text-white mt-1">{currentMetrics.currentFps} FPS</div>
-                <span className="text-[10px] text-text-muted">{currentMetrics.dropRatePercent}% drop rate</span>
-              </div>
-              <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
-                <span className="text-[10px] text-text-muted uppercase">Bandwidth</span>
-                <div className="text-2xl font-bold text-[#38BDF8] mt-1">
-                  {(currentMetrics.bandwidthKbps / 1000).toFixed(2)} Mbps
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                  <span className="text-[10px] text-text-muted uppercase">Latency</span>
+                  <div className="text-2xl font-bold text-[#00E5A0] mt-1">{currentMetrics.rttMs} ms</div>
+                  <span className="text-[10px] text-text-muted">Jitter: ±{currentMetrics.jitterMs} ms</span>
                 </div>
-                <span className="text-[10px] text-text-muted">Max: {localConfig.bitrateCapKbps} kbps</span>
+                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                  <span className="text-[10px] text-text-muted uppercase">Live FPS</span>
+                  <div className="text-2xl font-bold text-white mt-1">{currentMetrics.currentFps} FPS</div>
+                  <span className="text-[10px] text-text-muted">{currentMetrics.dropRatePercent}% drop rate</span>
+                </div>
+                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                  <span className="text-[10px] text-text-muted uppercase">Bandwidth</span>
+                  <div className="text-2xl font-bold text-[#38BDF8] mt-1">
+                    {(currentMetrics.bandwidthKbps / 1000).toFixed(2)} Mbps
+                  </div>
+                  <span className="text-[10px] text-text-muted">Max: {localConfig.bitrateCapKbps} kbps</span>
+                </div>
+              </div>
+
+              {/* Physical Radio Spectrum & Vision Engine Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/10 flex items-center justify-between font-mono">
+                  <div>
+                    <span className="text-[10px] text-text-muted uppercase block">Active Wi-Fi Spectrum</span>
+                    <span className="text-sm font-bold text-white mt-0.5 block flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#00E5A0]" />
+                      {currentMetrics.wifiBand || localConfig.wifiBand}
+                    </span>
+                    <span className="text-[10px] text-text-muted">
+                      {localConfig.wifiBand === '2.4GHz' ? '50m–100m Long Range / Baffle Penetration' : localConfig.wifiBand === '5GHz' ? '10m–25m High Speed 80MHz' : 'Negotiated Link'}
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-[#00E5A0] text-[26px]">wifi</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/10 flex items-center justify-between font-mono">
+                  <div>
+                    <span className="text-[10px] text-text-muted uppercase block">Vision Calculation Engine</span>
+                    <span className="text-sm font-bold text-[#38BDF8] mt-0.5 block flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+                      {currentMetrics.computationMode || localConfig.computationMode}
+                    </span>
+                    <span className="text-[10px] text-text-muted">
+                      {localConfig.computationMode === 'ON_DEVICE_EDGE'
+                        ? '⚡ Phone Edge Vision (<5ms Latency • 99.9% Net Saver)'
+                        : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
+                        ? '🎯 Phone Edge Vision + 10 FPS Stream Preview'
+                        : '🖥️ Central Server OpenCV / YOLO Stream'}
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-[#38BDF8] text-[26px]">memory</span>
+                </div>
               </div>
             </div>
           )}

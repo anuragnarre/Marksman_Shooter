@@ -295,9 +295,11 @@ export function LiveVisionDark({
                 className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/10 border border-[#00E5A0]/30 text-[#00E5A0] hover:bg-[#00E5A0]/20 flex items-center gap-1.5 transition-all shadow-sm"
                 title="Click to open Advanced Stream & Hardware Optimizer"
               >
-                <span className="material-symbols-outlined text-[15px]">bolt</span>
-                <span>{streamConfig.profile.replace('_', ' ')}</span>
-                <span className="text-[10px] text-text-muted">({telemetryMetrics.currentFps} FPS • {streamConfig.resolution})</span>
+                <span className="material-symbols-outlined text-[15px]">tune</span>
+                <span>{streamConfig.computationMode === 'ON_DEVICE_EDGE' ? '📱 EDGE CALC' : streamConfig.profile.replace('_', ' ')}</span>
+                <span className="text-[10px] text-text-muted">
+                  ({streamConfig.wifiBand} • {streamConfig.computationMode === 'ON_DEVICE_EDGE' ? 'Sub-5ms' : `${streamConfig.targetFps} FPS`})
+                </span>
               </button>
 
               {/* View Switchers */}
