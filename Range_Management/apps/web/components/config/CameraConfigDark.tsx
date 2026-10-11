@@ -47,7 +47,7 @@ export function CameraConfigDark() {
   type="button"
 >
 <span className="material-symbols-outlined text-[18px]">tune</span>
-<span>⚡ Stream &amp; Wireless Optimizer</span>
+<span>⚡ Stream Optimizer ({streamConfig.wifiBand} • {streamConfig.computationMode === 'ON_DEVICE_EDGE' ? 'EDGE' : `${streamConfig.targetFps} FPS`})</span>
 </button>
 <button className="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface transition-colors shadow-sm font-label-caps text-label-caps uppercase" type="button">
 <span className="material-symbols-outlined text-[18px] text-tertiary">science</span>
@@ -144,7 +144,10 @@ export function CameraConfigDark() {
 </div>
 </div>
 <div className="flex items-center gap-space-sm flex-shrink-0">
-<span className="px-space-sm py-0.5 rounded bg-surface-container-high font-telemetry-sm text-telemetry-sm text-tertiary">LATENCY: 18ms</span>
+<span className="px-space-sm py-0.5 rounded bg-surface-container-high font-telemetry-sm text-telemetry-sm text-primary font-bold">{streamConfig.wifiBand}</span>
+<span className="px-space-sm py-0.5 rounded bg-surface-container-high font-telemetry-sm text-telemetry-sm text-tertiary">
+  {streamConfig.computationMode === 'ON_DEVICE_EDGE' ? '⚡ EDGE CALC' : 'LATENCY: 18ms'}
+</span>
 <span className="px-space-sm py-0.5 rounded bg-surface-container-high font-telemetry-sm text-telemetry-sm text-primary">HOMOGRAPHY: 99.8%</span>
 </div>
 </div>

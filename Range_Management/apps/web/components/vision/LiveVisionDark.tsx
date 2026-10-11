@@ -28,6 +28,17 @@ export interface LaneCameraData {
   recentShots?: { x: number; y: number; score: number }[];
 }
 
+export interface ShotImpactSnapshot {
+  rangeId?: string;
+  laneId: string;
+  shotNumber: number;
+  score: number;
+  xMm: number;
+  yMm: number;
+  image: string;
+  timestamp: number;
+}
+
 export function LiveVisionDark({
   lanes = [],
   isLoading = false,
@@ -97,6 +108,8 @@ export function LiveVisionDark({
   const [opticalFilter, setOpticalFilter] = useState<'standard' | 'high_contrast' | 'thermal'>('standard');
   const [isCeasefireActive, setIsCeasefireActive] = useState<boolean>(false);
   const [simulatedShots, setSimulatedShots] = useState<{ x: number; y: number; score: number }[]>([]);
+  const [latestImpactSnapshot, setLatestImpactSnapshot] = useState<ShotImpactSnapshot | null>(null);
+  const [showSnapshotModal, setShowSnapshotModal] = useState<boolean>(false);
 
   // High-Speed Stream Optimization & Hardware Tuning State
   const [isStreamTunerOpen, setIsStreamTunerOpen] = useState(false);
@@ -140,6 +153,16 @@ export function LiveVisionDark({
     const y = Math.sin(angle) * distance;
     const score = Math.max(7.0, Number((10.9 - distance * 0.4).toFixed(1)));
     setSimulatedShots((prev) => [...prev, { x, y, score }]);
+
+    setLatestImpactSnapshot({
+      laneId: selectedLaneId,
+      shotNumber: (activeLane.recentShots?.length || 0) + simulatedShots.length + 1,
+      score,
+      xMm: x * 2.5,
+      yMm: y * 2.5,
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"><rect width="400" height="225" fill="%23060913"/><circle cx="200" cy="112" r="80" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="50" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="25" stroke="%23334155" stroke-width="1.5" fill="%230F172A"/><circle cx="200" cy="112" r="6" fill="%23EF4444"/><text x="14" y="24" fill="%2300E5A0" font-family="monospace" font-size="11" font-weight="bold">DOWNRANGE HIGH-RES OPTICAL CAPTURE</text><text x="14" y="42" fill="%2394A3B8" font-family="monospace" font-size="10">TRIGGERED BY EDGE YOLOv8 BULLET-DETECTION</text></svg>',
+      timestamp: Date.now(),
+    });
   };
 
   const toggleEmergencyCeasefire = () => {
@@ -380,6 +403,17 @@ export function LiveVisionDark({
                 <div className="absolute top-3 left-3 font-mono text-[10px] text-[#10B981] bg-black/70 px-2.5 py-1 rounded border border-[#10B981]/30">
                   CAM 1: DOWNRANGE 1080p60 // SUB-MM OPTICAL
                 </div>
+
+                {/* Optical Proof Quick Trigger */}
+                {latestImpactSnapshot && (
+                  <button
+                    onClick={() => setShowSnapshotModal(true)}
+                    className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00E5A0]/20 hover:bg-[#00E5A0]/30 border border-[#00E5A0] text-[#00E5A0] text-xs font-mono font-bold transition shadow-lg animate-pulse"
+                  >
+                    <span>📸</span>
+                    <span>Proof #{latestImpactSnapshot.shotNumber} ({latestImpactSnapshot.score.toFixed(1)})</span>
+                  </button>
+                )}
               </div>
             )}
 
@@ -452,6 +486,86 @@ export function LiveVisionDark({
           </div>
         </div>
       </div>
+
+      {/* Optical Impact Proof Verification Modal */}
+      {showSnapshotModal && latestImpactSnapshot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="relative w-full max-w-xl rounded-2xl bg-[#0B0F19] border border-[#00E5A0]/40 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#00E5A0]/20 flex items-center justify-center text-[#00E5A0] text-lg font-bold">
+                  🎯
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-display uppercase tracking-wide">
+                    Downrange Optical Impact Verification
+                  </h3>
+                  <p className="text-xs text-text-muted font-mono">
+                    Lane #{latestImpactSnapshot.laneId} • High-Res Bullet Hole Optical Proof
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSnapshotModal(false)}
+                className="text-text-muted hover:text-white p-1 text-sm font-mono"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Snapshot Preview with Reticle */}
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+              {latestImpactSnapshot.image ? (
+                <img
+                  src={latestImpactSnapshot.image}
+                  alt={`Shot ${latestImpactSnapshot.shotNumber} impact`}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="text-xs font-mono text-text-muted">No high-res image attached</div>
+              )}
+              {/* Reticle Overlay */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="w-12 h-12 border-2 border-[#00E5A0] rounded-full animate-ping opacity-75" />
+                <div className="w-2 h-2 bg-[#00E5A0] rounded-full" />
+              </div>
+              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-mono text-[#00E5A0] border border-[#00E5A0]/30">
+                EDGE ON-DEVICE RECOGNITION
+              </div>
+            </div>
+
+            {/* Shot Metrics Grid */}
+            <div className="grid grid-cols-4 gap-2 pt-1">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">SHOT #</div>
+                <div className="text-base font-mono font-bold text-white">#{latestImpactSnapshot.shotNumber}</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">SCORE</div>
+                <div className="text-base font-mono font-bold text-[#00E5A0]">{latestImpactSnapshot.score.toFixed(1)}</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET X</div>
+                <div className="text-base font-mono font-bold text-[#38BDF8]">{latestImpactSnapshot.xMm.toFixed(2)} mm</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET Y</div>
+                <div className="text-base font-mono font-bold text-[#F5A623]">{latestImpactSnapshot.yMm.toFixed(2)} mm</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs font-mono text-text-muted pt-2 border-t border-white/10">
+              <span>Transmitted via Wi-Fi {streamConfig.wifiBand} Low-Bandwidth Edge Protocol</span>
+              <button
+                onClick={() => setShowSnapshotModal(false)}
+                className="px-4 py-1.5 rounded-lg bg-[#00E5A0]/20 hover:bg-[#00E5A0]/30 text-[#00E5A0] border border-[#00E5A0] text-xs font-bold transition"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Advanced High-Speed Wireless & Hardware Stream Tuner Modal */}
       <StreamTunerModal

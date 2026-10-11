@@ -241,4 +241,59 @@ export class StreamTelemetryTracker {
       timestamp: now,
     };
   }
+
+  public computeAdaptiveAdjustment(
+    currentConfig: CameraStreamConfig,
+    metrics: StreamTelemetryMetrics
+  ): Partial<CameraStreamConfig> | null {
+    if (currentConfig.profile !== 'AUTO_ADAPTIVE') return null;
+
+    // Severe congestion or packet loss: Rescue session by engaging On-Device Edge Calculation!
+    if (metrics.dropRatePercent > 12 || metrics.rttMs > 200) {
+      if (currentConfig.computationMode !== 'ON_DEVICE_EDGE') {
+        return {
+          computationMode: 'ON_DEVICE_EDGE',
+          sendImpactSnapshot: true,
+          wifiBand: '2.4GHz',
+          targetFps: 10,
+          resolution: '360p',
+          bitrateCapKbps: 400,
+        };
+      }
+    }
+
+    // Moderate strain: Downscale resolution & bitrate
+    if (metrics.networkQuality === 'POOR' || metrics.dropRatePercent > 6) {
+      if (currentConfig.resolution === '1080p') {
+        return { resolution: '720p', targetFps: 24, qualityFactor: 0.45, bitrateCapKbps: 1800 };
+      }
+      if (currentConfig.resolution === '720p') {
+        return { resolution: '480p', targetFps: 18, qualityFactor: 0.35, bitrateCapKbps: 900 };
+      }
+      if (currentConfig.resolution === '480p' && currentConfig.targetFps > 12) {
+        return { targetFps: 12, qualityFactor: 0.28, bitrateCapKbps: 500 };
+      }
+    }
+
+    // High performance link restored: Upscale and resume full video vision
+    if (metrics.networkQuality === 'EXCELLENT' && metrics.rttMs < 35 && metrics.dropRatePercent === 0) {
+      if (currentConfig.computationMode === 'ON_DEVICE_EDGE') {
+        return {
+          computationMode: 'HYBRID_EDGE_STREAM',
+          resolution: '720p',
+          targetFps: 30,
+          qualityFactor: 0.50,
+          bitrateCapKbps: 2000,
+        };
+      }
+      if (currentConfig.resolution === '480p') {
+        return { resolution: '720p', targetFps: 30, qualityFactor: 0.55, bitrateCapKbps: 2200 };
+      }
+      if (currentConfig.resolution === '720p' && currentConfig.targetFps < 45) {
+        return { targetFps: 45, qualityFactor: 0.65, bitrateCapKbps: 3500 };
+      }
+    }
+
+    return null;
+  }
 }

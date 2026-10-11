@@ -12,16 +12,29 @@ export type CameraAngle = 'target' | 'stance' | 'trigger' | 'bay';
 export type ViewLayout = 'pip' | 'split' | 'quad';
 export type OpticalFilter = 'optical' | 'monochrome' | 'thermal';
 
+export interface ShotImpactSnapshot {
+  rangeId?: string;
+  laneId: string;
+  shotNumber: number;
+  score: number;
+  xMm: number;
+  yMm: number;
+  image: string;
+  timestamp: number;
+}
+
 interface MultiCameraTargetViewProps {
   spec: TargetSpec;
   shots: (ShotCoordinates & ShotResult)[];
   isCeasefireActive?: boolean;
+  latestImpactSnapshot?: ShotImpactSnapshot | null;
 }
 
 export function MultiCameraTargetView({
   spec,
   shots,
   isCeasefireActive = false,
+  latestImpactSnapshot = null,
 }: MultiCameraTargetViewProps) {
   const [layout, setLayout] = useState<ViewLayout>('pip');
   const [primaryAngle, setPrimaryAngle] = useState<CameraAngle>('target');
@@ -32,6 +45,14 @@ export function MultiCameraTargetView({
   const [isWebcamActive, setIsWebcamActive] = useState(false);
   const [heartRate, setHeartRate] = useState(72);
   const [holdStability, setHoldStability] = useState(94);
+  const [impactSnapshot, setImpactSnapshot] = useState<ShotImpactSnapshot | null>(latestImpactSnapshot);
+  const [showSnapshotModal, setShowSnapshotModal] = useState(false);
+
+  useEffect(() => {
+    if (latestImpactSnapshot) {
+      setImpactSnapshot(latestImpactSnapshot);
+    }
+  }, [latestImpactSnapshot]);
 
   // High-Speed Wireless Video & Hardware Stream Optimization
   const [isStreamTunerOpen, setIsStreamTunerOpen] = useState(false);
@@ -140,10 +161,22 @@ export function MultiCameraTargetView({
         {/* FEED CONTENT */}
         {isTarget ? (
           <div
-            className="w-full h-full flex items-center justify-center p-3 transition-transform duration-200"
+            className="w-full h-full flex items-center justify-center p-3 transition-transform duration-200 relative"
             style={{ transform: `scale(${zoom})` }}
           >
             <TargetCanvas spec={spec} shots={shots} />
+            {impactSnapshot && !isThumbnail && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSnapshotModal(true);
+                }}
+                className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#00E5A0]/20 hover:bg-[#00E5A0]/30 border border-[#00E5A0] text-[#00E5A0] text-[11px] font-mono font-bold transition shadow-lg"
+              >
+                <span>📸</span>
+                <span>Proof #{impactSnapshot.shotNumber} ({impactSnapshot.score.toFixed(1)})</span>
+              </button>
+            )}
           </div>
         ) : angle === 'stance' ? (
           <div className="w-full h-full relative flex items-center justify-center bg-gradient-to-b from-[#0F172A] to-[#050811]">
@@ -484,6 +517,85 @@ export function MultiCameraTargetView({
         )}
       </div>
 
+      {/* Optical Impact Proof Verification Modal */}
+      {showSnapshotModal && impactSnapshot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="relative w-full max-w-xl rounded-2xl bg-[#0B0F19] border border-[#00E5A0]/40 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#00E5A0]/20 flex items-center justify-center text-[#00E5A0] text-lg font-bold">
+                  🎯
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-display uppercase tracking-wide">
+                    Downrange Optical Impact Verification
+                  </h3>
+                  <p className="text-xs text-text-muted font-mono">
+                    Lane #{impactSnapshot.laneId} • High-Res Bullet Hole Optical Proof
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSnapshotModal(false)}
+                className="text-text-muted hover:text-white p-1 text-sm font-mono"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Snapshot Preview with Reticle */}
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+              {impactSnapshot.image ? (
+                <img
+                  src={impactSnapshot.image}
+                  alt={`Shot ${impactSnapshot.shotNumber} impact`}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="text-xs font-mono text-text-muted">No high-res image attached</div>
+              )}
+              {/* Reticle Overlay */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="w-12 h-12 border-2 border-[#00E5A0] rounded-full animate-ping opacity-75" />
+                <div className="w-2 h-2 bg-[#00E5A0] rounded-full" />
+              </div>
+              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-mono text-[#00E5A0] border border-[#00E5A0]/30">
+                EDGE ON-DEVICE RECOGNITION
+              </div>
+            </div>
+
+            {/* Shot Metrics Grid */}
+            <div className="grid grid-cols-4 gap-2 pt-1">
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">SHOT #</div>
+                <div className="text-base font-mono font-bold text-white">#{impactSnapshot.shotNumber}</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">SCORE</div>
+                <div className="text-base font-mono font-bold text-[#00E5A0]">{impactSnapshot.score.toFixed(1)}</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET X</div>
+                <div className="text-base font-mono font-bold text-[#38BDF8]">{impactSnapshot.xMm.toFixed(2)} mm</div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+                <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET Y</div>
+                <div className="text-base font-mono font-bold text-[#F5A623]">{impactSnapshot.yMm.toFixed(2)} mm</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs font-mono text-text-muted pt-2 border-t border-white/10">
+              <span>Transmitted via Wi-Fi {streamConfig.wifiBand} Low-Bandwidth Edge Protocol</span>
+              <button
+                onClick={() => setShowSnapshotModal(false)}
+                className="px-4 py-1.5 rounded-lg bg-[#00E5A0]/20 hover:bg-[#00E5A0]/30 text-[#00E5A0] border border-[#00E5A0] text-xs font-bold transition"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* High-Speed Wireless Stream Optimizer & Hardware Tuner Modal */}
       <StreamTunerModal

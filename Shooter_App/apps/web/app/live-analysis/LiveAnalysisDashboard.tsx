@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { TargetType, TARGET_SPECS, ShotCoordinates, ShotResult, calculateScore } from '../../lib/target-specs';
 import { TargetCanvas } from '../../components/live-analysis/TargetCanvas';
-import { MultiCameraTargetView } from '../../components/live-analysis/MultiCameraTargetView';
+import { MultiCameraTargetView, ShotImpactSnapshot } from '../../components/live-analysis/MultiCameraTargetView';
 import { RealTimeScoreboard } from '../../components/live-analysis/RealTimeScoreboard';
 import { LiveTargetSelector } from '../../components/live-analysis/LiveTargetSelector';
 
@@ -17,6 +17,7 @@ export function LiveAnalysisDashboard() {
   const [isCeasefireActive, setIsCeasefireActive] = useState(false);
   const [ceasefireReason, setCeasefireReason] = useState('');
   const [assignedLane, setAssignedLane] = useState<{ laneNumber?: number; status?: string } | null>(null);
+  const [latestImpactSnapshot, setLatestImpactSnapshot] = useState<ShotImpactSnapshot | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -47,6 +48,10 @@ export function LiveAnalysisDashboard() {
           status: data.status,
         });
       }
+    });
+
+    socket.on('shot_impact_snapshot', (payload: ShotImpactSnapshot) => {
+      setLatestImpactSnapshot(payload);
     });
 
     socket.on('shot_detected', (payload: ShotCoordinates) => {
@@ -178,6 +183,17 @@ export function LiveAnalysisDashboard() {
     const result = calculateScore({ x, y }, selectedTarget);
     setShots(prev => [...prev, { x, y, ...result }]);
     playShotFeedback(result.score);
+
+    // Generate local mock impact proof for demonstration/offline testing
+    setLatestImpactSnapshot({
+      laneId: assignedLane?.laneNumber ? `Lane-${assignedLane.laneNumber}` : 'Demo-1',
+      shotNumber: shots.length + 1,
+      score: result.score,
+      xMm: x,
+      yMm: y,
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"><rect width="400" height="225" fill="%23060913"/><circle cx="200" cy="112" r="80" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="50" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="25" stroke="%23334155" stroke-width="1.5" fill="%230F172A"/><circle cx="200" cy="112" r="6" fill="%23EF4444"/><text x="14" y="24" fill="%2300E5A0" font-family="monospace" font-size="11" font-weight="bold">DOWNRANGE HIGH-RES OPTICAL CAPTURE</text><text x="14" y="42" fill="%2394A3B8" font-family="monospace" font-size="10">TRIGGERED BY EDGE YOLOv8 BULLET-DETECTION</text></svg>',
+      timestamp: Date.now(),
+    });
   };
 
 
@@ -240,6 +256,7 @@ export function LiveAnalysisDashboard() {
             spec={TARGET_SPECS[selectedTarget]} 
             shots={shots}
             isCeasefireActive={isCeasefireActive}
+            latestImpactSnapshot={latestImpactSnapshot}
           />
         </div>
         
