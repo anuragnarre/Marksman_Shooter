@@ -69,10 +69,13 @@
   - Hardware CapEx: ₹35,000 – ₹55,000 / lane (vs ₹3,50,000 – ₹4,50,000 / lane for legacy Sius/Megalink EST systems, an 88% CapEx reduction).
   - Software Subscriptions: Club Starter (₹14,999/mo), Academy Pro (₹34,999/mo), National Olympic Center (Custom).
   - Interactive ROI Calculator: Dynamic lane and fee sliders calculating ₹46.4 Lakhs/yr net benefit for a 10-lane facility (including ₹8,40,000/yr saved in eliminated paper roll consumables).
+- **Authentic Product Plan & Capabilities Framing**:
+  - Eliminated premature claims of mass market adoption, replacing fake testimonials with a dedicated **Academy Pilot & Co-Development Program** offering subsidized early-batch target boxes (₹35k/lane), direct feature co-design, and locked founder software rates.
+  - Reframed presentation deck and commercial page around our 4-phase rollout roadmap: Phase 1 (Software Built) $\rightarrow$ Phase 2 (Live Hardware Field-Testing) $\rightarrow$ Phase 3 (5-Academy Pilot Cohort) $\rightarrow$ Phase 4 (Commercial Scale & ISSF Trials).
 - **Interactive Web Artifacts**:
-  - `Presenstation/advertisement.html`: Long-form high-conversion commercial landing page with interactive 10m target simulator, acoustic transient waveform display, and live ROI calculator.
-  - `Presenstation/index.html`: 12-slide executive presentation deck with keyboard shortcuts (`←`/`→`/`Space`/`N`/`F`/`G`), interactive target demo, and acoustic sensor breakdown slide.
-  - `Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`: 14-chapter comprehensive technical architecture specification with mathematical proofs, hardware box schematics, and INR pricing tables.
+  - `Presenstation/advertisement.html`: Long-form high-conversion commercial landing page with interactive 10m target simulator, acoustic transient waveform display, live INR ROI calculator, and Academy Pilot application modal.
+  - `Presenstation/index.html`: 12-slide executive presentation deck with keyboard shortcuts (`←`/`→`/`Space`/`N`/`F`/`G`), interactive target demo, acoustic sensor breakdown, and Phase 1-4 roadmap slide.
+  - `Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`: 15-chapter comprehensive technical architecture specification with mathematical proofs, hardware box schematics, INR pricing tables, and pilot program specifications.
   - Dual-directory synchronization: Mirrored all assets identically to `Presentation/`.
 
 ---

@@ -89,15 +89,18 @@
   - [x] 12-slide executive deck at `Presenstation/index.html` (and mirrored to `Presentation/`).
   - [x] Converted to eye-friendly light theme (`#F8FAFC`, `#FFFFFF`, `#0F172A`, `#0284C7`, `#D97706`).
   - [x] Interactive 10m Air Rifle target simulation with sub-millimeter scoring.
-- [x] **9.2 — Long-Form Commercial Landing Page**:
+  - [x] Reframed around 4-Phase Product Plan & Roadmap (Software Complete $\rightarrow$ Hardware Field Test $\rightarrow$ 5-Academy Pilot Cohort $\rightarrow$ Commercial Scale).
+- [x] **9.2 — Long-Form Product Plan & Capability Showcase**:
   - [x] Published `Presenstation/advertisement.html` with product feature highlights.
+  - [x] Replaced premature adoption claims and fake testimonials with structured **Academy Pilot & Co-Development Program**.
   - [x] Legacy EST vs Marksman Pro comparison tables.
   - [x] Interactive INR ROI calculator with dynamic sliders.
+  - [x] Pilot expression of interest application form.
 - [x] **9.3 — Acoustic-Optical Sensor Fusion Architecture**:
   - [x] Smartphone microphone muzzle trigger integration.
   - [x] Real-time pellet flight time and velocity calculation ($v_0 = 10\text{m} / t_{\text{flight}}$).
 - [x] **9.4 — Complete Technical Specification & Documentation**:
-  - [x] 14-chapter catalog at `Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`.
+  - [x] 15-chapter catalog at `Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`.
   - [x] All financial metrics expressed in Indian Rupees (₹ INR).
 
 ---

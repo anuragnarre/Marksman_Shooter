@@ -22,6 +22,7 @@
 12. [10m Olympic Airgun Target Hardware Box Specifications](#12-10m-olympic-airgun-target-hardware-box-specifications)
 13. [Commercial Pricing & Academy ROI Model (INR ₹)](#13-commercial-pricing--academy-roi-model-inr-)
 14. [Local Development, Orchestration & Credentials](#14-local-development-orchestration--credentials)
+15. [Product Development Roadmap & Academy Pilot Program](#15-product-development-roadmap--academy-pilot-program)
 
 ---
 
@@ -446,5 +447,44 @@ powershell -ExecutionPolicy Bypass -File .\ServerController.ps1
 
 ---
 
+## 15. Product Development Roadmap & Academy Pilot Program
+
+Marksman Pro is currently transitioning from software prototype verification to physical field testing:
+
+```
+┌─────────────────────────────────┐
+│  Phase 1: Software Ecosystem    │  ✅ COMPLETED
+│  - Web (:3000, :3002), API, DB  │  - Clean builds across all packages
+│  - Vision Engine & Socket WSS   │  - Seeding & Auth guards synced
+└────────────────┬────────────────┘
+                 ▼
+┌─────────────────────────────────┐
+│  Phase 2: Hardware Field Test   │  🔄 ACTIVE CURRENT STEP
+│  - Physical 10m Airgun Lane     │  - Target Camera APK downrange latency benchmark
+│  - Phone Mic Acoustic Trigger   │  - PCP muzzle transient verification (<8ms)
+└────────────────┬────────────────┘
+                 ▼
+┌─────────────────────────────────┐
+│  Phase 3: Academy Pilot Cohort  │  🎯 UPCOMING (Q4 2026 / Q1 2027)
+│  - 5 Partner Academies in India │  - 2 to 6 lane prototype installations
+│  - Subsidized Hardware Box      │  - Co-development of coach drill tools
+└────────────────┬────────────────┘
+                 ▼
+┌─────────────────────────────────┐
+│  Phase 4: Commercial Rollout    │  🚀 TARGET
+│  - Production Target Box Units  │  - Turnkey academy installations
+│  - National Tournaments & ISSF  │  - Federation-certified match scoring
+└─────────────────────────────────┘
+```
+
+### 15.1 Pilot Academy Cohort Details
+* **Target Participants**: 10m Air Rifle and Air Pistol academies, state rifle associations, and shooting sports clubs across India.
+* **Prototype Units**: Early-batch optical electronic target box assemblies supplied at subsidized prototype manufacturing cost (₹35,000/lane).
+* **Co-Design Commitment**: Dedicated engineering channels to incorporate coach-specific drills, custom squad analytics, and academy workflow feedback.
+* **Founder Software Benefits**: Lifetime preferential software pricing upon commercial release.
+
+---
+
 *End of Feature & Function Catalog. Maintained by the Marksman Platform Engineering Team.*
+
 
