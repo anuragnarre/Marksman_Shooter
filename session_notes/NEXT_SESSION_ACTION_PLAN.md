@@ -38,13 +38,20 @@
 ### Category 7 & 8: Safety & Compliance Audit Log
 - [x] Immutable `AuditLog` schema model.
 
+### Category 9: Commercial Showcase, Acoustic Sensors & Presentation
+- [x] Eye-pleasing light Olympic theme deck (`Presenstation/index.html`).
+- [x] Long-form advertisement showcase with sub-millimeter simulator (`Presenstation/advertisement.html`).
+- [x] Acoustic-optical smartphone microphone sensor fusion and ballistic velocity chronograph.
+- [x] Indian Rupee (₹ INR) economic modeling and interactive ROI calculator.
+- [x] 14-chapter technical specification (`Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`).
+
 ---
 
 ## 🛠️ Launch & Verification Instructions
 
 1. **Launch Full Stack**:
    ```powershell
-   powershell -ExecutionPolicy Bypass -File .\start-local.ps1
+   powershell -ExecutionPolicy Bypass -File .\ServerController.ps1
    ```
 2. **Verify Pages**:
    - Web App: `http://localhost:3000`
@@ -52,3 +59,5 @@
    - Digital Membership Card: `http://localhost:3000/shooter/membership`
    - ELO Leaderboard: `http://localhost:3000/shooter/leaderboard`
    - TV Kiosk Scoreboard: `http://localhost:3000/competitions/demo-event-1/kiosk`
+   - **Olympic Presentation Deck**: Open `Presenstation/index.html` in browser
+   - **Commercial Showcase**: Open `Presenstation/advertisement.html` in browser

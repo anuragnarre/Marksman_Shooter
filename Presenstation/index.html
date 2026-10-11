@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marksman Pro — Olympic 10m Airgun Range & Electronic Target Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F1F5F9;
+      --border-light: #E2E8F0;
+      --border-accent: rgba(2, 132, 199, 0.3);
+      --text-main: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+      --text-dim: #94A3B8;
+      --brand-blue: #0284C7;
+      --brand-blue-light: #E0F2FE;
+      --brand-teal: #0D9488;
+      --gold-olympic: #D97706;
+      --gold-light: #FEF3C7;
+      --crimson-alert: #E11D48;
+      --emerald-success: #059669;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Subtle Background */
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(2, 132, 199, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, #FFFFFF 0%, var(--bg-page) 100%);
+    }
+
+    /* Deck Header */
+    header.deck-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    .brand-logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand-blue), var(--brand-teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 900;
+      font-size: 1rem;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      background: var(--gold-light);
+      border: 1px solid rgba(217, 119, 6, 0.35);
+      color: var(--gold-olympic);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-subtle);
+      border-color: var(--brand-blue);
+      color: var(--brand-blue);
+    }
+
+    .btn-primary {
+      background: var(--brand-blue);
+      color: #FFFFFF;
+      border-color: var(--brand-blue);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: #0274b3;
+      color: #FFFFFF;
+    }
+
+    /* Progress Track */
+    .progress-track {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--border-light);
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand-blue), var(--gold-olympic));
+      width: 8.33%;
+      transition: width 0.4s var(--transition-smooth);
+    }
+
+    /* Deck Viewport */
+    main.deck-container {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 64px);
+      margin-top: 64px;
+      z-index: 1;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 36px 56px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(36px) scale(0.99);
+      transition: all 0.45s var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0) scale(1);
+    }
+
+    .slide.prev {
+      transform: translateX(-36px) scale(0.99);
+    }
+
+    /* Typography inside Slides */
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brand-blue);
+      margin-bottom: 10px;
+      font-weight: 700;
+      background: var(--brand-blue-light);
+      padding: 3px 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .slide-tag.gold {
+      color: var(--gold-olympic);
+      background: var(--gold-light);
+    }
+
+    h1.slide-title {
+      font-family: var(--font-display);
+      font-size: 2.85rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    h2.slide-subtitle {
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 26px;
+      max-width: 820px;
+      line-height: 1.5;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .tactical-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 22px;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tactical-card:hover {
+      border-color: var(--brand-blue);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--brand-blue-light);
+      border: 1px solid rgba(2, 132, 199, 0.2);
+      color: var(--brand-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .stat-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--brand-blue);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-number.gold {
+      color: var(--gold-olympic);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      margin: 4px 4px 0 0;
+      font-weight: 600;
+    }
+
+    /* Media Frame */
+    .media-frame {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-md);
+      background: #FFFFFF;
+    }
+
+    .media-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-overlay-badge {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-main);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Target Simulation */
+    .target-sim-container {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .target-canvas-box {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      background: #F8FAFC;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      cursor: crosshair;
+      overflow: hidden;
+    }
+
+    .target-canvas-box canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Stream Tuner Widget */
+    .stream-tuner-widget {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .profile-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .profile-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      border: 1px solid var(--border-light);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .profile-btn.active {
+      background: var(--brand-blue);
+      color: #FFFFFF;
+      border-color: var(--brand-blue);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .telemetry-live-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: #F8FAFC;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+    }
+
+    /* Acoustic Microphone Spotlight Box */
+    .mic-feature-box {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Footer */
+    footer.deck-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-light);
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slide-counter strong {
+      color: var(--brand-blue);
+      font-weight: 700;
+    }
+
+    .nav-arrow-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--brand-blue);
+      color: #FFFFFF;
+      border-color: var(--brand-blue);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* Speaker Notes & Thumbnails */
+    #speaker-notes-drawer {
+      position: fixed;
+      bottom: 54px;
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      background: #FFFFFF;
+      border-top: 2px solid var(--brand-blue);
+      padding: 18px 32px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 99;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    #speaker-notes-drawer.open {
+      transform: translateY(0);
+    }
+
+    #thumbnail-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      padding: 36px;
+      overflow-y: auto;
+    }
+
+    #thumbnail-modal.open {
+      display: flex;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .thumb-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .thumb-card:hover, .thumb-card.active-thumb {
+      border-color: var(--brand-blue);
+      background: var(--brand-blue-light);
+    }
+
+    .thumb-num {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--brand-blue);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .thumb-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header class="deck-header">
+    <div class="brand-mark">
+      <div class="brand-logo-icon">M</div>
+      <span>MARKSMAN OLYMPIC PRO</span>
+      <span class="brand-badge">AIRGUN TARGET SYSTEM</span>
+    </div>
+
+    <div class="deck-controls">
+      <button class="btn-icon" onclick="toggleThumbnails()" title="View All Slides (G)">
+        <span>⊞</span> Overview
+      </button>
+      <button class="btn-icon" onclick="toggleSpeakerNotes()" title="Speaker Notes (N)">
+        <span>📝</span> Notes
+      </button>
+      <button class="btn-icon" onclick="toggleFullscreen()" title="Toggle Fullscreen (F)">
+        <span>⛶</span> Fullscreen
+      </button>
+      <a href="advertisement.html" class="btn-icon btn-primary" target="_blank">
+        <span>🚀</span> Olympic Showcase Page
+      </a>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="progress-track">
+    <div id="progress-fill" class="progress-fill"></div>
+  </div>
+
+  <!-- Main Slides -->
+  <main class="deck-container">
+
+    <!-- SLIDE 1: Cover Slide -->
+    <section class="slide active" data-slide="1" data-notes="Welcome delegates, sports shooting coaches, and academy directors. Today we present Marksman Pro: the Olympic-grade electronic scoring target (EST) and academy operating system built for 10m Air Rifle and 10m Air Pistol ranges.">
+      <div class="grid-2">
+        <div>
+          <div class="slide-tag gold">Olympic Shooting Sports • ISSF 10m Target Architecture</div>
+          <h1 class="slide-title">The Next-Generation Electronic Target System</h1>
+          <h2 class="slide-subtitle">
+            Delivering sub-millimeter 0.1 decimal scoring (10.9), phone microphone acoustic muzzle trigger synchronization, AI coaching, and zero paper roll consumables—in Indian Rupees (₹).
+          </h2>
+          <div class="grid-3" style="margin-bottom: 26px;">
+            <div class="stat-box">
+              <div class="stat-number">10.9</div>
+              <div class="stat-label">Max Decimal Score</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number gold">4.5 mm</div>
+              <div class="stat-label">.177 Pellet Precision</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">₹0 / yr</div>
+              <div class="stat-label">Zero Paper Rolls</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-icon btn-primary" onclick="nextSlide()" style="padding: 10px 22px; font-size: 0.95rem;">
+              Start Presentation →
+            </button>
+            <a href="advertisement.html" target="_blank" class="btn-icon" style="padding: 10px 18px;">
+              🏅 View Long Showcase Page
+            </a>
+          </div>
+        </div>
+
+        <div class="media-frame" style="height: 460px;">
+          <img src="./assets/olympic_rifle_hero.jpg" alt="Olympic 10m Air Rifle Athlete">
+          <div class="media-overlay-badge">
+            <span style="color:#059669">●</span> Olympic 10m Air Rifle AR60 • Decimal Electronic Scoring
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: The Problem: Costly Legacy EST -->
+    <section class="slide" data-slide="2" data-notes="Legacy electronic targets from European brands cost ₹3.5 to ₹4.5 Lakhs per lane and force clubs to buy thousands of rupees in paper rolls every single year.">
+      <div>
+        <div class="slide-tag">The Electronic Target (EST) Bottleneck</div>
+        <h1 class="slide-title">Why Airgun Academies Struggle to Modernize</h1>
+        <h2 class="slide-subtitle">
+          Precision shooting sports clubs in India and globally face massive capital costs and continuous consumable roll maintenance.
+        </h2>
+
+        <div class="grid-3">
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--crimson-alert); background: #FFE4E6;">💸</div>
+            <div class="card-title">₹3,50,000+ Per Lane</div>
+            <div class="card-desc">
+              Legacy European targets (SIUS Ascor, Meyton) require enormous initial capital. A 10-lane academy needs ₹35 Lakhs just for target hardware.
+            </div>
+            <div style="margin-top: 14px;">
+              <span class="badge-pill">Crippling Capex</span>
+              <span class="badge-pill">Unobtainable for Youth Clubs</span>
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--crimson-alert); background: #FFE4E6;">📜</div>
+            <div class="card-title">₹80,000 Annual Paper Roll Drain</div>
+            <div class="card-desc">
+              Legacy targets use motorized paper or rubber rolls to mask pellet entry holes. Clubs spend ₹70,000 to ₹1,10,000 per lane every single year just on paper reels.
+            </div>
+            <div style="margin-top: 14px;">
+              <span class="badge-pill">Endless Paper Expenses</span>
+              <span class="badge-pill">Frequent Jamming</span>
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--crimson-alert); background: #FFE4E6;">🔌</div>
+            <div class="card-title">Closed Proprietary Cables</div>
+            <div class="card-desc">
+              Ancient serial cables, clunky monitors, and zero integration with mobile phones, athlete logbooks, or online member booking calendars.
+            </div>
+            <div style="margin-top: 14px;">
+              <span class="badge-pill">No AI Diagnostics</span>
+              <span class="badge-pill">Disconnected Systems</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: The Marksman Triad for Airgun Ranges -->
+    <section class="slide" data-slide="3" data-notes="Marksman Pro solves this with an integrated triad: Athlete companion app, Range Ops management room, and Downrange Optical Target Camera.">
+      <div>
+        <div class="slide-tag">The Modern Airgun Range Architecture</div>
+        <h1 class="slide-title">The Three Integrated Applications</h1>
+        <h2 class="slide-subtitle">
+          A synchronized software and optical hardware triad engineered for precision air rifle, air pistol, and academy logistics.
+        </h2>
+
+        <div class="grid-3">
+          <div class="tactical-card" style="border-top: 3px solid var(--brand-blue);">
+            <div class="card-icon">🎯</div>
+            <div class="card-title">Shooter App (:3000)</div>
+            <div class="card-desc">
+              Athlete and coach companion. Sub-millimeter 10.9 decimal scoring, phone mic acoustic muzzle sync, AI coaching, and turnstile QR pass.
+            </div>
+            <div style="margin-top: 16px;">
+              <span class="badge-pill">ISSF 10m Rules</span>
+              <span class="badge-pill">GenAI Coach</span>
+              <span class="badge-pill">ELO Leaderboard</span>
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-top: 3px solid var(--brand-teal);">
+            <div class="card-icon" style="color:var(--brand-teal); background:var(--brand-teal-light);">🏢</div>
+            <div class="card-title">Range Operations (:3002)</div>
+            <div class="card-desc">
+              Academy command center. 10m airgun bay scheduling, 1-hour slot booking matrix, automated turnstile gate check-in, and instant line safety ceasefires.
+            </div>
+            <div style="margin-top: 16px;">
+              <span class="badge-pill">Multi-Bay Roster</span>
+              <span class="badge-pill">Live WSS Video Wall</span>
+              <span class="badge-pill">QR Gate Scanner</span>
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-top: 3px solid var(--gold-olympic);">
+            <div class="card-icon" style="color:var(--gold-olympic); background:var(--gold-light);">📷</div>
+            <div class="card-title">Target Camera Rig (:8081)</div>
+            <div class="card-desc">
+              Downrange optical sensor box. Captures 4.5mm pellet entry holes at 120 FPS, computing sub-pixel coordinates without paper rolls.
+            </div>
+            <div style="margin-top: 16px;">
+              <span class="badge-pill">Zero Consumables</span>
+              <span class="badge-pill">FastAPI Vision</span>
+              <span class="badge-pill">Sub-15ms Relay</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: Interactive 10m Air Rifle Target Simulator -->
+    <section class="slide" data-slide="4" data-notes="Click the 10m Air Rifle target on the right to fire 4.5mm pellets and watch the decimal calculation and group radius update.">
+      <div class="grid-2">
+        <div>
+          <div class="slide-tag">Application 1 • Athlete & Coach Companion</div>
+          <h1 class="slide-title">Sub-Millimeter 10.9 Decimal Precision</h1>
+          <h2 class="slide-subtitle" style="margin-bottom: 20px;">
+            In ISSF 10m Air Rifle, the 10-ring is a tiny 0.5mm center dot. Marksman Pro resolves radial pellet dispersion down to 0.1 ring increments.
+          </h2>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--brand-blue);"></div>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>10.9 Bullseye Calculation:</strong> Exact sub-pixel center distance algorithm compliant with ISSF Rule 6.3.</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--brand-blue);"></div>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>AI Coach Analysis:</strong> Identifies vertical stringing (trigger dip) and lateral canting through rear sight irises.</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--brand-blue);"></div>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>Cadence & Split Times:</strong> Logs exact seconds from rifle lift to trigger break for optimal match rhythm.</span>
+            </div>
+          </div>
+
+          <a href="http://localhost:3000" target="_blank" class="btn btn-primary">
+            Launch Shooter Web (:3000) ↗
+          </a>
+        </div>
+
+        <!-- Interactive Target Box -->
+        <div class="target-sim-container">
+          <div class="target-canvas-box" id="target-box-air" onclick="handleDeckAirgunClick(event)">
+            <canvas id="deck-airgun-canvas" width="270" height="270"></canvas>
+            <div style="position: absolute; bottom: 6px; right: 8px; font-family: var(--font-mono); font-size: 0.65rem; color: #64748B;">
+              CLICK TO FIRE 4.5MM PELLET
+            </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--brand-blue); text-transform: uppercase; font-weight: 700;">
+              10M OLYMPIC DECIMAL TELEMETRY
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="stat-box" style="padding: 10px;">
+                <div id="deck-shots-count" class="stat-number" style="font-size: 1.5rem;">0 / 10</div>
+                <div class="stat-label">Shots</div>
+              </div>
+              <div class="stat-box" style="padding: 10px;">
+                <div id="deck-last-score" class="stat-number" style="font-size: 1.5rem; color: var(--brand-blue);">-</div>
+                <div class="stat-label">Last Score</div>
+              </div>
+            </div>
+            <div class="stat-box" style="padding: 10px;">
+              <div id="deck-series-total" class="stat-number gold" style="font-size: 1.4rem;">0.0</div>
+              <div class="stat-label">Series Total (Max 109.0)</div>
+            </div>
+            <button class="btn-icon" onclick="resetDeckAirgunShots()" style="align-self: flex-start; font-size: 0.75rem; padding: 5px 12px;">
+              ↺ Reset Series
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: Range Management for Airgun Clubs -->
+    <section class="slide" data-slide="5" data-notes="The Range Management application handles multi-bay 10m clubs, hourly practice slot booking, and instant RSO line safety locks.">
+      <div class="grid-2">
+        <div class="media-frame" style="height: 460px;">
+          <img src="./assets/command_hud.jpg" alt="Airgun Range RSO Command HUD">
+          <div class="media-overlay-badge">
+            <span style="color:#059669">●</span> 10m Airgun Range Control Room • 8 Active Stalls
+          </div>
+        </div>
+
+        <div>
+          <div class="slide-tag">Application 2 • Academy Command Room</div>
+          <h1 class="slide-title">Unified Airgun Club Operations</h1>
+          <h2 class="slide-subtitle" style="margin-bottom: 22px;">
+            Eliminating clipboards, paper punch cards, and booking conflicts with automated lane allocation.
+          </h2>
+
+          <div class="grid-2" style="gap: 14px; margin-bottom: 22px;">
+            <div class="tactical-card" style="padding: 16px;">
+              <div style="font-weight: 700; color: var(--brand-blue); margin-bottom: 4px;">🏢 Multi-Bay Facility Roster</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                Switch between 10m Airgun Bays, 25m Precision Range, and 50m Prone Racks in real time.
+              </div>
+            </div>
+            <div class="tactical-card" style="padding: 16px;">
+              <div style="font-weight: 700; color: var(--brand-teal); margin-bottom: 4px;">⏰ 1-Hour Slot Matrix</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                Reserve 60-minute academy training slots with collision-free lane assignment.
+              </div>
+            </div>
+            <div class="tactical-card" style="padding: 16px;">
+              <div style="font-weight: 700; color: var(--gold-olympic); margin-bottom: 4px;">🎫 QR Turnstile Scanner</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                Scan digital member passes to open hardware turnstiles and activate lane monitors.
+              </div>
+            </div>
+            <div class="tactical-card" style="padding: 16px;">
+              <div style="font-weight: 700; color: var(--crimson-alert); margin-bottom: 4px;">🛑 Global Range Ceasefire</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                One-touch RSO button flashes instant red emergency lockout warnings across all lanes.
+              </div>
+            </div>
+          </div>
+
+          <a href="http://localhost:3002" target="_blank" class="btn btn-primary">
+            Launch Range Ops (:3002) ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: Downrange Smart Target Box -->
+    <section class="slide" data-slide="6" data-notes="The downrange optical target box completely replaces paper roll mechanisms. It features a high-speed camera, diffused circular illumination, and lead pellet trap.">
+      <div class="grid-2">
+        <div>
+          <div class="slide-tag">Application 3 • Optical EST Hardware</div>
+          <h1 class="slide-title">Smart 10m Electronic Target Box</h1>
+          <h2 class="slide-subtitle" style="margin-bottom: 22px;">
+            Rugged anodized aluminum enclosure housing optical sensors, spent pellet lead trap, and wireless edge transmitter.
+          </h2>
+
+          <div class="tactical-card" style="margin-bottom: 14px;">
+            <div class="card-title">🔍 120 FPS Optical Bullet Hole Detection</div>
+            <div class="card-desc">
+              High-speed micro-cameras capture the 4.5mm diabolo pellet perforation at the speed of sound, calculating sub-pixel center coordinates in under 8ms.
+            </div>
+          </div>
+
+          <div class="tactical-card" style="margin-bottom: 14px;">
+            <div class="card-title">♻️ Zero Consumable Paper Rolls</div>
+            <div class="card-desc">
+              No paper reels to reload, no rubber bands to jam. Cuts operational maintenance to zero and saves Indian academies ₹75,000+ per lane annually.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-title">💡 1500 Lux Constant-Voltage DC Ring</div>
+            <div class="card-desc">
+              Diffused circular illumination provides perfect contrast against the black 10m target bullseye with zero AC flicker.
+            </div>
+          </div>
+        </div>
+
+        <div class="media-frame" style="height: 460px;">
+          <img src="./assets/airgun_target_box.jpg" alt="10m Airgun Electronic Scoring Target Box">
+          <div class="media-overlay-badge">
+            <span style="color:#059669">●</span> Smart 10m Optical Target Box • Integrated Pellet Trap
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: NEW ACOUSTIC SMART MIC FEATURE -->
+    <section class="slide" data-slide="7" data-notes="Here is our latest acoustic sensor innovation: utilizing the shooter's phone microphone at the firing line to detect the PCP muzzle crack, trigger the downrange camera, and calculate pellet muzzle velocity without a chronograph!">
+      <div class="grid-2">
+        <div>
+          <div class="slide-tag" style="background: var(--brand-teal-light); color: var(--brand-teal);">Smart Sensor Innovation</div>
+          <h1 class="slide-title">Phone Mic Acoustic Muzzle Trigger</h1>
+          <h2 class="slide-subtitle" style="margin-bottom: 20px;">
+            Dual Sensor Fusion: Acoustic Timing + Downrange Optical Scoring.
+          </h2>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--brand-teal); margin-bottom: 14px;">
+            <div class="card-title">🎤 Zero-Latency Camera Trigger</div>
+            <div class="card-desc">
+              The phone microphone detects the sharp 5ms acoustic release crack (>75dB) of the air rifle PCP valve, immediately signaling the downrange camera to grab the target impact frame.
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--brand-blue); margin-bottom: 14px;">
+            <div class="card-title">⏱️ Built-in Pellet Chronograph ($v_0$)</div>
+            <div class="card-desc">
+              Measures exact flight time from muzzle click to target entry ($t_{\text{flight}} \approx 57\text{ ms}$). Computes exact muzzle velocity ($v_0 = 175.4\text{ m/s}$) for every shot!
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--gold-olympic);">
+            <div class="card-title">🛡️ 100% False-Positive Immunity</div>
+            <div class="card-desc">
+              The target camera only records a scored shot when verified by the acoustic muzzle impulse, completely ignoring shadows or camera vibrations.
+            </div>
+          </div>
+        </div>
+
+        <div class="mic-feature-box">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--brand-teal); font-weight: 700; margin-bottom: 10px;">
+            ACOUSTIC TRANSIENT SENSOR WAVEFORM
+          </div>
+          <div style="height: 100px; background: #0F172A; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+            <div id="deck-waveform-bar" style="height: 6px; width: 85%; background: linear-gradient(90deg, #00E5A0, #0284C7); border-radius: 3px; transition: height 0.12s ease;"></div>
+            <div style="position: absolute; font-family: var(--font-mono); font-size: 0.7rem; color: rgba(255,255,255,0.4);">
+              SIMULATED PHONE MIC INPUT
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 10px; margin-bottom: 16px;">
+            <div class="stat-box" style="padding: 12px;">
+              <div id="deck-chrono-time" class="stat-number" style="font-size: 1.4rem; color: var(--brand-teal);">57.1 ms</div>
+              <div class="stat-label">10m Flight Time</div>
+            </div>
+            <div class="stat-box" style="padding: 12px;">
+              <div id="deck-chrono-vel" class="stat-number" style="font-size: 1.4rem; color: var(--brand-blue);">175.1 m/s</div>
+              <div class="stat-label">Muzzle Velocity ($v_0$)</div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary" onclick="simulateDeckAcousticSpike()" style="width: 100%; font-size: 0.85rem; padding: 10px;">
+            💥 Test Acoustic Muzzle Impulse
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: High-Speed Streaming & ABR Engine -->
+    <section class="slide" data-slide="8" data-notes="Our wireless streaming engine features Adaptive Bitrate and 5 hardware profiles, ensuring zero video stuttering across multi-lane range Wi-Fi.">
+      <div>
+        <div class="slide-tag">Engineering Innovation • Wireless Optimization</div>
+        <h1 class="slide-title">Adaptive Bitrate (ABR) & Wireless Tuning</h1>
+        <h2 class="slide-subtitle">
+          Intelligent congestion management providing sub-15ms streaming latency and instant hardware acceleration.
+        </h2>
+
+        <div class="stream-tuner-widget" style="margin-bottom: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--text-main);">
+              Live Stream Tuner Profile Simulator
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--brand-blue); font-weight: 700;">
+              SELECT A PRESET TO SIMULATE METRICS:
+            </div>
+          </div>
+
+          <div class="profile-tabs">
+            <button class="profile-btn active" onclick="selectStreamProfile('LAN_ULTRA_LOW_LAT', this)">LAN_ULTRA_LOW_LAT (1080p @ 60 FPS)</button>
+            <button class="profile-btn" onclick="selectStreamProfile('BALANCED_WIRELESS', this)">BALANCED_WIRELESS (720p @ 30 FPS)</button>
+            <button class="profile-btn" onclick="selectStreamProfile('AUTO_ADAPTIVE', this)">AUTO_ADAPTIVE (Dynamic ABR)</button>
+            <button class="profile-btn" onclick="selectStreamProfile('BANDWIDTH_SAVER', this)">BANDWIDTH_SAVER (480p @ 15 FPS)</button>
+            <button class="profile-btn" onclick="selectStreamProfile('ECO_BATTERY', this)">ECO_BATTERY (360p @ 10 FPS)</button>
+          </div>
+
+          <div class="telemetry-live-grid">
+            <div class="stat-box" style="padding: 10px;">
+              <div id="sim-fps" class="stat-number" style="font-size: 1.6rem;">60</div>
+              <div class="stat-label">Live FPS</div>
+            </div>
+            <div class="stat-box" style="padding: 10px;">
+              <div id="sim-rtt" class="stat-number" style="font-size: 1.6rem; color: var(--brand-teal);">11 ms</div>
+              <div class="stat-label">Round-Trip Time</div>
+            </div>
+            <div class="stat-box" style="padding: 10px;">
+              <div id="sim-bitrate" class="stat-number" style="font-size: 1.6rem; color: var(--brand-blue);">6000 kbps</div>
+              <div class="stat-label">Bitrate Cap</div>
+            </div>
+            <div class="stat-box" style="padding: 10px;">
+              <div id="sim-quality" class="stat-number" style="font-size: 1.6rem; color: var(--emerald-success);">EXCELLENT</div>
+              <div class="stat-label">Link Quality</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="tactical-card" style="padding: 16px;">
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🚀 GPU Acceleration</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">WebGL2 acceleration decodes high-FPS frames without bogging down tablet CPU performance.</div>
+          </div>
+          <div class="tactical-card" style="padding: 16px;">
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🛡️ DROP_LATE Policy</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">Discards queued lag frames automatically, ensuring the athlete's screen displays zero latency after trigger break.</div>
+          </div>
+          <div class="tactical-card" style="padding: 16px;">
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">📡 5GHz / 2.4GHz Agility</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">Dynamically selects the cleanest wireless spectrum channel across dense multi-lane club environments.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: Optical Impact Verification & Pistol Terminal -->
+    <section class="slide" data-slide="9" data-notes="Here is the Shooter Lane Terminal mounted right next to an Olympic Air Pistol athlete. In cases of Wi-Fi noise, it triggers instantaneous on-device optical impact snapshots.">
+      <div class="grid-2">
+        <div class="media-frame" style="height: 460px;">
+          <img src="./assets/olympic_pistol.jpg" alt="Olympic 10m Air Pistol Shooter Terminal">
+          <div class="media-overlay-badge">
+            <span style="color:#D97706">●</span> Lane 4 Terminal • 10.9 Bullseye Live Shot #24
+          </div>
+        </div>
+
+        <div>
+          <div class="slide-tag gold">Instant Verification Telemetry</div>
+          <h1 class="slide-title">Downrange Optical Impact Snapshots</h1>
+          <h2 class="slide-subtitle" style="margin-bottom: 22px;">
+            Real-time visual shot confirmation delivered straight to the athlete's stall monitor in under 15ms.
+          </h2>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--brand-teal); margin-bottom: 14px;">
+            <div class="card-title">⚡ Instant Pellet Entry Crop</div>
+            <div class="card-desc">
+              Upon lead pellet impact, the camera captures an instantaneous high-res crop of the black bullseye perforation, broadcasting it via the `shot_impact_snapshot` WebSocket event.
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--brand-blue); margin-bottom: 14px;">
+            <div class="card-title">🔄 Autonomous Edge Failover</div>
+            <div class="card-desc">
+              If wireless interference causes packet drops above 12%, the system seamlessly switches from full video streaming to on-device edge calculation mode to keep the match running smoothly.
+            </div>
+          </div>
+
+          <div class="tactical-card" style="border-left: 3px solid var(--gold-olympic);">
+            <div class="card-title">🏅 ISSF Finals Elimination Table</div>
+            <div class="card-desc">
+              Spectator and coaching monitors display real-time single-elimination finals rankings, highlighting who drops out after shot 12, 14, 16, and beyond.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: Safety & Junior Academy Standards -->
+    <section class="slide" data-slide="10" data-notes="Safety is critical, especially in youth airgun academies. Marksman complies with lead dust management, ventilation standards, and line safety protocols.">
+      <div>
+        <div class="slide-tag">Safety Standards & Youth Compliance</div>
+        <h1 class="slide-title">Certified Safety & Air Quality Standards</h1>
+        <h2 class="slide-subtitle">
+          Ensuring pristine indoor air quality, lead dust containment, and child-safe academy operations.
+        </h2>
+
+        <div class="grid-4">
+          <div class="tactical-card">
+            <div class="card-icon">💨</div>
+            <div class="card-title">Lead Dust Control</div>
+            <div class="card-desc">
+              Enclosed pellet trap design eliminates airborne lead spall, keeping indoor 10m academies well below OSHA 1910.1025 thresholds.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--brand-blue); background:var(--brand-blue-light);">🎯</div>
+            <div class="card-title">ISSF Rule 6.3 Standard</div>
+            <div class="card-desc">
+              Calibrated to official ISSF dimensions: 10m Air Rifle target 0.5mm 10-ring and 10m Air Pistol 11.5mm 10-ring.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--gold-olympic); background:var(--gold-light);">🛡️</div>
+            <div class="card-title">Digital Range Kill-Switch</div>
+            <div class="card-desc">
+              RSOs can halt shooting immediately with bi-directional emergency ceasefire locks across all lane tablets.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-icon" style="color:var(--crimson-alert); background:#FFE4E6;">📜</div>
+            <div class="card-title">Immutable Audit Trail</div>
+            <div class="card-desc">
+              Maintains full digital audit logs of member check-ins, junior certifications, and tournament score sign-offs.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: Club ROI & Financial Model (IN INR ₹) -->
+    <section class="slide" data-slide="11" data-notes="For an airgun academy, the financial ROI in Indian Rupees is compelling. You save thousands in consumable paper rolls and add recurring digital membership revenue.">
+      <div>
+        <div class="slide-tag gold">Commercial Feasibility (in ₹ INR)</div>
+        <h1 class="slide-title">Transforming Airgun Club Economics</h1>
+        <h2 class="slide-subtitle">
+          Eliminating recurring paper expenses and unlocking automated membership revenue streams in Indian Rupees.
+        </h2>
+
+        <div class="grid-3" style="margin-bottom: 22px;">
+          <div class="tactical-card">
+            <div class="card-title">₹8,40,000 Paper Savings</div>
+            <div class="card-desc">
+              A 12-lane club eliminates paper roll and rubber band purchases entirely, pocketing ₹8,40,000+ in pure annual operational savings.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-title">+30% Lane Throughput</div>
+            <div class="card-desc">
+              No paper jams or manual target reel repairs. Practice lanes cycle shooters smoothly without technician interventions.
+            </div>
+          </div>
+
+          <div class="tactical-card">
+            <div class="card-title">Digital Academy Subscriptions</div>
+            <div class="card-desc">
+              Clubs sell junior and senior monthly training passes (₹2,500/mo) with automated QR turnstiles, generating over ₹36 Lakhs in recurring ARR.
+            </div>
+          </div>
+        </div>
+
+        <div class="tactical-card" style="background: var(--brand-blue-light); border-color: rgba(2, 132, 199, 0.3); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-main);">
+              Calculate Your Club's Revenue & Savings in INR (₹)
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);">
+              Use our interactive Airgun Club Financial Calculator to model exact returns.
+            </div>
+          </div>
+          <a href="advertisement.html#roi-calculator" class="btn btn-primary">
+            Open Club ROI Calculator ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: Conclusion & Launch Guide -->
+    <section class="slide" data-slide="12" data-notes="Thank you for your time. All Marksman services are running locally and ready for live demonstrations.">
+      <div class="grid-2">
+        <div>
+          <div class="slide-tag">Deployment & Verification</div>
+          <h1 class="slide-title">Ready for Academy Deployment</h1>
+          <h2 class="slide-subtitle">
+            Marksman Pro is production-ready, fully architected, and verified across native mobile builds, containerized databases, and cloud web services.
+          </h2>
+
+          <div class="grid-2" style="gap: 14px; margin-bottom: 24px;">
+            <div class="stat-box">
+              <div class="stat-number" style="font-size: 1.6rem; color: var(--emerald-success);">🟢 READY</div>
+              <div class="stat-label">Full Stack Health</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number" style="font-size: 1.6rem; color: var(--brand-blue);">APK READY</div>
+              <div class="stat-label">Target Camera Release</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="http://localhost:3000" target="_blank" class="btn btn-primary" style="padding: 10px 18px;">
+              🎯 Open Shooter Web (:3000)
+            </a>
+            <a href="http://localhost:3002" target="_blank" class="btn btn-ghost" style="padding: 10px 18px;">
+              🏢 Open Range Ops (:3002)
+            </a>
+            <a href="advertisement.html" target="_blank" class="btn btn-secondary" style="padding: 10px 18px;">
+              🏅 Commercial Showcase
+            </a>
+          </div>
+        </div>
+
+        <div class="tactical-card" style="padding: 28px; background: #FFFFFF;">
+          <div style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main);">
+            Quick Start Commands
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+            Launch the complete local ecosystem with a single command:
+          </div>
+          <pre style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--brand-blue); background: #F8FAFC; border: 1px solid var(--border-light); padding: 12px; border-radius: 8px; margin-bottom: 14px;">
+# Graphical Desktop Controller
+powershell -File .\ServerController.ps1
+
+# Full Multi-Service Batch Launcher
+.\run_all_local.bat</pre>
+
+          <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;">
+            <strong>Demo Accounts:</strong><br>
+            • Shooter: <code>shooter@example.com</code> / <code>Password123!</code><br>
+            • Coach: <code>coach@example.com</code> / <code>Password123!</code><br>
+            • Range Operator: <code>range@marksman.local</code> / <code>Password123!</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="deck-footer">
+    <div class="slide-counter">
+      <span>SLIDE <strong id="current-slide-num">01</strong> / <span id="total-slides-num">12</span></span>
+      <span style="color: var(--border-light);">|</span>
+      <span id="slide-name-display" style="color: var(--text-dim); font-size: 0.78rem;">Executive Title</span>
+    </div>
+
+    <div class="nav-arrow-group">
+      <button id="prev-btn" class="nav-btn" onclick="prevSlide()" title="Previous Slide (←)">
+        ←
+      </button>
+      <button id="next-btn" class="nav-btn" onclick="nextSlide()" title="Next Slide (→)">
+        →
+      </button>
+    </div>
+  </footer>
+
+  <!-- Speaker Notes Drawer -->
+  <aside id="speaker-notes-drawer">
+    <div style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--brand-blue); font-weight: 700; margin-bottom: 6px;">Presenter Notes (Press N to close)</div>
+    <div id="speaker-notes-content" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+      Welcome delegates, coaches, and sports shooting club directors.
+    </div>
+  </aside>
+
+  <!-- Thumbnail Overview Modal -->
+  <div id="thumbnail-modal" onclick="if(event.target===this) toggleThumbnails()">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: #FFFFFF;">Presentation Slide Directory</h2>
+      <button class="btn btn-ghost" onclick="toggleThumbnails()">✕ Close</button>
+    </div>
+    <div class="thumb-grid" id="thumb-grid"></div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    const slideTitles = [
+      "Olympic Airgun Platform Vision",
+      "The Legacy Electronic Target Dilemma",
+      "The Modern Airgun Range Triad",
+      "10m Air Rifle Decimal Scoring Demo",
+      "Unified Airgun Club Operations",
+      "Smart 10m Optical Target Box",
+      "Phone Mic Acoustic Muzzle Trigger",
+      "Adaptive Bitrate Wireless Engine",
+      "Downrange Impact Snapshots & Terminal",
+      "Safety & Youth Academy Standards",
+      "Airgun Club ROI in INR (₹)",
+      "Conclusion & Local Deployment"
+    ];
+
+    document.getElementById('total-slides-num').textContent = String(totalSlides).padStart(2, '0');
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        s.classList.remove('active', 'prev');
+        if (idx === currentSlide) {
+          s.classList.add('active');
+        } else if (idx < currentSlide) {
+          s.classList.add('prev');
+        }
+      });
+
+      document.getElementById('current-slide-num').textContent = String(currentSlide + 1).padStart(2, '0');
+      document.getElementById('slide-name-display').textContent = slideTitles[currentSlide] || '';
+      document.getElementById('prev-btn').disabled = currentSlide === 0;
+      document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+
+      const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progress-fill').style.width = progressPercent + '%';
+
+      const notes = slides[currentSlide].getAttribute('data-notes') || 'No notes for this slide.';
+      document.getElementById('speaker-notes-content').textContent = notes;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlide();
+        document.getElementById('thumbnail-modal').classList.remove('open');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'n' || e.key === 'N') {
+        toggleSpeakerNotes();
+      } else if (e.key === 'g' || e.key === 'G') {
+        toggleThumbnails();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Escape') {
+        document.getElementById('thumbnail-modal').classList.remove('open');
+        document.getElementById('speaker-notes-drawer').classList.remove('open');
+      }
+    });
+
+    function toggleSpeakerNotes() {
+      document.getElementById('speaker-notes-drawer').classList.toggle('open');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function toggleThumbnails() {
+      const modal = document.getElementById('thumbnail-modal');
+      const grid = document.getElementById('thumb-grid');
+      modal.classList.toggle('open');
+
+      if (modal.classList.contains('open')) {
+        grid.innerHTML = '';
+        slideTitles.forEach((title, idx) => {
+          const card = document.createElement('div');
+          card.className = `thumb-card ${idx === currentSlide ? 'active-thumb' : ''}`;
+          card.onclick = () => goToSlide(idx);
+          card.innerHTML = `
+            <div class="thumb-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+            <div class="thumb-name">${title}</div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+    }
+
+    // ── 10m Airgun Target Simulation in Slide 4 (Light Theme) ──
+    const deckCanvas = document.getElementById('deck-airgun-canvas');
+    const deckCtx = deckCanvas ? deckCanvas.getContext('2d') : null;
+    const deckShots = [];
+
+    function drawDeckAirgunTarget() {
+      if (!deckCtx) return;
+      const w = deckCanvas.width;
+      const h = deckCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      deckCtx.clearRect(0, 0, w, h);
+
+      // Light target paper card
+      deckCtx.fillStyle = '#FFFFFF';
+      deckCtx.fillRect(0, 0, w, h);
+
+      // Outer rings (1 to 3)
+      deckCtx.beginPath();
+      deckCtx.arc(cx, cy, 120, 0, Math.PI * 2);
+      deckCtx.fillStyle = '#F8FAFC';
+      deckCtx.fill();
+
+      // Black bullseye (Ring 4 inwards)
+      deckCtx.beginPath();
+      deckCtx.arc(cx, cy, 82, 0, Math.PI * 2);
+      deckCtx.fillStyle = '#0F172A';
+      deckCtx.fill();
+
+      // Concentric rings
+      const radii = [120, 105, 90, 75, 60, 46, 32, 18, 9, 2.5];
+      radii.forEach(r => {
+        deckCtx.beginPath();
+        deckCtx.arc(cx, cy, r, 0, Math.PI * 2);
+        deckCtx.strokeStyle = r <= 2.5 ? '#F59E0B' : (r <= 75 ? 'rgba(255, 255, 255, 0.35)' : 'rgba(15, 23, 42, 0.25)');
+        deckCtx.lineWidth = r <= 2.5 ? 1.5 : 0.8;
+        deckCtx.stroke();
+      });
+
+      // Crosshairs
+      deckCtx.beginPath();
+      deckCtx.moveTo(cx, 12); deckCtx.lineTo(cx, h - 12);
+      deckCtx.moveTo(12, cy); deckCtx.lineTo(w - 12, cy);
+      deckCtx.strokeStyle = 'rgba(15, 23, 42, 0.15)';
+      deckCtx.lineWidth = 0.5;
+      deckCtx.stroke();
+
+      // Plot fired pellets
+      deckShots.forEach((shot, idx) => {
+        deckCtx.beginPath();
+        deckCtx.arc(shot.px, shot.py, 4.5, 0, Math.PI * 2);
+        deckCtx.fillStyle = '#0284C7';
+        deckCtx.fill();
+        deckCtx.strokeStyle = '#FFFFFF';
+        deckCtx.lineWidth = 1;
+        deckCtx.stroke();
+
+        deckCtx.font = 'bold 8px var(--font-mono)';
+        deckCtx.fillStyle = '#FFFFFF';
+        deckCtx.textAlign = 'center';
+        deckCtx.textBaseline = 'middle';
+        deckCtx.fillText(String(idx + 1), shot.px, shot.py);
+      });
+    }
+
+    function handleDeckAirgunClick(e) {
+      if (!deckCanvas || deckShots.length >= 10) return;
+      const rect = deckCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const px = (clickX / rect.width) * deckCanvas.width;
+      const py = (clickY / rect.height) * deckCanvas.height;
+
+      const cx = deckCanvas.width / 2;
+      const cy = deckCanvas.height / 2;
+      const dx = px - cx;
+      const dy = py - cy;
+      const distPx = Math.sqrt(dx * dx + dy * dy);
+
+      let score;
+      if (distPx <= 9) {
+        score = 10.9 - (distPx / 9) * 0.9;
+      } else {
+        score = 10.0 - ((distPx - 9) / 111) * 9.0;
+      }
+      score = Math.max(0, Math.min(10.9, parseFloat(score.toFixed(1))));
+
+      deckShots.push({ px, py, dx, dy, distPx, score });
+      drawDeckAirgunTarget();
+      updateDeckAirgunStats();
+    }
+
+    function updateDeckAirgunStats() {
+      const countEl = document.getElementById('deck-shots-count');
+      const lastScoreEl = document.getElementById('deck-last-score');
+      const totalScoreEl = document.getElementById('deck-series-total');
+
+      if (!countEl || !lastScoreEl || !totalScoreEl) return;
+
+      countEl.textContent = `${deckShots.length} / 10`;
+
+      if (deckShots.length > 0) {
+        const last = deckShots[deckShots.length - 1];
+        lastScoreEl.textContent = last.score.toFixed(1);
+
+        const total = deckShots.reduce((acc, s) => acc + s.score, 0);
+        totalScoreEl.textContent = total.toFixed(1);
+      } else {
+        lastScoreEl.textContent = '-';
+        totalScoreEl.textContent = '0.0';
+      }
+    }
+
+    function resetDeckAirgunShots() {
+      deckShots.length = 0;
+      drawDeckAirgunTarget();
+      updateDeckAirgunStats();
+    }
+
+    // ── Acoustic Transient Waveform in Slide 7 ──
+    function simulateDeckAcousticSpike() {
+      const bar = document.getElementById('deck-waveform-bar');
+      const timeEl = document.getElementById('deck-chrono-time');
+      const velEl = document.getElementById('deck-chrono-vel');
+      if (!bar) return;
+
+      bar.style.height = '64px';
+      bar.style.background = 'linear-gradient(90deg, #F59E0B, #E11D48)';
+
+      const flightMs = (56.5 + Math.random() * 1.5).toFixed(1);
+      const velocity = (10 / (flightMs / 1000)).toFixed(1);
+
+      if (timeEl) timeEl.textContent = `${flightMs} ms`;
+      if (velEl) velEl.textContent = `${velocity} m/s`;
+
+      setTimeout(() => {
+        bar.style.height = '6px';
+        bar.style.background = 'linear-gradient(90deg, #00E5A0, #0284C7)';
+      }, 300);
+    }
+
+    // ── Stream Profile Simulator ──
+    const profileConfigs = {
+      LAN_ULTRA_LOW_LAT: { fps: 60, rtt: '11 ms', bitrate: '6000 kbps', quality: 'EXCELLENT', color: '#059669' },
+      BALANCED_WIRELESS: { fps: 30, rtt: '24 ms', bitrate: '2500 kbps', quality: 'EXCELLENT', color: '#059669' },
+      AUTO_ADAPTIVE:     { fps: 45, rtt: '18 ms', bitrate: '3200 kbps', quality: 'EXCELLENT', color: '#0284C7' },
+      BANDWIDTH_SAVER:   { fps: 15, rtt: '68 ms', bitrate: '800 kbps',  quality: 'GOOD',      color: '#D97706' },
+      ECO_BATTERY:       { fps: 10, rtt: '92 ms', bitrate: '400 kbps',  quality: 'FAIR',      color: '#EA580C' },
+    };
+
+    function selectStreamProfile(profileKey, btnEl) {
+      document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const data = profileConfigs[profileKey] || profileConfigs.AUTO_ADAPTIVE;
+      document.getElementById('sim-fps').textContent = data.fps;
+      document.getElementById('sim-rtt').textContent = data.rtt;
+      document.getElementById('sim-bitrate').textContent = data.bitrate;
+      const qEl = document.getElementById('sim-quality');
+      qEl.textContent = data.quality;
+      qEl.style.color = data.color;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSlide();
+      drawDeckAirgunTarget();
+    });
+  </script>
+</body>
+</html>

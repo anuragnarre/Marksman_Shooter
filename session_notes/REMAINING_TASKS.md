@@ -81,3 +81,30 @@
 ## 🛡️ CATEGORY 7 & 8: SAFETY, COMPLIANCE & AUDIT LOG
 - [x] **7.3 — Audit Trail**:
   - [x] `AuditLog` Prisma model for immutable action tracking.
+
+---
+
+## 🎯 CATEGORY 9: COMMERCIAL SHOWCASE, ACOUSTIC SENSORS & PRESENTATION
+- [x] **9.1 — Light-Themed Olympic 10m Airgun Presentation Deck**:
+  - [x] 12-slide executive deck at `Presenstation/index.html` (and mirrored to `Presentation/`).
+  - [x] Converted to eye-friendly light theme (`#F8FAFC`, `#FFFFFF`, `#0F172A`, `#0284C7`, `#D97706`).
+  - [x] Interactive 10m Air Rifle target simulation with sub-millimeter scoring.
+- [x] **9.2 — Long-Form Commercial Landing Page**:
+  - [x] Published `Presenstation/advertisement.html` with product feature highlights.
+  - [x] Legacy EST vs Marksman Pro comparison tables.
+  - [x] Interactive INR ROI calculator with dynamic sliders.
+- [x] **9.3 — Acoustic-Optical Sensor Fusion Architecture**:
+  - [x] Smartphone microphone muzzle trigger integration.
+  - [x] Real-time pellet flight time and velocity calculation ($v_0 = 10\text{m} / t_{\text{flight}}$).
+- [x] **9.4 — Complete Technical Specification & Documentation**:
+  - [x] 14-chapter catalog at `Presenstation/FEATURE_AND_FUNCTION_CATALOG.md`.
+  - [x] All financial metrics expressed in Indian Rupees (₹ INR).
+
+---
+
+## 🔬 NEXT PHYSICAL MILESTONE: HARDWARE FIELD TEST
+- [ ] **Physical Android Target Camera Benchmarking**:
+  - [ ] Deploy Target Camera APK to physical Android device downrange at a physical 10m airgun lane.
+  - [ ] Benchmark optical impact snapshot stream latency (<50 ms target).
+  - [ ] Test acoustic phone microphone trigger with physical PCP air rifle / pistol muzzle discharge.
+

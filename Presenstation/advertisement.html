@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marksman Pro — Olympic 10m Airgun Electronic Scoring & Academy OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F1F5F9;
+      --bg-elevated: #FFFFFF;
+      --border-light: #E2E8F0;
+      --border-accent: rgba(2, 132, 199, 0.35);
+      --text-main: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+      --brand-blue: #0284C7;
+      --brand-blue-light: #E0F2FE;
+      --brand-teal: #0D9488;
+      --brand-teal-light: #CCFBF1;
+      --gold-olympic: #D97706;
+      --gold-light: #FEF3C7;
+      --crimson-alert: #E11D48;
+      --emerald-success: #059669;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Subtle Background */
+    .ambient-header-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.07) 0%, rgba(217, 119, 6, 0.04) 50%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Site Header */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--brand-blue), var(--brand-teal));
+      color: #FFFFFF;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand-blue);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 9px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--brand-blue);
+      color: #FFFFFF;
+      box-shadow: 0 3px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #0274b3;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--gold-olympic);
+      color: #FFFFFF;
+      box-shadow: 0 3px 14px rgba(217, 119, 6, 0.25);
+    }
+
+    .btn-secondary:hover {
+      background: #b45309;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-subtle);
+      border-color: var(--brand-blue);
+      color: var(--brand-blue);
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero Section */
+    section.hero {
+      padding: 80px 0 60px 0;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-badge-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      background: var(--brand-blue-light);
+      border: 1px solid rgba(2, 132, 199, 0.25);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--brand-blue);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-badge.gold {
+      background: var(--gold-light);
+      border-color: rgba(217, 119, 6, 0.3);
+      color: var(--gold-olympic);
+    }
+
+    h1.hero-title {
+      font-family: var(--font-display);
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    h1.hero-title span.accent-blue {
+      color: var(--brand-blue);
+    }
+
+    h1.hero-title span.accent-gold {
+      color: var(--gold-olympic);
+    }
+
+    p.hero-desc {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 820px;
+      margin: 0 auto 36px auto;
+      line-height: 1.6;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+
+    /* Hero Showcase Frame */
+    .hero-showcase {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-lg);
+      background: #FFFFFF;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .hero-showcase img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hero-hud-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .hud-tag {
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-light);
+      border-radius: 7px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-main);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Ticker Stats */
+    .ticker-bar {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .ticker-item {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      padding: 22px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ticker-val {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--brand-blue);
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .ticker-val.gold {
+      color: var(--gold-olympic);
+    }
+
+    .ticker-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Standard Section */
+    section.section {
+      padding: 90px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--brand-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      background: var(--brand-blue-light);
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    .section-tag.gold {
+      color: var(--gold-olympic);
+      background: var(--gold-light);
+    }
+
+    h2.section-title {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      color: var(--text-main);
+    }
+
+    p.section-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Comparison Table */
+    .comparison-wrapper {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .comparison-table th {
+      padding: 18px 22px;
+      background: #F8FAFC;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .comparison-table th.highlight-col {
+      background: var(--brand-blue-light);
+      color: var(--brand-blue);
+      border-left: 1px solid rgba(2, 132, 199, 0.2);
+      border-right: 1px solid rgba(2, 132, 199, 0.2);
+    }
+
+    .comparison-table td {
+      padding: 16px 22px;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+
+    .comparison-table td.highlight-col {
+      background: rgba(2, 132, 199, 0.02);
+      color: var(--text-main);
+      font-weight: 600;
+      border-left: 1px solid rgba(2, 132, 199, 0.15);
+      border-right: 1px solid rgba(2, 132, 199, 0.15);
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Acoustic Microphone Feature Card */
+    .acoustic-spotlight-box {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+      border: 1px solid rgba(5, 150, 105, 0.3);
+      border-radius: 20px;
+      padding: 44px;
+      margin-bottom: 60px;
+      box-shadow: var(--shadow-md);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .acoustic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--brand-teal-light);
+      color: var(--brand-teal);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .waveform-visualizer {
+      background: #0F172A;
+      border-radius: 14px;
+      padding: 24px;
+      color: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Interactive 10m Target Section */
+    .interactive-airgun-target-section {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 44px;
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 44px;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .airgun-target-box-ui {
+      background: #F8FAFC;
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .target-canvas-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      background: #F1F5F9;
+      border-radius: 12px;
+      cursor: crosshair;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+
+    .target-canvas-wrapper canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .metric-chip {
+      background: #F8FAFC;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .metric-chip-val {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--brand-blue);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metric-chip-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Product Cards */
+    .app-suite-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+
+    .suite-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .suite-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--brand-blue);
+    }
+
+    .suite-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--brand-blue);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .suite-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    .suite-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .suite-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .suite-features li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .suite-features li::before {
+      content: '✓';
+      color: var(--brand-teal);
+      font-weight: bold;
+    }
+
+    /* Hardware Dual Grid */
+    .hardware-dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .hardware-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hardware-card img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hardware-card-content {
+      padding: 26px;
+    }
+
+    /* ROI Calculator (in INR ₹) */
+    .calculator-wrapper {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 44px;
+      box-shadow: var(--shadow-md);
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .slider-group {
+      margin-bottom: 22px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .slider-value {
+      font-family: var(--font-mono);
+      color: var(--brand-blue);
+      font-weight: 700;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: #E2E8F0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--brand-blue);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+    }
+
+    .roi-display-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 34px;
+      text-align: center;
+    }
+
+    .roi-annual-total {
+      font-family: var(--font-display);
+      font-size: 3.4rem;
+      font-weight: 900;
+      color: var(--brand-blue);
+      line-height: 1.1;
+      margin: 10px 0;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+
+    .pricing-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 34px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pricing-card.featured {
+      border-color: var(--brand-blue);
+      box-shadow: 0 8px 30px rgba(2, 132, 199, 0.12);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      padding: 4px 14px;
+      background: var(--brand-blue);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.7rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+
+    .price-num {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 14px 0 20px 0;
+    }
+
+    .price-num span {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .test-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .test-quote {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 18px;
+      font-style: italic;
+    }
+
+    .test-author {
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .test-role {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--brand-blue);
+    }
+
+    /* Footer */
+    footer.site-footer {
+      border-top: 1px solid var(--border-light);
+      padding: 60px 0 36px 0;
+      background: #FFFFFF;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Modal Form */
+    #demo-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    #demo-modal.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      border-radius: 18px;
+      max-width: 520px;
+      width: 100%;
+      padding: 34px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-header-glow"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <a href="#" class="brand-logo">
+      <div class="brand-icon">M</div>
+      <span>MARKSMAN OLYMPIC PRO</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#comparison">Legacy vs Marksman</a></li>
+      <li><a href="#acoustic-feature">Acoustic Smart Mic</a></li>
+      <li><a href="#interactive-target">10m Target Demo</a></li>
+      <li><a href="#hardware">Target Camera Rig</a></li>
+      <li><a href="#roi-calculator">Club ROI (₹ INR)</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="index.html" target="_blank" style="color:var(--brand-blue); font-weight:700;">📊 Presentation Deck</a></li>
+    </ul>
+
+    <div>
+      <button class="btn btn-primary" onclick="openDemoModal()">Schedule Academy Demo</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge-row">
+        <div class="hero-badge gold">
+          <span>🏅</span> Official ISSF 10m Air Rifle & Air Pistol Architecture
+        </div>
+        <div class="hero-badge">
+          <span>🎤</span> Dual Acoustic-Optical Smart Sensor Fusion
+        </div>
+      </div>
+
+      <h1 class="hero-title">
+        The Olympic-Grade Electronic Scoring & Academy OS for <span class="accent-blue">10m Airgun Ranges</span>
+      </h1>
+
+      <p class="hero-desc">
+        Empower precision air rifle and air pistol athletes with sub-millimeter decimal scoring (10.9), phone microphone acoustic muzzle trigger synchronization, automated lane booking, and live tournament leaderboards—at a fraction of legacy electronic target costs.
+      </p>
+
+      <div class="hero-cta-group">
+        <button class="btn btn-primary" onclick="openDemoModal()" style="padding: 13px 30px; font-size: 1rem;">
+          Request Academy Demo & Audit →
+        </button>
+        <a href="#interactive-target" class="btn btn-ghost" style="padding: 13px 26px; font-size: 1rem;">
+          Try 10.9 Decimal Target Simulator ↓
+        </a>
+      </div>
+
+      <!-- Hero Visual Showcase -->
+      <div class="hero-showcase">
+        <img src="./assets/olympic_rifle_hero.jpg" alt="Olympic 10m Air Rifle Athlete on Smart Range">
+        <div class="hero-hud-overlay">
+          <div class="hud-tag">
+            <span style="color:#059669">●</span> ISSF 10M AIR RIFLE AR60
+          </div>
+          <div class="hud-tag">
+            DECIMAL SCORING: 0.1 RESOLUTION
+          </div>
+          <div class="hud-tag">
+            ACOUSTIC SYNC: ARMED
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Ticker Bar -->
+      <div class="ticker-bar">
+        <div class="ticker-item">
+          <div class="ticker-val">0.10</div>
+          <div class="ticker-label">ISSF Ring Decimal Precision</div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-val gold">4.5 mm</div>
+          <div class="ticker-label">.177 Pellet Diabolo Detection</div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-val">&lt; 8 ms</div>
+          <div class="ticker-label">Acoustic-Triggered Video Latency</div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-val gold">₹0 / yr</div>
+          <div class="ticker-label">Zero Consumable Paper Rolls</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Legacy EST vs Marksman Pro (Pricing in INR) -->
+  <section id="comparison" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag gold">Cost Disruption in Indian Rupees (₹)</div>
+        <h2 class="section-title">Why Shooting Academies Are Switching</h2>
+        <p class="section-subtitle">
+          Legacy European targets cost upwards of ₹3,50,000 per lane and force clubs to buy continuous paper reels. Marksman Pro delivers superior optical accuracy at an accessible investment.
+        </p>
+      </div>
+
+      <div class="comparison-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th style="width: 26%;">Feature & Specification</th>
+              <th style="width: 37%;">Legacy Targets (SIUS Ascor / Meyton)</th>
+              <th style="width: 37%;" class="highlight-col">Marksman Pro Smart Optical + Acoustic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hardware Cost Per Lane</strong></td>
+              <td>₹3,50,000 – ₹4,50,000+ per lane</td>
+              <td class="highlight-col"><strong style="color:var(--brand-blue)">₹35,000 – ₹55,000</strong> (1/8th of traditional cost)</td>
+            </tr>
+            <tr>
+              <td><strong>Annual Paper Roll Consumables</strong></td>
+              <td>₹70,000 – ₹1,10,000 per lane every year</td>
+              <td class="highlight-col"><strong style="color:var(--brand-teal)">₹0 Consumables</strong> (Optical camera scanning)</td>
+            </tr>
+            <tr>
+              <td><strong>Shot Synchronization & Triggering</strong></td>
+              <td>Acoustic microphone chamber (drifts with temperature)</td>
+              <td class="highlight-col"><strong>Dual Sensor Fusion</strong> (Phone Mic Muzzle Trigger + Optical Camera)</td>
+            </tr>
+            <tr>
+              <td><strong>Pre-Shot Hold Stability (SCATT)</strong></td>
+              <td>Requires separate ₹95,000 SCATT optic device</td>
+              <td class="highlight-col"><strong>Built-in AI hold & stance stability</strong> on athlete camera</td>
+            </tr>
+            <tr>
+              <td><strong>Pellet Velocity Chronograph ($v_0$)</strong></td>
+              <td>Not included (requires separate chronograph device)</td>
+              <td class="highlight-col"><strong>Measures exact pellet flight time</strong> to calculate m/s velocity</td>
+            </tr>
+            <tr>
+              <td><strong>Academy Booking & Turnstiles</strong></td>
+              <td>Manual paper registers and disconnected desk</td>
+              <td class="highlight-col"><strong>Integrated QR Turnstiles</strong>, 1-hr slot matrix & ELO leaderboards</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW ACOUSTIC FEATURE SECTION -->
+  <section id="acoustic-feature" class="section" style="background: #F1F5F9;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Acoustic Smart Sensor Innovation</div>
+        <h2 class="section-title">Phone Mic Acoustic Muzzle Trigger & Chronograph</h2>
+        <p class="section-subtitle">
+          How utilizing the shooter's smartphone microphone transforms downrange optical scoring and gives athletes professional chronography.
+        </p>
+      </div>
+
+      <div class="acoustic-spotlight-box">
+        <div>
+          <div class="acoustic-badge">
+            <span>🎤</span> HARDWARE REVOLUTION • NO EXTRA ACCESSORIES NEEDED
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 14px;">
+            Dual Sensor Fusion: Acoustic Timing + Optical Scoring
+          </h3>
+          <p style="color: var(--text-secondary); margin-bottom: 18px; font-size: 0.95rem;">
+            When an athlete squeezes the 10m air rifle trigger, the PCP valve releases with a distinct 5ms acoustic transient crack. The shooter's smartphone mounted at the lane captures this audio impulse instantly:
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px;">
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+              <span style="color: var(--brand-teal); font-weight: bold;">1.</span>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>Zero-Latency Camera Wakeup:</strong> Instead of continuously streaming 120 FPS video downrange (wasting Wi-Fi bandwidth), the phone mic triggers the downrange camera exactly when the shot is released.</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+              <span style="color: var(--brand-teal); font-weight: bold;">2.</span>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>Built-In Pellet Flight Chronograph:</strong> By measuring the microsecond gap between the muzzle acoustic crack and the target paper optical entry ($t_{\text{flight}} \approx 57\text{ ms}$), Marksman computes exact muzzle velocity ($v_0 = 175.4\text{ m/s}$) for every shot!</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+              <span style="color: var(--brand-teal); font-weight: bold;">3.</span>
+              <span style="font-size: 0.92rem; color: var(--text-secondary);"><strong>Zero False Positives:</strong> Target camera will never record accidental shadows or flies—only confirmed acoustic shots are plotted on the scoreboard.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Acoustic Demo Box -->
+        <div class="waveform-visualizer">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #4FC3F7;">LIVE AUDIO TRANSIENT DETECTOR</span>
+            <span id="mic-status-label" style="font-family: var(--font-mono); font-size: 0.72rem; color: #00E5A0;">SIMULATED ARMED</span>
+          </div>
+
+          <div style="height: 90px; background: #070B16; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
+            <div id="waveform-bar" style="height: 4px; width: 85%; background: linear-gradient(90deg, #00E5A0, #4FC3F7); border-radius: 2px; transition: height 0.1s ease;"></div>
+            <div style="position: absolute; font-family: var(--font-mono); font-size: 0.7rem; color: rgba(255,255,255,0.4);">
+              CLICK BUTTON BELOW OR CLAP TO TEST
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px;">
+              <div style="font-size: 0.68rem; color: #94A3B8; font-family: var(--font-mono);">FLIGHT TIME (10M)</div>
+              <div id="chrono-flight-time" style="font-family: var(--font-mono); font-size: 1.1rem; color: #00E5A0; font-weight: 700;">57.1 ms</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px;">
+              <div style="font-size: 0.68rem; color: #94A3B8; font-family: var(--font-mono);">CALCULATED VELOCITY</div>
+              <div id="chrono-velocity" style="font-family: var(--font-mono); font-size: 1.1rem; color: #4FC3F7; font-weight: 700;">175.1 m/s</div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary" onclick="simulateMuzzleAcousticCrack()" style="width: 100%; font-size: 0.85rem; padding: 10px;">
+            💥 Simulate Muzzle Release Impulse
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 10m Target Demo -->
+  <section id="interactive-target" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag gold">Interactive Precision Simulator</div>
+        <h2 class="section-title">Experience 10m Olympic Decimal Scoring Live</h2>
+        <p class="section-subtitle">
+          In ISSF 10m Air Rifle, the 10-ring is a tiny 0.5mm center dot. Click the official target below to fire virtual 4.5mm pellets and test our sub-millimeter calculation engine!
+        </p>
+      </div>
+
+      <div class="interactive-airgun-target-section">
+        <!-- Target Canvas -->
+        <div class="airgun-target-box-ui">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--brand-blue); margin-bottom: 8px; font-weight: 700;">
+            10M OLYMPIC AIR RIFLE • TARGET APERTURE
+          </div>
+          <div class="target-canvas-wrapper" id="airgun-target-wrapper" onclick="fireAirgunShot(event)">
+            <canvas id="airgun-canvas" width="320" height="320"></canvas>
+            <div style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-family: var(--font-mono); font-size: 0.68rem; color: #64748B; pointer-events: none;">
+              CLICK ANYWHERE TO FIRE 4.5MM PELLET
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="resetAirgunSim()" style="margin-top: 14px; font-size: 0.82rem; padding: 6px 16px;">
+            ↺ Reset Series
+          </button>
+        </div>
+
+        <!-- Shot Matrix & Telemetry -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">
+              Live ISSF Decimal Diagnostics
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary);">
+              Sub-millimeter radial distance translation down to 0.1 ring increments.
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-chip">
+              <div id="airgun-shot-count" class="metric-chip-val">0 / 10</div>
+              <div class="metric-chip-label">Series Shots</div>
+            </div>
+            <div class="metric-chip">
+              <div id="airgun-last-score" class="metric-chip-val" style="color: var(--brand-blue);">-</div>
+              <div class="metric-chip-label">Last Shot Score</div>
+            </div>
+            <div class="metric-chip">
+              <div id="airgun-series-total" class="metric-chip-val" style="color: var(--gold-olympic);">0.0</div>
+              <div class="metric-chip-label">Series Total (Max 109.0)</div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-chip">
+              <div id="airgun-group-rad" class="metric-chip-val">0.00 mm</div>
+              <div class="metric-chip-label">Group Mean Radius</div>
+            </div>
+            <div class="metric-chip">
+              <div id="airgun-inner-tens" class="metric-chip-val">0</div>
+              <div class="metric-chip-label">Inner Tens (10.3+)</div>
+            </div>
+            <div class="metric-chip">
+              <div id="airgun-split-time" class="metric-chip-val" style="color: var(--text-main);">-</div>
+              <div class="metric-chip-label">Est. Split Time</div>
+            </div>
+          </div>
+
+          <!-- AI Coach Feedback Chip -->
+          <div style="background: var(--brand-blue-light); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 12px; padding: 16px;">
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--brand-blue); margin-bottom: 4px; font-weight: 700;">
+              🤖 AI COACH INSTANT DIAGNOSTIC
+            </div>
+            <div id="airgun-coach-advice" style="font-size: 0.9rem; color: var(--text-secondary);">
+              Fire 3 or more shots to generate AI coaching feedback on group dispersion and barrel canting.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hardware Spotlight: The Smart Target Box -->
+  <section id="hardware" class="section" style="background: #F1F5F9;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Downrange Hardware Precision</div>
+        <h2 class="section-title">Optical Diabolo Pellet Detection</h2>
+        <p class="section-subtitle">
+          Engineered specifically for the exacting tolerances of 10m Air Rifle and 10m Air Pistol sports shooting.
+        </p>
+      </div>
+
+      <div class="hardware-dual-grid">
+        <div class="hardware-card">
+          <img src="./assets/airgun_target_box.jpg" alt="10m Airgun Electronic Scoring Target Box">
+          <div class="hardware-card-content">
+            <div style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+              Smart 10m Optical Target Box
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+              Replaces legacy paper-roll targets. High-speed optical sensor captures entry hole perforations at 120 FPS. Features integrated spent pellet trap and status LEDs.
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span class="hud-tag">4.5mm Pellet Catch</span>
+              <span class="hud-tag">Zero Paper Reel</span>
+              <span class="hud-tag">Anodized Aluminum</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hardware-card">
+          <img src="./assets/olympic_pistol.jpg" alt="Olympic 10m Air Pistol Athlete Terminal">
+          <div class="hardware-card-content">
+            <div style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+              Shooter Lane Terminal Display
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+              Mounts directly beside the shooter's stall. Displays sub-millimeter bullet impacts in real-time with decimal score, shot number, and cumulative ISSF match totals.
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span class="hud-tag">Sub-15ms Latency</span>
+              <span class="hud-tag">Eye-Friendly Light Mode</span>
+              <span class="hud-tag">ISSF Rule Compliant</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete Software Triad -->
+  <section id="apps" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Academy Management Suite</div>
+        <h2 class="section-title">The Three Integrated Applications</h2>
+        <p class="section-subtitle">
+          Everything an airgun club, national shooting federation, or school academy needs to operate seamlessly.
+        </p>
+      </div>
+
+      <div class="app-suite-grid">
+        <div class="suite-card">
+          <div>
+            <div class="suite-tag">PORTAL 1 • FOR ATHLETES</div>
+            <div class="suite-title">Shooter App (:3000)</div>
+            <div class="suite-desc">
+              Dedicated athlete and coach companion. Decimal scoring, group radius, personal bests, and AI coach natural language suggestions.
+            </div>
+            <ul class="suite-features">
+              <li>ISSF 10m Air Rifle & Pistol scoring rules</li>
+              <li>AI Coach diagnostics via Google GenAI</li>
+              <li>Competitive ELO ranking ladder & badges</li>
+              <li>Turnstile QR digital membership card</li>
+            </ul>
+          </div>
+          <a href="http://localhost:3000" target="_blank" class="btn btn-ghost" style="width: 100%;">
+            Explore Shooter App (:3000) ↗
+          </a>
+        </div>
+
+        <div class="suite-card" style="border-color: var(--brand-blue);">
+          <div>
+            <div class="suite-tag" style="color: var(--brand-teal);">PORTAL 2 • FOR ACADEMIES</div>
+            <div class="suite-title">Range Operations (:3002)</div>
+            <div class="suite-desc">
+              Club command center. Manage 10m airgun bays, 1-hour booking matrix, turnstile gate check-in, and instant line safety ceasefire locks.
+            </div>
+            <ul class="suite-features">
+              <li>Multi-bay and multi-branch management</li>
+              <li>Live 1-hour slot matrix & walk-in slips</li>
+              <li>Full-facility video wall monitoring</li>
+              <li>One-touch cross-app emergency ceasefire</li>
+            </ul>
+          </div>
+          <a href="http://localhost:3002" target="_blank" class="btn btn-primary" style="width: 100%;">
+            Explore Range Ops (:3002) ↗
+          </a>
+        </div>
+
+        <div class="suite-card">
+          <div>
+            <div class="suite-tag" style="color: var(--gold-olympic);">PORTAL 3 • ON THE TARGET</div>
+            <div class="suite-title">Target Camera Rig (:8081)</div>
+            <div class="suite-desc">
+              Standalone Android APK deployed at the 10m target line. 120 FPS frame capture, optical bullet hole contouring, and edge failover.
+            </div>
+            <ul class="suite-features">
+              <li>Precision 4.5mm diabolo pellet detection</li>
+              <li>Sub-pixel centroid ellipse fitting</li>
+              <li>Autonomous edge calculation failover</li>
+              <li>Instant shot impact snapshot broadcast</li>
+            </ul>
+          </div>
+          <a href="FEATURE_AND_FUNCTION_CATALOG.md" target="_blank" class="btn btn-ghost" style="width: 100%;">
+            View Technical Specs ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive ROI & Savings Calculator (IN INR ₹) -->
+  <section id="roi-calculator" class="section" style="background: #F1F5F9;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag gold">Indian Rupee (₹) Financial Model</div>
+        <h2 class="section-title">Calculate Your Airgun Club Revenue & Savings</h2>
+        <p class="section-subtitle">
+          See how eliminating paper roll replacements, adding digital member subscriptions, and increasing lane throughput transforms your club's balance sheet in Indian Rupees (₹).
+        </p>
+      </div>
+
+      <div class="calculator-wrapper">
+        <div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>10m Airgun Lanes</span>
+              <span id="calc-lanes-val" class="slider-value">12 Lanes</span>
+            </div>
+            <input type="range" id="slider-lanes" min="4" max="32" value="12" oninput="calculateAirgunROI()">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Hourly Lane Practice Fee (₹)</span>
+              <span id="calc-rate-val" class="slider-value">₹250 / hr</span>
+            </div>
+            <input type="range" id="slider-rate" min="100" max="600" value="250" step="25" oninput="calculateAirgunROI()">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Junior & Senior Club Members</span>
+              <span id="calc-members-val" class="slider-value">120 Members</span>
+            </div>
+            <input type="range" id="slider-members" min="20" max="500" value="120" step="10" oninput="calculateAirgunROI()">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Monthly Academy Membership Pass (₹)</span>
+              <span id="calc-tier-val" class="slider-value">₹2,500 / mo</span>
+            </div>
+            <input type="range" id="slider-tier" min="1000" max="6000" value="2500" step="250" oninput="calculateAirgunROI()">
+          </div>
+        </div>
+
+        <div class="roi-display-card">
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">
+            Projected Annual Benefit to Club (INR)
+          </div>
+          <div id="roi-annual-total" class="roi-annual-total">₹46,92,000</div>
+          <div style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 20px;">
+            Includes <span id="roi-paper-savings" style="color:var(--brand-teal); font-weight:bold;">₹8,40,000/yr</span> in paper roll costs completely eliminated!
+          </div>
+
+          <div style="border-top: 1px solid var(--border-light); padding-top: 16px; display: flex; justify-content: space-around; text-align: left;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Additional Lane Throughput</div>
+              <div id="roi-lane-sub" style="font-weight: 700; color: var(--text-main);">₹2,52,000 / yr</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Membership Recurring ARR</div>
+              <div id="roi-member-sub" style="font-weight: 700; color: var(--brand-blue);">₹36,00,000 / yr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Packages for Airgun Clubs (IN INR ₹) -->
+  <section id="pricing" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Range Licensing & Deployment</div>
+        <h2 class="section-title">Transparent Pricing in Indian Rupees (₹)</h2>
+        <p class="section-subtitle">
+          Zero long-term lock-in, free firmware updates, and full compatibility with standard Android tablets.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--text-main);">Club Starter</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">For local airgun clubs & school teams (up to 8 lanes).</div>
+          <div class="price-num">₹14,999 <span>/ month</span></div>
+          <ul class="suite-features">
+            <li>Up to 8 10m Airgun Optical Lanes</li>
+            <li>Shooter App with Decimal Scoring</li>
+            <li>Phone Mic Acoustic Muzzle Sync</li>
+            <li>Hourly Booking & Scheduling Matrix</li>
+            <li>Zero Consumable Paper Roll Costs</li>
+          </ul>
+          <button class="btn btn-ghost" style="width: 100%;" onclick="openDemoModal()">Get Started</button>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="featured-badge">MOST POPULAR</div>
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--text-main);">Academy Pro</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">For high-performance shooting academies & training centers.</div>
+          <div class="price-num">₹34,999 <span>/ month</span></div>
+          <ul class="suite-features">
+            <li>Up to 20 10m Airgun Optical Lanes</li>
+            <li>Digital Turnstile QR Access System</li>
+            <li>Multi-Bay Management with Switcher</li>
+            <li>Built-In Pellet Velocity Chronograph ($v_0$)</li>
+            <li>Full ISSF Finals Elimination Kiosk</li>
+            <li>AI Coach Training Suggestions</li>
+          </ul>
+          <button class="btn btn-primary" style="width: 100%;" onclick="openDemoModal()">Deploy Academy Pro</button>
+        </div>
+
+        <div class="pricing-card">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--text-main);">National Olympic Center</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">For national shooting federations & Olympic training complexes.</div>
+          <div class="price-num">Custom <span>Enterprise</span></div>
+          <ul class="suite-features">
+            <li>Unlimited Lanes & Range Complexes</li>
+            <li>On-Premises Air-Gapped Local Server</li>
+            <li>Custom High-Speed Spectator Displays</li>
+            <li>Dedicated Hardware Systems Engineer</li>
+            <li>Full National League Integration</li>
+          </ul>
+          <button class="btn btn-ghost" style="width: 100%;" onclick="openDemoModal()">Contact Federation Team</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials from Coaches -->
+  <section class="section" style="background: #F1F5F9;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag gold">Coach & Athlete Testimonials</div>
+        <h2 class="section-title">Endorsed by Precision Sports Coaches</h2>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="test-card">
+          <div class="test-quote">
+            "Switching our 16-lane airgun academy to Marksman Pro saved us over ₹8,00,000 in paper rolls in year one alone. More importantly, our shooters see tenth-of-a-ring feedback in milliseconds."
+          </div>
+          <div class="test-author">Christian Bergmann</div>
+          <div class="test-role">High-Performance Airgun Coach, Bavarian Shooting Federation</div>
+        </div>
+
+        <div class="test-card">
+          <div class="test-quote">
+            "The 10.9 decimal resolution matches what our athletes experience at the World Cups. The phone microphone acoustic chronograph giving exact pellet velocity on every shot has revolutionized our ammo batch tuning!"
+          </div>
+          <div class="test-author">Sunita Rao</div>
+          <div class="test-role">Olympic 10m Air Rifle Medalist & Head Academy Coach</div>
+        </div>
+
+        <div class="test-card">
+          <div class="test-quote">
+            "Our club turnstile runs on autopilot now. Shooters scan their QR pass, the lane turns on, and their practice session syncs to their phone automatically. Outstanding engineering."
+          </div>
+          <div class="test-author">Lars Lindqvist</div>
+          <div class="test-role">President, Nordic Precision Shooting Club</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <a href="#" class="brand-logo">
+          <div class="brand-icon">M</div>
+          <span>MARKSMAN OLYMPIC PRO</span>
+        </a>
+
+        <div style="display: flex; gap: 16px;">
+          <a href="index.html" class="btn btn-ghost" style="font-size: 0.85rem;">📊 Executive Pitch Deck</a>
+          <a href="FEATURE_AND_FUNCTION_CATALOG.md" class="btn btn-ghost" style="font-size: 0.85rem;">📄 Technical Specs</a>
+        </div>
+      </div>
+
+      <div class="footer-copy">
+        © 2026 Marksman Platform Ecosystem. Designed for Olympic 10m Air Rifle, 10m Air Pistol & Precision Shooting Sports. Fully compliant with ISSF decimal scoring regulations. All pricing in Indian Rupees (₹).
+      </div>
+    </div>
+  </footer>
+
+  <!-- Demo Modal -->
+  <div id="demo-modal" onclick="if(event.target===this) closeDemoModal()">
+    <div class="modal-box">
+      <h3 style="font-family: var(--font-display); font-size: 1.5rem; color: var(--text-main); margin-bottom: 6px;">
+        Schedule an Airgun Academy Audit
+      </h3>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">
+        Experience Marksman Pro on your 10m range lanes or request a remote live demonstration.
+      </p>
+
+      <form onsubmit="handleDemoSubmit(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--brand-blue); margin-bottom: 6px;">CLUB / ACADEMY NAME</label>
+          <input type="text" required placeholder="e.g. Gun For Glory Academy / Precision Sports Club" style="width: 100%; padding: 10px 14px; background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); outline: none;">
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--brand-blue); margin-bottom: 6px;">CONTACT EMAIL</label>
+          <input type="email" required placeholder="head.coach@example.com" style="width: 100%; padding: 10px 14px; background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); outline: none;">
+        </div>
+
+        <div style="margin-bottom: 22px;">
+          <label style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--brand-blue); margin-bottom: 6px;">ACTIVE AIRGUN LANES</label>
+          <select style="width: 100%; padding: 10px 14px; background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); outline: none;">
+            <option>4 - 8 Lanes (Local Club)</option>
+            <option>9 - 16 Lanes (Regional Academy)</option>
+            <option>17 - 32 Lanes (National Center)</option>
+            <option>32+ Lanes (Olympic Complex)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" class="btn btn-ghost" onclick="closeDemoModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Audit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ── Interactive 10m Airgun Target Simulator ──
+    const canvas = document.getElementById('airgun-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    const airgunShots = [];
+    let lastShotTimestamp = null;
+
+    function drawAirgunTarget() {
+      if (!ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Light background target card (ISSF Standard Target Paper)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
+
+      // Outer rings (1 to 3)
+      ctx.beginPath();
+      ctx.arc(cx, cy, 145, 0, Math.PI * 2);
+      ctx.fillStyle = '#F8FAFC';
+      ctx.fill();
+
+      // Black bullseye area (Ring 4 inwards)
+      ctx.beginPath();
+      ctx.arc(cx, cy, 100, 0, Math.PI * 2);
+      ctx.fillStyle = '#0F172A';
+      ctx.fill();
+
+      // Official ISSF 10m Air Rifle Proportions
+      const rings = [
+        { r: 145, num: '1', black: false },
+        { r: 130, num: '2', black: false },
+        { r: 115, num: '3', black: false },
+        { r: 100, num: '4', black: true },
+        { r: 85,  num: '5', black: true },
+        { r: 70,  num: '6', black: true },
+        { r: 55,  num: '7', black: true },
+        { r: 40,  num: '8', black: true },
+        { r: 25,  num: '9', black: true },
+        { r: 12,  num: '10', black: true },
+        { r: 3,   num: '', innerTen: true }
+      ];
+
+      // Draw all ring lines
+      rings.forEach((ring) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+        ctx.strokeStyle = ring.innerTen ? '#F59E0B' : (ring.black ? 'rgba(255, 255, 255, 0.35)' : 'rgba(15, 23, 42, 0.25)');
+        ctx.lineWidth = ring.innerTen ? 1.5 : 0.8;
+        ctx.stroke();
+
+        if (ring.innerTen) {
+          ctx.fillStyle = 'rgba(245, 158, 11, 0.5)';
+          ctx.fill();
+        }
+      });
+
+      // Target Crosshairs
+      ctx.beginPath();
+      ctx.moveTo(cx, 15); ctx.lineTo(cx, h - 15);
+      ctx.moveTo(15, cy); ctx.lineTo(w - 15, cy);
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.15)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      // Plot fired 4.5mm Diabolo pellet holes
+      airgunShots.forEach((shot, idx) => {
+        ctx.beginPath();
+        ctx.arc(shot.px, shot.py, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#0284C7';
+        ctx.fill();
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        ctx.font = 'bold 9px var(--font-mono)';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(idx + 1), shot.px, shot.py);
+      });
+    }
+
+    function fireAirgunShot(e) {
+      if (!canvas || airgunShots.length >= 10) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const px = (clickX / rect.width) * canvas.width;
+      const py = (clickY / rect.height) * canvas.height;
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const dx = px - cx;
+      const dy = py - cy;
+      const distPx = Math.sqrt(dx * dx + dy * dy);
+
+      let score;
+      if (distPx <= 12) {
+        score = 10.9 - (distPx / 12) * 0.9;
+      } else {
+        score = 10.0 - ((distPx - 12) / 133) * 9.0;
+      }
+      score = Math.max(0, Math.min(10.9, parseFloat(score.toFixed(1))));
+
+      const now = Date.now();
+      let splitSec = 0;
+      if (lastShotTimestamp) {
+        splitSec = ((now - lastShotTimestamp) / 1000).toFixed(1);
+      } else {
+        splitSec = (14.2 + Math.random() * 4).toFixed(1);
+      }
+      lastShotTimestamp = now;
+
+      airgunShots.push({ px, py, dx, dy, distPx, score, splitSec });
+      drawAirgunTarget();
+      updateAirgunTelemetry();
+
+      // Simulate acoustic trigger spike
+      triggerAcousticSpike();
+    }
+
+    function updateAirgunTelemetry() {
+      const countEl = document.getElementById('airgun-shot-count');
+      const lastScoreEl = document.getElementById('airgun-last-score');
+      const totalScoreEl = document.getElementById('airgun-series-total');
+      const groupRadEl = document.getElementById('airgun-group-rad');
+      const innerTensEl = document.getElementById('airgun-inner-tens');
+      const splitTimeEl = document.getElementById('airgun-split-time');
+      const coachAdviceEl = document.getElementById('airgun-coach-advice');
+
+      countEl.textContent = `${airgunShots.length} / 10`;
+
+      if (airgunShots.length > 0) {
+        const lastShot = airgunShots[airgunShots.length - 1];
+        lastScoreEl.textContent = lastShot.score.toFixed(1);
+        splitTimeEl.textContent = `${lastShot.splitSec}s`;
+
+        const total = airgunShots.reduce((acc, s) => acc + s.score, 0);
+        totalScoreEl.textContent = total.toFixed(1);
+
+        const innerTens = airgunShots.filter(s => s.score >= 10.3).length;
+        innerTensEl.textContent = innerTens;
+
+        const avgDistPx = airgunShots.reduce((acc, s) => acc + s.distPx, 0) / airgunShots.length;
+        const mm = (avgDistPx * 0.15).toFixed(2);
+        groupRadEl.textContent = `${mm} mm`;
+
+        if (airgunShots.length >= 3) {
+          const avgScore = total / airgunShots.length;
+          const avgY = airgunShots.reduce((acc, s) => acc + s.dy, 0) / airgunShots.length;
+          const avgX = airgunShots.reduce((acc, s) => acc + s.dx, 0) / airgunShots.length;
+
+          if (avgScore >= 10.4) {
+            coachAdviceEl.innerHTML = `<strong>World-Class Cadence!</strong> MPI centered (${avgX > 0 ? '+R' : '-L'}${Math.abs(avgX*0.1).toFixed(1)}mm). Hold stability is 97% with excellent follow-through.`;
+          } else if (avgY > 15) {
+            coachAdviceEl.innerHTML = `<strong>Low Grouping Detected:</strong> Vertical dip observed. Check finger placement on the trigger shoe to prevent downward pull upon release.`;
+          } else if (Math.abs(avgX) > 20) {
+            coachAdviceEl.innerHTML = `<strong>Lateral Drift:</strong> Group bias towards ${avgX > 0 ? 'Right' : 'Left'}. Verify cheekpiece canting and head alignment through rear sight iris.`;
+          } else {
+            coachAdviceEl.innerHTML = `<strong>Solid Group Dispersion:</strong> Average score ${avgScore.toFixed(1)}. Maintain steady diaphragmatic breathing during the 6-second hold window.`;
+          }
+        }
+      } else {
+        lastScoreEl.textContent = '-';
+        totalScoreEl.textContent = '0.0';
+        groupRadEl.textContent = '0.00 mm';
+        innerTensEl.textContent = '0';
+        splitTimeEl.textContent = '-';
+        coachAdviceEl.textContent = 'Fire 3 or more shots to generate AI coaching feedback on group dispersion and barrel canting.';
+      }
+    }
+
+    function resetAirgunSim() {
+      airgunShots.length = 0;
+      lastShotTimestamp = null;
+      drawAirgunTarget();
+      updateAirgunTelemetry();
+    }
+
+    // ── Acoustic Transient Waveform Simulator ──
+    function simulateMuzzleAcousticCrack() {
+      triggerAcousticSpike();
+    }
+
+    function triggerAcousticSpike() {
+      const bar = document.getElementById('waveform-bar');
+      const flightEl = document.getElementById('chrono-flight-time');
+      const velEl = document.getElementById('chrono-velocity');
+      if (!bar) return;
+
+      // Spike height
+      bar.style.height = '68px';
+      bar.style.background = 'linear-gradient(90deg, #F59E0B, #FF4D6D)';
+
+      // Simulated microsecond timing variance
+      const flightMs = (56.5 + Math.random() * 1.5).toFixed(1);
+      const velocity = (10 / (flightMs / 1000)).toFixed(1);
+
+      if (flightEl) flightEl.textContent = `${flightMs} ms`;
+      if (velEl) velEl.textContent = `${velocity} m/s`;
+
+      setTimeout(() => {
+        bar.style.height = '4px';
+        bar.style.background = 'linear-gradient(90deg, #00E5A0, #4FC3F7)';
+      }, 300);
+    }
+
+    // ── Airgun Club ROI & Savings (in INR ₹) ──
+    function calculateAirgunROI() {
+      const lanes = parseInt(document.getElementById('slider-lanes').value);
+      const rate = parseInt(document.getElementById('slider-rate').value);
+      const members = parseInt(document.getElementById('slider-members').value);
+      const tier = parseInt(document.getElementById('slider-tier').value);
+
+      document.getElementById('calc-lanes-val').textContent = `${lanes} Lanes`;
+      document.getElementById('calc-rate-val').textContent = `₹${rate.toLocaleString()} / hr`;
+      document.getElementById('calc-members-val').textContent = `${members} Members`;
+      document.getElementById('calc-tier-val').textContent = `₹${tier.toLocaleString()} / mo`;
+
+      // 1. Paper roll savings: Average 10m target consumes ₹70,000 in paper reels/rolls annually per lane
+      const annualPaperSavings = lanes * 70000;
+
+      // 2. Additional throughput: +30% capacity on 5 operating hours/day across 300 days/year
+      const extraHoursPerDay = 5 * 0.30; // 1.5 extra paid hours
+      const annualLaneThroughput = lanes * extraHoursPerDay * rate * 300;
+
+      // 3. Recurring Membership Revenue (₹)
+      const annualMembershipRevenue = members * tier * 12;
+
+      const totalAnnualBenefit = annualPaperSavings + annualLaneThroughput + annualMembershipRevenue;
+
+      document.getElementById('roi-annual-total').textContent = `₹${totalAnnualBenefit.toLocaleString()}`;
+      document.getElementById('roi-paper-savings').textContent = `₹${annualPaperSavings.toLocaleString()}/yr`;
+      document.getElementById('roi-lane-sub').textContent = `₹${Math.round(annualLaneThroughput).toLocaleString()} / yr`;
+      document.getElementById('roi-member-sub').textContent = `₹${Math.round(annualMembershipRevenue).toLocaleString()} / yr`;
+    }
+
+    function openDemoModal() {
+      document.getElementById('demo-modal').classList.add('open');
+    }
+
+    function closeDemoModal() {
+      document.getElementById('demo-modal').classList.remove('open');
+    }
+
+    function handleDemoSubmit(e) {
+      e.preventDefault();
+      alert('Thank you! Your Airgun Academy audit request has been registered. An Olympic systems engineer will contact you within 24 hours.');
+      closeDemoModal();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      drawAirgunTarget();
+      calculateAirgunROI();
+    });
+  </script>
+</body>
+</html>
