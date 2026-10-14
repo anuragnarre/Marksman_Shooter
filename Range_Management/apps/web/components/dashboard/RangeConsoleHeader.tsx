@@ -7,12 +7,14 @@ import { useAuth } from "../../contexts/auth-context";
 interface RangeConsoleHeaderProps {
   rangeStatus: "HOT" | "COLD";
   onToggleStatus: () => void;
+  onToggleSidebar?: () => void;
   className?: string;
 }
 
 export function RangeConsoleHeader({
   rangeStatus,
   onToggleStatus,
+  onToggleSidebar,
   className = "",
 }: RangeConsoleHeaderProps) {
   const { resolvedTheme, toggleTheme, dashboardTheme, setDashboardTheme } = useTheme();
@@ -20,14 +22,25 @@ export function RangeConsoleHeader({
 
   return (
     <header
-      className={`fixed top-0 left-56 md:left-64 right-0 h-14 bg-surface/95 backdrop-blur-md border-b border-outline-variant/20 shadow-sm z-40 flex items-center justify-between px-4 lg:px-6 select-none ${className}`}
+      className={`fixed top-0 left-0 lg:left-64 right-0 h-14 bg-surface/95 backdrop-blur-md border-b border-outline-variant/20 shadow-sm z-40 flex items-center justify-between px-3 sm:px-4 lg:px-6 select-none ${className}`}
     >
-      {/* Left: Range Selector & Environmental Telemetry */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/20">
+      {/* Left: Mobile Menu Toggle + Range Selector & Environmental Telemetry */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            type="button"
+            className="lg:hidden p-1.5 -ml-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+            title="Toggle Navigation Menu"
+          >
+            <span className="material-symbols-outlined text-[22px]">menu</span>
+          </button>
+        )}
+
+        <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 sm:px-3 py-1.5 rounded-lg border border-outline-variant/20">
           <span className="material-symbols-outlined text-outline text-[16px]">corporate_fare</span>
-          <span className="font-telemetry-sm text-[12px] text-on-surface font-semibold">
-            Main Indoor Range - 25yd
+          <span className="font-telemetry-sm text-[11px] sm:text-[12px] text-on-surface font-semibold truncate max-w-[130px] sm:max-w-none">
+            Main Indoor - 25yd
           </span>
           <span className="material-symbols-outlined text-outline text-[16px]">arrow_drop_down</span>
         </div>
@@ -56,12 +69,12 @@ export function RangeConsoleHeader({
       </div>
 
       {/* Right: Master Status Pill, Theme Switcher, Optics Mode Toggle, User Avatar */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5">
         {/* Master Range Status Badge */}
         <button
           onClick={onToggleStatus}
           title="Click to toggle Range Master Status"
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-label-caps uppercase tracking-wider font-bold transition-all shadow-sm ${
+          className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-label-caps uppercase tracking-wider font-bold transition-all shadow-sm ${
             rangeStatus === "HOT"
               ? "bg-secondary-container text-on-secondary-container hover:opacity-90 animate-pulse border border-secondary"
               : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest border border-outline-variant"
@@ -72,14 +85,15 @@ export function RangeConsoleHeader({
               rangeStatus === "HOT" ? "bg-secondary" : "bg-outline"
             }`}
           />
-          <span>{rangeStatus === "HOT" ? "● RANGE HOT / LIVE FIRE" : "○ RANGE COLD / CEASE FIRE"}</span>
+          <span className="hidden sm:inline">{rangeStatus === "HOT" ? "● RANGE HOT / LIVE FIRE" : "○ RANGE COLD / CEASE FIRE"}</span>
+          <span className="sm:hidden">{rangeStatus === "HOT" ? "HOT" : "COLD"}</span>
         </button>
 
         {/* Dashboard Interface Theme Switcher Pill */}
         <div className="hidden sm:flex items-center bg-surface-container-low p-0.5 rounded-lg border border-outline-variant/20 text-[11px] font-label-caps">
           <button
             onClick={() => setDashboardTheme("compact-tactical")}
-            className={`px-2.5 py-1 rounded-md transition-all ${
+            className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md transition-all ${
               dashboardTheme === "compact-tactical"
                 ? "bg-primary text-on-primary font-bold shadow-xs"
                 : "text-on-surface-variant hover:text-on-surface"
@@ -90,7 +104,7 @@ export function RangeConsoleHeader({
           </button>
           <button
             onClick={() => setDashboardTheme("harmonized-precision")}
-            className={`px-2.5 py-1 rounded-md transition-all ${
+            className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md transition-all ${
               dashboardTheme === "harmonized-precision"
                 ? "bg-primary text-on-primary font-bold shadow-xs"
                 : "text-on-surface-variant hover:text-on-surface"
@@ -114,7 +128,7 @@ export function RangeConsoleHeader({
         </button>
 
         {/* User / RSO Profile */}
-        <div className="flex items-center gap-2 pl-1 bg-surface-container-low py-1 px-2.5 rounded-lg border border-outline-variant/15">
+        <div className="flex items-center gap-1.5 sm:gap-2 pl-1 bg-surface-container-low py-1 px-1.5 sm:px-2.5 rounded-lg border border-outline-variant/15">
           <div className="flex flex-col text-right hidden sm:flex">
             <span className="font-body-md text-[12px] text-on-surface leading-tight font-semibold">
               {user?.name || "Sgt. Miller"}

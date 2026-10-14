@@ -6,9 +6,15 @@ import { usePathname } from "next/navigation";
 
 interface RangeConsoleSidebarProps {
   className?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function RangeConsoleSidebar({ className = "" }: RangeConsoleSidebarProps) {
+export function RangeConsoleSidebar({
+  className = "",
+  isOpen = false,
+  onClose,
+}: RangeConsoleSidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
@@ -20,24 +26,47 @@ export function RangeConsoleSidebar({ className = "" }: RangeConsoleSidebarProps
   ];
 
   return (
-    <aside
-      className={`fixed left-0 top-0 h-full w-56 md:w-64 bg-surface-container-low border-r border-outline-variant/20 shadow-xl z-50 flex flex-col justify-between select-none ${className}`}
-    >
-      <div className="flex flex-col">
-        {/* Brand Header */}
-        <div className="h-14 flex items-center gap-3 px-4 bg-surface-container-lowest border-b border-outline-variant/15">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
-            <span className="font-headline-md font-bold text-primary text-[16px]">M</span>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 lg:hidden transition-opacity duration-200"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={`fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 shadow-2xl lg:shadow-md z-50 flex flex-col justify-between select-none transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        } ${className}`}
+      >
+        <div className="flex flex-col">
+          {/* Brand Header */}
+          <div className="h-14 flex items-center justify-between px-4 bg-surface-container-lowest border-b border-outline-variant/15">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
+                <span className="font-headline-md font-bold text-primary text-[16px]">M</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-label-caps text-[11px] uppercase text-on-surface font-bold tracking-wider">
+                  MARKSMAN
+                </span>
+                <span className="font-telemetry-sm text-[9px] uppercase text-outline tracking-wider leading-none">
+                  Range Console
+                </span>
+              </div>
+            </div>
+
+            {/* Mobile Close Button */}
+            <button
+              onClick={onClose}
+              type="button"
+              className="lg:hidden p-1.5 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors"
+              title="Close Navigation Menu"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
           </div>
-          <div className="flex flex-col">
-            <span className="font-label-caps text-[11px] uppercase text-on-surface font-bold tracking-wider">
-              MARKSMAN
-            </span>
-            <span className="font-telemetry-sm text-[9px] uppercase text-outline tracking-wider leading-none">
-              Range Console
-            </span>
-          </div>
-        </div>
 
         {/* Facility Operations Nav */}
         <div className="px-3 py-3">
@@ -95,5 +124,6 @@ export function RangeConsoleSidebar({ className = "" }: RangeConsoleSidebarProps
         </div>
       </div>
     </aside>
+  </>
   );
 }

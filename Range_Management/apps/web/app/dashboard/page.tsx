@@ -101,6 +101,8 @@ export default function DashboardPage() {
     }
   };
 
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
   if (!mounted) {
     return (
       <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center font-sans">
@@ -115,16 +117,20 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans select-none overflow-x-hidden">
       {/* Stitch Facility Operations Left Sidebar */}
-      <RangeConsoleSidebar />
+      <RangeConsoleSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Stitch Fixed Top Command Header */}
       <RangeConsoleHeader
         rangeStatus={rangeStatus}
         onToggleStatus={handleToggleStatus}
+        onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
       />
 
       {/* Main Command Center Body */}
-      <main className="pl-56 md:pl-64 pt-14 min-h-screen bg-surface w-full p-4 md:p-6 overflow-y-auto">
+      <main className="pl-0 lg:pl-64 pt-14 pb-20 lg:pb-6 min-h-screen bg-surface w-full p-2 sm:p-4 md:p-6 overflow-y-auto">
         {dashboardTheme === "harmonized-precision" ? (
           <CommandCenterLight
             rangeStatus={rangeStatus}
@@ -141,6 +147,33 @@ export default function DashboardPage() {
           />
         )}
       </main>
+
+      {/* Mobile Ergonomic Bottom Navigation Bar (Hidden on lg+ / Desktop / Fold Unfolded) */}
+      <nav className="fixed bottom-0 left-0 right-0 h-14 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/20 z-40 flex items-center justify-around lg:hidden select-none px-2 shadow-lg">
+        <Link href="/dashboard" className="flex flex-col items-center gap-0.5 text-primary py-1">
+          <span className="material-symbols-outlined text-[20px]">dashboard</span>
+          <span className="text-[10px] font-bold">Console</span>
+        </Link>
+        <Link href="/lanes" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
+          <span className="material-symbols-outlined text-[20px]">my_location</span>
+          <span className="text-[10px] font-medium">Lanes</span>
+        </Link>
+        <Link href="/checkin" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
+          <span className="material-symbols-outlined text-[20px]">badge</span>
+          <span className="text-[10px] font-medium">Kiosk</span>
+        </Link>
+        <Link href="/safety" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
+          <span className="material-symbols-outlined text-[20px]">report</span>
+          <span className="text-[10px] font-medium">Safety</span>
+        </Link>
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1"
+        >
+          <span className="material-symbols-outlined text-[20px]">menu</span>
+          <span className="text-[10px] font-medium">More</span>
+        </button>
+      </nav>
     </div>
   );
 }

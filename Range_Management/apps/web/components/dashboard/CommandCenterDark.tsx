@@ -14,15 +14,15 @@ interface CommandCenterDarkProps {
 
 export function CommandCenterDark({ rangeStatus, lanes, isLoading, onToggleStatus }: CommandCenterDarkProps) {
   return (
-    <div className="flex flex-col w-full p-space-md gap-space-md select-none h-full overflow-y-auto">
+    <div className="flex flex-col w-full p-1 sm:p-2 lg:p-space-md gap-2.5 sm:gap-space-md select-none">
       {/* Global Range Status Banner */}
       {rangeStatus === "COLD" && (
-        <div className="w-full bg-secondary-container/90 border border-secondary rounded p-space-sm flex items-center justify-between shadow-sm animate-pulse shrink-0">
-          <div className="flex items-center gap-3">
+        <div className="w-full bg-secondary-container/90 border border-secondary rounded p-2.5 sm:p-space-sm flex items-center justify-between shadow-sm animate-pulse shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="material-symbols-outlined text-white text-[20px]">campaign</span>
             <div>
-              <h3 className="text-white font-bold text-sm uppercase tracking-wider">Master All-Range Cease-Fire Engaged</h3>
-              <p className="text-[11px] text-white/90">All firing has ceased. Siren sounding. Awaiting RSO clearance.</p>
+              <h3 className="text-white font-bold text-xs sm:text-sm uppercase tracking-wider">Master All-Range Cease-Fire Engaged</h3>
+              <p className="text-[10px] sm:text-[11px] text-white/90">All firing has ceased. Siren sounding. Awaiting RSO clearance.</p>
             </div>
           </div>
         </div>
@@ -30,7 +30,7 @@ export function CommandCenterDark({ rangeStatus, lanes, isLoading, onToggleStatu
 
       <KpiGrid />
 
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-gutter w-full items-start flex-1 min-h-0 pb-space-lg">
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-3 lg:gap-gutter w-full items-start flex-1 min-h-0 pb-6 lg:pb-space-lg">
         <LaneMatrix lanes={lanes} isLoading={isLoading} />
         <RightPanel rangeStatus={rangeStatus} onToggleStatus={onToggleStatus} isLoading={isLoading} />
       </section>

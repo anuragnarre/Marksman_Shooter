@@ -17,14 +17,14 @@ export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPane
   ]);
 
   return (
-    <div className="col-span-4 flex flex-col gap-space-sm h-[500px] xl:h-auto">
+    <div className="col-span-12 xl:col-span-4 flex flex-col gap-space-sm w-full">
       {/* Action Panel: Call Range Cold & Quick Check-in */}
       <div className="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
         <div className="flex items-center justify-between">
           <span className="font-label-caps text-label-caps uppercase text-outline tracking-wider">Tactical Override</span>
           <span className="font-telemetry-sm text-[10px] text-tertiary">Direct SCADA Interlock</span>
         </div>
-        <div className="grid grid-cols-2 gap-space-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
           {/* Emergency Button */}
           <button 
             disabled={isLoading}

@@ -125,21 +125,21 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
   const maintCount = displayLanes.filter((l) => l.status === "MAINTENANCE").length;
 
   return (
-    <div className="col-span-12 xl:col-span-8 flex flex-col gap-3 bg-surface-container-low rounded-xl p-4 shadow-md border border-outline-variant/15">
+    <div className="col-span-12 xl:col-span-8 flex flex-col gap-3 bg-surface-container-low rounded-xl p-2.5 sm:p-4 shadow-md border border-outline-variant/15 w-full">
       {/* Matrix Header Controls */}
-      <div className="flex items-center justify-between pb-1 border-b border-outline-variant/10">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-outline-variant/10">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-primary text-[18px]">token</span>
-            <h2 className="font-headline-md text-[16px] text-on-surface font-bold">
-              Live Firing Line Overview &amp; Telemetry Matrix
+            <h2 className="font-headline-md text-[14px] sm:text-[16px] text-on-surface font-bold">
+              Firing Line Overview &amp; Telemetry
             </h2>
           </div>
           <span className="font-telemetry-sm text-[11px] text-outline hidden lg:inline">
             Range Alpha // 12-Bay Automation
           </span>
         </div>
-        <div className="flex items-center gap-1.5 font-label-caps text-[10px]">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 font-label-caps text-[9px] sm:text-[10px]">
           <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active ({activeCount})
           </span>
@@ -156,29 +156,29 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 w-full max-h-[580px] overflow-y-auto pr-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5 w-full lg:max-h-[640px] lg:overflow-y-auto pr-0 lg:pr-1">
         {displayLanes.map((lane) => (
           <LaneCard key={lane.id} lane={lane} />
         ))}
       </div>
 
       {/* Quick Range Firing Bay Visual Preview Overlay Card */}
-      <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 shadow-xs shrink-0 mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 shadow-xs shrink-0 mt-1">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30">
+          <div className="w-9 h-9 rounded-md bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30 shrink-0">
             <span className="material-symbols-outlined text-primary text-[20px]">videocam</span>
           </div>
-          <div className="flex flex-col">
-            <span className="font-label-caps text-[10px] uppercase text-outline font-bold">
+          <div className="flex flex-col min-w-0">
+            <span className="font-label-caps text-[10px] uppercase text-outline font-bold truncate">
               Optical Range Visualiser // Bay Line West
             </span>
-            <span className="font-body-md text-[11px] text-on-surface">
-              Target Retrieval Carrier Motor Bus: 48V DC nominal • Trap Air Vane 880 fpm
+            <span className="font-body-md text-[10px] sm:text-[11px] text-on-surface truncate">
+              Motor Bus: 48V DC nominal • Trap Air 880 fpm
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-md text-[11px] font-semibold rounded flex items-center gap-1 transition-colors border border-outline-variant/30">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button className="w-full sm:w-auto justify-center px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-md text-[11px] font-semibold rounded flex items-center gap-1 transition-colors border border-outline-variant/30">
             <span className="material-symbols-outlined text-[14px]">vertical_align_bottom</span> Recall All Targets
           </button>
         </div>
