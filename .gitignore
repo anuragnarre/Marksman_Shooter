@@ -3,7 +3,7 @@ node_modules/
 .pnp
 .pnp.js
 
-# Build outputs
+# Build outputs & caches
 .next/
 dist/
 build/
@@ -11,18 +11,49 @@ out/
 .turbo/
 *.tsbuildinfo
 
-# Environment variables
+# Python virtual environments & bytecode
+.venv/
+.venv*/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+*.egg-info/
+
+# Secrets, Environment & Credentials (Block all .env variants, preserve .example templates)
 .env
+.env.*
 .env*.local
-.env.development.local
-.env.test.local
-.env.production.local
+!.env.example
+!.env.*.example
+!*.example
+
+# Keystores, Certificates, Private Keys & Tokens
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.p8
+*.pem
+*.key
+*.crt
+*.der
+*.csr
+*token*.txt
+*credentials*.json
+*credentials*.txt
+google-services.json
+GoogleService-Info.plist
+
+# Local Cloudflare tokens & configs
+cloudflare_token*
+.cloudflared/
 
 # Archives and old backups
-Version_1_Core_App exclude from ai scans this is and old build not in use.rar
+"Version_1_Core_App exclude from ai scans this is and old build not in use.rar"
 *.zip
 *.tar.gz
 *.rar
+backups/
 
 # Android / Mobile build caches
 .gradle/
@@ -43,8 +74,12 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Temporary screenshot captures
+# Temporary screenshot captures & binaries (APKs are published in GitHub Releases)
 /*.png
 *.apk
 

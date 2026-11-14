@@ -1,5 +1,32 @@
-Version_1_Core_App exclude from ai scans this is and old build not in use.rar
+# Range Management gitignore
 node_modules/
-.env
+.next/
+out/
+dist/
+build/
+.turbo/
 
+# Environment files
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.*.example
+!*.example
+
+# Keystores and secrets
+*.keystore
+*.jks
+*.pem
+*.key
+*.p12
+
+# Mobile build
+.gradle/
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+Version_1_Core_App exclude from ai scans this is and old build not in use.rar
 *.zip
