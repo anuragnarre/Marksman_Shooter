@@ -9,6 +9,8 @@ import { useToast } from '../../contexts/toast-context';
 
 interface TrajectoryRow { range: number; drop: number; vel: number; ke: number; }
 
+const STORAGE_KEY = 'marksman_ballistics_profiles_v1';
+
 const DEFAULT_PROFILE = {
   name: 'New Profile',
   muzzleVelocityFps: 890,
@@ -17,6 +19,35 @@ const DEFAULT_PROFILE = {
   sightHeightInches: 1.8,
   zeroRangeYards: 50,
 };
+
+function computeTrajectoryLocal(p: typeof DEFAULT_PROFILE): TrajectoryRow[] {
+  const v0 = Math.max(100, Number(p.muzzleVelocityFps) || 890);
+  const weight = Math.max(1, Number(p.pelletWeightGrains) || 18.1);
+  const bc = Math.max(0.005, Number(p.ballisticCoef) || 0.033);
+  const sightHeight = Math.max(0, Number(p.sightHeightInches) || 1.8);
+  const zeroRange = Math.max(1, Number(p.zeroRangeYards) || 50);
+
+  const velAt = (r: number) => v0 / (1 + (r * 0.0018) / bc);
+  const gravDrop = (r: number) => {
+    if (r <= 0) return 0;
+    const avgV = (v0 + velAt(r)) / 2;
+    const t = (r * 3) / avgV;
+    return -0.5 * 32.174 * t * t * 12;
+  };
+  const boreAngle = (sightHeight - gravDrop(zeroRange)) / (zeroRange * 36);
+  const ranges = Array.from(new Set([0, 10, 25, 50, 75, 100, zeroRange])).sort((a, b) => a - b);
+  return ranges.map((r) => {
+    const vel = Math.round(velAt(r));
+    const drop = r === 0 ? -sightHeight : -sightHeight + boreAngle * (r * 36) + gravDrop(r);
+    const ke = (weight * vel * vel) / 450400;
+    return {
+      range: r,
+      drop: Math.abs(drop) < 0.005 ? 0 : +drop.toFixed(2),
+      vel,
+      ke: +ke.toFixed(2),
+    };
+  });
+}
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -37,26 +68,45 @@ export default function BallisticsPage() {
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(DEFAULT_PROFILE);
-  const [trajectory, setTrajectory] = useState<TrajectoryRow[]>([]);
+  const [trajectory, setTrajectory] = useState<TrajectoryRow[]>(() => computeTrajectoryLocal(DEFAULT_PROFILE));
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'drop' | 'velocity'>('drop');
 
   const loadProfiles = useCallback(async () => {
     try {
       const data = await apiFetch<any[]>('/ballistics');
-      setProfiles(data);
-      if (data.length > 0) {
+      if (Array.isArray(data) && data.length > 0) {
+        setProfiles(data);
         setProfile(data[0]);
+        setTrajectory(computeTrajectoryLocal(data[0]));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return;
       }
     } catch {
-      console.error('Failed to load profiles');
+      // fallback to local storage
     }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProfiles(parsed);
+          setProfile(parsed[0]);
+          setTrajectory(computeTrajectoryLocal(parsed[0]));
+        }
+      }
+    } catch {}
   }, []);
 
   useEffect(() => { loadProfiles(); }, [loadProfiles]);
 
   const handleChange = (key: string, value: string) => {
-    setProfile((prev: any) => ({ ...prev, [key]: parseFloat(value) }));
+    if (key === 'name') {
+      setProfile((prev: any) => ({ ...prev, name: value }));
+      return;
+    }
+    const parsed = parseFloat(value);
+    setProfile((prev: any) => ({ ...prev, [key]: Number.isFinite(parsed) ? parsed : 0 }));
   };
 
   const calculate = useCallback(async () => {
@@ -66,16 +116,36 @@ export default function BallisticsPage() {
         method: 'POST',
         body: JSON.stringify(profile),
       });
-      setTrajectory(result.trajectory);
-      // Refresh profiles list to show the newly saved one
-      loadProfiles();
-      toast?.('Trajectory calculated successfully!', 'success');
+      if (result?.trajectory?.length) {
+        setTrajectory(result.trajectory);
+        if (result.profile) {
+          setProfile(result.profile);
+        }
+        await loadProfiles();
+        toast?.('Trajectory calculated and saved!', 'success');
+        return;
+      }
     } catch {
-      toast?.('Calculation failed. Please try again.', 'error');
+      // compute client-side below
     } finally {
       setLoading(false);
     }
-  }, [profile, toast]);
+
+    const computed = computeTrajectoryLocal(profile);
+    setTrajectory(computed);
+    const localProfile = {
+      ...profile,
+      id: profile.id || `local-${Date.now().toString(36)}`,
+      name: (profile.name || '').trim() || 'Custom Load',
+    };
+    setProfile(localProfile);
+    setProfiles((prev) => {
+      const next = [localProfile, ...prev.filter((p) => p.id !== localProfile.id)];
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+    toast?.('Trajectory computed and saved locally', 'success');
+  }, [profile, loadProfiles, toast]);
 
   const fields = [
     { key: 'muzzleVelocityFps', label: 'Muzzle Velocity (FPS)', step: '1' },

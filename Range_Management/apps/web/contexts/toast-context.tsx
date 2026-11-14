@@ -124,13 +124,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         className="fixed z-[100] pointer-events-none"
         style={{
-          top: '1rem',
+          top: 'calc(1rem + env(safe-area-inset-top, 0px))',
           right: '1rem',
           display: 'flex',
           flexDirection: 'column',
           gap: '0.5rem',
           maxWidth: '24rem',
-          width: '100%',
+          width: 'calc(100% - 2rem)',
         }}
       >
         {toasts.map((t) => {
@@ -244,13 +244,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        /* Mobile: bottom positioning */
+        /* Mobile: bottom positioning above mobile nav bar + safe area */
         @media (max-width: 640px) {
           .fixed.z-\\[100\\] {
             top: auto !important;
-            bottom: 1rem !important;
-            right: 0.5rem !important;
-            left: 0.5rem !important;
+            bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+            right: 0.75rem !important;
+            left: 0.75rem !important;
+            width: auto !important;
             max-width: 100% !important;
           }
         }

@@ -9,7 +9,7 @@ import { syncToBackend, isAvailable as isHcAvailable } from '../lib/health-conne
 import { useAuth } from '../contexts/auth-context';
 import type { BiometricReading, BiometricUpdateEvent } from '@shooting-platform/shared-types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3003';
 
 export function BiometricLiveCard({ compact = false }: { compact?: boolean }) {
   const { user } = useAuth();

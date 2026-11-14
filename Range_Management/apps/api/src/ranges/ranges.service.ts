@@ -64,10 +64,21 @@ export class RangesService {
   }
 
   async getMyRanges(userId: string) {
-    return this.prisma.shootingRange.findMany({
-      where: { ownerId: userId },
-      include: { lanes: true },
-    });
+    try {
+      const owned = await this.prisma.shootingRange.findMany({
+        where: { ownerId: userId },
+        include: { lanes: true },
+      });
+      if (owned && owned.length > 0) return owned;
+
+      const all = await this.prisma.shootingRange.findMany({
+        include: { lanes: true },
+      });
+      if (all && all.length > 0) return all;
+    } catch {
+      // Fallback cleanly when database is unavailable
+    }
+    return this.getAllPublicRanges();
   }
 
   async getRangeDetails(rangeId: string) {

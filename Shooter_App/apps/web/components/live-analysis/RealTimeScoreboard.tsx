@@ -33,7 +33,7 @@ export function RealTimeScoreboard({ shots }: RealTimeScoreboardProps) {
         
         <div className="bg-bg-elevated rounded-lg p-4 flex flex-col justify-center items-center">
           <p className="font-body text-xs text-text-secondary uppercase tracking-widest mb-1">Inner Tens</p>
-          <p className="font-mono text-4xl font-bold text-data-blue">{innerTens}</p>
+          <p className="font-mono text-4xl font-bold text-[#4FC3F7]">{innerTens}</p>
         </div>
         
         <div className="bg-bg-elevated rounded-lg p-4 flex flex-col justify-center items-center">
@@ -57,9 +57,9 @@ export function RealTimeScoreboard({ shots }: RealTimeScoreboardProps) {
               key={i} 
               className={`font-mono text-sm px-3 py-1 rounded border ${
                 shot.score >= 10.5 ? 'bg-accent/15 text-accent border-accent/30' :
-                shot.score >= 10.0 ? 'bg-data-blue/15 text-data-blue border-data-blue/30' :
-                shot.score >= 9.0  ? 'bg-emerald-data/15 text-emerald-data border-emerald-data/30' :
-                'bg-signal-red/15 text-signal-red border-signal-red/30'
+                shot.score >= 10.0 ? 'bg-[#4FC3F7]/15 text-[#4FC3F7] border-[#4FC3F7]/30' :
+                shot.score >= 9.0  ? 'bg-[#00E5A0]/15 text-[#00E5A0] border-[#00E5A0]/30' :
+                'bg-[#FF4D6D]/15 text-[#FF4D6D] border-[#FF4D6D]/30'
               } animate-fade-up`}
             >
               {shot.score.toFixed(1)}

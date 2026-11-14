@@ -24,10 +24,19 @@ async function bootstrap(): Promise<void> {
       if (
         origin.includes('localhost') ||
         origin.includes('127.0.0.1') ||
+        origin.startsWith('capacitor://') ||
         origin.startsWith('http://[::1]')
       ) {
         return callback(null, true);
       }
+      // Production domains (marksmanshooter.in and pages.dev previews)
+      if (
+        /^https?:\/\/([a-z0-9-]+\.)?marksmanshooter\.in$/i.test(origin) ||
+        /^https?:\/\/([a-z0-9-]+\.)?pages\.dev$/i.test(origin)
+      ) {
+        return callback(null, true);
+      }
+
       // Explicitly configured origins (set CORS_ORIGINS env var for admin/WS)
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
@@ -60,7 +69,7 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT ?? 3001;
+  const port = process.env.PORT ?? 3003;
   await app.listen(port, '0.0.0.0');
   console.log(`API running on http://0.0.0.0:${port}`);
 }

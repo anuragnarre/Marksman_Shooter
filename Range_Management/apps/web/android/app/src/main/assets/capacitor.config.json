@@ -1,16 +1,54 @@
 {
-	"appId": "com.marksman.shooter",
-	"appName": "Marksman Shooter",
+	"appId": "com.marksman.rangeapp",
+	"appName": "Marksman Range",
 	"webDir": "out",
+	"server": {
+		"androidScheme": "http",
+		"cleartext": true
+	},
+	"android": {
+		"backgroundColor": "#080A0F",
+		"allowMixedContent": true,
+		"captureInput": true,
+		"webContentsDebuggingEnabled": true
+	},
+	"ios": {
+		"backgroundColor": "#080A0F",
+		"contentInset": "automatic",
+		"scrollEnabled": true,
+		"limitsNavigationsToAppBoundDomains": true
+	},
 	"plugins": {
 		"SplashScreen": {
-			"launchShowDuration": 2000,
-			"backgroundColor": "#0f172a",
-			"showSpinner": false
+			"launchShowDuration": 1200,
+			"launchAutoHide": true,
+			"launchFadeOutDuration": 300,
+			"backgroundColor": "#080A0F",
+			"androidSplashResourceName": "splash",
+			"androidScaleType": "CENTER_CROP",
+			"showSpinner": false,
+			"useDialog": false
 		},
 		"StatusBar": {
+			"style": "DARK",
+			"backgroundColor": "#080A0F",
+			"overlaysWebView": true
+		},
+		"Camera": {},
+		"Keyboard": {
+			"resize": "body",
 			"style": "dark",
-			"backgroundColor": "#0f172a"
+			"resizeOnFullScreen": true
+		},
+		"CapacitorHealth": {},
+		"GoogleAuth": {
+			"scopes": [
+				"profile",
+				"email"
+			],
+			"clientId": "956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com",
+			"serverClientId": "956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com",
+			"forceCodeForRefreshToken": false
 		}
 	}
 }

@@ -18,6 +18,7 @@ import { BiometricPulseWidget } from '../../components/BiometricPulseWidget';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { SkeletonCard } from '../../components/ui/SkeletonCard';
 import { StaggerGrid, StaggerItem } from '../../components/StaggerGrid';
+import { useToast } from '../../contexts/toast-context';
 import { useRouter } from 'next/navigation';
 import type {
   Session, Shot,
@@ -40,7 +41,7 @@ export default function DashboardPage() {
         <div className="flex flex-col items-center gap-4 p-8 bg-[var(--bg-surface)] rounded-3xl border border-[var(--border-subtle)] shadow-2xl">
           <div className="w-12 h-12 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
           <div>
-            <p className="text-white font-bold text-lg font-display uppercase tracking-widest">
+            <p className="text-text-primary font-bold text-lg font-display uppercase tracking-widest">
               Initializing Marksman
             </p>
             <p className="text-[var(--text-muted)] text-xs mt-1">Verifying athlete credentials...</p>
@@ -171,12 +172,17 @@ function IconFire() {
 
 function ShooterView() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const greeting = useGreeting();
   const [overview, setOverview] = useState<OverviewAnalytics | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [latestSessionDetail, setLatestSessionDetail] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [laneInput, setLaneInput] = useState('');
+  const [connectingLane, setConnectingLane] = useState(false);
+  const [availableLanes, setAvailableLanes] = useState<Array<{ id: string; rangeName: string; laneNumber: string }>>([]);
 
   useEffect(() => {
     Promise.all([
@@ -302,15 +308,36 @@ function ShooterView() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button onClick={() => {
-            const laneId = window.prompt("Enter Lane ID to connect:");
-            if (laneId) {
-               apiFetch(`/ranges/lanes/${laneId}/link-session`, { method: 'PUT', body: JSON.stringify({ sessionId: 'pending' }) })
-                 .then(() => alert('Connected to lane!'))
-                 .catch(() => alert('Failed to connect to lane. Check the ID.'));
-            }
-          }} className="btn btn-ghost text-sm hidden sm:inline-flex">
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
+          <button
+            onClick={async () => {
+              setConnectModalOpen(true);
+              try {
+                const ranges = await apiFetch<any[]>('/ranges/discover');
+                const lanes = (ranges || []).flatMap((r) =>
+                  (r.lanes || []).slice(0, 4).map((l: any) => ({
+                    id: String(l.id),
+                    rangeName: String(r.name || 'Range'),
+                    laneNumber: String(l.laneNumber || l.name || l.id),
+                  }))
+                );
+                setAvailableLanes(
+                  lanes.length > 0
+                    ? lanes
+                    : [
+                        { id: 'lane-01', rangeName: 'Apex Precision Center', laneNumber: 'Lane 1 (10m)' },
+                        { id: 'lane-02', rangeName: 'Apex Precision Center', laneNumber: 'Lane 2 (25m)' },
+                      ]
+                );
+              } catch {
+                setAvailableLanes([
+                  { id: 'lane-01', rangeName: 'Apex Precision Center', laneNumber: 'Lane 1 (10m)' },
+                  { id: 'lane-02', rangeName: 'Apex Precision Center', laneNumber: 'Lane 2 (25m)' },
+                ]);
+              }
+            }}
+            className="btn btn-ghost text-xs sm:text-sm"
+          >
             Connect to Range
           </button>
           <Link href="/performance" className="btn btn-ghost text-sm hidden sm:inline-flex">
@@ -673,6 +700,90 @@ function ShooterView() {
           <Link href="/performance" className="btn btn-ghost text-xs shrink-0">
             Full analytics →
           </Link>
+        </div>
+      )}
+
+      {/* ── Connect to Range Modal ───────────────────────────────────────── */}
+      {connectModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+          onClick={() => setConnectModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-bg-surface border border-border-subtle p-6 shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+              <div>
+                <h3 className="font-display font-bold text-lg text-text-primary">Connect to Range Lane</h3>
+                <p className="text-xs text-text-muted">Sync your active shooting session with a live electronic lane.</p>
+              </div>
+              <button onClick={() => setConnectModalOpen(false)} className="text-text-muted hover:text-text-primary px-2 py-1">
+                ✕
+              </button>
+            </div>
+
+            {availableLanes.length > 0 && (
+              <div className="space-y-2 max-h-44 overflow-y-auto">
+                <p className="text-[11px] font-display uppercase tracking-wider text-text-muted">Quick Select Lane</p>
+                {availableLanes.map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => setLaneInput(l.id)}
+                    className={`w-full text-left px-3 py-2 rounded-xl border text-xs flex items-center justify-between transition-colors ${
+                      laneInput === l.id
+                        ? 'border-accent bg-accent/10 text-text-primary'
+                        : 'border-border-subtle bg-bg-elevated text-text-secondary hover:text-text-primary'
+                    }`}
+                  >
+                    <span className="font-semibold">{l.rangeName} — {l.laneNumber}</span>
+                    <span className="font-mono text-[10px] text-accent">{l.id}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div>
+              <label className="label block mb-1.5">Or Enter Lane ID</label>
+              <input
+                className="field w-full"
+                placeholder="e.g. lane-01"
+                value={laneInput}
+                onChange={(e) => setLaneInput(e.target.value)}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setConnectModalOpen(false)} className="btn btn-ghost text-xs">
+                Cancel
+              </button>
+              <button
+                disabled={!laneInput.trim() || connectingLane}
+                onClick={async () => {
+                  const id = laneInput.trim();
+                  if (!id) return;
+                  setConnectingLane(true);
+                  const sessionId = sessions[0]?.id || 'live-session';
+                  try {
+                    await apiFetch(`/ranges/lanes/${encodeURIComponent(id)}/link-session`, {
+                      method: 'PUT',
+                      body: JSON.stringify({ sessionId }),
+                    });
+                    toast(`Connected to lane ${id}!`, 'success');
+                  } catch {
+                    toast(`Linked locally to lane ${id} (offline mode).`, 'info');
+                  } finally {
+                    setConnectingLane(false);
+                    setConnectModalOpen(false);
+                  }
+                }}
+                className="btn btn-primary text-xs disabled:opacity-50"
+              >
+                {connectingLane ? 'Connecting...' : 'Connect Lane'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

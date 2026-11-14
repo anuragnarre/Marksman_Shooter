@@ -12,11 +12,11 @@ export class RangeOperationsController {
   constructor(private readonly rangeOperationsService: RangeOperationsService) {}
 
   @Get(':rangeId/staff/shifts')
-  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'RSO')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'RSO', 'STAFF')
   async getShifts(
     @Param('rangeId') rangeId: string,
-    @Query('start') start: string,
-    @Query('end') end: string
+    @Query('start') start?: string,
+    @Query('end') end?: string
   ) {
     return this.rangeOperationsService.getStaffShifts(rangeId, start, end);
   }
@@ -121,12 +121,6 @@ export class RangeOperationsController {
   @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'RSO')
   async getRules(@Param('rangeId') rangeId: string) {
     return this.rangeOperationsService.getSafetyRules(rangeId);
-  }
-
-  @Get(':rangeId/staff/shifts')
-  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN')
-  async getStaffShifts(@Param('rangeId') rangeId: string) {
-    return this.rangeOperationsService.getStaffShifts(rangeId);
   }
 
   @Get(':rangeId/inventory')

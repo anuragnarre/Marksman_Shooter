@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Target_Camera_App",
-    "slug": "Target_Camera_App",
+    "name": "Marksman Target Camera",
+    "slug": "marksman-target-camera",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,6 +18,13 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.Target_Camera_App"
+    },
+    "androidStatusBar": {
+      "hidden": true,
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive"
     },
     "web": {
       "favicon": "./assets/favicon.png"

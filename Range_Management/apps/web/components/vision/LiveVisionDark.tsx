@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { StreamTunerModal } from './StreamTunerModal';
 import { CameraStreamConfig, StreamTelemetryMetrics } from '@shooting-platform/shared-types';
 import { loadStreamConfig, saveStreamConfig, STREAM_PRESETS, StreamTelemetryTracker } from '@/lib/stream-optimizer';
+import { MaterialIcon } from '@/components/ui/TacticalIcons';
+import { useToast } from '@/contexts/toast-context';
 
 
 export interface LaneCameraData {
@@ -46,6 +48,7 @@ export function LiveVisionDark({
   lanes?: LaneCameraData[];
   isLoading?: boolean;
 }) {
+  const { toast } = useToast();
   // Default mock lanes if none provided
   const activeLanes: LaneCameraData[] = lanes.length > 0 ? lanes : [
     {
@@ -144,7 +147,7 @@ export function LiveVisionDark({
 
   const triggerLaneShot = () => {
     if (isCeasefireActive) {
-      alert('CANNOT REGISTER SHOT: Emergency Ceasefire is currently ACTIVE across all bays.');
+      toast('Cannot register shot: Emergency Ceasefire is currently active across all bays.', 'warning');
       return;
     }
     const angle = Math.random() * Math.PI * 2;
@@ -163,14 +166,19 @@ export function LiveVisionDark({
       image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"><rect width="400" height="225" fill="%23060913"/><circle cx="200" cy="112" r="80" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="50" stroke="%23334155" stroke-width="1.5" fill="none"/><circle cx="200" cy="112" r="25" stroke="%23334155" stroke-width="1.5" fill="%230F172A"/><circle cx="200" cy="112" r="6" fill="%23EF4444"/><text x="14" y="24" fill="%2300E5A0" font-family="monospace" font-size="11" font-weight="bold">DOWNRANGE HIGH-RES OPTICAL CAPTURE</text><text x="14" y="42" fill="%2394A3B8" font-family="monospace" font-size="10">TRIGGERED BY EDGE YOLOv8 BULLET-DETECTION</text></svg>',
       timestamp: Date.now(),
     });
+    toast(`Recorded optical hit #${shotsToRender.length + 1}: ${score.toFixed(1)}`, 'success');
   };
 
   const toggleEmergencyCeasefire = () => {
-    setIsCeasefireActive((prev) => !prev);
+    setIsCeasefireActive((prev) => {
+      const next = !prev;
+      toast(next ? 'Emergency Ceasefire broadcast across all bays!' : 'Ceasefire cleared — line hot', next ? 'error' : 'success');
+      return next;
+    });
   };
 
   return (
-    <div className="flex flex-col w-full gap-6 h-full pb-16 text-text-primary">
+    <div className="flex flex-col w-full gap-4 sm:gap-6 p-4 sm:p-6 pb-[calc(5.5rem+var(--sab))] lg:pb-8 text-text-primary">
       {/* Top Banner & Multi-Camera Health */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#0F172A] border border-border-subtle shadow-xl relative overflow-hidden">
         {isCeasefireActive && (
@@ -183,7 +191,7 @@ export function LiveVisionDark({
               <span className={`relative inline-flex rounded-full h-3 w-3 ${isCeasefireActive ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`} />
             </span>
             <h1 className="text-2xl font-bold font-display tracking-tight text-white flex items-center gap-2">
-              Multi-Camera Live Vision & Target Telemetry
+              Multi-Camera Live Vision &amp; Target Telemetry
             </h1>
             <span className="px-2.5 py-0.5 rounded bg-white/10 text-xs font-mono font-bold text-[#F5A623]">
               RSO CONSOLE
@@ -194,7 +202,7 @@ export function LiveVisionDark({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 relative z-10">
+        <div className="flex flex-wrap items-center gap-3 relative z-10">
           <button
             onClick={toggleEmergencyCeasefire}
             className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-lg ${
@@ -203,7 +211,7 @@ export function LiveVisionDark({
                 : 'bg-[#EF4444] text-white hover:bg-[#EF4444]/90 shadow-[#EF4444]/30 animate-pulse'
             }`}
           >
-            {isCeasefireActive ? 'CLEAR CEASEFIRE (RESUME)' : '🚨 BROADCAST CEASEFIRE'}
+            {isCeasefireActive ? 'CLEAR CEASEFIRE (RESUME)' : 'BROADCAST CEASEFIRE'}
           </button>
           <div className="px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs font-mono">
             <span className="text-text-muted">ACTIVE LANES: </span>
@@ -215,17 +223,17 @@ export function LiveVisionDark({
       </div>
 
       {/* Main Grid: Left Lane Matrix, Right Multi-Angle Monitor */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-[600px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Left: 4 Columns - Lane Matrix */}
         <div className="lg:col-span-4 flex flex-col gap-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">
-              RANGE BAY MATRIX (4 LANES)
+              RANGE BAY MATRIX ({activeLanes.length} LANES)
             </h2>
             <span className="text-[10px] font-mono text-[#38BDF8]">LAN SYNC: 100%</span>
           </div>
 
-          <div className="flex flex-col gap-3 max-h-[680px] overflow-y-auto pr-1">
+          <div className="flex flex-col gap-3">
             {activeLanes.map((lane) => {
               const laneNum = lane.number ?? lane.laneNumber ?? lane.id;
               const isSelected = lane.id === activeLane.id;
@@ -318,7 +326,7 @@ export function LiveVisionDark({
                 className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/10 border border-[#00E5A0]/30 text-[#00E5A0] hover:bg-[#00E5A0]/20 flex items-center gap-1.5 transition-all shadow-sm"
                 title="Click to open Advanced Stream & Hardware Optimizer"
               >
-                <span className="material-symbols-outlined text-[15px]">tune</span>
+                <MaterialIcon name="tune" className="text-[15px]" />
                 <span>{streamConfig.computationMode === 'ON_DEVICE_EDGE' ? '📱 EDGE CALC' : streamConfig.profile.replace('_', ' ')}</span>
                 <span className="text-[10px] text-text-muted">
                   ({streamConfig.wifiBand} • {streamConfig.computationMode === 'ON_DEVICE_EDGE' ? 'Sub-5ms' : `${streamConfig.targetFps} FPS`})
@@ -351,7 +359,7 @@ export function LiveVisionDark({
                 className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#0F172A] hover:bg-white/10 text-white border border-white/20 flex items-center gap-1.5 transition-all"
                 title="Configure Video Stream Bitrate, Latency & Sensors"
               >
-                <span className="material-symbols-outlined text-[16px] text-[#00E5A0]">tune</span>
+                <MaterialIcon name="tune" className="text-[16px] text-[#00E5A0]" />
                 <span>Stream Tuner</span>
               </button>
             </div>
@@ -468,7 +476,10 @@ export function LiveVisionDark({
                 + Simulate Lane Shot Impact
               </button>
               <button
-                onClick={() => setSimulatedShots([])}
+                onClick={() => {
+                  setSimulatedShots([]);
+                  toast('Target impact overlay cleared', 'info');
+                }}
                 className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-text-secondary text-xs font-mono border border-white/10"
               >
                 Reset Target

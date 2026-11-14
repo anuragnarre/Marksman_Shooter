@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -93,23 +94,14 @@ export default function GuidanceSection() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative mb-10 overflow-hidden rounded-2xl" style={{ minHeight: 280 }}>
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              'url(https://images.pexels.com/photos/6669403/pexels-photo-6669403.jpeg?auto=compress&cs=tinysrgb&w=1400&h=700&dpr=1)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
-            filter: 'brightness(0.3) saturate(0.8)',
-          }}
-        />
+      <section className="relative mb-10 overflow-hidden rounded-2xl border border-[#F5A623]/20" style={{ minHeight: 280 }}>
+        <TacticalBackdrop variant="hero" accent="#F5A623" />
         {/* Gradient overlay */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(135deg, var(--bg-void) 0%, var(--glass-bg) 50%, var(--bg-void) 100%)',
+              'linear-gradient(135deg, var(--bg-void) 0%, rgba(11,19,38,0.68) 50%, var(--bg-void) 100%)',
           }}
         />
         {/* Amber accent line */}
@@ -199,16 +191,10 @@ export default function GuidanceSection() {
           }}
         >
           <div className="relative h-52 sm:h-64 overflow-hidden">
-            <img
-              src="https://images.pexels.com/photos/6091858/pexels-photo-6091858.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
-              alt="Shooter aiming pistol at indoor range"
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.6) saturate(0.9)' }}
-              loading="lazy"
-            />
+            <TacticalBackdrop variant="sight" accent="#F5A623" />
             <div
               className="absolute inset-0"
-              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 60%)' }}
+              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 65%)' }}
             />
             <div className="absolute bottom-4 left-5 right-5">
               <span className="tag">Fundamental</span>
@@ -247,16 +233,10 @@ export default function GuidanceSection() {
           }}
         >
           <div className="relative h-52 sm:h-64 overflow-hidden">
-            <img
-              src="https://images.pexels.com/photos/6090788/pexels-photo-6090788.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
-              alt="Shooter aiming rifle in competition stance"
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.55) saturate(0.9)' }}
-              loading="lazy"
-            />
+            <TacticalBackdrop variant="npa" accent="#4FC3F7" />
             <div
               className="absolute inset-0"
-              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 60%)' }}
+              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 65%)' }}
             />
             <div className="absolute bottom-4 left-5 right-5">
               <span className="tag">Fundamental</span>
@@ -304,17 +284,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Understanding the core principles of precision shooting</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/HSPAxItV0TY"
-            title="Marksmanship Fundamentals"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/HSPAxItV0TY"
+          title="Marksmanship Fundamentals"
+          accent="#F5A623"
+          takeaways={[
+            '00:45 — Front sight equalization & dominant eye focus',
+            '02:20 — Natural Point of Aim (NPA) zeroing check',
+            '04:10 — Follow-through hold before eye relaxation',
+          ]}
+        />
       </div>
 
       {/* ═══ SECTION 2: Stance & Posture ═══ */}
@@ -324,7 +303,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-standing"
           title="Standing (Offhand)"
-          image="https://images.pexels.com/photos/6091660/pexels-photo-6091660.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
+          variant="standing"
           visible={visibleCards.has('card-standing')}
           points={[
             'Feet shoulder-width apart, perpendicular to target',
@@ -338,7 +317,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-kneeling"
           title="Kneeling"
-          image="https://images.pexels.com/photos/6090798/pexels-photo-6090798.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
+          variant="kneeling"
           visible={visibleCards.has('card-kneeling')}
           points={[
             'Strong-side knee on the ground with ankle flat',
@@ -352,7 +331,7 @@ export default function GuidanceSection() {
         <StanceCard
           id="card-prone"
           title="Prone"
-          image="https://images.pexels.com/photos/6090912/pexels-photo-6090912.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=1"
+          variant="prone"
           visible={visibleCards.has('card-prone')}
           points={[
             'Body angled 15-25 degrees from line of fire',
@@ -382,17 +361,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Detailed breakdown of standing, kneeling, sitting, and prone</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/eo_uINlK0KA"
-            title="Shooting Positions Masterclass"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/eo_uINlK0KA"
+          title="Shooting Positions Masterclass"
+          accent="#4FC3F7"
+          takeaways={[
+            '01:10 — Skeletal bone-on-bone support vs muscle tension',
+            '03:35 — Kneeling roll & ankle weight distribution',
+            '06:00 — Prone sling tension & cheek weld indexing',
+          ]}
+        />
       </div>
 
       {/* ═══ SECTION 3: Breathing Control ═══ */}
@@ -410,14 +388,8 @@ export default function GuidanceSection() {
           }}
         >
           <h3 className="font-display font-bold text-text-primary text-base mb-4">The Respiratory Pause</h3>
-          <div className="relative overflow-hidden rounded-xl mb-5" style={{ height: 180 }}>
-            <img
-              src="https://images.pexels.com/photos/5202431/pexels-photo-5202431.jpeg?auto=compress&cs=tinysrgb&w=900&h=500&dpr=1"
-              alt="ISSF precision shooting target"
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.35) saturate(0.7) hue-rotate(180deg)' }}
-              loading="lazy"
-            />
+          <div className="relative overflow-hidden rounded-xl mb-5 border border-[#00E5A0]/20" style={{ height: 180 }}>
+            <TacticalBackdrop variant="breathing" accent="#00E5A0" />
             <div className="absolute inset-0" style={{ background: 'var(--glass-bg)' }} />
             <div className="absolute inset-0 flex items-center justify-center">
               <BreathingDiagram />
@@ -509,17 +481,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Learn the respiratory pause and timing your shot</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/GvuWLZx3i64"
-            title="Breathing for Shooters"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/GvuWLZx3i64"
+          title="Breathing for Shooters"
+          accent="#00E5A0"
+          takeaways={[
+            '00:50 — Diaphragmatic inhalation vs thoracic heave',
+            '02:15 — 3–5 second natural respiratory pause window',
+            '04:05 — Resetting immediately if wobble increases',
+          ]}
+        />
       </div>
 
       {/* ═══ SECTION 4: Trigger Discipline ═══ */}
@@ -536,14 +507,8 @@ export default function GuidanceSection() {
           }}
         >
           <h3 className="font-display font-bold text-text-primary text-lg mb-4">Trigger Control</h3>
-          <div className="relative rounded-xl overflow-hidden mb-5 h-48">
-            <img
-              src="https://images.pexels.com/photos/5202428/pexels-photo-5202428.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
-              alt="Shooting target with firearm and magazines"
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.4) saturate(0.8)' }}
-              loading="lazy"
-            />
+          <div className="relative rounded-xl overflow-hidden mb-5 h-48 border border-[#FF4D6D]/20">
+            <TacticalBackdrop variant="trigger" accent="#FF4D6D" />
             <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 70%)' }} />
           </div>
           <p className="prose-p mb-4">
@@ -626,17 +591,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Techniques for a clean, consistent trigger press</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/CmbmIi2VGgg"
-            title="Trigger Control Mastery"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/CmbmIi2VGgg"
+          title="Trigger Control Mastery"
+          accent="#FF4D6D"
+          takeaways={[
+            '01:05 — First-pad placement along axial trigger vector',
+            '02:55 — Eliminating low-left slap & grip milking',
+            '05:20 — Wall break vs clean tactile reset drill',
+          ]}
+        />
       </div>
 
       {/* ═══ SECTION 5: Mental Preparation ═══ */}
@@ -653,16 +617,10 @@ export default function GuidanceSection() {
           }}
         >
           <div className="relative h-56 overflow-hidden">
-            <img
-              src="https://images.pexels.com/photos/6091854/pexels-photo-6091854.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1"
-              alt="Shooter focusing at indoor range"
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.35) saturate(0.8)' }}
-              loading="lazy"
-            />
+            <TacticalBackdrop variant="mental" accent="#A78BFA" />
             <div
               className="absolute inset-0"
-              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 60%)' }}
+              style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 65%)' }}
             />
             <div className="absolute bottom-4 left-5 right-5">
               <span className="tag" style={{ background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.3)', color: '#A78BFA' }}>
@@ -753,17 +711,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Developing focus, confidence, and composure under pressure</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/sX8nm21Hbwk"
-            title="Mental Game Shooting"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/sX8nm21Hbwk"
+          title="Mental Game Shooting"
+          accent="#A78BFA"
+          takeaways={[
+            '01:20 — Box breathing & match-pressure HR recovery',
+            '03:40 — Shot-by-shot process reset after a 9',
+            '06:15 — Pre-shot motor pattern mental rehearsal',
+          ]}
+        />
       </div>
 
       {/* ═══ SECTION 6: Range Safety ═══ */}
@@ -778,14 +735,8 @@ export default function GuidanceSection() {
           transform: visibleCards.has('card-safety-rules') ? 'translateY(0)' : 'translateY(24px)',
         }}
       >
-        <div className="relative rounded-xl overflow-hidden mb-6 h-52">
-          <img
-            src="https://images.pexels.com/photos/6655483/pexels-photo-6655483.jpeg?auto=compress&cs=tinysrgb&w=1200&h=600&dpr=1"
-            alt="Shooting range targets"
-            className="w-full h-full object-cover"
-            style={{ filter: 'brightness(0.35) saturate(0.7)' }}
-            loading="lazy"
-          />
+        <div className="relative rounded-xl overflow-hidden mb-6 h-52 border border-[#F59E0B]/20">
+          <TacticalBackdrop variant="safety" accent="#F59E0B" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, var(--glass-bg) 100%)' }} />
           <div className="absolute bottom-5 left-5 right-5">
             <h3 className="font-display font-black text-2xl text-text-primary">The 4 Universal Rules</h3>
@@ -896,17 +847,16 @@ export default function GuidanceSection() {
             <p className="text-text-muted text-xs">Safety protocols every shooter must know before stepping on the range</p>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          <iframe
-            src="https://www.youtube.com/embed/COvFyw-6Fqs"
-            title="Range Safety"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            style={{ border: 'none' }}
-          />
-        </div>
+        <OfflineSafeVideo
+          src="https://www.youtube.com/embed/COvFyw-6Fqs"
+          title="Range Safety"
+          accent="#F59E0B"
+          takeaways={[
+            '00:35 — Muzzle discipline & chamber-flag verification',
+            '02:05 — Hot vs Cold range transition procedure',
+            '03:50 — Mandatory ANSI Z87.1+ eye & NRR 22+ ear PPE',
+          ]}
+        />
       </div>
 
       {/* Bottom CTA */}
@@ -929,12 +879,12 @@ export default function GuidanceSection() {
           Put these techniques into practice. Track your progress, analyze your groups,
           and get AI-powered coaching feedback.
         </p>
-        <a
+        <Link
           href="/sessions/new"
-          className="btn btn-primary text-sm px-8 py-3"
+          className="btn btn-primary text-sm px-8 py-3 inline-flex items-center justify-center"
         >
           New Session
-        </a>
+        </Link>
       </div>
     </>
   );
@@ -988,8 +938,8 @@ function InfoChip({ label, color }: { label: string; color: string }) {
   );
 }
 
-function StanceCard({ id, title, image, visible, points, difficulty, diffColor }: {
-  id: string; title: string; image: string; visible: boolean;
+function StanceCard({ id, title, variant, visible, points, difficulty, diffColor }: {
+  id: string; title: string; variant: 'standing' | 'kneeling' | 'prone'; visible: boolean;
   points: string[]; difficulty: string; diffColor: string;
 }) {
   return (
@@ -1003,13 +953,7 @@ function StanceCard({ id, title, image, visible, points, difficulty, diffColor }
       }}
     >
       <div className="relative h-44 overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover"
-          style={{ filter: 'brightness(0.4) saturate(0.8)' }}
-          loading="lazy"
-        />
+        <TacticalBackdrop variant={variant} accent={diffColor} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, var(--bg-surface) 0%, transparent 70%)' }} />
         <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
           <h4 className="font-display font-bold text-text-primary">{title}</h4>
@@ -1288,5 +1232,160 @@ function ShirtSvg() {
       <path d="M5 2L1 5v3l3-1v7h8V7l3 1V5l-4-3" />
       <path d="M5 2c0 1.5 1.5 3 3 3s3-1.5 3-3" />
     </svg>
+  );
+}
+
+function TacticalBackdrop({ variant, accent }: {
+  variant: 'hero' | 'sight' | 'npa' | 'standing' | 'kneeling' | 'prone' | 'breathing' | 'trigger' | 'mental' | 'safety';
+  accent: string;
+}) {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        background: `radial-gradient(circle at 75% 30%, ${accent}22 0%, rgba(11,19,38,0.92) 55%, #060913 100%)`,
+      }}
+    >
+      <svg className="w-full h-full opacity-45" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" fill="none">
+        <defs>
+          <pattern id={`grid-${variant}`} width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 24" stroke={accent} strokeOpacity="0.14" strokeWidth="0.6" />
+          </pattern>
+        </defs>
+        <rect width="400" height="220" fill={`url(#grid-${variant})`} />
+        <g stroke={accent} strokeOpacity="0.4">
+          <circle cx="300" cy="95" r="68" strokeWidth="1" strokeDasharray="4 4" />
+          <circle cx="300" cy="95" r="44" strokeWidth="1" />
+          <circle cx="300" cy="95" r="20" strokeWidth="1.2" />
+          <circle cx="300" cy="95" r="4" fill={accent} fillOpacity="0.65" />
+          <line x1="215" y1="95" x2="385" y2="95" strokeWidth="0.7" />
+          <line x1="300" y1="15" x2="300" y2="175" strokeWidth="0.7" />
+        </g>
+        {variant === 'trigger' && (
+          <path d="M40 160 L120 160 L150 105 L210 105" stroke={accent} strokeWidth="1.6" strokeOpacity="0.55" />
+        )}
+        {variant === 'standing' && (
+          <g stroke={accent} strokeWidth="1.6" strokeOpacity="0.55">
+            <circle cx="95" cy="55" r="10" />
+            <line x1="95" y1="65" x2="95" y2="115" />
+            <line x1="72" y1="80" x2="130" y2="76" />
+            <line x1="95" y1="115" x2="80" y2="165" />
+            <line x1="95" y1="115" x2="112" y2="165" />
+          </g>
+        )}
+        {variant === 'kneeling' && (
+          <g stroke={accent} strokeWidth="1.6" strokeOpacity="0.55">
+            <circle cx="95" cy="70" r="10" />
+            <line x1="95" y1="80" x2="95" y2="122" />
+            <line x1="74" y1="94" x2="132" y2="88" />
+            <path d="M95 122 L118 140 L118 168" />
+            <path d="M95 122 L76 155 L58 158" />
+          </g>
+        )}
+        {variant === 'prone' && (
+          <g stroke={accent} strokeWidth="1.6" strokeOpacity="0.55">
+            <circle cx="132" cy="112" r="9" />
+            <line x1="45" y1="138" x2="128" y2="122" />
+            <line x1="128" y1="122" x2="160" y2="116" />
+            <line x1="115" y1="126" x2="108" y2="152" />
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+function OfflineSafeVideo({
+  src,
+  title,
+  accent,
+  takeaways,
+}: {
+  src: string;
+  title: string;
+  accent: string;
+  takeaways: string[];
+}) {
+  const [online, setOnline] = useState(true);
+  const [loadStream, setLoadStream] = useState(true);
+
+  useEffect(() => {
+    const sync = () => setOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+    sync();
+    window.addEventListener('online', sync);
+    window.addEventListener('offline', sync);
+    return () => {
+      window.removeEventListener('online', sync);
+      window.removeEventListener('offline', sync);
+    };
+  }, []);
+
+  if (!online || !loadStream) {
+    return (
+      <div
+        className="relative rounded-xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between gap-4 border"
+        style={{
+          minHeight: 220,
+          background: 'var(--bg-void)',
+          borderColor: `${accent}30`,
+        }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span
+              className="inline-block text-[10px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 rounded-md mb-2"
+              style={{ background: `${accent}18`, color: accent }}
+            >
+              Offline Range Briefing
+            </span>
+            <h4 className="font-display font-bold text-base text-text-primary">{title}</h4>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+              setLoadStream(true);
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-colors"
+            style={{ borderColor: `${accent}45`, color: accent, background: `${accent}10` }}
+          >
+            Retry Video Stream
+          </button>
+        </div>
+        <ul className="space-y-2 text-xs text-text-secondary font-mono">
+          {takeaways.map((line) => (
+            <li key={line} className="flex items-start gap-2">
+              <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: accent }} />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
+        <iframe
+          src={src}
+          title={title}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+          style={{ border: 'none' }}
+        />
+      </div>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setLoadStream(false)}
+          className="text-[11px] font-mono text-text-muted hover:text-text-primary underline"
+        >
+          Switch to Offline Key Notes
+        </button>
+      </div>
+    </div>
   );
 }

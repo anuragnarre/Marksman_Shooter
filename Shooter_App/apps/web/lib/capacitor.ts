@@ -68,12 +68,8 @@ function base64ToFile(base64: string, filename: string, mimeType: string): File 
 export async function initStatusBar(): Promise<void> {
   if (!isNative()) return;
   try {
-    const { StatusBar, Style } = await import('@capacitor/status-bar');
-    await StatusBar.setStyle({ style: Style.Dark });
-    if (isAndroid()) {
-      await StatusBar.setBackgroundColor({ color: '#080A0F' });
-      await StatusBar.setOverlaysWebView({ overlay: true });
-    }
+    const { StatusBar } = await import('@capacitor/status-bar');
+    await StatusBar.hide();
   } catch { /* non-fatal */ }
 }
 

@@ -2,11 +2,14 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { SlidersHorizontal } from 'lucide-react';
 import { TargetSpec, ShotCoordinates, ShotResult } from '../../lib/target-specs';
 import { TargetCanvas } from './TargetCanvas';
 import { StreamTunerModal } from './StreamTunerModal';
 import { CameraStreamConfig, StreamTelemetryMetrics } from '@shooting-platform/shared-types';
-import { loadStreamConfig, saveStreamConfig, STREAM_PRESETS, StreamTelemetryTracker } from '@/lib/stream-optimizer';
+import { loadStreamConfig, saveStreamConfig, StreamTelemetryTracker } from '@/lib/stream-optimizer';
+import { useToast } from '../../contexts/toast-context';
+import { requestCameraPermission } from '../../lib/capacitor';
 
 export type CameraAngle = 'target' | 'stance' | 'trigger' | 'bay';
 export type ViewLayout = 'pip' | 'split' | 'quad';
@@ -36,6 +39,7 @@ export function MultiCameraTargetView({
   isCeasefireActive = false,
   latestImpactSnapshot = null,
 }: MultiCameraTargetViewProps) {
+  const { toast } = useToast();
   const [layout, setLayout] = useState<ViewLayout>('pip');
   const [primaryAngle, setPrimaryAngle] = useState<CameraAngle>('target');
   const [pipAngle, setPipAngle] = useState<CameraAngle>('stance');
@@ -96,6 +100,10 @@ export function MultiCameraTargetView({
       setIsWebcamActive(false);
     } else {
       try {
+        await requestCameraPermission();
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Camera stream API unavailable');
+        }
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
@@ -108,7 +116,7 @@ export function MultiCameraTargetView({
         setIsWebcamActive(true);
       } catch (err) {
         console.warn('Unable to access webcam:', err);
-        alert('Webcam access was denied or not available. Using tactical synthetic camera feed.');
+        toast('Live webcam unavailable on this device — using tactical synthetic feed.', 'info');
       }
     }
   };
@@ -211,8 +219,8 @@ export function MultiCameraTargetView({
                   <circle cx="50" cy="72" r="3" fill="#10B981" />
                 </svg>
 
-                <div className="absolute bottom-6 flex items-center gap-3 text-[10px] font-mono text-text-muted bg-black/60 px-3 py-1 rounded-full border border-white/10">
-                  <span className="text-[#10B981]">● BALANCE: 51/49%</span>
+                <div className="absolute bottom-6 flex items-center gap-3 text-[10px] font-mono text-slate-300 bg-black/70 px-3 py-1 rounded-full border border-white/15">
+                  <span className="text-[#10B981]">BALANCE: 51/49%</span>
                   <span className="text-[#38BDF8]">SPINE: 89.2°</span>
                 </div>
               </div>
@@ -231,7 +239,7 @@ export function MultiCameraTargetView({
               {/* Finger Placement Guideline */}
               <circle cx="61" cy="44" r="5" fill="#EF4444" opacity="0.6" />
             </svg>
-            <div className="absolute bottom-6 flex items-center gap-3 text-[10px] font-mono text-text-muted bg-black/60 px-3 py-1 rounded-full border border-white/10">
+            <div className="absolute bottom-6 flex items-center gap-3 text-[10px] font-mono text-slate-300 bg-black/70 px-3 py-1 rounded-full border border-white/15">
               <span className="text-[#F5A623]">PRE-TRAVEL: 1.8mm</span>
               <span className="text-[#10B981]">FREEZE INDEX: 0.12s</span>
             </div>
@@ -243,7 +251,7 @@ export function MultiCameraTargetView({
               <span className="text-[11px] font-mono text-[#10B981]/70">
                 MUZZLE SAFETY ENVELOPE: 45° BOUNDARY [CLEAR]
               </span>
-              <div className="absolute bottom-2 left-3 text-[9px] font-mono text-text-muted">
+              <div className="absolute bottom-2 left-3 text-[9px] font-mono text-slate-400">
                 RSO OVERVIEW // SECTOR 1-A
               </div>
             </div>
@@ -259,9 +267,9 @@ export function MultiCameraTargetView({
             {angle === 'trigger' && 'CAM 3: TRIGGER GRIP MACRO'}
             {angle === 'bay' && 'CAM 4: WIDE BAY SAFETY'}
           </span>
-          <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono text-text-muted">
+          <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-black/60 text-[9px] font-mono text-slate-300">
             {angle === 'target' && streamConfig.computationMode === 'ON_DEVICE_EDGE'
-              ? '📱 EDGE CALC'
+              ? 'EDGE CALC'
               : `${streamConfig.resolution.toUpperCase()} @ ${streamConfig.targetFps} FPS`}
           </span>
           {angle === 'target' && (
@@ -292,14 +300,14 @@ export function MultiCameraTargetView({
   return (
     <div className="space-y-4">
       {/* Top Camera Controls Bar */}
-      <div className="p-4 rounded-2xl bg-[#0F172A] border border-border-subtle flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-bg-surface border border-border-subtle shadow-card flex flex-wrap items-center justify-between gap-4">
         {/* Layout Mode Toggles */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-mono font-bold text-text-muted uppercase mr-1">VIEW MODE:</span>
           {[
-            { id: 'pip', label: 'Picture-in-Picture', icon: '🔲' },
-            { id: 'split', label: 'Dual Split', icon: '🌗' },
-            { id: 'quad', label: 'Tactical Quad', icon: '⊞' },
+            { id: 'pip', label: 'PiP', icon: 'PiP' },
+            { id: 'split', label: 'Dual Split', icon: 'Split' },
+            { id: 'quad', label: 'Quad', icon: 'Quad' },
           ].map((m) => (
             <button
               key={m.id}
@@ -307,7 +315,7 @@ export function MultiCameraTargetView({
               className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
                 layout === m.id
                   ? 'bg-[#F5A623] text-black shadow-md'
-                  : 'bg-black/40 text-text-secondary hover:text-white border border-white/5'
+                  : 'bg-bg-elevated text-text-secondary hover:text-text-primary border border-border-subtle'
               }`}
             >
               <span>{m.icon}</span>
@@ -317,20 +325,20 @@ export function MultiCameraTargetView({
         </div>
 
         {/* Optical Filter Modes */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-mono font-bold text-text-muted uppercase mr-1">OPTICS:</span>
           {[
-            { id: 'optical', label: 'Optical', color: '#10B981' },
-            { id: 'monochrome', label: 'High Contrast', color: '#38BDF8' },
-            { id: 'thermal', label: 'Thermal', color: '#EF4444' },
+            { id: 'optical', label: 'Optical' },
+            { id: 'monochrome', label: 'High Contrast' },
+            { id: 'thermal', label: 'Thermal' },
           ].map((f) => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id as OpticalFilter)}
               className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all ${
                 filter === f.id
-                  ? 'bg-white/15 text-white border border-white/30 font-bold'
-                  : 'text-text-muted hover:text-text-secondary'
+                  ? 'bg-accent/15 text-accent border border-accent/40 font-bold'
+                  : 'text-text-secondary hover:text-text-primary border border-transparent'
               }`}
             >
               {f.label}
@@ -339,27 +347,27 @@ export function MultiCameraTargetView({
         </div>
 
         {/* Zoom & Webcam Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={toggleWebcam}
             className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
               isWebcamActive
-                ? 'bg-[#10B981]/20 border-[#10B981] text-[#10B981]'
-                : 'bg-black/30 border-white/10 text-text-secondary hover:text-white'
+                ? 'bg-[#10B981]/15 border-[#10B981] text-[#10B981]'
+                : 'bg-bg-elevated border-border-subtle text-text-secondary hover:text-text-primary'
             }`}
             title="Toggle Live Stance Webcam"
           >
-            📷 {isWebcamActive ? 'Webcam Active' : 'Enable Webcam'}
+            {isWebcamActive ? 'Webcam Active' : 'Enable Webcam'}
           </button>
 
-          <div className="flex items-center bg-black/40 border border-white/10 rounded-lg px-2 py-1">
+          <div className="flex items-center bg-bg-elevated border border-border-subtle rounded-lg px-2 py-1">
             <span className="text-[11px] font-mono text-text-muted mr-2">ZOOM</span>
             {[1.0, 1.5, 2.0].map((z) => (
               <button
                 key={z}
                 onClick={() => setZoom(z)}
                 className={`px-1.5 py-0.5 text-[11px] font-mono rounded ${
-                  zoom === z ? 'bg-[#F5A623] text-black font-bold' : 'text-text-muted hover:text-white'
+                  zoom === z ? 'bg-[#F5A623] text-black font-bold' : 'text-text-muted hover:text-text-primary'
                 }`}
               >
                 {z}x
@@ -369,23 +377,25 @@ export function MultiCameraTargetView({
 
           <button
             onClick={() => setShowReticle((prev) => !prev)}
-            className={`p-1.5 rounded-lg border text-xs font-mono ${
-              showReticle ? 'bg-white/10 border-white/20 text-[#38BDF8]' : 'text-text-muted border-transparent'
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-mono ${
+              showReticle
+                ? 'bg-[#38BDF8]/15 border-[#38BDF8]/40 text-[#38BDF8]'
+                : 'text-text-muted border-border-subtle bg-bg-elevated'
             }`}
             title="Toggle Reticle & Scanning Grid"
           >
-            🎯 Reticle
+            Reticle
           </button>
 
           {/* Performance & Stream Tuner Trigger Button */}
           <button
             onClick={() => setIsStreamTunerOpen(true)}
-            className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/10 border border-[#00E5A0]/30 text-[#00E5A0] hover:bg-[#00E5A0]/20 flex items-center gap-1.5 transition-all shadow-sm"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E5A0]/15 border border-[#00E5A0]/40 text-[#00E5A0] hover:bg-[#00E5A0]/25 flex items-center gap-1.5 transition-all shadow-sm"
             title="Configure Video Stream Bitrate, Latency & Sensor GPU Acceleration"
           >
-            <span className="material-symbols-outlined text-[15px]">tune</span>
+            <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">Stream Tuner</span>
-            <span className="text-[10px] text-text-muted">({telemetryMetrics.currentFps} FPS)</span>
+            <span className="text-[10px] opacity-80">({telemetryMetrics.currentFps} FPS)</span>
           </button>
         </div>
       </div>
@@ -393,41 +403,41 @@ export function MultiCameraTargetView({
 
       {/* Synchronized Biometrics & Sensor Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3 rounded-xl bg-[#0F172A] border border-border-subtle flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-bg-surface border border-border-subtle shadow-card flex items-center justify-between">
           <div>
             <p className="text-[10px] font-mono text-text-muted uppercase">HEART RATE</p>
             <p className="text-lg font-mono font-bold text-[#EF4444]">{heartRate} BPM</p>
           </div>
-          <span className="text-xl animate-pulse">💓</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] animate-pulse" />
         </div>
 
-        <div className="p-3 rounded-xl bg-[#0F172A] border border-border-subtle flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-bg-surface border border-border-subtle shadow-card flex items-center justify-between">
           <div>
             <p className="text-[10px] font-mono text-text-muted uppercase">HOLD STABILITY</p>
             <p className="text-lg font-mono font-bold text-[#10B981]">{holdStability}%</p>
           </div>
-          <span className="text-xl">🎯</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
         </div>
 
-        <div className="p-3 rounded-xl bg-[#0F172A] border border-border-subtle flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-bg-surface border border-border-subtle shadow-card flex items-center justify-between">
           <div>
             <p className="text-[10px] font-mono text-text-muted uppercase">WIND DEFLECTION</p>
             <p className="text-lg font-mono font-bold text-[#38BDF8]">3.4 mph <span className="text-xs">NW</span></p>
           </div>
-          <span className="text-xl">💨</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
         </div>
 
-        <div className="p-3 rounded-xl bg-[#0F172A] border border-border-subtle flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-bg-surface border border-border-subtle shadow-card flex items-center justify-between">
           <div>
             <p className="text-[10px] font-mono text-text-muted uppercase">TOTAL DETECTED</p>
             <p className="text-lg font-mono font-bold text-[#F5A623]">{shots.length} SHOTS</p>
           </div>
-          <span className="text-xl">💥</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#F5A623]" />
         </div>
       </div>
 
       {/* MAIN VIEWPORT LAYOUTS */}
-      <div className="relative min-h-[550px] w-full">
+      <div className="relative min-h-[340px] sm:min-h-[550px] w-full">
         {/* Ceasefire Alert Overlay */}
         {isCeasefireActive && (
           <div className="absolute inset-0 z-40 bg-black/85 backdrop-blur-md rounded-2xl border-2 border-[#EF4444] flex flex-col items-center justify-center p-6 text-center shadow-[0_0_50px_rgba(239,68,68,0.5)]">
@@ -448,38 +458,38 @@ export function MultiCameraTargetView({
 
         {/* LAYOUT 1: PICTURE-IN-PICTURE (PIP) */}
         {layout === 'pip' && (
-          <div className="relative w-full h-[580px]">
+          <div className="relative w-full h-[360px] sm:h-[580px]">
             {/* Primary Feed */}
             <div className="w-full h-full">
               {renderCameraFeed(primaryAngle)}
             </div>
 
             {/* Floating PiP Window */}
-            <div className="absolute bottom-4 right-4 z-30 w-72 h-48 rounded-xl shadow-2xl border-2 border-[#F5A623]/80 overflow-hidden bg-black group transition-transform duration-200 hover:scale-105">
+            <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-30 w-44 h-28 sm:w-72 sm:h-48 rounded-xl shadow-2xl border-2 border-[#F5A623]/80 overflow-hidden bg-black group transition-transform duration-200 hover:scale-105">
               {renderCameraFeed(pipAngle, true)}
 
-              {/* PiP Angle Selector Overlay */}
-              <div className="absolute top-2 right-2 z-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-black/80 p-1 rounded-md">
+              {/* PiP Angle Selector Overlay — always accessible on touch devices */}
+              <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 z-40 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-black/85 p-1 rounded-md">
                 <button
                   onClick={() => {
                     const temp = primaryAngle;
                     setPrimaryAngle(pipAngle);
                     setPipAngle(temp);
                   }}
-                  className="px-2 py-0.5 rounded bg-[#F5A623] text-black text-[10px] font-mono font-bold"
+                  className="px-1.5 sm:px-2 py-0.5 rounded bg-[#F5A623] text-black text-[10px] font-mono font-bold"
                   title="Swap Primary & PiP"
                 >
-                  ⇄ Swap
+                  Swap
                 </button>
                 <select
                   value={pipAngle}
                   onChange={(e) => setPipAngle(e.target.value as CameraAngle)}
-                  className="bg-black text-white text-[10px] font-mono p-0.5 rounded border border-white/20"
+                  className="bg-black text-white text-[10px] font-mono p-0.5 rounded border border-white/20 max-w-[90px]"
                 >
-                  <option value="stance">Cam 2: Stance</option>
-                  <option value="trigger">Cam 3: Trigger</option>
-                  <option value="bay">Cam 4: Bay</option>
-                  <option value="target">Cam 1: Target</option>
+                  <option value="stance">Stance</option>
+                  <option value="trigger">Trigger</option>
+                  <option value="bay">Bay</option>
+                  <option value="target">Target</option>
                 </select>
               </div>
             </div>
@@ -488,7 +498,7 @@ export function MultiCameraTargetView({
 
         {/* LAYOUT 2: DUAL SPLIT SCREEN */}
         {layout === 'split' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[580px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[520px] sm:h-[580px]">
             <div className="w-full h-full">
               {renderCameraFeed('target')}
             </div>
@@ -520,14 +530,14 @@ export function MultiCameraTargetView({
       {/* Optical Impact Proof Verification Modal */}
       {showSnapshotModal && impactSnapshot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="relative w-full max-w-xl rounded-2xl bg-[#0B0F19] border border-[#00E5A0]/40 p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="relative w-full max-w-xl rounded-2xl bg-bg-surface border border-[#00E5A0]/40 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#00E5A0]/20 flex items-center justify-center text-[#00E5A0] text-lg font-bold">
-                  🎯
+                <div className="w-8 h-8 rounded-lg bg-[#00E5A0]/20 flex items-center justify-center text-[#00E5A0] text-sm font-mono font-bold">
+                  #{impactSnapshot.shotNumber}
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white font-display uppercase tracking-wide">
+                  <h3 className="text-base font-bold text-text-primary font-display uppercase tracking-wide">
                     Downrange Optical Impact Verification
                   </h3>
                   <p className="text-xs text-text-muted font-mono">
@@ -537,14 +547,14 @@ export function MultiCameraTargetView({
               </div>
               <button
                 onClick={() => setShowSnapshotModal(false)}
-                className="text-text-muted hover:text-white p-1 text-sm font-mono"
+                className="text-text-muted hover:text-text-primary p-1 text-sm font-mono"
               >
                 ✕
               </button>
             </div>
 
             {/* Snapshot Preview with Reticle */}
-            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-border-subtle flex items-center justify-center">
               {impactSnapshot.image ? (
                 <img
                   src={impactSnapshot.image}
@@ -552,7 +562,7 @@ export function MultiCameraTargetView({
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="text-xs font-mono text-text-muted">No high-res image attached</div>
+                <div className="text-xs font-mono text-slate-400">No high-res image attached</div>
               )}
               {/* Reticle Overlay */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -565,27 +575,27 @@ export function MultiCameraTargetView({
             </div>
 
             {/* Shot Metrics Grid */}
-            <div className="grid grid-cols-4 gap-2 pt-1">
-              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+              <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-subtle text-center">
                 <div className="text-[10px] font-mono text-text-muted uppercase">SHOT #</div>
-                <div className="text-base font-mono font-bold text-white">#{impactSnapshot.shotNumber}</div>
+                <div className="text-base font-mono font-bold text-text-primary">#{impactSnapshot.shotNumber}</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+              <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-subtle text-center">
                 <div className="text-[10px] font-mono text-text-muted uppercase">SCORE</div>
                 <div className="text-base font-mono font-bold text-[#00E5A0]">{impactSnapshot.score.toFixed(1)}</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+              <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-subtle text-center">
                 <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET X</div>
                 <div className="text-base font-mono font-bold text-[#38BDF8]">{impactSnapshot.xMm.toFixed(2)} mm</div>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#0F172A] border border-white/5 text-center">
+              <div className="p-2.5 rounded-lg bg-bg-elevated border border-border-subtle text-center">
                 <div className="text-[10px] font-mono text-text-muted uppercase">OFFSET Y</div>
                 <div className="text-base font-mono font-bold text-[#F5A623]">{impactSnapshot.yMm.toFixed(2)} mm</div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-xs font-mono text-text-muted pt-2 border-t border-white/10">
-              <span>Transmitted via Wi-Fi {streamConfig.wifiBand} Low-Bandwidth Edge Protocol</span>
+            <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-mono text-text-muted pt-2 border-t border-border-subtle">
+              <span>Transmitted via Wi-Fi {streamConfig.wifiBand} Edge Protocol</span>
               <button
                 onClick={() => setShowSnapshotModal(false)}
                 className="px-4 py-1.5 rounded-lg bg-[#00E5A0]/20 hover:bg-[#00E5A0]/30 text-[#00E5A0] border border-[#00E5A0] text-xs font-bold transition"

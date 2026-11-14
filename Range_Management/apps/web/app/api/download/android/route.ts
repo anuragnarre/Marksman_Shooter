@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export async function GET() {
   // Prefer server-only APK_URL; fall back to public var for convenience

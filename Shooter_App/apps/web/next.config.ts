@@ -2,6 +2,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'export',
   transpilePackages: ['@shooting-platform/shared-types'],
   compress: true,
   compiler: {
@@ -22,10 +23,7 @@ const nextConfig: NextConfig = {
     '*.marksmanshooter.in'
   ],
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'images.pexels.com' },
-    ],
+    unoptimized: true,
   },
   // ── API Proxy Rewrites ────────────────────────────────────────────────────────
   // ALL browser API calls go to the same frontend domain (e.g. marksman.xxx.proxy.netbird.io/api/*)

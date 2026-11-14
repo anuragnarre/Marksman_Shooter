@@ -77,4 +77,4 @@ Write-Host "  Launch Commands" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "  Shooter App:       adb -s <device> shell monkey -p com.marksman.shooting -c android.intent.category.LAUNCHER 1"
 Write-Host "  Range Management:  adb -s <device> shell monkey -p com.marksman.rangeapp -c android.intent.category.LAUNCHER 1"
-Write-Host "  Target Camera:     adb -s <device> shell monkey -p com.marksman.targetcamera -c android.intent.category.LAUNCHER 1"
+Write-Host "  Target Camera:     adb -s <device> shell monkey -p com.anonymous.Target_Camera_App -c android.intent.category.LAUNCHER 1"

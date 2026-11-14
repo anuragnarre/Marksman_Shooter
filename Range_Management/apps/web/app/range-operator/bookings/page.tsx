@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { TopBar } from '../../../components/TopBar';
+import { DashboardLayout } from '../../../components/layouts/DashboardLayout';
 import { apiFetch } from '../../../lib/api';
+import { useToast } from '../../../contexts/toast-context';
 
 interface Booking {
   id: string;
@@ -25,6 +26,7 @@ interface RangeDetails {
 }
 
 export default function BookingsPage() {
+  const { toast } = useToast();
   const [range, setRange] = useState<RangeDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'ACTIVE'>('ALL');
@@ -39,8 +41,8 @@ export default function BookingsPage() {
           const details = await apiFetch(`/ranges/${myRanges[0].id}`) as RangeDetails;
           setRange(details);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
+        // Offline fallback handled below
       } finally {
         setLoading(false);
       }
@@ -48,7 +50,6 @@ export default function BookingsPage() {
     loadRange();
   }, []);
 
-  // Mock initial bookings if range has none yet for rich demonstration
   const sampleBookings: Booking[] = [
     {
       id: 'BK-9021',
@@ -100,27 +101,31 @@ export default function BookingsPage() {
     return true;
   });
 
-  const handleCheckIn = (bookingId: string) => {
-    setCheckedInIds((prev) => [...prev, bookingId]);
-    alert(`CHECK-IN COMPLETE: Shooter checked in and synchronized with Lane Target Camera rig.`);
+  const handleCheckIn = (booking: Booking) => {
+    setCheckedInIds((prev) => (prev.includes(booking.id) ? prev : [...prev, booking.id]));
+    toast(`${booking.user?.name || 'Shooter'} checked in and synced to Lane ${booking.lane?.laneNumber || '01'}`, 'success');
   };
 
-  if (loading) return <div className="p-8 text-center text-text-muted font-mono">Loading Bookings Roster...</div>;
+  if (loading) {
+    return (
+      <DashboardLayout role="RANGE_OPERATOR" showBack pageTitle="Operator Bookings">
+        <div className="p-8 text-center text-text-muted font-mono">Loading Bookings Roster...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full bg-void text-text-primary">
-      <TopBar title="Range Bookings & Check-in Roster" backUrl="/range-operator/dashboard" />
-      
-      <div className="p-4 md:p-8 flex-1 overflow-y-auto max-w-6xl mx-auto w-full space-y-6">
+    <DashboardLayout role="RANGE_OPERATOR" showBack pageTitle="Operator Bookings">
+      <div className="p-4 md:p-8 flex-1 max-w-6xl mx-auto w-full space-y-6">
         {/* Top Header Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#0F172A] border border-border-subtle shadow-md">
           <div>
-            <h1 className="text-xl font-bold font-display uppercase tracking-wider text-white flex items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-bold font-display uppercase tracking-wider text-white flex items-center gap-2">
               <span>📅</span>
-              <span>Lane Reservations & Check-in Roster</span>
+              <span>Lane Reservations &amp; Check-in Roster</span>
             </h1>
             <p className="text-xs text-text-muted font-mono mt-1">
-              Automated Turnstile QR Verification & Lane Camera Pairing
+              Automated Turnstile QR Verification &amp; Lane Camera Pairing
             </p>
           </div>
 
@@ -136,7 +141,7 @@ export default function BookingsPage() {
 
         {/* Filter and Search Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-[#0F172A] border border-border-subtle">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {[
               { id: 'ALL', label: 'All Bookings' },
               { id: 'PENDING', label: 'Pending Arrival' },
@@ -156,7 +161,7 @@ export default function BookingsPage() {
             ))}
           </div>
 
-          <div className="relative min-w-[260px]">
+          <div className="relative w-full sm:w-auto sm:min-w-[260px]">
             <input
               type="text"
               placeholder="Search athlete name or booking ID..."
@@ -179,7 +184,7 @@ export default function BookingsPage() {
               >
                 <div className="flex items-start gap-4">
                   <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-mono font-bold text-base ${
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-mono font-bold text-base shrink-0 ${
                       isCheckedIn ? 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30' : 'bg-white/10 text-white'
                     }`}
                   >
@@ -187,7 +192,7 @@ export default function BookingsPage() {
                   </div>
 
                   <div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                       <h3 className="text-base font-bold font-display text-white">{booking.user?.name || 'Guest Athlete'}</h3>
                       <span className="text-xs font-mono text-text-muted">#{booking.id}</span>
                       <span
@@ -206,7 +211,7 @@ export default function BookingsPage() {
                       {new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Discipline: {booking.discipline || '10m Air Rifle'}
                     </p>
 
-                    <div className="flex items-center gap-3 text-[11px] font-mono text-text-muted mt-2">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-text-muted mt-2">
                       <span className="flex items-center gap-1 text-[#10B981]">
                         ● Cam 1 (Target Rig): Online
                       </span>
@@ -223,18 +228,17 @@ export default function BookingsPage() {
                 <div className="flex items-center gap-3 w-full md:w-auto justify-end">
                   {!isCheckedIn ? (
                     <button
-                      onClick={() => handleCheckIn(booking.id)}
+                      onClick={() => handleCheckIn(booking)}
                       className="px-4 py-2 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-black font-mono font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5"
                     >
                       <span>✓</span>
-                      <span>Check-In & Arm Lane</span>
+                      <span>Check-In &amp; Arm Lane</span>
                     </button>
                   ) : (
                     <Link
                       href="/range-operator/dashboard"
                       className="px-4 py-2 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 text-[#38BDF8] font-mono text-xs transition-all flex items-center gap-1.5"
                     >
-                      <span>📹</span>
                       <span>View Live Stream</span>
                     </Link>
                   )}
@@ -250,7 +254,6 @@ export default function BookingsPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
-

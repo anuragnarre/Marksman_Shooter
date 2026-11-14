@@ -1,0 +1,3 @@
+@echo off
+echo Starting Pixel 10 Pro Fold standalone emulator...
+start "" "%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe" -avd Pixel_10_Pro_Fold -gpu host

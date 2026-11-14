@@ -64,7 +64,7 @@ routing.registerRoute(
 routing.registerRoute(
   ({ url }) =>
     url.pathname.startsWith('/api') ||
-    url.port === '3001' ||
+    url.port === '3003' ||
     url.hostname !== self.location.hostname,
   new strategies.NetworkOnly(),
 );

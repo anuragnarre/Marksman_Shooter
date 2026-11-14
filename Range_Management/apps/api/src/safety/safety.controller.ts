@@ -10,32 +10,38 @@ export class SafetyController {
   constructor(private readonly safetyService: SafetyService) {}
 
   @Post('incidents')
-  @Roles('RANGE_ADMIN', 'RSO')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   createIncident(@Body() createIncidentDto: { type: string; severity: any; description: string; reporterId: string; locationId?: string; laneId?: string; status: any }) {
     return this.safetyService.createIncidentReport(createIncidentDto);
   }
 
   @Get('incidents')
-  @Roles('RANGE_ADMIN', 'RSO')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   findAllIncidents() {
     return this.safetyService.getAllIncidents();
   }
 
   @Get('incidents/:id')
-  @Roles('RANGE_ADMIN', 'RSO')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   findOneIncident(@Param('id') id: string) {
     return this.safetyService.getIncidentById(id);
   }
 
   @Put('incidents/:id/status')
-  @Roles('RANGE_ADMIN')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   updateStatus(@Param('id') id: string, @Body('status') status: any) {
     return this.safetyService.updateIncidentStatus(id, status);
   }
 
+  @Post('incidents/:id/resolve')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
+  resolveIncident(@Param('id') id: string) {
+    return this.safetyService.updateIncidentStatus(id, 'RESOLVED');
+  }
+
   // Quizzes
   @Post('ranges/:rangeId/quizzes')
-  @Roles('RANGE_ADMIN')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR')
   createQuiz(@Param('rangeId') rangeId: string, @Body() data: any) {
     return this.safetyService.createQuiz(rangeId, data);
   }
@@ -52,20 +58,20 @@ export class SafetyController {
 
   // First Aid Kits
   @Get('ranges/:rangeId/first-aid-kits')
-  @Roles('RANGE_ADMIN', 'RSO', 'STAFF')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO', 'STAFF')
   getFirstAidKits(@Param('rangeId') rangeId: string) {
     return this.safetyService.getFirstAidKits(rangeId);
   }
 
   @Put('first-aid-kits/:id')
-  @Roles('RANGE_ADMIN', 'RSO')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   updateFirstAidKit(@Param('id') id: string, @Body() data: any) {
     return this.safetyService.updateFirstAidKit(id, data);
   }
 
   // Audit Logs
   @Get('audit-logs')
-  @Roles('RANGE_ADMIN')
+  @Roles('RANGE_ADMIN', 'RANGE_OPERATOR', 'RSO')
   getAuditLogs() {
     return this.safetyService.getAuditLogs();
   }

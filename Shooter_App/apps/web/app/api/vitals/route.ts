@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
+export const dynamic = 'force-static';
+
 export async function GET() {
   return NextResponse.json(
     { status: 'ok', method: 'POST required', hint: 'Send a POST with JSON body { heartRate, spo2 }' },

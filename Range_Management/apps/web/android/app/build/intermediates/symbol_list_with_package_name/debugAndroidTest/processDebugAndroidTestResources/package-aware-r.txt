@@ -1,3 +1,0 @@
-com.marksman.rangeapp.test
-style WhiteBackgroundDialogTheme
-style WhiteBackgroundTheme

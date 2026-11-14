@@ -10,6 +10,7 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { login } from '../../../lib/auth';
+import { ApiError } from '../../../lib/api';
 import { useAuth } from '../../../contexts/auth-context';
 import { useIsMobile } from '../../../lib/use-mobile';
 import { useToast } from '../../../contexts/toast-context';
@@ -65,40 +66,61 @@ export default function LoginPage() {
       setUser(res.user);
       router.push('/dashboard');
     } catch (err) {
-      // Fallback local auth for dev/testing when API or credentials miss
-      const fallbackUser = {
-        id: 'usr-alex-9941',
-        name: email.split('@')[0].replace('.', ' ') || 'Alex Marksman',
-        email: email.trim() || 'shooter@example.com',
-        role: 'SHOOTER' as const,
-        createdAt: new Date(),
-      };
-      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-      const body = btoa(JSON.stringify({ sub: fallbackUser.id, email: fallbackUser.email, role: fallbackUser.role, exp: Math.floor(Date.now() / 1000) + 86400 * 30 }));
-      localStorage.setItem('access_token', `${header}.${body}.sig`);
-      localStorage.setItem('current_user', JSON.stringify(fallbackUser));
-      setUser(fallbackUser);
-      router.push('/dashboard');
+      const isNetworkOffline =
+        (typeof navigator !== 'undefined' && !navigator.onLine) ||
+        (err instanceof ApiError && err.status === 0) ||
+        (err instanceof TypeError);
+      if (isNetworkOffline) {
+        const fallbackUser = {
+          id: 'usr-alex-9941',
+          name: email.split('@')[0].replace('.', ' ') || 'Alex Marksman',
+          email: email.trim() || 'shooter@example.com',
+          role: 'SHOOTER' as const,
+          createdAt: new Date(),
+        };
+        const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+        const body = btoa(JSON.stringify({ sub: fallbackUser.id, email: fallbackUser.email, role: fallbackUser.role, exp: Math.floor(Date.now() / 1000) + 86400 * 30 }));
+        localStorage.setItem('access_token', `${header}.${body}.sig`);
+        localStorage.setItem('current_user', JSON.stringify(fallbackUser));
+        setUser(fallbackUser);
+        toast('Signed in with offline demo session', 'info');
+        router.push('/dashboard');
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Invalid email or password');
+      setHasError(true);
     } finally {
       setLoading(false);
     }
   }
 
-  function handleDemoLogin(role: 'SHOOTER' | 'COACH') {
+  async function handleDemoLogin(role: 'SHOOTER' | 'COACH') {
     const isCoach = role === 'COACH';
-    const demoUser = {
-      id: isCoach ? 'usr-coach-101' : 'usr-alex-9941',
-      name: isCoach ? 'Jordan Coach' : 'Alex Marksman',
-      email: isCoach ? 'coach@example.com' : 'shooter@example.com',
-      role: role,
-      createdAt: new Date(),
-    };
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const body = btoa(JSON.stringify({ sub: demoUser.id, email: demoUser.email, role: demoUser.role, exp: Math.floor(Date.now() / 1000) + 86400 * 30 }));
-    localStorage.setItem('access_token', `${header}.${body}.sig`);
-    localStorage.setItem('current_user', JSON.stringify(demoUser));
-    setUser(demoUser);
-    router.push('/dashboard');
+    const targetEmail = isCoach ? 'coach@example.com' : 'shooter@example.com';
+    const targetPassword = 'Password123!';
+    setLoading(true);
+    try {
+      const res = await login({ email: targetEmail, password: targetPassword });
+      setUser(res.user);
+      router.push('/dashboard');
+    } catch (err) {
+      console.warn('Backend login unavailable, fallback to offline demo mode:', err);
+      const demoUser = {
+        id: isCoach ? 'usr-coach-101' : 'usr-alex-9941',
+        name: isCoach ? 'Jordan Coach' : 'Alex Marksman',
+        email: targetEmail,
+        role: role,
+        createdAt: new Date(),
+      };
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const body = btoa(JSON.stringify({ sub: demoUser.id, email: demoUser.email, role: demoUser.role, exp: Math.floor(Date.now() / 1000) + 86400 * 30 }));
+      localStorage.setItem('access_token', `${header}.${body}.sig`);
+      localStorage.setItem('current_user', JSON.stringify(demoUser));
+      setUser(demoUser);
+      router.push('/dashboard');
+    } finally {
+      setLoading(false);
+    }
   }
 
 
@@ -117,30 +139,24 @@ export default function LoginPage() {
       />
 
       {/* ── Mobile image banner (shown only on small screens) ────────── */}
-      <div className="lg:hidden relative h-32 overflow-hidden flex-shrink-0">
-        <img
-          src="https://images.pexels.com/photos/6091606/pexels-photo-6091606.jpeg?auto=compress&cs=tinysrgb&w=800&h=300&dpr=1"
-          className="w-full h-full object-cover"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(6,8,16,0.45) 0%, rgba(6,8,16,0.96) 100%)' }} />
-        <div className="absolute bottom-4 left-6 flex items-center gap-2.5">
+      <div className="lg:hidden relative h-24 overflow-hidden flex-shrink-0 bg-gradient-to-r from-[#060810] via-[#0D1527] to-[#060810] border-b border-white/5 flex items-center justify-between px-6">
+        <div className="flex items-center gap-2.5">
           <CrosshairMark />
-          <span className="font-display font-bold text-xl tracking-widest text-[#F0F4FF] uppercase">MARKSMAN</span>
+          <span className="font-display font-bold text-lg tracking-widest text-[#F0F4FF] uppercase">MARKSMAN</span>
         </div>
+        <span className="text-[10px] uppercase font-mono px-2.5 py-1 rounded-full bg-[#F5A623]/15 text-[#F5A623] border border-[#F5A623]/30 font-bold">
+          ATHLETE PORTAL
+        </span>
       </div>
 
       {/* ── Left visual panel (hidden on mobile) ───────────────────────── */}
       <div
-        className="hidden lg:flex lg:w-[55%] relative overflow-hidden flex-col justify-between p-12 noise-overlay"
+        className="hidden lg:flex lg:w-[55%] relative overflow-hidden flex-col justify-between p-12 noise-overlay bg-[#060810]"
         style={{
           backgroundImage: [
-            'linear-gradient(135deg, rgba(6,8,16,0.82) 0%, rgba(8,12,28,0.60) 50%, rgba(6,8,16,0.90) 100%)',
-            'url(https://images.pexels.com/photos/6091606/pexels-photo-6091606.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1600&dpr=1)',
+            'linear-gradient(135deg, rgba(6,8,16,0.88) 0%, rgba(8,14,32,0.72) 50%, rgba(6,8,16,0.94) 100%)',
+            'radial-gradient(circle at 35% 30%, rgba(245,166,35,0.12), transparent 60%)',
           ].join(', '),
-          backgroundSize: 'cover, cover',
-          backgroundPosition: 'center, center',
         }}
       >
         {/* Animated target rings SVG */}
@@ -178,11 +194,14 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right form panel ────────────────────────────────────────────── */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-10 lg:flex lg:items-center lg:justify-center">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto px-6 pt-4 lg:py-10 lg:flex lg:items-center lg:justify-center"
+        style={{ paddingBottom: 'max(4rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
+      >
         <div className="w-full max-w-md mx-auto animate-slide-up">
 
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-10">
+          {/* Logo (desktop only; mobile banner already features MARKSMAN brand) */}
+          <div className="hidden lg:flex items-center gap-3 mb-8">
             <CrosshairMark />
             <span className="font-display font-bold text-2xl tracking-widest text-text-primary">
               MARKSMAN
@@ -190,8 +209,8 @@ export default function LoginPage() {
           </div>
 
           {/* Heading */}
-          <div className="mb-8">
-            <h1 className="font-display font-bold text-3xl text-text-primary mb-1">
+          <div className="mb-4 lg:mb-8">
+            <h1 className="font-display font-bold text-2xl lg:text-3xl text-text-primary mb-1">
               Welcome back
             </h1>
             <p className="text-text-secondary text-sm">
@@ -276,14 +295,14 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => handleDemoLogin('SHOOTER')}
-                  className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-[var(--accent-primary)]/40 text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5"
+                  className="py-2.5 px-3 rounded-xl bg-elevated hover:bg-surface border border-[var(--accent-primary)]/45 text-xs font-bold text-text-primary transition-all flex items-center justify-center gap-1.5"
                 >
                   🎯 Quick Shooter
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDemoLogin('COACH')}
-                  className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 text-xs font-bold text-[var(--text-secondary)] hover:text-white transition-all flex items-center justify-center gap-1.5"
+                  className="py-2.5 px-3 rounded-xl bg-elevated hover:bg-surface border border-border-default text-xs font-bold text-text-secondary hover:text-text-primary transition-all flex items-center justify-center gap-1.5"
                 >
                   📋 Quick Coach
                 </button>

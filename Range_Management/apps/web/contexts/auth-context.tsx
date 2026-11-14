@@ -61,15 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!token || !isAuthenticated() || isTokenExpired(token)) {
-      // Default to Lead RSO demo profile so operators can immediately use Range Management
-      const demoOperator: User = {
-        id: 'rso-demo-01',
-        name: 'Sgt. Miller (Lead RSO)',
-        email: 'rso@marksmanspro.com',
-        role: 'RANGE_OPERATOR',
-        createdAt: new Date(),
-      };
-      setUserState(demoOperator);
+      setUserState(null);
       setIsLoading(false);
       return;
     }

@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const memoryFeedback: any[] = [];
 
+export const dynamic = 'force-static';
+
 export async function GET() {
   return NextResponse.json(memoryFeedback);
 }

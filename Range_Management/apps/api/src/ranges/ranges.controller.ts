@@ -11,7 +11,7 @@ export class RangesController {
   constructor(private readonly rangesService: RangesService) {}
 
   @Post()
-  @Roles('RANGE_OPERATOR')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN')
   createRange(@Request() req: any, @Body() dto: CreateRangeDto) {
     return this.rangesService.createRange(req.user.id, dto);
   }
@@ -35,13 +35,13 @@ export class RangesController {
   }
 
   @Post(':id/lanes')
-  @Roles('RANGE_OPERATOR')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN')
   createLane(@Param('id') id: string, @Body() dto: CreateLaneDto) {
     return this.rangesService.createLane(id, dto);
   }
 
   @Post(':id/walk-in')
-  @Roles('RANGE_OPERATOR')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'STAFF', 'RSO')
   registerWalkInGuest(@Param('id') id: string, @Body() dto: WalkInGuestDto) {
     return this.rangesService.registerWalkInGuest(id, dto);
   }
@@ -52,7 +52,7 @@ export class RangesController {
   }
 
   @Put('lanes/:laneId/clear')
-  @Roles('RANGE_OPERATOR')
+  @Roles('RANGE_OPERATOR', 'RANGE_ADMIN', 'RSO')
   clearLane(@Param('laneId') laneId: string) {
     return this.rangesService.clearLane(laneId);
   }

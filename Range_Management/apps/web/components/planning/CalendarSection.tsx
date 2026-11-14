@@ -18,6 +18,8 @@ import type {
 import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../../lib/api';
 import { useAuth } from '../../contexts/auth-context';
+import { useToast } from '../../contexts/toast-context';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import type {
   TrainingEvent, User, EventType, RecurringType, ScheduleRequest, RequestStatus,
 } from '@shooting-platform/shared-types';
@@ -100,6 +102,7 @@ export default function CalendarSection() {
 
 function CoachCalendar() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const isMobile = useIsMobile(768);
   const calRef = useRef<FullCalendar>(null);
   const calendarConfig = useMemo(() => ({
@@ -116,6 +119,7 @@ function CoachCalendar() {
   const [modal,         setModal]         = useState<'create' | 'edit' | null>(null);
   const [showRequests,  setShowRequests]  = useState(false);
   const [selected,      setSelected]      = useState<TrainingEvent | null>(null);
+  const [seriesDeleteOpen, setSeriesDeleteOpen] = useState(false);
   const [form,          setForm]          = useState<EventFormState>(BLANK_FORM);
   const [saving,        setSaving]        = useState(false);
   const [error,         setError]         = useState<string | null>(null);
@@ -151,7 +155,7 @@ function CoachCalendar() {
   // WebSocket — receive new request notifications
   useEffect(() => {
     if (!user?.id) return;
-    const socket: Socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001');
+    const socket: Socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3003');
     socket.emit('joinUserRoom', user.id);
     socket.on('schedule.request.created', () => {
       fetchRequests();
@@ -197,20 +201,34 @@ function CoachCalendar() {
     } finally { setSaving(false); }
   }
 
-  async function handleDelete() {
+  async function executeDelete(allInSeries: boolean) {
     if (!selected) return;
     setSaving(true);
     try {
-      if (selected.recurringGroupId) {
-        const all = confirm('Delete all events in this series?\nOK = all series  Cancel = just this one');
-        if (all) await apiFetch(`/calendar/events/recurring/${selected.recurringGroupId}`, { method: 'DELETE' });
-        else     await apiFetch(`/calendar/events/${selected.id}`, { method: 'DELETE' });
+      if (allInSeries && selected.recurringGroupId) {
+        await apiFetch(`/calendar/events/recurring/${selected.recurringGroupId}`, { method: 'DELETE' });
+        toast('Recurring event series deleted', 'success');
       } else {
         await apiFetch(`/calendar/events/${selected.id}`, { method: 'DELETE' });
+        toast('Event deleted', 'success');
       }
-      setModal(null); fetchEvents();
-    } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Failed to delete');
-    } finally { setSaving(false); }
+      setSeriesDeleteOpen(false);
+      setModal(null);
+      fetchEvents();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to delete');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!selected) return;
+    if (selected.recurringGroupId) {
+      setSeriesDeleteOpen(true);
+      return;
+    }
+    await executeDelete(false);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,6 +338,19 @@ function CoachCalendar() {
         <RequestsPanel requests={requests} onClose={() => setShowRequests(false)}
           onRefresh={fetchRequests} onEventRefresh={fetchEvents} />
       )}
+      <ConfirmModal
+        open={seriesDeleteOpen}
+        title="Delete Recurring Event"
+        message={`"${selected?.title ?? 'This event'}" repeats as part of a series. Choose whether to delete only this occurrence or the entire series.`}
+        confirmLabel="Delete Entire Series"
+        secondaryLabel="Only This Event"
+        cancelLabel="Cancel"
+        danger
+        loading={saving}
+        onConfirm={() => executeDelete(true)}
+        onSecondary={() => executeDelete(false)}
+        onCancel={() => setSeriesDeleteOpen(false)}
+      />
     </div>
   );
 }
@@ -386,7 +417,7 @@ function ShooterCalendar() {
   // WebSocket — get notified when coach resolves a request
   useEffect(() => {
     if (!user?.id) return;
-    const socket: Socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001');
+    const socket: Socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3003');
     socket.emit('joinUserRoom', user.id);
     socket.on('schedule.request.resolved', () => {
       apiFetch<ScheduleRequest[]>('/schedule-requests').then(setRequests).catch(() => {});

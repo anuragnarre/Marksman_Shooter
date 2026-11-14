@@ -5,7 +5,28 @@
 
 import { isOnline, setOnline } from './network-state';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+function getApiBase(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') {
+    const customUrl = localStorage.getItem('marksman_server_url');
+    if (customUrl) return customUrl;
+
+    const isCapacitor = 
+      window.location.protocol === 'capacitor:' || 
+      (typeof (window as any).Capacitor !== 'undefined' && typeof (window as any).Capacitor.isNativePlatform === 'function' && (window as any).Capacitor.isNativePlatform());
+
+    // Only force localhost:3001 if testing on a desktop web browser at localhost (not on native mobile)
+    if (!isCapacitor && (
+      (window.location.protocol === 'https:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ||
+      (window.location.protocol === 'http:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    )) {
+      return 'http://localhost:3001';
+    }
+  }
+  return envUrl && envUrl !== '/api' ? envUrl : 'https://api.marksmanshooter.in';
+}
+
+const API_BASE = getApiBase();
 
 export class ApiError extends Error {
   constructor(
@@ -97,6 +118,11 @@ export async function apiFetch<T>(
       // ignore JSON parse errors
     }
     if (res.status === 401 && typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      if (token && token.endsWith('.sig')) {
+        console.warn('Dev mock token used with backend API - staying logged in locally');
+        return undefined as unknown as T;
+      }
       localStorage.removeItem('access_token');
       localStorage.removeItem('current_user');
       window.dispatchEvent(new Event('auth:unauthorized'));

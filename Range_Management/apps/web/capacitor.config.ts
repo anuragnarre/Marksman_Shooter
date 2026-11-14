@@ -1,24 +1,21 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.marksman.rangeops',
-  appName: 'Marksman Range Ops',
+  appId: 'com.marksman.rangeapp',
+  appName: 'Marksman Range',
   webDir: 'out',
 
-  // Points the Android/iOS WebView at the live production deployment.
+  // Uses local bundled web assets from 'out' for offline & local backend operation.
   server: {
-    url: 'https://www.marksmanspro.com',
-    cleartext: false,
-    androidScheme: 'https',
-    allowNavigation: ['www.marksmanspro.com', 'marksmanspro.com'],
+    androidScheme: 'http',
+    cleartext: true,
   },
 
   android: {
     backgroundColor: '#080A0F',
-    // Let the web content render under the system status bar
-    allowMixedContent: false,
+    allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: false,
+    webContentsDebuggingEnabled: true,
   },
 
   ios: {

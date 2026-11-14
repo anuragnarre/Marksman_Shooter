@@ -32,7 +32,7 @@ export function LiveTargetSelector({ selectedTarget, onChange, isConnected }: Li
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg-elevated border border-border-subtle">
-          <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-data pulse-amber' : 'bg-signal-red'}`} />
+          <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#00E5A0] pulse-amber' : 'bg-[#FF4D6D]'}`} />
           <span className="font-body text-xs font-medium text-text-secondary">
             {isConnected ? 'LIVE' : 'OFFLINE'}
           </span>

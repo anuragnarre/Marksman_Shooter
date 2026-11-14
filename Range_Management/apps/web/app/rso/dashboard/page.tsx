@@ -1,19 +1,22 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { ShieldAlert, Maximize, QrCode, Power, CheckCircle, AlertTriangle, Shield, Check, Radio } from "lucide-react";
+import Link from "next/link";
+import { ShieldAlert, Maximize, QrCode, Power, CheckCircle, AlertTriangle, Shield, Radio, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { apiFetch } from "@/lib/api";
 import { io, Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/contexts/toast-context";
 
 // Mobile-first RSO Dashboard
 export default function RSODashboard() {
   const router = useRouter();
+  const { toast } = useToast();
   const [rangeStatus, setRangeStatus] = useState<'HOT' | 'COLD'>('HOT');
   const [rangeId, setRangeId] = useState<string>('range-1');
   const [rangeName, setRangeName] = useState<string>('Range Alpha');
-  const [showScanner, setShowScanner] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [emergencyReason, setEmergencyReason] = useState('Unsafe Downrange Condition');
   const [broadcastMessage, setBroadcastMessage] = useState<string | null>(null);
@@ -93,6 +96,10 @@ export default function RSODashboard() {
         });
       }
     }
+    toast(
+      isCeasefire ? 'Range is now COLD — Ceasefire broadcasted' : 'Range is now HOT — Firing permitted',
+      isCeasefire ? 'warning' : 'success'
+    );
   };
 
   const handleTriggerEmergencyCeasefire = async () => {
@@ -115,27 +122,56 @@ export default function RSODashboard() {
       });
     }
     setBroadcastMessage(`🚨 EMERGENCY CEASEFIRE BROADCAST: ${emergencyReason}`);
+    toast(`Emergency ceasefire active: ${emergencyReason}`, 'error');
+  };
+
+  const handleToggleFullscreen = async () => {
+    const next = !focusMode;
+    setFocusMode(next);
+    try {
+      if (next && document.documentElement.requestFullscreen && !document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else if (!next && document.exitFullscreen && document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // Android WebView handles immersive mode natively
+    }
+    toast(next ? 'RSO High-Visibility Focus Mode enabled' : 'Standard RSO view restored', 'info');
   };
 
   return (
-    <div className="bg-surface-container-lowest min-h-screen text-on-surface font-sans flex flex-col">
+    <div className="bg-surface-container-lowest min-h-[100dvh] text-on-surface font-sans flex flex-col">
       {/* Mobile-friendly Header */}
-      <div className="bg-surface-container-high border-b border-outline-variant/30 p-4 sticky top-0 z-10 flex justify-between items-center shadow-sm">
-        <div className="flex items-center gap-2">
-           <Shield className="text-primary" size={24} />
+      <div className="bg-surface-container-high border-b border-outline-variant/30 px-4 pb-3 pt-[calc(0.75rem+var(--sat))] sticky top-0 z-10 flex justify-between items-center shadow-sm">
+        <div className="flex items-center gap-2.5">
+           <Link
+             href="/dashboard"
+             className="w-9 h-9 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface"
+             aria-label="Back to Command Center"
+           >
+             <ArrowLeft size={18} />
+           </Link>
+           <Shield className="text-primary" size={22} />
            <div>
-             <h1 className="text-lg font-bold leading-tight">RSO Panel</h1>
-             <p className="text-xs text-on-surface-variant">Active Shift: Range A</p>
+             <h1 className="text-base sm:text-lg font-bold leading-tight">RSO Panel</h1>
+             <p className="text-xs text-on-surface-variant">Active Shift: {rangeName}</p>
            </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="rounded-full w-10 h-10 p-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleFullscreen}
+            title="Toggle High-Visibility RSO Focus Mode"
+            className={`rounded-full w-10 h-10 p-0 ${focusMode ? 'border-primary text-primary bg-primary/10' : ''}`}
+          >
             <Maximize size={18} />
           </Button>
         </div>
       </div>
 
-      <div className="p-4 flex-1 flex flex-col space-y-6">
+      <div className="p-4 pb-[calc(1.5rem+var(--sab))] flex-1 flex flex-col space-y-6">
         {broadcastMessage && (
           <div className="bg-primary/20 border border-primary text-on-surface px-4 py-3 rounded-2xl flex items-center gap-3 animate-in fade-in duration-300">
             <Radio className="text-primary animate-pulse" size={20} />

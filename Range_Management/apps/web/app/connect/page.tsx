@@ -79,7 +79,7 @@ export default function ConnectPage() {
   useEffect(() => {
     if (user?.role && user.role !== 'SHOOTER') return;
     loadData();
-    const socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001');
+    const socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3003');
     socketRef.current = socket;
     if (user?.id) socket.emit('joinUserRoom', user.id);
     socket.on('connection.invite',   () => { setNewInvite(true); loadData(); });

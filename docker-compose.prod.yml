@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL Database ───────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: marksman-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMeInProductionSecret123!}
+      POSTGRES_DB: ${POSTGRES_DB:-shooting_platform}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marksman-internal
+
+  # ── Redis Cache & Bull Queues ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: marksman-redis-prod
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marksman-internal
+
+  # ── Shooter App NestJS API (:3001) ────────────────────────────────────────
+  shooter-api:
+    build:
+      context: ./Shooter_App
+      dockerfile: Dockerfile.api
+    container_name: marksman-shooter-api
+    restart: always
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-ChangeMeInProductionSecret123!}@postgres:5432/${POSTGRES_DB:-shooting_platform}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-marksman-jwt-secret-replace-in-production}
+      VISION_SERVICE_URL: http://vision-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - marksman-internal
+
+  # ── Range Management NestJS API (:3003) ───────────────────────────────────
+  range-api:
+    build:
+      context: ./Range_Management
+      dockerfile: Dockerfile.api
+    container_name: marksman-range-api
+    restart: always
+    environment:
+      PORT: 3003
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-ChangeMeInProductionSecret123!}@postgres:5432/${POSTGRES_DB:-shooting_platform}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-marksman-jwt-secret-replace-in-production}
+      VISION_SERVICE_URL: http://vision-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - marksman-internal
+
+  # ── Python OpenCV / AI Vision Engine (:8000) ──────────────────────────────
+  vision-service:
+    build:
+      context: ./Shooter_App/apps/vision
+      dockerfile: Dockerfile
+    container_name: marksman-vision-service
+    restart: always
+    environment:
+      PORT: 8000
+      PYTHONUNBUFFERED: 1
+    networks:
+      - marksman-internal
+
+  # ── Cloudflare Tunnel (cloudflared) ───────────────────────────────────────
+  # Secure outbound-only tunnel to Cloudflare Edge. No open inbound ports required!
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: marksman-cloudflared
+    restart: always
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - shooter-api
+      - range-api
+      - vision-service
+    networks:
+      - marksman-internal
+
+networks:
+  marksman-internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+

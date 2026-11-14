@@ -9,6 +9,7 @@ import { LoadingScreen } from '../components/LoadingScreen';
 import { MarketingNav } from '../components/MarketingNav';
 import { MiniTargetCanvas } from '../components/MiniTargetCanvas';
 import { useCountUp } from '../hooks/useCountUp';
+import { isNative } from '../lib/capacitor';
 
 // ─── Shot data (deterministic) ────────────────────────────────────────────────
 const SHOTS = [
@@ -940,7 +941,12 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoading, setShowLoading]       = useState(true);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    if (isNative()) {
+      router.replace('/auth/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -1005,14 +1011,22 @@ export default function HomePage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  if (mounted && isNative()) {
+    return (
+      <div className="min-h-screen bg-[#07090F] flex flex-col items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-2 border-[#00D48A] border-t-transparent animate-spin mb-3" />
+        <span className="font-mono text-xs text-[#ECEEF4]/60 tracking-widest uppercase">Launching Marksman Range...</span>
+      </div>
+    );
+  }
+
   return (
     <>
       {showLoading && <LoadingScreen onComplete={() => setShowLoading(false)} />}
 
       {/* ── Global Styles ─────────────────────────────────────────────────── */}
       <style>{`
-        /* Fonts: Outfit (display) + JetBrains Mono (data/labels) */
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+        /* System + bundled font fallback stack for offline-safe rendering */
 
         /* Keyframes */
         @keyframes lp-marquee  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
@@ -1113,18 +1127,18 @@ export default function HomePage() {
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 mb-9"
                   style={{ animation: 'lp-heroUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.28s both' }}>
-                  <Link href="/auth/login"
+                  <Link href="/auth/login?role=RANGE_OPERATOR"
                     className="inline-flex items-center justify-center gap-2 font-display font-bold text-[14px] px-7 py-3.5 rounded-[12px] group active:scale-[0.98]"
                     style={{ background: 'linear-gradient(135deg, #F5A623 0%, #E18E0D 100%)', color: '#07090F', boxShadow: isDark ? '0 0 22px rgba(245,166,35,0.16), 0 4px 14px rgba(0,0,0,0.26)' : '0 4px 14px rgba(245,166,35,0.16)', transition: 'filter 220ms ease, transform 150ms ease' }}
                     onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1.06)'}
                     onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1)'}>
-                    SHOOTER APP
+                    ENTER RANGE MANAGEMENT
                     <IconArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </Link>
-                  <Link href="/auth/login?role=RANGE_OPERATOR"
+                  <Link href="/auth/login"
                     className="inline-flex items-center justify-center gap-2 font-display font-bold text-[13px] px-6 py-3.5 rounded-[12px] group hover:text-[#4FC3F7] active:scale-[0.98]"
                     style={{ color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', background: 'transparent', transition: 'color 220ms ease, transform 150ms ease' }}>
-                    RANGE APP
+                    OPERATOR SIGN IN
                     <IconArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </Link>
                   <AppDownloadButton size="md" />

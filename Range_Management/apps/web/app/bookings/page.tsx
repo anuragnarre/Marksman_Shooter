@@ -10,23 +10,25 @@ import { useBookings } from "@/hooks/useBookings";
 
 export default function BookingsPage() {
   const { resolvedTheme } = useTheme();
-  const { events, requests, isLoading, approveRequest, rejectRequest } = useBookings();
+  const { events, requests, isLoading, createBooking, approveRequest, rejectRequest } = useBookings();
 
   return (
     <DashboardLayout role="RANGE_OPERATOR">
       {resolvedTheme === "light" ? (
-        <BookingsLight 
-          events={events} 
-          requests={requests} 
-          isLoading={isLoading} 
+        <BookingsLight
+          events={events}
+          requests={requests}
+          isLoading={isLoading}
+          createBooking={createBooking}
           approveRequest={approveRequest}
           rejectRequest={rejectRequest}
         />
       ) : (
-        <BookingsDark 
-          events={events} 
-          requests={requests} 
-          isLoading={isLoading} 
+        <BookingsDark
+          events={events}
+          requests={requests}
+          isLoading={isLoading}
+          createBooking={createBooking}
           approveRequest={approveRequest}
           rejectRequest={rejectRequest}
         />

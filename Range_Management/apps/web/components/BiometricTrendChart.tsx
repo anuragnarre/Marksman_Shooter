@@ -11,7 +11,7 @@ import { apiFetch } from '../lib/api';
 import { useAuth } from '../contexts/auth-context';
 import type { BiometricTrendPoint, BiometricReading, BiometricUpdateEvent } from '@shooting-platform/shared-types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3003';
 
 type TrendMode = 'live' | '1h' | '1d' | '7d' | '30d' | '90d';
 

@@ -29,6 +29,26 @@ function getSystemTheme(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
+function syncCapacitorStatusBar(resolved: ResolvedTheme) {
+  if (typeof window === 'undefined') return;
+  void (async () => {
+    try {
+      const { Capacitor } = await import('@capacitor/core');
+      if (!Capacitor.isNativePlatform()) return;
+      const { StatusBar, Style } = await import('@capacitor/status-bar');
+      await StatusBar.setOverlaysWebView({ overlay: true });
+      await StatusBar.setStyle({
+        style: resolved === 'dark' ? Style.Dark : Style.Light,
+      });
+      await StatusBar.setBackgroundColor({
+        color: resolved === 'dark' ? '#0b1326' : '#f8f9ff',
+      });
+    } catch {
+      // Non-Capacitor environment or plugin unavailable — ignore
+    }
+  })();
+}
+
 function applyTheme(resolved: ResolvedTheme, dashboardTheme: DashboardTheme) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
@@ -42,6 +62,7 @@ function applyTheme(resolved: ResolvedTheme, dashboardTheme: DashboardTheme) {
     root.setAttribute('data-theme', 'light');
   }
   root.setAttribute('data-dashboard-theme', dashboardTheme);
+  syncCapacitorStatusBar(resolved);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

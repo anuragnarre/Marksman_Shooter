@@ -50,7 +50,7 @@ export class AuthService {
         name: dto.name,
         email: dto.email,
         passwordHash,
-        role: dto.role,
+        role: dto.role ?? 'SHOOTER',
       },
     });
 
@@ -114,8 +114,15 @@ export class AuthService {
 
   async googleLogin(dto: GoogleAuthDto): Promise<AuthResponse> {
     // Guard: fail clearly if Google OAuth is not configured on this server
-    const googleClientId = this.configService.get<string>('GOOGLE_CLIENT_ID') ?? '';
-    if (!googleClientId || googleClientId.startsWith('dummy') || googleClientId === 'your-google-web-client-id.apps.googleusercontent.com') {
+    const rawClientIds = this.configService.get<string>('GOOGLE_CLIENT_ID') ?? '';
+    const audiences = Array.from(
+      new Set([
+        ...rawClientIds.split(',').map((id) => id.trim()).filter(Boolean),
+        '956705763664-jd9dqcqf3tdknjaflb2gc0iknnf9hmen.apps.googleusercontent.com',
+      ]),
+    ).filter((id) => !id.startsWith('dummy') && id !== 'your-google-web-client-id.apps.googleusercontent.com');
+
+    if (audiences.length === 0) {
       throw new BadRequestException(
         'Google Sign-In is not configured on this server. Please use email/password login.',
       );
@@ -126,7 +133,7 @@ export class AuthService {
     try {
       ticket = await this.googleClient.verifyIdToken({
         idToken: dto.credential,
-        audience: googleClientId,
+        audience: audiences.length === 1 ? audiences[0] : audiences,
       });
     } catch (err) {
       this.logger.error('[googleLogin] verifyIdToken failed:', err);

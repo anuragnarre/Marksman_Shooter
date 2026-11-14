@@ -151,6 +151,117 @@ export interface Shot {
   flightTimeMs?: number; // In-flight duration from muzzle crack to impact (ms)
   muzzleVelocityMps?: number; // Calculated muzzle velocity (m/s)
   acousticTriggered?: boolean; // Whether shot was triggered by acoustic sensor
+  isSighter?: boolean; // True if designated as unscored sighter shot
+}
+
+export interface SightCorrection {
+  mpiX: number; // Mean Point of Impact X offset in mm
+  mpiY: number; // Mean Point of Impact Y offset in mm
+  mpiRadiusMm: number; // Distance of group centroid from dead center
+  windageClicks: number;
+  windageDirection: 'LEFT' | 'RIGHT' | 'CENTER';
+  elevationClicks: number;
+  elevationDirection: 'UP' | 'DOWN' | 'CENTER';
+  adviceSummary: string;
+  tightnessRating: 'MATCH_GRADE' | 'EXCELLENT' | 'GOOD' | 'DISPERSED';
+}
+
+export interface SeriesScore {
+  seriesNumber: number;
+  shots: Shot[];
+  decimalTotal: number;
+  integerTotal: number;
+  innerTens: number;
+  extremeSpreadMm: number;
+  meanRadiusMm: number;
+}
+
+export type MatchDisciplineMode = 'PRACTICE' | 'SIGHTER' | 'MATCH_10' | 'MATCH_20' | 'MATCH_40' | 'MATCH_60';
+
+export type MatchTimerPreset =
+  | 'ISSF_60_SHOTS'
+  | 'ISSF_40_SHOTS'
+  | 'ISSF_PREP_SIGHT'
+  | 'ISSF_SERIES_5M'
+  | 'RAPID_FIRE_8S'
+  | 'RAPID_FIRE_6S'
+  | 'RAPID_FIRE_4S'
+  | 'CUSTOM';
+
+export interface MatchTimerConfig {
+  preset: MatchTimerPreset;
+  label: string;
+  durationSeconds: number;
+  description: string;
+}
+
+export const MATCH_TIMER_PRESETS: Record<MatchTimerPreset, MatchTimerConfig> = {
+  ISSF_60_SHOTS: {
+    preset: 'ISSF_60_SHOTS',
+    label: '60 Shots (75m)',
+    durationSeconds: 4500,
+    description: 'ISSF 10m Air Rifle / Air Pistol 60-shot qualification match (75 mins)',
+  },
+  ISSF_40_SHOTS: {
+    preset: 'ISSF_40_SHOTS',
+    label: '40 Shots (50m)',
+    durationSeconds: 3000,
+    description: 'ISSF Junior / Masters 40-shot qualification match (50 mins)',
+  },
+  ISSF_PREP_SIGHT: {
+    preset: 'ISSF_PREP_SIGHT',
+    label: 'Prep & Sight (15m)',
+    durationSeconds: 900,
+    description: 'Preparation and sighting time before match competition (15 mins)',
+  },
+  ISSF_SERIES_5M: {
+    preset: 'ISSF_SERIES_5M',
+    label: '5-Shot Series (5m)',
+    durationSeconds: 300,
+    description: 'Precision stage 5-shot series (5 mins)',
+  },
+  RAPID_FIRE_8S: {
+    preset: 'RAPID_FIRE_8S',
+    label: 'Rapid Fire (8s)',
+    durationSeconds: 8,
+    description: '25m Rapid Fire stage 1: 5 shots in 8 seconds',
+  },
+  RAPID_FIRE_6S: {
+    preset: 'RAPID_FIRE_6S',
+    label: 'Rapid Fire (6s)',
+    durationSeconds: 6,
+    description: '25m Rapid Fire stage 2: 5 shots in 6 seconds',
+  },
+  RAPID_FIRE_4S: {
+    preset: 'RAPID_FIRE_4S',
+    label: 'Rapid Fire (4s)',
+    durationSeconds: 4,
+    description: '25m Rapid Fire stage 3: 5 shots in 4 seconds',
+  },
+  CUSTOM: {
+    preset: 'CUSTOM',
+    label: 'Custom Timer',
+    durationSeconds: 600,
+    description: 'User specified training drill interval',
+  },
+};
+
+export interface SessionSummary {
+  laneId: string;
+  targetType: TargetTypeCode;
+  targetName: string;
+  timestamp: number;
+  totalShots: number;
+  matchShotsCount: number;
+  sighterShotsCount: number;
+  totalScore: number;
+  decimalTotal: number;
+  innerTensCount: number;
+  averageScore: number;
+  extremeSpreadMm: number;
+  meanRadiusMm: number;
+  series: SeriesScore[];
+  sightCorrection: SightCorrection;
 }
 
 export interface TargetTelemetryPayload {
@@ -165,4 +276,37 @@ export interface TargetTelemetryPayload {
 
 export type WiFiFrequencyBand = '2.4GHz' | '5GHz' | '6GHz+' | 'AUTO_DETECT';
 export type VideoComputationMode = 'SERVER_VISION' | 'ON_DEVICE_EDGE' | 'HYBRID_EDGE_STREAM';
+export type MountingMode = 'OVERHEAD_DOWN' | 'OVERHEAD_UP' | 'WALL_RIG';
+
+export interface OrientationReading {
+  rollDeg: number;
+  pitchDeg: number;
+  gx: number;
+  gy: number;
+  gz: number;
+  totalG: number;
+  mountingMode: MountingMode;
+}
+
+export interface AudioReading {
+  rmsDb: number;
+  peakDb: number;
+  dbfs: number;
+  timestamp: number;
+}
+
+export interface CvFrameStats {
+  lumaAvg: number;
+  contrastScore: number;
+  sharpnessScore: number;
+  baselineLocked: boolean;
+  cameraMoved?: boolean;
+  hasImpact?: boolean;
+  normU?: number;
+  normV?: number;
+  clusterPixels?: number;
+  impactConfidence?: number;
+  meanAbsDiff?: number;
+  message: string;
+}
 

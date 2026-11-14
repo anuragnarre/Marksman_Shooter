@@ -7,14 +7,23 @@ import { io } from 'socket.io-client';
 import { apiFetch } from '../../lib/api';
 import { useAuth } from '../../contexts/auth-context';
 import { useTheme } from '../../contexts/theme-context';
+import { useToast } from '../../contexts/toast-context';
 import { RangeConsoleSidebar } from '../../components/dashboard/RangeConsoleSidebar';
 import { RangeConsoleHeader } from '../../components/dashboard/RangeConsoleHeader';
 import { CommandCenterDark } from '../../components/dashboard/CommandCenterDark';
 import { CommandCenterLight } from '../../components/dashboard/CommandCenterLight';
+import {
+  IconDashboard,
+  IconMyLocation,
+  IconBadge,
+  IconReport,
+  IconMenu,
+} from '../../components/ui/TacticalIcons';
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading, setUser } = useAuth();
   const { dashboardTheme } = useTheme();
+  const { toast } = useToast();
 
   const [rangeStatus, setRangeStatus] = useState<"HOT" | "COLD">("HOT");
   const [rangeId, setRangeId] = useState<string | null>(null);
@@ -24,6 +33,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      const main = document.querySelector('main');
+      if (main) main.scrollTop = 0;
+    }
   }, []);
 
   // Auto-fill demo operator user if unauthenticated during inspection
@@ -69,6 +83,12 @@ export default function DashboardPage() {
   const handleToggleStatus = async () => {
     const newStatus = rangeStatus === "HOT" ? "COLD" : "HOT";
     setRangeStatus(newStatus); // Optimistic update
+    toast(
+      newStatus === "COLD"
+        ? "RANGE COLD — All-Range Cease-Fire Engaged"
+        : "RANGE HOT — Live Fire Cleared by RSO",
+      newStatus === "COLD" ? "warning" : "success",
+    );
 
     // Broadcast instantaneously over WebSocket to all range monitors, cameras, and shooter apps
     try {
@@ -115,7 +135,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans select-none overflow-x-hidden">
+    <div className="h-[100dvh] w-full bg-surface text-on-surface flex flex-col font-sans select-none overflow-hidden">
       {/* Stitch Facility Operations Left Sidebar */}
       <RangeConsoleSidebar
         isOpen={isSidebarOpen}
@@ -129,8 +149,8 @@ export default function DashboardPage() {
         onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
       />
 
-      {/* Main Command Center Body */}
-      <main className="pl-0 lg:pl-64 pt-14 pb-20 lg:pb-6 min-h-screen bg-surface w-full p-2 sm:p-4 md:p-6 overflow-y-auto">
+      {/* Main Command Center Body - Dedicated scrolling viewport between fixed header & footer */}
+      <main className="flex-1 w-full pl-0 lg:pl-64 pt-[calc(3.5rem+var(--sat))] pb-[calc(4.75rem+var(--sab))] lg:pb-6 overflow-y-auto overflow-x-hidden bg-surface p-2 sm:p-4 md:p-6 overscroll-contain">
         {dashboardTheme === "harmonized-precision" ? (
           <CommandCenterLight
             rangeStatus={rangeStatus}
@@ -149,28 +169,28 @@ export default function DashboardPage() {
       </main>
 
       {/* Mobile Ergonomic Bottom Navigation Bar (Hidden on lg+ / Desktop / Fold Unfolded) */}
-      <nav className="fixed bottom-0 left-0 right-0 h-14 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/20 z-40 flex items-center justify-around lg:hidden select-none px-2 shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 h-[calc(3.5rem+var(--sab))] pb-[var(--sab)] bg-surface-container-lowest border-t border-outline-variant/30 z-40 flex items-center justify-around lg:hidden select-none px-2 shadow-2xl">
         <Link href="/dashboard" className="flex flex-col items-center gap-0.5 text-primary py-1">
-          <span className="material-symbols-outlined text-[20px]">dashboard</span>
+          <IconDashboard className="w-5 h-5 text-primary" />
           <span className="text-[10px] font-bold">Console</span>
         </Link>
         <Link href="/lanes" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
-          <span className="material-symbols-outlined text-[20px]">my_location</span>
+          <IconMyLocation className="w-5 h-5 text-on-surface-variant" />
           <span className="text-[10px] font-medium">Lanes</span>
         </Link>
         <Link href="/checkin" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
-          <span className="material-symbols-outlined text-[20px]">badge</span>
+          <IconBadge className="w-5 h-5 text-on-surface-variant" />
           <span className="text-[10px] font-medium">Kiosk</span>
         </Link>
         <Link href="/safety" className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1">
-          <span className="material-symbols-outlined text-[20px]">report</span>
+          <IconReport className="w-5 h-5 text-on-surface-variant" />
           <span className="text-[10px] font-medium">Safety</span>
         </Link>
         <button
           onClick={() => setSidebarOpen(true)}
           className="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-primary py-1"
         >
-          <span className="material-symbols-outlined text-[20px]">menu</span>
+          <IconMenu className="w-5 h-5 text-on-surface-variant" />
           <span className="text-[10px] font-medium">More</span>
         </button>
       </nav>

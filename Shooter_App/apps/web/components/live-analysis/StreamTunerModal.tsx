@@ -3,12 +3,23 @@
 
 import React, { useState, useEffect } from 'react';
 import {
+  SlidersHorizontal,
+  X,
+  Sparkles,
+  Gauge,
+  Radio,
+  BatteryCharging,
+  Wifi,
+  Cpu,
+  Camera,
+  Link2,
+  CheckCircle2,
+  Zap,
+} from 'lucide-react';
+import {
   CameraStreamConfig,
   StreamProfilePreset,
   StreamTelemetryMetrics,
-  VideoHardwareAcceleration,
-  VideoTransportProtocol,
-  CongestionPolicy,
   WiFiFrequencyBand,
   VideoComputationMode,
 } from '@shooting-platform/shared-types';
@@ -30,7 +41,6 @@ export function StreamTunerModal({
   config,
   onConfigChange,
   telemetry,
-  laneName = 'Lane 1',
   laneId = 'lane-1',
 }: StreamTunerModalProps) {
   const [localConfig, setLocalConfig] = useState<CameraStreamConfig>(config);
@@ -42,6 +52,11 @@ export function StreamTunerModal({
   }, [config]);
 
   if (!isOpen) return null;
+
+  const triggerSaveIndicator = () => {
+    setHasSaved(true);
+    setTimeout(() => setHasSaved(false), 2000);
+  };
 
   const handleSelectPreset = (preset: StreamProfilePreset) => {
     if (preset === 'CUSTOM') {
@@ -57,21 +72,17 @@ export function StreamTunerModal({
   };
 
   const updateField = <K extends keyof CameraStreamConfig>(field: K, val: CameraStreamConfig[K]) => {
-    setLocalConfig((prev) => {
-      const updated = { ...prev, [field]: val, profile: 'CUSTOM' as StreamProfilePreset };
-      return updated;
-    });
+    setLocalConfig((prev) => ({
+      ...prev,
+      [field]: val,
+      profile: 'CUSTOM' as StreamProfilePreset,
+    }));
   };
 
   const handleApplyCustom = () => {
     onConfigChange(localConfig);
     saveStreamConfig(localConfig, laneId);
     triggerSaveIndicator();
-  };
-
-  const triggerSaveIndicator = () => {
-    setHasSaved(true);
-    setTimeout(() => setHasSaved(false), 2000);
   };
 
   const currentMetrics: StreamTelemetryMetrics = telemetry || {
@@ -89,38 +100,39 @@ export function StreamTunerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-3xl rounded-2xl bg-[#0B0F19] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-3xl rounded-2xl bg-bg-surface border border-border-subtle shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0F172A]">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0]">
-              <span className="material-symbols-outlined text-[20px]">tune</span>
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-border-subtle bg-bg-elevated">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 rounded-lg bg-[#00E5A0]/15 border border-[#00E5A0]/30 text-[#00E5A0] shrink-0">
+              <SlidersHorizontal className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white font-display">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base sm:text-lg font-bold text-text-primary font-display truncate">
                   Live Stream Performance &amp; Video Engine
                 </h2>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/10 text-[#00E5A0]">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#00E5A0]/15 text-[#00E5A0] border border-[#00E5A0]/30 shrink-0">
                   SHOOTER HUD
                 </span>
               </div>
-              <p className="text-xs text-text-muted font-mono">
-                Hardware Acceleration • Frame Throttling • Custom Downrange Bitrate Options
+              <p className="text-xs text-text-muted font-mono truncate">
+                Hardware Acceleration • Frame Throttling • Downrange Bitrate
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Close Stream Tuner"
+            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-subtle transition-colors shrink-0"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Real-time Quick Metric Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 px-6 py-3 bg-[#080B12] border-b border-white/5 font-mono text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 sm:px-6 py-3 bg-bg-void border-b border-border-subtle font-mono text-xs">
           <div className="flex flex-col">
             <span className="text-[10px] text-text-muted uppercase">Live FPS</span>
             <span className="font-bold text-[#00E5A0] text-sm flex items-center gap-1">
@@ -137,69 +149,49 @@ export function StreamTunerModal({
           </div>
           <div className="flex flex-col">
             <span className="text-[10px] text-text-muted uppercase">Effective Bitrate</span>
-            <span className="font-bold text-white text-sm">
+            <span className="font-bold text-text-primary text-sm">
               {(currentMetrics.bandwidthKbps / 1000).toFixed(1)} Mbps
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-[10px] text-text-muted uppercase">Health</span>
-            <span className="font-bold text-sm flex items-center gap-1">
+            <span className="font-bold text-sm flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#00E5A0]" />
-              <span className="text-white text-xs">{currentMetrics.networkQuality}</span>
+              <span className="text-text-primary text-xs">{currentMetrics.networkQuality}</span>
             </span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center px-6 border-b border-white/10 bg-[#0B0F19]">
-          <button
-            onClick={() => setActiveTab('presets')}
-            className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${
-              activeTab === 'presets'
-                ? 'border-[#00E5A0] text-[#00E5A0]'
-                : 'border-transparent text-text-muted hover:text-white'
-            }`}
-          >
-            Stream Profiles
-          </button>
-          <button
-            onClick={() => setActiveTab('custom')}
-            className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${
-              activeTab === 'custom'
-                ? 'border-[#00E5A0] text-[#00E5A0]'
-                : 'border-transparent text-text-muted hover:text-white'
-            }`}
-          >
-            Custom Tuner
-          </button>
-          <button
-            onClick={() => setActiveTab('hardware')}
-            className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${
-              activeTab === 'hardware'
-                ? 'border-[#00E5A0] text-[#00E5A0]'
-                : 'border-transparent text-text-muted hover:text-white'
-            }`}
-          >
-            GPU &amp; Sensor
-          </button>
-          <button
-            onClick={() => setActiveTab('telemetry')}
-            className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${
-              activeTab === 'telemetry'
-                ? 'border-[#00E5A0] text-[#00E5A0]'
-                : 'border-transparent text-text-muted hover:text-white'
-            }`}
-          >
-            Diagnostics
-          </button>
+        <div className="flex items-center px-4 sm:px-6 border-b border-border-subtle bg-bg-surface overflow-x-auto whitespace-nowrap">
+          {(
+            [
+              { id: 'presets', label: 'Stream Profiles' },
+              { id: 'custom', label: 'Custom Tuner' },
+              { id: 'hardware', label: 'GPU & Sensor' },
+              { id: 'telemetry', label: 'Diagnostics' },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`px-3.5 sm:px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors shrink-0 ${
+                activeTab === t.id
+                  ? 'border-[#00E5A0] text-[#00E5A0]'
+                  : 'border-transparent text-text-muted hover:text-text-primary'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
           {/* TAB 1: PREBAKED PROFILES */}
           {activeTab === 'presets' && (
             <div className="space-y-4">
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-text-secondary">
                 Choose an engineered preset tailored for your current wireless connection:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -207,25 +199,25 @@ export function StreamTunerModal({
                   onClick={() => handleSelectPreset('AUTO_ADAPTIVE')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all ${
                     localConfig.profile === 'AUTO_ADAPTIVE'
-                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-lg'
-                      : 'border-white/10 bg-[#0F172A] hover:border-white/30'
+                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-md'
+                      : 'border-border-subtle bg-bg-elevated hover:border-accent/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-white text-sm flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#00E5A0] text-[18px]">auto_mode</span>
+                    <span className="font-bold text-text-primary text-sm flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#00E5A0]" />
                       Auto Adaptive (Recommended)
                     </span>
                     {localConfig.profile === 'AUTO_ADAPTIVE' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
                     )}
                   </div>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <p className="text-xs text-text-secondary leading-relaxed">
                     Auto-adjusts frame rate and resolution based on wireless signal strength. Zero frame freeze.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#00E5A0]">
-                    <span className="px-2 py-0.5 rounded bg-white/5">Auto Spectrum</span>
-                    <span className="px-2 py-0.5 rounded bg-white/5">Dynamic 30 FPS</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">Auto Spectrum</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">Dynamic 30 FPS</span>
                   </div>
                 </div>
 
@@ -233,26 +225,26 @@ export function StreamTunerModal({
                   onClick={() => handleSelectPreset('LAN_ULTRA_LOW_LAT')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all ${
                     localConfig.profile === 'LAN_ULTRA_LOW_LAT'
-                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-lg'
-                      : 'border-white/10 bg-[#0F172A] hover:border-white/30'
+                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-md'
+                      : 'border-border-subtle bg-bg-elevated hover:border-accent/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-white text-sm flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#38BDF8] text-[18px]">speed</span>
+                    <span className="font-bold text-text-primary text-sm flex items-center gap-2">
+                      <Gauge className="w-4 h-4 text-[#38BDF8]" />
                       Ultra-Low Latency (LAN / 5GHz)
                     </span>
                     {localConfig.profile === 'LAN_ULTRA_LOW_LAT' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
                     )}
                   </div>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <p className="text-xs text-text-secondary leading-relaxed">
                     True 60 FPS zero-jitter-buffer stream. Instant strike feedback for rapid fire competitions.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#38BDF8]">
-                    <span className="px-2 py-0.5 rounded bg-white/5">5GHz / LAN</span>
-                    <span className="px-2 py-0.5 rounded bg-white/5">Server Vision</span>
-                    <span className="px-2 py-0.5 rounded bg-white/5">1080p @ 60 FPS</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">5GHz / LAN</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">Server Vision</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">1080p @ 60 FPS</span>
                   </div>
                 </div>
 
@@ -260,25 +252,25 @@ export function StreamTunerModal({
                   onClick={() => handleSelectPreset('BANDWIDTH_SAVER')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all ${
                     localConfig.profile === 'BANDWIDTH_SAVER'
-                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-lg'
-                      : 'border-white/10 bg-[#0F172A] hover:border-white/30'
+                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-md'
+                      : 'border-border-subtle bg-bg-elevated hover:border-accent/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-white text-sm flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#F5A623] text-[18px]">cell_tower</span>
-                      Bandwidth Saver & 2.4GHz Edge
+                    <span className="font-bold text-text-primary text-sm flex items-center gap-2">
+                      <Radio className="w-4 h-4 text-[#F5A623]" />
+                      Bandwidth Saver &amp; 2.4GHz Edge
                     </span>
                     {localConfig.profile === 'BANDWIDTH_SAVER' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
                     )}
                   </div>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    On-device phone edge scoring. Sub-5ms shot detection, 99.9% bandwidth reduction, penetrates concrete barriers.
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    On-device phone edge scoring. Sub-5ms shot detection, 99.9% bandwidth reduction, penetrates barriers.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#F5A623]">
-                    <span className="px-2 py-0.5 rounded bg-white/5">2.4GHz Long-Range</span>
-                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/20 text-[#00E5A0] font-bold">📱 On-Device Edge</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">2.4GHz Long-Range</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/15 text-[#00E5A0] font-bold">On-Device Edge</span>
                   </div>
                 </div>
 
@@ -286,25 +278,25 @@ export function StreamTunerModal({
                   onClick={() => handleSelectPreset('ECO_BATTERY')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all ${
                     localConfig.profile === 'ECO_BATTERY'
-                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-lg'
-                      : 'border-white/10 bg-[#0F172A] hover:border-white/30'
+                      ? 'border-[#00E5A0] bg-[#00E5A0]/10 shadow-md'
+                      : 'border-border-subtle bg-bg-elevated hover:border-accent/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-white text-sm flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#A78BFA] text-[18px]">battery_saver</span>
+                    <span className="font-bold text-text-primary text-sm flex items-center gap-2">
+                      <BatteryCharging className="w-4 h-4 text-[#A78BFA]" />
                       Battery &amp; Thermal Saver
                     </span>
                     {localConfig.profile === 'ECO_BATTERY' && (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E5A0] text-black font-bold">ACTIVE</span>
                     )}
                   </div>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    360p @ 10 FPS with on-device scoring and sleep mode to extend battery life on wireless target stands.
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    360p @ 10 FPS with on-device scoring and sleep mode to extend battery life on wireless stands.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-[#A78BFA]">
-                    <span className="px-2 py-0.5 rounded bg-white/5">2.4GHz Ultra-Eco</span>
-                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/20 text-[#00E5A0] font-bold">📱 On-Device Edge</span>
+                    <span className="px-2 py-0.5 rounded bg-bg-void/60 border border-border-subtle">2.4GHz Ultra-Eco</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00E5A0]/15 text-[#00E5A0] font-bold">On-Device Edge</span>
                   </div>
                 </div>
               </div>
@@ -314,26 +306,25 @@ export function StreamTunerModal({
           {/* TAB 2: CUSTOM STREAM CONFIG */}
           {activeTab === 'custom' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-bold text-white">Manual Performance Controls</h3>
+                  <h3 className="text-sm font-bold text-text-primary">Manual Performance Controls</h3>
                   <p className="text-xs text-text-muted">Fine-tune frame rate, bitrate, and resolution to your preference.</p>
                 </div>
                 <button
                   onClick={handleApplyCustom}
-                  className="px-4 py-2 rounded-lg bg-[#00E5A0] text-black font-bold text-xs uppercase tracking-wider flex items-center gap-1 shadow-md hover:bg-[#00E5A0]/90 transition-all"
+                  className="px-4 py-2 rounded-lg bg-[#00E5A0] text-black font-bold text-xs uppercase tracking-wider flex items-center gap-1 shadow-md hover:brightness-110 transition-all"
                 >
                   Apply Custom Settings
                 </button>
               </div>
 
-              {/* Radio Link & Computation Architecture Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-[#080B12] border border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-bg-void border border-border-subtle">
                 {/* 1. Wi-Fi Physical Frequency Band */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5 uppercase">
-                      <span className="material-symbols-outlined text-[16px] text-[#00E5A0]">wifi</span>
+                    <label className="text-xs font-mono font-bold text-text-primary flex items-center gap-1.5 uppercase">
+                      <Wifi className="w-4 h-4 text-[#00E5A0]" />
                       Wi-Fi Frequency Band
                     </label>
                     <span className="text-[10px] font-mono text-[#00E5A0] font-bold">
@@ -343,76 +334,80 @@ export function StreamTunerModal({
                   <select
                     value={localConfig.wifiBand}
                     onChange={(e) => updateField('wifiBand', e.target.value as WiFiFrequencyBand)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0F172A] border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-subtle text-text-primary font-mono text-xs focus:border-[#00E5A0] outline-none"
                   >
                     <option value="AUTO_DETECT">AUTO_DETECT (Adaptive Spectrum Negotiation)</option>
-                    <option value="2.4GHz">2.4 GHz ISM (Long Range 50m–100m • High Obstacle Penetration)</option>
-                    <option value="5GHz">5 GHz Unlicensed (High Speed 10m–25m • Low Latency Line-of-Sight)</option>
-                    <option value="6GHz+">6 GHz+ (Wi-Fi 6E/7 • Zero Congestion / Flagship Hardware)</option>
+                    <option value="2.4GHz">2.4 GHz ISM (Long Range 50m–100m)</option>
+                    <option value="5GHz">5 GHz Unlicensed (High Speed 10m–25m)</option>
+                    <option value="6GHz+">6 GHz+ (Wi-Fi 6E/7 Zero Congestion)</option>
                   </select>
                   <p className="text-[11px] text-text-muted leading-tight">
                     {localConfig.wifiBand === '2.4GHz'
-                      ? '⚠️ 2.4 GHz penetrates thick range baffles & concrete easily. Caps bitrate to prevent packet drops.'
+                      ? '2.4 GHz penetrates range baffles & concrete easily.'
                       : localConfig.wifiBand === '5GHz'
-                      ? '⚡ 5 GHz offers 80 MHz channel widths for 60 FPS streaming, but attenuates quickly through physical barriers.'
+                      ? '5 GHz offers 80 MHz channels for 60 FPS line-of-sight video.'
                       : localConfig.wifiBand === '6GHz+'
-                      ? '🚀 6 GHz+ delivers pristine spectrum with zero channel interference. Requires Wi-Fi 6E/7 devices.'
-                      : '🔄 Auto-detect continually benchmarks ping jitter and RSSI to negotiate optimal parameters.'}
+                      ? '6 GHz+ delivers clean spectrum with minimal channel interference.'
+                      : 'Auto-detect benchmarks ping jitter and RSSI to negotiate parameters.'}
                   </p>
                 </div>
 
                 {/* 2. Target Vision & Shot Calculation Engine */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5 uppercase">
-                      <span className="material-symbols-outlined text-[16px] text-[#38BDF8]">memory</span>
+                    <label className="text-xs font-mono font-bold text-text-primary flex items-center gap-1.5 uppercase">
+                      <Cpu className="w-4 h-4 text-[#38BDF8]" />
                       Vision Computation Engine
                     </label>
-                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                      localConfig.computationMode === 'ON_DEVICE_EDGE'
-                        ? 'bg-[#00E5A0]/20 text-[#00E5A0]'
-                        : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
-                        ? 'bg-[#F5A623]/20 text-[#F5A623]'
-                        : 'bg-[#38BDF8]/20 text-[#38BDF8]'
-                    }`}>
+                    <span
+                      className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                        localConfig.computationMode === 'ON_DEVICE_EDGE'
+                          ? 'bg-[#00E5A0]/15 text-[#00E5A0]'
+                          : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
+                          ? 'bg-[#F5A623]/15 text-[#F5A623]'
+                          : 'bg-[#38BDF8]/15 text-[#38BDF8]'
+                      }`}
+                    >
                       {localConfig.computationMode}
                     </span>
                   </div>
                   <select
                     value={localConfig.computationMode}
                     onChange={(e) => updateField('computationMode', e.target.value as VideoComputationMode)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0F172A] border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-subtle text-text-primary font-mono text-xs focus:border-[#00E5A0] outline-none"
                   >
-                    <option value="ON_DEVICE_EDGE">📱 ON_DEVICE_EDGE (Phone computes shots locally • Sub-5ms / 99.9% bandwidth saving)</option>
-                    <option value="HYBRID_EDGE_STREAM">⚡ HYBRID_EDGE_STREAM (Local phone scoring + 10 FPS low-bandwidth live preview)</option>
-                    <option value="SERVER_VISION">🖥️ SERVER_VISION (Continuous video stream to Server/OpenCV/YOLO)</option>
+                    <option value="ON_DEVICE_EDGE">ON_DEVICE_EDGE (Sub-5ms / 99.9% Net Saver)</option>
+                    <option value="HYBRID_EDGE_STREAM">HYBRID_EDGE_STREAM (Edge + 10 FPS Preview)</option>
+                    <option value="SERVER_VISION">SERVER_VISION (Continuous Server Vision)</option>
                   </select>
                   <p className="text-[11px] text-text-muted leading-tight">
                     {localConfig.computationMode === 'ON_DEVICE_EDGE'
-                      ? '✨ Phone calculates bullet impact coords downrange. Sends lightweight <2 kbps JSON. Zero stream lag!'
+                      ? 'Computes bullet impact coordinates locally (<2 kbps JSON).'
                       : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
-                      ? '🎯 Instant shot detection on phone + throttled 10 FPS video preview for human verification.'
-                      : '📹 Full video feed transmitted across Wi-Fi for centralized computer vision processing.'}
+                      ? 'Instant edge scoring plus throttled 10 FPS video preview.'
+                      : 'Full video feed streamed over Wi-Fi for central processing.'}
                   </p>
                 </div>
 
-                {/* Impact Snapshot Option (Active in EDGE / HYBRID mode) */}
-                <div className="md:col-span-2 pt-2 border-t border-white/5">
-                  <label className="flex items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/5 cursor-pointer hover:border-white/20 transition-colors">
+                {/* Impact Snapshot Option */}
+                <div className="md:col-span-2 pt-2 border-t border-border-subtle">
+                  <label className="flex items-center justify-between p-2.5 rounded-lg bg-bg-elevated border border-border-subtle cursor-pointer hover:border-accent/40 transition-colors">
                     <div className="space-y-0.5 pr-4">
                       <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[16px] text-[#F5A623]">camera</span>
-                        <span className="text-xs font-bold text-white">Transmit High-Res Impact Snapshot on Bullet Hit</span>
+                        <Camera className="w-4 h-4 text-[#F5A623]" />
+                        <span className="text-xs font-bold text-text-primary">
+                          Transmit High-Res Impact Snapshot on Bullet Hit
+                        </span>
                       </div>
                       <p className="text-[11px] text-text-muted">
-                        When edge computing is active, eliminates constant video streaming but captures and sends a crisp high-res still crop of the target face when a shot is detected.
+                        Captures and sends a still crop of the target face whenever a new shot is detected.
                       </p>
                     </div>
                     <input
                       type="checkbox"
                       checked={localConfig.sendImpactSnapshot}
                       onChange={(e) => updateField('sendImpactSnapshot', e.target.checked)}
-                      className="w-4 h-4 accent-[#00E5A0] rounded cursor-pointer"
+                      className="w-4 h-4 accent-[#00E5A0] rounded cursor-pointer shrink-0"
                     />
                   </label>
                 </div>
@@ -424,7 +419,7 @@ export function StreamTunerModal({
                   <select
                     value={localConfig.resolution}
                     onChange={(e) => updateField('resolution', e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-lg bg-[#0F172A] border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-subtle text-text-primary font-mono text-xs focus:border-[#00E5A0] outline-none"
                   >
                     <option value="1080p">1080p (FHD - High Definition)</option>
                     <option value="720p">720p (HD - Balanced)</option>
@@ -452,7 +447,7 @@ export function StreamTunerModal({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-mono">
                     <span className="font-bold text-text-muted uppercase">Bitrate Limit</span>
-                    <span className="text-white font-bold">{localConfig.bitrateCapKbps} kbps</span>
+                    <span className="text-text-primary font-bold">{localConfig.bitrateCapKbps} kbps</span>
                   </div>
                   <input
                     type="range"
@@ -468,7 +463,7 @@ export function StreamTunerModal({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-mono">
                     <span className="font-bold text-text-muted uppercase">Quality Compression</span>
-                    <span className="text-white font-bold">{Math.round(localConfig.qualityFactor * 100)}%</span>
+                    <span className="text-text-primary font-bold">{Math.round(localConfig.qualityFactor * 100)}%</span>
                   </div>
                   <input
                     type="range"
@@ -483,9 +478,9 @@ export function StreamTunerModal({
               </div>
 
               {/* RTSP / IP Camera Endpoint Override */}
-              <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/10 space-y-2">
-                <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#00E5A0]">link</span>
+              <div className="p-3.5 rounded-xl bg-bg-elevated border border-border-subtle space-y-2">
+                <label className="text-xs font-mono font-bold text-text-primary flex items-center gap-1.5">
+                  <Link2 className="w-4 h-4 text-[#00E5A0]" />
                   Custom RTSP / IP Target Camera Endpoint URL
                 </label>
                 <input
@@ -493,7 +488,7 @@ export function StreamTunerModal({
                   placeholder="rtsp://192.168.1.100:8554/live or http://..."
                   value={localConfig.customRtspUrl || ''}
                   onChange={(e) => updateField('customRtspUrl', e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-[#00E5A0] outline-none"
+                  className="w-full px-3 py-2 rounded-lg bg-bg-void border border-border-subtle text-text-primary font-mono text-xs focus:border-[#00E5A0] outline-none"
                 />
               </div>
             </div>
@@ -502,9 +497,9 @@ export function StreamTunerModal({
           {/* TAB 3: HARDWARE ACCELERATION */}
           {activeTab === 'hardware' && (
             <div className="space-y-4">
-              <span className="font-bold text-white text-xs block">GPU Rendering Backend</span>
+              <span className="font-bold text-text-primary text-xs block">GPU Rendering Backend</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className="p-3 rounded-lg border border-white/10 bg-[#0F172A] flex items-start gap-2 cursor-pointer">
+                <label className="p-3 rounded-lg border border-border-subtle bg-bg-elevated flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="radio"
                     name="accel"
@@ -513,11 +508,11 @@ export function StreamTunerModal({
                     className="mt-1 accent-[#00E5A0]"
                   />
                   <div>
-                    <span className="text-xs font-bold text-white block">WebGL 2.0 GPU Blit</span>
-                    <span className="text-[10px] text-text-muted">Hardware GPU rendering directly to target canvas</span>
+                    <span className="text-xs font-bold text-text-primary block">WebGL 2.0 GPU Blit</span>
+                    <span className="text-[11px] text-text-muted">Hardware GPU rendering directly to target canvas</span>
                   </div>
                 </label>
-                <label className="p-3 rounded-lg border border-white/10 bg-[#0F172A] flex items-start gap-2 cursor-pointer">
+                <label className="p-3 rounded-lg border border-border-subtle bg-bg-elevated flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="radio"
                     name="accel"
@@ -526,8 +521,8 @@ export function StreamTunerModal({
                     className="mt-1 accent-[#00E5A0]"
                   />
                   <div>
-                    <span className="text-xs font-bold text-white block">OffscreenCanvas Worker</span>
-                    <span className="text-[10px] text-text-muted">Separates video decoding from UI thread</span>
+                    <span className="text-xs font-bold text-text-primary block">OffscreenCanvas Worker</span>
+                    <span className="text-[11px] text-text-muted">Separates video decoding from UI thread</span>
                   </div>
                 </label>
               </div>
@@ -538,17 +533,17 @@ export function StreamTunerModal({
           {activeTab === 'telemetry' && (
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                <div className="p-4 rounded-xl bg-bg-elevated border border-border-subtle font-mono">
                   <span className="text-[10px] text-text-muted uppercase">Latency</span>
                   <div className="text-2xl font-bold text-[#00E5A0] mt-1">{currentMetrics.rttMs} ms</div>
                   <span className="text-[10px] text-text-muted">Jitter: ±{currentMetrics.jitterMs} ms</span>
                 </div>
-                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                <div className="p-4 rounded-xl bg-bg-elevated border border-border-subtle font-mono">
                   <span className="text-[10px] text-text-muted uppercase">Live FPS</span>
-                  <div className="text-2xl font-bold text-white mt-1">{currentMetrics.currentFps} FPS</div>
+                  <div className="text-2xl font-bold text-text-primary mt-1">{currentMetrics.currentFps} FPS</div>
                   <span className="text-[10px] text-text-muted">{currentMetrics.dropRatePercent}% drop rate</span>
                 </div>
-                <div className="p-4 rounded-xl bg-[#0F172A] border border-white/10 font-mono">
+                <div className="p-4 rounded-xl bg-bg-elevated border border-border-subtle font-mono">
                   <span className="text-[10px] text-text-muted uppercase">Bandwidth</span>
                   <div className="text-2xl font-bold text-[#38BDF8] mt-1">
                     {(currentMetrics.bandwidthKbps / 1000).toFixed(2)} Mbps
@@ -557,38 +552,41 @@ export function StreamTunerModal({
                 </div>
               </div>
 
-              {/* Physical Radio Spectrum & Vision Engine Status */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/10 flex items-center justify-between font-mono">
+                <div className="p-3.5 rounded-xl bg-bg-elevated border border-border-subtle flex items-center justify-between font-mono">
                   <div>
                     <span className="text-[10px] text-text-muted uppercase block">Active Wi-Fi Spectrum</span>
-                    <span className="text-sm font-bold text-white mt-0.5 block flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-text-primary mt-0.5 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[#00E5A0]" />
                       {currentMetrics.wifiBand || localConfig.wifiBand}
                     </span>
                     <span className="text-[10px] text-text-muted">
-                      {localConfig.wifiBand === '2.4GHz' ? '50m–100m Long Range / Baffle Penetration' : localConfig.wifiBand === '5GHz' ? '10m–25m High Speed 80MHz' : 'Negotiated Link'}
+                      {localConfig.wifiBand === '2.4GHz'
+                        ? '50m–100m Long Range / Baffle Penetration'
+                        : localConfig.wifiBand === '5GHz'
+                        ? '10m–25m High Speed 80MHz'
+                        : 'Negotiated Link'}
                     </span>
                   </div>
-                  <span className="material-symbols-outlined text-[#00E5A0] text-[26px]">wifi</span>
+                  <Wifi className="w-6 h-6 text-[#00E5A0] shrink-0" />
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#0F172A] border border-white/10 flex items-center justify-between font-mono">
+                <div className="p-3.5 rounded-xl bg-bg-elevated border border-border-subtle flex items-center justify-between font-mono">
                   <div>
                     <span className="text-[10px] text-text-muted uppercase block">Vision Calculation Engine</span>
-                    <span className="text-sm font-bold text-[#38BDF8] mt-0.5 block flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-[#38BDF8] mt-0.5 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
                       {currentMetrics.computationMode || localConfig.computationMode}
                     </span>
                     <span className="text-[10px] text-text-muted">
                       {localConfig.computationMode === 'ON_DEVICE_EDGE'
-                        ? '⚡ Phone Edge Vision (<5ms Latency • 99.9% Net Saver)'
+                        ? 'Phone Edge Vision (<5ms Latency • 99.9% Net Saver)'
                         : localConfig.computationMode === 'HYBRID_EDGE_STREAM'
-                        ? '🎯 Phone Edge Vision + 10 FPS Stream Preview'
-                        : '🖥️ Central Server OpenCV / YOLO Stream'}
+                        ? 'Phone Edge Vision + 10 FPS Stream Preview'
+                        : 'Central Server OpenCV / YOLO Stream'}
                     </span>
                   </div>
-                  <span className="material-symbols-outlined text-[#38BDF8] text-[26px]">memory</span>
+                  <Cpu className="w-6 h-6 text-[#38BDF8] shrink-0" />
                 </div>
               </div>
             </div>
@@ -596,27 +594,27 @@ export function StreamTunerModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-[#0F172A]">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 py-4 border-t border-border-subtle bg-bg-elevated">
           <div>
             {hasSaved && (
-              <span className="text-xs font-mono text-[#00E5A0] flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+              <span className="text-xs font-mono text-[#00E5A0] flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
                 Stream settings saved &amp; synchronized!
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase"
+              className="px-4 py-2 rounded-lg bg-bg-surface border border-border-subtle hover:border-accent/40 text-text-primary font-bold text-xs uppercase transition-colors"
             >
               Close
             </button>
             <button
               onClick={handleApplyCustom}
-              className="px-5 py-2 rounded-lg bg-[#00E5A0] text-black font-bold text-xs uppercase tracking-wider shadow-lg hover:bg-[#00E5A0]/90 transition-all flex items-center gap-1"
+              className="px-5 py-2 rounded-lg bg-[#00E5A0] text-black font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 transition-all flex items-center gap-1.5"
             >
-              <span className="material-symbols-outlined text-[16px]">bolt</span>
+              <Zap className="w-4 h-4 shrink-0" />
               Save &amp; Apply
             </button>
           </div>

@@ -3,14 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { TargetType, TARGET_SPECS, ShotCoordinates, ShotResult, calculateScore } from '../../lib/target-specs';
-import { TargetCanvas } from '../../components/live-analysis/TargetCanvas';
 import { MultiCameraTargetView, ShotImpactSnapshot } from '../../components/live-analysis/MultiCameraTargetView';
 import { RealTimeScoreboard } from '../../components/live-analysis/RealTimeScoreboard';
 import { LiveTargetSelector } from '../../components/live-analysis/LiveTargetSelector';
+import { useToast } from '../../contexts/toast-context';
 
 type ShotData = ShotCoordinates & ShotResult;
 
 export function LiveAnalysisDashboard() {
+  const { toast } = useToast();
   const [selectedTarget, setSelectedTarget] = useState<TargetType>('10m_air_rifle');
   const [shots, setShots] = useState<ShotData[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -19,16 +20,19 @@ export function LiveAnalysisDashboard() {
   const [assignedLane, setAssignedLane] = useState<{ laneNumber?: number; status?: string } | null>(null);
   const [latestImpactSnapshot, setLatestImpactSnapshot] = useState<ShotImpactSnapshot | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const selectedTargetRef = useRef(selectedTarget);
 
   useEffect(() => {
-    // Connect to WebSocket Server
+    selectedTargetRef.current = selectedTarget;
+  }, [selectedTarget]);
+
+  useEffect(() => {
     const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
     const socket = io(socketUrl, { transports: ['websocket'] });
     socketRef.current = socket;
 
     socket.on('connect', () => {
       setIsConnected(true);
-      // Join a generic live range room for demo purposes
       socket.emit('joinLiveRange', 'demo_lane_1');
     });
 
@@ -55,40 +59,13 @@ export function LiveAnalysisDashboard() {
     });
 
     socket.on('shot_detected', (payload: ShotCoordinates) => {
-      // The payload only contains raw coordinates (x, y)
-      // We calculate the exact score here based on the CURRENT target type
-      setShots((prev) => {
-        // Warning: if we change target type, we might want to recalculate old scores.
-        // For simplicity in this real-time view, we just calculate for the new shot.
-        const currentTargetType = selectedTarget; // Note: closure might be stale, better to use state callback or ref
-        // Let's rely on the latest target spec.
-        return prev; // We will fix the stale closure below
-      });
+      const result = calculateScore(payload, selectedTargetRef.current);
+      setShots((prev) => [...prev, { ...payload, ...result }]);
     });
 
     return () => {
       socket.disconnect();
-    };
-  }, []); // Run once on mount
-
-  // Fixing stale state in socket event handler:
-  const selectedTargetRef = useRef(selectedTarget);
-  useEffect(() => {
-    selectedTargetRef.current = selectedTarget;
-  }, [selectedTarget]);
-
-  useEffect(() => {
-    if (!socketRef.current) return;
-    
-    const handleShot = (payload: ShotCoordinates) => {
-      const result = calculateScore(payload, selectedTargetRef.current);
-      setShots(prev => [...prev, { ...payload, ...result }]);
-    };
-
-    socketRef.current.on('shot_detected', handleShot);
-    
-    return () => {
-      socketRef.current?.off('shot_detected', handleShot);
+      socketRef.current = null;
     };
   }, []);
 
@@ -163,7 +140,7 @@ export function LiveAnalysisDashboard() {
 
   const triggerMockShot = () => {
     if (isCeasefireActive) {
-      alert("EMERGENCY CEASEFIRE ACTIVE — Weapons must remain grounded and unhandled.");
+      toast('EMERGENCY CEASEFIRE ACTIVE — Weapons must remain grounded and unhandled.', 'error');
       return;
     }
     const r1 = Math.random();
@@ -206,17 +183,23 @@ export function LiveAnalysisDashboard() {
   return (
     <div className="flex flex-col gap-6">
       {assignedLane && (
-        <div className="flex items-center justify-between bg-surface-container/60 border border-primary/30 rounded-xl px-4 py-2.5">
+        <div className="flex items-center justify-between bg-bg-surface border border-accent/30 rounded-xl px-4 py-2.5 shadow-card">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm font-bold text-white">
-              ASSIGNED LANE: <strong className="text-primary font-mono">LANE {assignedLane.laneNumber}</strong>
+            <span className="text-sm font-bold text-text-primary">
+              ASSIGNED LANE: <strong className="text-accent font-mono">LANE {assignedLane.laneNumber}</strong>
             </span>
             <span className="text-xs text-text-muted">({assignedLane.status || 'ACTIVE'})</span>
           </div>
-          <span className="text-xs bg-primary/20 text-primary border border-primary/40 px-2.5 py-0.5 rounded-full font-bold">
+          <span className="text-xs bg-accent/15 text-accent border border-accent/30 px-2.5 py-0.5 rounded-full font-bold">
             Live Synchronized
           </span>
+        </div>
+      )}
+
+      {isCeasefireActive && ceasefireReason && (
+        <div className="flex items-center justify-between bg-[#FF4D6D]/10 border border-[#FF4D6D]/40 rounded-xl px-4 py-2.5 text-xs font-mono text-[#FF4D6D]">
+          <span>CEASEFIRE ORDER: {ceasefireReason}</span>
         </div>
       )}
 
@@ -227,10 +210,10 @@ export function LiveAnalysisDashboard() {
       />
 
       {/* Ballistics Dispersion & Shot Group Analytics Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-[#0F172A] border border-border-subtle shadow-md">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-bg-surface border border-border-subtle shadow-card">
         <div className="border-l-2 border-[#10B981] pl-3">
           <span className="text-[10px] font-mono text-text-muted uppercase block">MEAN RADIUS</span>
-          <span className="text-lg font-mono font-bold text-white">{groupStats.meanRadius} mm</span>
+          <span className="text-lg font-mono font-bold text-text-primary">{groupStats.meanRadius} mm</span>
         </div>
         <div className="border-l-2 border-[#F5A623] pl-3">
           <span className="text-[10px] font-mono text-text-muted uppercase block">EXTREME SPREAD</span>
@@ -242,11 +225,11 @@ export function LiveAnalysisDashboard() {
         </div>
         <div className="border-l-2 border-[#A855F7] pl-3">
           <span className="text-[10px] font-mono text-text-muted uppercase block">SPLIT CADENCE</span>
-          <span className="text-lg font-mono font-bold text-white">{lastSplitTime ? `${lastSplitTime}s` : '—'}</span>
+          <span className="text-lg font-mono font-bold text-text-primary">{lastSplitTime ? `${lastSplitTime}s` : '—'}</span>
         </div>
         <div className="border-l-2 border-[#EF4444] pl-3">
           <span className="text-[10px] font-mono text-text-muted uppercase block">INNER 10s (X)</span>
-          <span className="text-lg font-mono font-bold text-white">{groupStats.innerTens} / {shots.length}</span>
+          <span className="text-lg font-mono font-bold text-text-primary">{groupStats.innerTens} / {shots.length}</span>
         </div>
       </div>
 
@@ -265,25 +248,25 @@ export function LiveAnalysisDashboard() {
         </div>
       </div>
 
-      {/* Developer Controls - Live Vision Controls */}
-      <div className="p-4 rounded-2xl bg-[#0F172A] border border-border-subtle flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      {/* Live Vision Controls */}
+      <div className="p-4 rounded-2xl bg-bg-surface border border-border-subtle shadow-card flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setAudioFeedback(prev => !prev)}
             className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
               audioFeedback
-                ? 'bg-[#10B981]/20 border-[#10B981] text-[#10B981]'
-                : 'bg-black/30 border-white/10 text-text-muted'
+                ? 'bg-[#10B981]/15 border-[#10B981] text-[#10B981]'
+                : 'bg-bg-elevated border-border-subtle text-text-secondary hover:text-text-primary'
             }`}
           >
-            🔊 {audioFeedback ? 'Voice Callouts ON' : 'Voice Callouts OFF'}
+            {audioFeedback ? 'Voice Callouts ON' : 'Voice Callouts OFF'}
           </button>
           <span className="text-xs font-mono text-text-muted">
-            FPS: 60 • YOLOv8 Sub-mm Resolution: 0.12mm/px
+            FPS: 60 • Edge Vision: 0.12mm/px
           </span>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button 
             onClick={triggerMockShot}
             className="bg-[#F5A623] hover:bg-[#F5A623]/90 text-black font-mono font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md"

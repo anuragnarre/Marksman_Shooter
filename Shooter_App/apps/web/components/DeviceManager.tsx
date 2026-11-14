@@ -50,6 +50,7 @@ export function DeviceManager() {
   const [detail, setDetail] = useState<DeviceDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   async function loadDevices() {
     try {
@@ -110,9 +111,9 @@ export function DeviceManager() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Remove this device and all its readings?')) return;
     try {
       await apiFetch(`/biometrics/devices/${id}`, { method: 'DELETE' });
+      setConfirmDeleteId(null);
       if (expandedId === id) {
         setExpandedId(null);
         setDetail(null);
@@ -367,17 +368,34 @@ export function DeviceManager() {
                         >
                           {d.isActive ? 'Disable Device' : 'Enable Device'}
                         </button>
-                        <button
-                          onClick={() => handleDelete(d.id)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-display font-semibold transition-all"
-                          style={{
-                            background: 'rgba(255,77,109,0.06)',
-                            color: '#FF4D6D',
-                            border: '1px solid rgba(255,77,109,0.15)',
-                          }}
-                        >
-                          Remove Device
-                        </button>
+                        {confirmDeleteId === d.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => handleDelete(d.id)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-display font-bold transition-all bg-[#FF4D6D] text-white"
+                            >
+                              Confirm Remove
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-display font-semibold transition-all text-text-secondary border border-border-subtle"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(d.id)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-display font-semibold transition-all"
+                            style={{
+                              background: 'rgba(255,77,109,0.06)',
+                              color: '#FF4D6D',
+                              border: '1px solid rgba(255,77,109,0.15)',
+                            }}
+                          >
+                            Remove Device
+                          </button>
+                        )}
                       </div>
 
                       {/* Device info */}

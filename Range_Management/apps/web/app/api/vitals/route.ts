@@ -2,7 +2,9 @@
 // Thin proxy: Arduino → Next.js → NestJS backend
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3003';
+
+export const dynamic = 'force-static';
 
 export async function GET() {
   return NextResponse.json(

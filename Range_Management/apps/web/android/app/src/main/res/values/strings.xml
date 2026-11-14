@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Marksman Range</string>
+    <string name="title_activity_main">Marksman Range</string>
+    <string name="package_name">com.marksman.rangeapp</string>
+    <string name="custom_url_scheme">com.marksman.rangeapp</string>
+</resources>

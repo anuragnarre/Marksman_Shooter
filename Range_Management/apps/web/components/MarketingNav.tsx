@@ -87,15 +87,23 @@ export function MarketingNav() {
             </Link>
           </div>
 
-          <button onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle navigation menu"
-            className="md:hidden text-text-secondary hover:text-accent transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5">
-              {mobileOpen
-                ? <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
-                : <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />}
-            </svg>
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/auth/login"
+              className="font-body text-xs font-bold text-bg-void bg-accent hover:bg-accent-hover px-3.5 py-1.5 rounded-lg shadow-sm transition-all"
+            >
+              Sign In
+            </Link>
+            <button onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle navigation menu"
+              className="text-text-secondary hover:text-accent transition-colors p-2 min-w-[40px] min-h-[40px] flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {mobileOpen
+                  ? <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
+                  : <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {mobileOpen && (

@@ -29,6 +29,20 @@ function applyTheme(resolved: ResolvedTheme) {
   } else {
     root.classList.remove('light');
   }
+  void syncNativeStatusBar(resolved);
+}
+
+async function syncNativeStatusBar(resolved: ResolvedTheme) {
+  if (typeof window === 'undefined') return;
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (!Capacitor.isNativePlatform()) return;
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    await StatusBar.setStyle({ style: resolved === 'light' ? Style.Light : Style.Dark });
+    await StatusBar.setBackgroundColor({ color: resolved === 'light' ? '#F1F3F7' : '#080A0F' });
+  } catch {
+    // non-fatal on web or older WebViews
+  }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

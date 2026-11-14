@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { MaterialIcon } from "../ui/TacticalIcons";
 
 interface RightPanelProps {
   rangeStatus: "HOT" | "COLD";
@@ -9,12 +11,30 @@ interface RightPanelProps {
 }
 
 export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPanelProps) {
+  const router = useRouter();
   const [logs, setLogs] = useState([
     { id: 1, type: "info", time: "14:18:04", title: "VIP Bay 02: Target recalled & renewed", desc: "Target swapped to Steel Plate (50 rds)", icon: "verified" },
     { id: 2, type: "error", time: "14:16:30", title: "Bay 07 Hold: RSO Miller dispatched", desc: "Unflagged firearm casing review", icon: "error" },
     { id: 3, type: "primary", time: "14:14:12", title: "Kiosk: Party of 2 assigned to Bay 09", desc: "Gold Member: #M-9024 [Waiver Signed]", icon: "badge" },
     { id: 4, type: "default", time: "14:09:50", title: "Supply: Bay 08 & 12 Target roll stocked", desc: "Dispenser reel sensor reset to 100%", icon: "inventory_2" }
   ]);
+
+  const handleToggleWithLog = () => {
+    const nextStatus = rangeStatus === "HOT" ? "COLD" : "HOT";
+    const nowStr = new Date().toTimeString().split(" ")[0];
+    setLogs((prev) => [
+      {
+        id: Date.now(),
+        type: nextStatus === "COLD" ? "error" : "info",
+        time: nowStr,
+        title: nextStatus === "COLD" ? "SCADA Override: Range Called COLD" : "RSO Clearance: Range Resumed HOT",
+        desc: nextStatus === "COLD" ? "All-bay cease-fire broadcast active" : "Live-fire interlock released",
+        icon: nextStatus === "COLD" ? "error" : "verified",
+      },
+      ...prev,
+    ]);
+    onToggleStatus();
+  };
 
   return (
     <div className="col-span-12 xl:col-span-4 flex flex-col gap-space-sm w-full">
@@ -27,19 +47,20 @@ export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPane
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
           {/* Emergency Button */}
           <button 
+            type="button"
             disabled={isLoading}
             className={`rounded-lg p-space-sm flex flex-col items-center justify-center gap-1 text-center transition-transform active:scale-95 shadow-lg group ${
               rangeStatus === 'HOT' 
                 ? 'bg-secondary-container hover:opacity-95 text-on-secondary-container'
                 : 'bg-surface-container-highest hover:bg-surface-bright text-on-surface'
             }`}
-            onClick={onToggleStatus}
+            onClick={handleToggleWithLog}
           >
             <div className="flex items-center gap-1.5">
               {rangeStatus === 'HOT' ? (
                 <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
               ) : (
-                <span className="material-symbols-outlined text-[14px]">lock_open</span>
+                <MaterialIcon name="lock_open" className="w-3.5 h-3.5" />
               )}
               <span className={`font-label-caps text-label-caps uppercase font-bold tracking-widest ${rangeStatus === 'HOT' ? 'text-secondary' : 'text-on-surface-variant'}`}>
                 {rangeStatus === 'HOT' ? 'EMERGENCY' : 'SECURE'}
@@ -51,9 +72,13 @@ export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPane
           </button>
           
           {/* Quick Check-in Button */}
-          <button className="bg-primary hover:bg-primary-container text-on-primary-container rounded-lg p-space-sm flex flex-col items-center justify-center gap-1 text-center transition-transform active:scale-95 shadow-md">
+          <button
+            type="button"
+            onClick={() => router.push("/checkin")}
+            className="bg-primary hover:bg-primary-container text-on-primary-container rounded-lg p-space-sm flex flex-col items-center justify-center gap-1 text-center transition-transform active:scale-95 shadow-md"
+          >
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-on-primary-container text-[16px]">person_add</span>
+              <MaterialIcon name="person_add" className="text-on-primary-container w-4 h-4" />
               <span className="font-label-caps text-label-caps uppercase font-bold tracking-widest text-on-primary-container">Kiosk Intake</span>
             </div>
             <span className="font-headline-md text-[16px] font-bold tracking-tight text-on-primary leading-none">+ Quick Check-In</span>
@@ -66,7 +91,7 @@ export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPane
       <div className="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-xs shrink-0">
         <div className="flex items-center justify-between pb-space-xs">
           <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-tertiary text-[18px]">graphic_eq</span>
+            <MaterialIcon name="graphic_eq" className="text-tertiary w-[18px] h-[18px]" />
             <span className="font-headline-md text-headline-md text-on-surface">Acoustic &amp; Airflow Telemetry</span>
           </div>
           <span className="font-telemetry-sm text-telemetry-sm text-tertiary">Real-time RT-60</span>
@@ -111,22 +136,23 @@ export function RightPanel({ rangeStatus, onToggleStatus, isLoading }: RightPane
       <div className="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-xs flex-1 min-h-0 overflow-hidden">
         <div className="flex items-center justify-between pb-space-xs shrink-0">
           <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-outline text-[18px]">receipt_long</span>
+            <MaterialIcon name="receipt_long" className="text-outline w-[18px] h-[18px]" />
             <span className="font-headline-md text-headline-md text-on-surface">Real-Time Event Stream</span>
           </div>
-          <button className="font-telemetry-sm text-[10px] text-outline hover:text-on-surface transition-colors" onClick={() => setLogs([])}>Clear</button>
+          <button type="button" className="font-telemetry-sm text-[10px] text-outline hover:text-on-surface transition-colors" onClick={() => setLogs([])}>Clear</button>
         </div>
         <div className="flex flex-col gap-space-xs overflow-y-auto pr-1 h-full">
           {logs.map(log => (
             <div key={log.id} className="p-space-xs rounded bg-surface-container flex items-start justify-between gap-space-xs">
               <div className="flex items-start gap-space-xs min-w-0">
-                <span className={`material-symbols-outlined text-[15px] mt-[1px] ${
-                  log.type === 'error' ? 'text-secondary' : 
-                  log.type === 'primary' ? 'text-tertiary' : 
-                  log.type === 'info' ? 'text-primary' : 'text-outline'
-                }`}>
-                  {log.icon}
-                </span>
+                <MaterialIcon
+                  name={log.icon}
+                  className={`w-[15px] h-[15px] mt-[2px] ${
+                    log.type === 'error' ? 'text-secondary' : 
+                    log.type === 'primary' ? 'text-tertiary' : 
+                    log.type === 'info' ? 'text-primary' : 'text-outline'
+                  }`}
+                />
                 <div className="flex flex-col min-w-0">
                   <span className={`font-body-md text-body-sm font-medium truncate ${
                     log.type === 'error' ? 'text-secondary' : 'text-on-surface'

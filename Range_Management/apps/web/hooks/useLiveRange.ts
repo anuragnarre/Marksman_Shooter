@@ -43,7 +43,7 @@ export function useLiveRange({
   useEffect(() => {
     if (!enabled || !rangeId) return;
 
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001';
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3003';
 
     let socket: any;
 

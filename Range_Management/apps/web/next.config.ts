@@ -1,7 +1,14 @@
 // apps/web/next.config.ts
 import type { NextConfig } from 'next';
 
+const isExport = process.env.NEXT_EXPORT === 'true' || process.env.CAPACITOR_BUILD === 'true' || true;
+
 const nextConfig: NextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
   transpilePackages: ['@shooting-platform/shared-types'],
   experimental: {
     optimizePackageImports: ['framer-motion'],
@@ -17,32 +24,18 @@ const nextConfig: NextConfig = {
     '*.ts.net',
     '192.168.*',
   ],
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'images.pexels.com' },
-    ],
-  },
-  // ── API Proxy Rewrites ────────────────────────────────────────────────────────
-  // ALL browser API calls go to the same frontend domain (e.g. marksman.xxx.proxy.netbird.io/api/*)
-  // Next.js server-side forwards them to localhost:3001 internally.
-  // This means port 3001 (API) and port 8000 (Vision) NEVER need to be exposed publicly.
-  async rewrites() {
-    const apiBase = process.env.INTERNAL_API_URL ?? 'http://localhost:3001';
-    const visionBase = process.env.INTERNAL_VISION_URL ?? 'http://localhost:8000';
-    return [
-      // Proxy /api/* → NestJS on localhost:3001
-      {
-        source: '/api/:path*',
-        destination: `${apiBase}/:path*`,
-      },
-      // Proxy /vision/* → FastAPI on localhost:8000
-      {
-        source: '/vision/:path*',
-        destination: `${visionBase}/:path*`,
-      },
-    ];
-  },
+  ...(isExport
+    ? {}
+    : {
+        async rewrites() {
+          const apiBase = process.env.INTERNAL_API_URL ?? 'http://localhost:3003';
+          const visionBase = process.env.INTERNAL_VISION_URL ?? 'http://localhost:8000';
+          return [
+            { source: '/api/:path*', destination: `${apiBase}/:path*` },
+            { source: '/vision/:path*', destination: `${visionBase}/:path*` },
+          ];
+        },
+      }),
   async headers() {
     return [
       {

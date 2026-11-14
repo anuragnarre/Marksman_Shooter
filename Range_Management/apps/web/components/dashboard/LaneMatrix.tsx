@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { io } from "socket.io-client";
+import { useToast } from "../../contexts/toast-context";
+import { IconVolumeUp, IconWarning, IconPersonAdd, IconMyLocation, IconVideocam, IconArrowDown } from "../ui/TacticalIcons";
 
 interface Lane {
   id: string;
@@ -114,23 +117,48 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
     };
   }, []);
 
-  const displayLanes = liveLanes;
+  const router = useRouter();
+  const { toast } = useToast();
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+
+  const updateLaneState = (laneId: string, updater: (l: Lane) => Lane) => {
+    setLiveLanes((prev) => prev.map((l) => (l.id === laneId ? updater(l) : l)));
+  };
+
+  const handleRecallAll = () => {
+    setLiveLanes((prev) =>
+      prev.map((l) => ({
+        ...l,
+        activeSession: l.activeSession ? { ...l.activeSession, distance: "0 YDS" } : l.activeSession,
+      }))
+    );
+    toast("All bay target carriers recalled to 0 YDS home position", "info");
+  };
 
   // Aggregate stats
-  const activeCount = displayLanes.filter((l) => l.status === "OCCUPIED").length;
-  const ceaseFireCount = displayLanes.filter((l) => l.status === "CEASE_FIRE").length;
-  const readyCount = displayLanes.filter(
+  const activeCount = liveLanes.filter((l) => l.status === "OCCUPIED").length;
+  const ceaseFireCount = liveLanes.filter((l) => l.status === "CEASE_FIRE").length;
+  const readyCount = liveLanes.filter(
     (l) => !["OCCUPIED", "MAINTENANCE", "CEASE_FIRE"].includes(l.status)
   ).length;
-  const maintCount = displayLanes.filter((l) => l.status === "MAINTENANCE").length;
+  const maintCount = liveLanes.filter((l) => l.status === "MAINTENANCE").length;
+
+  const displayLanes = liveLanes.filter((l) => {
+    if (statusFilter === "ALL") return true;
+    if (statusFilter === "OCCUPIED") return l.status === "OCCUPIED";
+    if (statusFilter === "CEASE_FIRE") return l.status === "CEASE_FIRE";
+    if (statusFilter === "READY") return !["OCCUPIED", "MAINTENANCE", "CEASE_FIRE"].includes(l.status);
+    if (statusFilter === "MAINTENANCE") return l.status === "MAINTENANCE";
+    return true;
+  });
 
   return (
-    <div className="col-span-12 xl:col-span-8 flex flex-col gap-3 bg-surface-container-low rounded-xl p-2.5 sm:p-4 shadow-md border border-outline-variant/15 w-full">
+    <div className="col-span-12 lg:col-span-8 flex flex-col gap-3 bg-surface-container-low rounded-xl p-2.5 sm:p-4 shadow-md border border-outline-variant/15 w-full">
       {/* Matrix Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-outline-variant/10">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-primary text-[18px]">token</span>
+            <IconMyLocation className="w-4 h-4 text-primary" />
             <h2 className="font-headline-md text-[14px] sm:text-[16px] text-on-surface font-bold">
               Firing Line Overview &amp; Telemetry
             </h2>
@@ -139,26 +167,148 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
             Range Alpha // 12-Bay Automation
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 font-label-caps text-[9px] sm:text-[10px]">
-          <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface flex items-center gap-1">
+
+        {/* Interactive Filter Pills */}
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-full font-label-caps text-[9px] sm:text-[10px]">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("ALL")}
+            className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 shrink-0 ${
+              statusFilter === "ALL"
+                ? "bg-primary text-on-primary font-bold shadow-xs"
+                : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+            }`}
+          >
+            All ({liveLanes.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("OCCUPIED")}
+            className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 shrink-0 ${
+              statusFilter === "OCCUPIED"
+                ? "bg-tertiary text-on-tertiary font-bold shadow-xs"
+                : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+            }`}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active ({activeCount})
-          </span>
-          <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span> Cease Fire ({ceaseFireCount})
-          </span>
-          <span className="px-2 py-0.5 rounded bg-surface-container-high text-outline flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-outline"></span> Safe / Ready ({readyCount})
-          </span>
-          <span className="px-2 py-0.5 rounded bg-surface-container-high text-primary flex items-center gap-1">
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("CEASE_FIRE")}
+            className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 shrink-0 ${
+              statusFilter === "CEASE_FIRE"
+                ? "bg-secondary text-on-secondary font-bold shadow-xs"
+                : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span> Cease ({ceaseFireCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("READY")}
+            className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 shrink-0 ${
+              statusFilter === "READY"
+                ? "bg-outline text-surface font-bold shadow-xs"
+                : "bg-surface-container-high text-outline hover:bg-surface-container-highest"
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-outline"></span> Ready ({readyCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("MAINTENANCE")}
+            className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 shrink-0 ${
+              statusFilter === "MAINTENANCE"
+                ? "bg-primary text-on-primary font-bold shadow-xs"
+                : "bg-surface-container-high text-primary hover:bg-surface-container-highest"
+            }`}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-primary"></span> Maint ({maintCount})
-          </span>
+          </button>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5 w-full lg:max-h-[640px] lg:overflow-y-auto pr-0 lg:pr-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3 w-full lg:max-h-[640px] lg:overflow-y-auto pr-0 lg:pr-1">
         {displayLanes.map((lane) => (
-          <LaneCard key={lane.id} lane={lane} />
+          <LaneCard
+            key={lane.id}
+            lane={lane}
+            onRecall={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                activeSession: l.activeSession ? { ...l.activeSession, distance: "0 YDS" } : l.activeSession,
+              }));
+              toast(`Lane ${label} target carrier recalled to 0 YDS`, "info");
+            }}
+            onStop={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                status: "CEASE_FIRE",
+                activeSession: l.activeSession ? { ...l.activeSession, db: "STAGED" } : l.activeSession,
+              }));
+              toast(`Lane ${label} placed in CEASE-FIRE HOLD`, "warning");
+            }}
+            onExtend={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                activeSession: l.activeSession
+                  ? {
+                      ...l.activeSession,
+                      distance: l.activeSession.distance === "0 YDS" ? "15 YDS" : l.activeSession.distance,
+                    }
+                  : l.activeSession,
+              }));
+              toast(`Extended Bay ${label} session by +15 mins`, "success");
+            }}
+            onTestCycle={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                activeSession: {
+                  ...l.activeSession,
+                  shooter: l.activeSession?.shooter || { name: "Pulley Check" },
+                  distance: l.activeSession?.distance === "CALIBRATING" ? "TESTED OK" : "CALIBRATING",
+                },
+              }));
+              toast(`Lane ${label} pulley servo test cycle completed`, "info");
+            }}
+            onClearMaint={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                status: "READY",
+                activeSession: { shooter: { name: "Unoccupied" }, weapon: "CLEARED", distance: "PARKED", rounds: 0, db: "00 dB" },
+              }));
+              toast(`Lane ${label} cleared from maintenance → READY`, "success");
+            }}
+            onVerifyClear={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                status: "READY",
+                activeSession: {
+                  ...l.activeSession,
+                  db: "68 dB",
+                },
+              }));
+              toast(`Lane ${label} chamber verified clear → READY`, "success");
+            }}
+            onLockBay={() => {
+              const label = `L${String(lane.laneNumber).padStart(2, "0")}`;
+              updateLaneState(lane.id, (l) => ({
+                ...l,
+                status: "MAINTENANCE",
+              }));
+              toast(`Lane ${label} locked out for inspection`, "warning");
+            }}
+            onAssignParty={() => {
+              router.push(`/checkin?lane=${lane.laneNumber}`);
+            }}
+          />
         ))}
       </div>
 
@@ -166,7 +316,7 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 shadow-xs shrink-0 mt-1">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-md bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30 shrink-0">
-            <span className="material-symbols-outlined text-primary text-[20px]">videocam</span>
+            <IconVideocam className="w-5 h-5 text-primary" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-label-caps text-[10px] uppercase text-outline font-bold truncate">
@@ -178,8 +328,12 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button className="w-full sm:w-auto justify-center px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-md text-[11px] font-semibold rounded flex items-center gap-1 transition-colors border border-outline-variant/30">
-            <span className="material-symbols-outlined text-[14px]">vertical_align_bottom</span> Recall All Targets
+          <button
+            type="button"
+            onClick={handleRecallAll}
+            className="w-full sm:w-auto justify-center px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-md text-[11px] font-semibold rounded flex items-center gap-1.5 transition-colors border border-outline-variant/30 active:scale-95 min-h-[36px]"
+          >
+            <IconArrowDown className="w-3.5 h-3.5 text-on-surface" /> Recall All Targets
           </button>
         </div>
       </div>
@@ -187,7 +341,29 @@ export function LaneMatrix({ lanes, isLoading }: LaneMatrixProps) {
   );
 }
 
-function LaneCard({ lane }: { lane: Lane }) {
+interface LaneCardProps {
+  lane: Lane;
+  onRecall: () => void;
+  onStop: () => void;
+  onExtend: () => void;
+  onTestCycle: () => void;
+  onClearMaint: () => void;
+  onVerifyClear: () => void;
+  onLockBay: () => void;
+  onAssignParty: () => void;
+}
+
+function LaneCard({
+  lane,
+  onRecall,
+  onStop,
+  onExtend,
+  onTestCycle,
+  onClearMaint,
+  onVerifyClear,
+  onLockBay,
+  onAssignParty,
+}: LaneCardProps) {
   const laneStr = `L${String(lane.laneNumber).padStart(2, "0")}`;
   const isActive = lane.status === "OCCUPIED";
   const isOffline = lane.status === "MAINTENANCE";
@@ -195,42 +371,42 @@ function LaneCard({ lane }: { lane: Lane }) {
 
   if (isActive) {
     return (
-      <div className="group relative bg-surface-container rounded-lg p-3 flex flex-col justify-between hover:bg-surface-container-high transition-colors shadow-xs border border-outline-variant/20">
+      <div className="group relative bg-surface-container rounded-xl p-3.5 flex flex-col justify-between hover:bg-surface-container-high transition-colors shadow-sm border border-outline-variant/20">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="font-telemetry-lg text-[16px] text-on-surface font-bold">{laneStr}</span>
-            <span className="px-1.5 py-[1px] bg-tertiary/10 text-tertiary font-label-caps text-[9px] rounded font-bold">
+          <div className="flex items-center gap-2">
+            <span className="font-telemetry-lg text-base text-on-surface font-black tracking-wide">{laneStr}</span>
+            <span className="px-2 py-0.5 bg-tertiary/15 text-tertiary font-label-caps text-[10px] rounded-md font-bold">
               MEM
             </span>
           </div>
-          <div className="flex items-center gap-1 bg-surface-container-lowest px-1.5 py-0.5 rounded border border-tertiary/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
-            <span className="font-label-caps text-[9px] text-tertiary font-bold">HOT</span>
+          <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-0.5 rounded-full border border-tertiary/30">
+            <span className="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+            <span className="font-label-caps text-[10px] text-tertiary font-bold tracking-wider">HOT</span>
           </div>
         </div>
-        <div className="my-2 flex items-baseline justify-between font-telemetry-sm">
-          <div className="text-on-surface font-semibold text-[13px] truncate max-w-[90px]">
+        <div className="my-2.5 flex items-baseline justify-between font-telemetry-sm gap-2">
+          <div className="text-on-surface font-bold text-sm truncate flex-1 min-w-0">
             {lane.activeSession?.shooter?.name || "K. Vance"}
           </div>
-          <div className="text-outline text-[11px]">
+          <div className="text-outline text-xs shrink-0">
             <span className="text-on-surface font-bold">{lane.activeSession?.rounds || 184}</span> rds
           </div>
         </div>
-        <div className="flex items-center justify-between text-outline text-[10px] font-telemetry-sm mb-2">
+        <div className="flex items-center justify-between text-outline text-xs font-telemetry-sm mb-3">
           <span>{lane.activeSession?.distance || "25 yd"}</span>
-          <span className="text-secondary font-bold flex items-center gap-0.5">
-            <span className="material-symbols-outlined text-[12px]">volume_up</span>
+          <span className="text-secondary font-bold flex items-center gap-1">
+            <IconVolumeUp className="w-3.5 h-3.5 text-secondary" />
             {lane.activeSession?.db || "141 dB"}
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-outline-variant/15 mt-auto">
-          <button className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded py-1 flex items-center justify-center text-[10px]" title="Recall Target">
-            <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-outline-variant/15 mt-auto">
+          <button type="button" onClick={onRecall} className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded-lg h-9 flex items-center justify-center text-xs font-bold active:scale-95 transition-transform" title="Recall Target">
+            ↓ Recall
           </button>
-          <button className="bg-secondary-container hover:opacity-90 text-on-secondary-container rounded py-1 flex items-center justify-center font-bold text-[9px]">
+          <button type="button" onClick={onStop} className="bg-secondary-container hover:opacity-90 text-white rounded-lg h-9 flex items-center justify-center font-black text-xs tracking-wider active:scale-95 transition-transform shadow-xs">
             STOP
           </button>
-          <button className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded py-1 flex items-center justify-center font-telemetry-sm text-[9px]">
+          <button type="button" onClick={onExtend} className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded-lg h-9 flex items-center justify-center font-telemetry-sm text-xs font-semibold active:scale-95 transition-transform">
             +15m
           </button>
         </div>
@@ -240,32 +416,32 @@ function LaneCard({ lane }: { lane: Lane }) {
 
   if (isOffline) {
     return (
-      <div className="group relative bg-surface-container-low/80 rounded-lg p-3 flex flex-col justify-between shadow-xs border border-outline-variant/20 opacity-90">
+      <div className="group relative bg-surface-container-low/80 rounded-xl p-3.5 flex flex-col justify-between shadow-xs border border-outline-variant/20 opacity-90">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="font-telemetry-lg text-[16px] text-outline font-bold">{laneStr}</span>
-            <span className="px-1.5 py-[1px] bg-primary-container/20 text-primary font-label-caps text-[9px] rounded font-bold">
+          <div className="flex items-center gap-2">
+            <span className="font-telemetry-lg text-base text-outline font-bold tracking-wide">{laneStr}</span>
+            <span className="px-2 py-0.5 bg-primary-container/20 text-primary font-label-caps text-[10px] rounded-md font-bold">
               MAINT
             </span>
           </div>
-          <div className="flex items-center gap-1 bg-surface-container-lowest px-1.5 py-0.5 rounded border border-primary/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-            <span className="font-label-caps text-[9px] text-primary font-bold">OFFLINE</span>
+          <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-0.5 rounded-full border border-primary/30">
+            <span className="w-2 h-2 rounded-full bg-primary"></span>
+            <span className="font-label-caps text-[10px] text-primary font-bold">OFFLINE</span>
           </div>
         </div>
-        <div className="my-2 flex items-baseline justify-between font-telemetry-sm">
-          <div className="text-outline font-medium text-[13px]">Carrier Serv.</div>
-          <div className="text-outline text-[11px]">0 rds</div>
+        <div className="my-2.5 flex items-baseline justify-between font-telemetry-sm">
+          <div className="text-outline font-medium text-sm">Carrier Serv.</div>
+          <div className="text-outline text-xs">0 rds</div>
         </div>
-        <div className="flex items-center justify-between text-primary font-telemetry-sm text-[10px] mb-2">
+        <div className="flex items-center justify-between text-primary font-telemetry-sm text-xs mb-3">
           <span>Cable Inspect</span>
-          <span>Tech: #4</span>
+          <span>{lane.activeSession?.distance === "TESTED OK" ? "TESTED OK" : "Tech: #4"}</span>
         </div>
-        <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-outline-variant/15 mt-auto">
-          <button className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded py-1 font-telemetry-sm text-[10px]">
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant/15 mt-auto">
+          <button type="button" onClick={onTestCycle} className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded-lg h-9 font-telemetry-sm text-xs font-semibold flex items-center justify-center active:scale-95 transition-transform">
             Test Cycle
           </button>
-          <button className="bg-primary/20 hover:bg-primary/30 text-primary rounded py-1 font-telemetry-sm text-[10px] font-bold">
+          <button type="button" onClick={onClearMaint} className="bg-primary/20 hover:bg-primary/30 text-primary rounded-lg h-9 font-telemetry-sm text-xs font-bold flex items-center justify-center active:scale-95 transition-transform">
             Clear
           </button>
         </div>
@@ -275,32 +451,32 @@ function LaneCard({ lane }: { lane: Lane }) {
 
   if (isCeaseFire) {
     return (
-      <div className="group relative bg-secondary-container/20 rounded-lg p-3 flex flex-col justify-between shadow-md border border-secondary">
+      <div className="group relative bg-secondary-container/20 rounded-xl p-3.5 flex flex-col justify-between shadow-md border-2 border-secondary">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="font-telemetry-lg text-[16px] text-secondary font-bold">{laneStr}</span>
-            <span className="px-1.5 py-[1px] bg-secondary-container text-on-secondary-container font-label-caps text-[9px] rounded font-bold">
+          <div className="flex items-center gap-2">
+            <span className="font-telemetry-lg text-base text-secondary font-black tracking-wide">{laneStr}</span>
+            <span className="px-2 py-0.5 bg-secondary-container text-on-secondary-container font-label-caps text-[10px] rounded-md font-bold">
               HOLD
             </span>
           </div>
-          <div className="flex items-center gap-1 bg-surface-container-lowest px-1.5 py-0.5 rounded border border-secondary/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
-            <span className="font-label-caps text-[9px] text-secondary font-bold">CEASE</span>
+          <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-0.5 rounded-full border border-secondary/40">
+            <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+            <span className="font-label-caps text-[10px] text-secondary font-bold tracking-wider">CEASE</span>
           </div>
         </div>
-        <div className="my-2 flex items-baseline justify-between font-telemetry-sm">
-          <div className="text-secondary font-bold text-[13px]">Breech Flg?</div>
-          <div className="text-outline text-[11px]"><span className="text-on-surface font-bold">92</span> rds</div>
+        <div className="my-2.5 flex items-baseline justify-between font-telemetry-sm">
+          <div className="text-secondary font-bold text-sm">Breech Flg?</div>
+          <div className="text-outline text-xs"><span className="text-on-surface font-bold">{lane.activeSession?.rounds ?? 92}</span> rds</div>
         </div>
-        <div className="flex items-center justify-between text-secondary font-telemetry-sm text-[10px] mb-2 font-semibold">
+        <div className="flex items-center justify-between text-secondary font-telemetry-sm text-xs mb-3 font-semibold">
           <span>RSO Inspecting</span>
-          <span className="material-symbols-outlined text-[13px]">priority_high</span>
+          <IconWarning className="w-4 h-4 text-secondary" />
         </div>
-        <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-outline-variant/15 mt-auto">
-          <button className="bg-secondary text-on-secondary font-bold rounded py-1 font-telemetry-sm text-[10px]">
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant/15 mt-auto">
+          <button type="button" onClick={onVerifyClear} className="bg-secondary text-white font-bold rounded-lg h-9 font-telemetry-sm text-xs flex items-center justify-center active:scale-95 transition-transform shadow-xs">
             Verify Clear
           </button>
-          <button className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded py-1 font-telemetry-sm text-[10px]">
+          <button type="button" onClick={onLockBay} className="bg-surface-container-highest hover:bg-surface-bright text-on-surface rounded-lg h-9 font-telemetry-sm text-xs font-semibold flex items-center justify-center active:scale-95 transition-transform">
             Lock Bay
           </button>
         </div>
@@ -309,29 +485,29 @@ function LaneCard({ lane }: { lane: Lane }) {
   }
 
   return (
-    <div className="group relative bg-surface-container-lowest rounded-lg p-3 flex flex-col justify-between hover:bg-surface-container transition-colors shadow-xs border border-outline-variant/20">
+    <div className="group relative bg-surface-container-lowest rounded-xl p-3.5 flex flex-col justify-between hover:bg-surface-container transition-colors shadow-sm border border-outline-variant/20">
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-1.5">
-          <span className="font-telemetry-lg text-[16px] text-on-surface-variant font-bold">{laneStr}</span>
-          <span className="px-1.5 py-[1px] bg-surface-container-high text-outline font-label-caps text-[9px] rounded font-semibold">
+        <div className="flex items-center gap-2">
+          <span className="font-telemetry-lg text-base text-on-surface-variant font-bold tracking-wide">{laneStr}</span>
+          <span className="px-2 py-0.5 bg-surface-container-high text-outline font-label-caps text-[10px] rounded-md font-semibold">
             READY
           </span>
         </div>
-        <div className="flex items-center gap-1 bg-surface-container px-1.5 py-0.5 rounded">
-          <span className="w-1.5 h-1.5 rounded-full bg-outline"></span>
-          <span className="font-label-caps text-[9px] text-outline font-semibold">COLD</span>
+        <div className="flex items-center gap-1.5 bg-surface-container px-2 py-0.5 rounded-full">
+          <span className="w-2 h-2 rounded-full bg-outline"></span>
+          <span className="font-label-caps text-[10px] text-outline font-semibold">COLD</span>
         </div>
       </div>
-      <div className="my-2 flex items-baseline justify-between font-telemetry-sm">
-        <div className="text-outline font-medium text-[13px]">Staged: 0 yd</div>
-        <div className="text-outline text-[11px]">Ready</div>
+      <div className="my-2.5 flex items-baseline justify-between font-telemetry-sm">
+        <div className="text-outline font-medium text-sm">Staged: 0 yd</div>
+        <div className="text-outline text-xs">Ready</div>
       </div>
-      <div className="flex items-center justify-between text-outline text-[10px] font-telemetry-sm mb-2">
+      <div className="flex items-center justify-between text-outline text-xs font-telemetry-sm mb-3">
         <span>Cleaned 13:50</span>
         <span className="truncate ml-1">TGT #1</span>
       </div>
-      <button className="mt-auto w-full bg-primary text-on-primary hover:opacity-90 font-body-md font-semibold text-[11px] py-1 rounded transition-colors flex items-center justify-center gap-1">
-        <span className="material-symbols-outlined text-[13px]">person_add</span> Assign Party
+      <button type="button" onClick={onAssignParty} className="mt-auto w-full bg-primary text-on-primary hover:opacity-90 font-body-md font-bold text-xs h-9 rounded-lg transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+        <IconPersonAdd className="w-4 h-4 text-on-primary" /> Assign Party
       </button>
     </div>
   );

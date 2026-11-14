@@ -197,17 +197,22 @@ function CoachCalendar() {
     } finally { setSaving(false); }
   }
 
-  async function handleDelete() {
+  const [confirmSeriesDelete, setConfirmSeriesDelete] = useState(false);
+
+  async function handleDelete(deleteAllSeries?: boolean) {
     if (!selected) return;
+    if (selected.recurringGroupId && deleteAllSeries === undefined) {
+      setConfirmSeriesDelete(true);
+      return;
+    }
     setSaving(true);
     try {
-      if (selected.recurringGroupId) {
-        const all = confirm('Delete all events in this series?\nOK = all series  Cancel = just this one');
-        if (all) await apiFetch(`/calendar/events/recurring/${selected.recurringGroupId}`, { method: 'DELETE' });
-        else     await apiFetch(`/calendar/events/${selected.id}`, { method: 'DELETE' });
+      if (selected.recurringGroupId && deleteAllSeries) {
+        await apiFetch(`/calendar/events/recurring/${selected.recurringGroupId}`, { method: 'DELETE' });
       } else {
         await apiFetch(`/calendar/events/${selected.id}`, { method: 'DELETE' });
       }
+      setConfirmSeriesDelete(false);
       setModal(null); fetchEvents();
     } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Failed to delete');
     } finally { setSaving(false); }
@@ -314,7 +319,12 @@ function CoachCalendar() {
       {modal && (
         <EventModal mode={modal} form={form} setForm={setForm} shooters={shooters}
           saving={saving} error={error} onSave={handleSave}
-          onDelete={modal === 'edit' ? handleDelete : undefined} onClose={() => setModal(null)} />
+          onDelete={modal === 'edit' ? () => handleDelete() : undefined}
+          confirmSeriesDelete={confirmSeriesDelete}
+          onDeleteSingle={() => handleDelete(false)}
+          onDeleteSeries={() => handleDelete(true)}
+          onCancelDelete={() => setConfirmSeriesDelete(false)}
+          onClose={() => { setConfirmSeriesDelete(false); setModal(null); }} />
       )}
       {showRequests && (
         <RequestsPanel requests={requests} onClose={() => setShowRequests(false)}
@@ -1392,8 +1402,15 @@ interface EventModalProps {
   setForm: React.Dispatch<React.SetStateAction<EventFormState>>;
   shooters: User[]; saving: boolean; error: string | null;
   onSave: () => void; onDelete?: () => void; onClose: () => void;
+  confirmSeriesDelete?: boolean;
+  onDeleteSingle?: () => void;
+  onDeleteSeries?: () => void;
+  onCancelDelete?: () => void;
 }
-function EventModal({ mode, form, setForm, shooters, saving, error, onSave, onDelete, onClose }: EventModalProps) {
+function EventModal({
+  mode, form, setForm, shooters, saving, error, onSave, onDelete, onClose,
+  confirmSeriesDelete, onDeleteSingle, onDeleteSeries, onCancelDelete,
+}: EventModalProps) {
   const f = (k: keyof EventFormState, v: unknown) => setForm(p => ({ ...p, [k]: v }));
   const toggleAssignee = (id: string) =>
     setForm(p => ({ ...p, assigneeIds: p.assigneeIds.includes(id) ? p.assigneeIds.filter(x => x !== id) : [...p.assigneeIds, id] }));
@@ -1501,21 +1518,40 @@ function EventModal({ mode, form, setForm, shooters, saving, error, onSave, onDe
             </div>
           )}
         </div>
-        <div className="flex items-center gap-3 px-6 py-4 border-t border-border-subtle">
-          {onDelete && (
-            <button onClick={onDelete} disabled={saving} className="px-4 py-2.5 text-sm font-display font-semibold rounded-xl transition-all hover:opacity-80"
-              style={{ color: '#FF4D6D', background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.25)' }}>
-              Delete
-            </button>
+        <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-t border-border-subtle">
+          {confirmSeriesDelete ? (
+            <div className="w-full flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-display font-semibold text-[#FF4D6D]">Delete repeating event?</span>
+              <div className="flex items-center gap-2">
+                <button onClick={onDeleteSingle} disabled={saving} className="px-3 py-1.5 text-xs font-display font-semibold rounded-lg bg-[#FF4D6D]/15 text-[#FF4D6D] border border-[#FF4D6D]/30">
+                  Just This One
+                </button>
+                <button onClick={onDeleteSeries} disabled={saving} className="px-3 py-1.5 text-xs font-display font-semibold rounded-lg bg-[#FF4D6D] text-white">
+                  Entire Series
+                </button>
+                <button onClick={onCancelDelete} disabled={saving} className="px-3 py-1.5 text-xs font-display text-text-muted">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {onDelete && (
+                <button onClick={onDelete} disabled={saving} className="px-4 py-2.5 text-sm font-display font-semibold rounded-xl transition-all hover:opacity-80"
+                  style={{ color: '#FF4D6D', background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.25)' }}>
+                  Delete
+                </button>
+              )}
+              <button onClick={onClose} className="ml-auto px-4 py-2.5 text-sm font-display font-semibold rounded-xl"
+                style={{ color: 'var(--text-muted)', background: 'var(--chip-bg)', border: '1px solid var(--glass-border)' }}>
+                Cancel
+              </button>
+              <button onClick={onSave} disabled={saving} className="btn-primary px-5 py-2.5 text-sm font-display font-semibold rounded-xl min-w-[100px]">
+                {saving ? <span className="flex items-center gap-2 justify-center"><span className="w-3 h-3 border-2 border-t-transparent border-[#060810] rounded-full animate-spin" />Saving…</span>
+                  : mode === 'create' ? 'Create Event' : 'Save Changes'}
+              </button>
+            </>
           )}
-          <button onClick={onClose} className="ml-auto px-4 py-2.5 text-sm font-display font-semibold rounded-xl"
-            style={{ color: 'var(--text-muted)', background: 'var(--chip-bg)', border: '1px solid var(--glass-border)' }}>
-            Cancel
-          </button>
-          <button onClick={onSave} disabled={saving} className="btn-primary px-5 py-2.5 text-sm font-display font-semibold rounded-xl min-w-[100px]">
-            {saving ? <span className="flex items-center gap-2 justify-center"><span className="w-3 h-3 border-2 border-t-transparent border-[#060810] rounded-full animate-spin" />Saving…</span>
-              : mode === 'create' ? 'Create Event' : 'Save Changes'}
-          </button>
         </div>
       </div>
     </div>

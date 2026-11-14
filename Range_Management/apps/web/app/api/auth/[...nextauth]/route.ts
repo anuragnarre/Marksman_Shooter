@@ -2,6 +2,11 @@
 // This file is kept to avoid Next.js build warnings about missing route handlers.
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-static';
+export function generateStaticParams() {
+  return [{ nextauth: ['session'] }];
+}
+
 export function GET() {
   return NextResponse.json({ error: 'Not used' }, { status: 404 });
 }

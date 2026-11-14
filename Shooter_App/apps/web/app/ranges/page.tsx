@@ -51,7 +51,6 @@ const DEFAULT_RANGES: ShootingRange[] = [
     code: 'OLY-A',
     status: 'HOT',
     rating: 4.9,
-    photoUrl: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600&h=300&fit=crop',
     lanes: [
       { id: 'lane-1', laneNumber: 1, targetDistance: 10, status: 'AVAILABLE', targetType: 'Megalink 3D 10m' },
       { id: 'lane-2', laneNumber: 2, targetDistance: 10, status: 'AVAILABLE', targetType: 'Megalink 3D 10m' },
@@ -68,7 +67,6 @@ const DEFAULT_RANGES: ShootingRange[] = [
     code: 'METRO',
     status: 'HOT',
     rating: 4.8,
-    photoUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=300&fit=crop',
     lanes: [
       { id: 'lane-201', laneNumber: 1, targetDistance: 10, status: 'AVAILABLE', targetType: 'Marksman AI Optical' },
       { id: 'lane-202', laneNumber: 2, targetDistance: 10, status: 'AVAILABLE', targetType: 'Marksman AI Optical' },
@@ -120,30 +118,37 @@ export default function RangesDiscoveryPage() {
     if (!selectedRange || !selectedLane) return;
 
     setIsSubmitting(true);
+    const SLOT_TIMES: Record<string, [string, string]> = {
+      '09:00 - 11:00 AM': ['09:00:00Z', '11:00:00Z'],
+      '11:30 - 01:30 PM': ['11:30:00Z', '13:30:00Z'],
+      '02:00 - 04:00 PM': ['14:00:00Z', '16:00:00Z'],
+      '04:30 - 06:30 PM': ['16:30:00Z', '18:30:00Z'],
+    };
+    const [startIso, endIso] = SLOT_TIMES[selectedSlot] ?? ['09:00:00Z', '11:00:00Z'];
+
     const bookingPayload = {
       rangeId: selectedRange.id,
       laneId: selectedLane.id,
       userId: user?.id || 'usr-alex-9941',
-      shooterName: user?.name || 'Alex Mercer',
+      shooterName: user?.name || 'Alex Marksman',
       date: selectedDate,
       timeSlot: selectedSlot,
       discipline,
       targetCamLinked: linkTargetCam,
-      startTime: `${selectedDate}T${selectedSlot.split(' - ')[0]}:00Z`,
-      endTime: `${selectedDate}T${selectedSlot.split(' - ')[1]}:00Z`,
+      startTime: `${selectedDate}T${startIso}`,
+      endTime: `${selectedDate}T${endIso}`,
     };
 
     try {
-      // 1. Send schedule request to backend
       await apiFetch(`/schedule-requests`, {
         method: 'POST',
         body: JSON.stringify(bookingPayload),
       });
     } catch {
-      // Offline fallback
+      // Offline fallback saved below
     }
 
-    setConfirmedBooking({
+    const confirmation = {
       id: `BK-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
       rangeName: selectedRange.name,
       laneNumber: selectedLane.laneNumber,
@@ -151,9 +156,14 @@ export default function RangesDiscoveryPage() {
       date: selectedDate,
       timeSlot: selectedSlot,
       discipline,
-      shooterName: user?.name || 'Alex Mercer',
+      shooterName: user?.name || 'Alex Marksman',
       timestamp: new Date().toLocaleTimeString(),
-    });
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('marksman_range_bookings_v1') || '[]');
+      localStorage.setItem('marksman_range_bookings_v1', JSON.stringify([confirmation, ...existing].slice(0, 20)));
+    } catch {}
+    setConfirmedBooking(confirmation);
 
     setIsSubmitting(false);
   };
@@ -178,7 +188,7 @@ export default function RangesDiscoveryPage() {
               <Target className="w-5 h-5" />
               <span className="text-xs font-bold uppercase tracking-widest">CERTIFIED RANGE NETWORK</span>
             </div>
-            <h1 className="text-3xl font-display font-bold text-white tracking-tight">Range Discovery &amp; Booking</h1>
+            <h1 className="text-3xl font-display font-bold text-text-primary tracking-tight">Range Discovery &amp; Booking</h1>
             <p className="text-[var(--text-secondary)] text-sm">
               Book electronic targets, ISSF 10m halls, and optical camera-equipped lanes with live downrange sync.
             </p>
@@ -200,7 +210,7 @@ export default function RangesDiscoveryPage() {
               placeholder="Search by facility name or city..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] focus:border-[var(--accent-primary)] rounded-xl px-4 py-2.5 text-sm text-white placeholder-stone-500"
+              className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] focus:border-[var(--accent-primary)] rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none"
             />
           </div>
 
@@ -219,7 +229,7 @@ export default function RangesDiscoveryPage() {
                 className={`text-xs px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                   filterDistance === d.val
                     ? 'bg-[var(--accent-primary)] text-black shadow-glow'
-                    : 'bg-[var(--bg-void)] text-[var(--text-secondary)] hover:text-white border border-[var(--border-subtle)]'
+                    : 'bg-[var(--bg-void)] text-[var(--text-secondary)] hover:text-text-primary border border-[var(--border-subtle)]'
                 }`}
               >
                 {d.label}
@@ -237,23 +247,23 @@ export default function RangesDiscoveryPage() {
             return (
               <div 
                 key={range.id} 
-                className="bg-gradient-to-br from-[#12131A] to-[#181A24] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/40 rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+                className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/40 rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between group shadow-lg"
               >
                 <div>
                   {/* Top status & rating row */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-xs font-mono font-bold text-emerald-300 uppercase tracking-wider">
+                      <span className="text-xs font-mono font-bold text-emerald-500 uppercase tracking-wider">
                         {range.status || 'HOT'} &bull; OPEN
                       </span>
                     </div>
-                    <span className="text-xs font-mono bg-white/5 text-white/80 px-2.5 py-1 rounded-full border border-white/10 font-bold">
-                      ⭐ {range.rating || 4.9} / 5.0
+                    <span className="text-xs font-mono bg-[var(--bg-elevated)] text-text-secondary px-2.5 py-1 rounded-full border border-[var(--border-subtle)] font-bold">
+                      ★ {range.rating || 4.9} / 5.0
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-display font-bold text-white group-hover:text-[var(--accent-primary)] transition-colors">
+                  <h3 className="text-2xl font-display font-bold text-text-primary group-hover:text-[var(--accent-primary)] transition-colors">
                     {range.name}
                   </h3>
 
@@ -274,7 +284,7 @@ export default function RangesDiscoveryPage() {
                       <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-bold">
                         Firing Line Status
                       </span>
-                      <span className="text-xs font-mono font-bold text-white">
+                      <span className="text-xs font-mono font-bold text-text-primary">
                         {openLanes} of {totalLanes} Lanes Open
                       </span>
                     </div>
@@ -283,17 +293,19 @@ export default function RangesDiscoveryPage() {
                       {range.lanes.map((lane) => {
                         const isAvail = lane.status === 'AVAILABLE';
                         return (
-                          <div
+                          <button
+                            type="button"
+                            onClick={() => handleOpenBooking(range, lane)}
                             key={lane.id}
                             className={`p-2 rounded-xl text-center border transition-all ${
                               isAvail
-                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                                : 'bg-red-500/10 border-red-500/20 text-red-400/80'
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:border-emerald-400'
+                                : 'bg-red-500/10 border-red-500/20 text-red-500/80'
                             }`}
                           >
                             <span className="text-[10px] font-mono block font-bold">L-{String(lane.laneNumber).padStart(2, '0')}</span>
                             <span className="text-[11px] font-bold block">{lane.targetDistance}m</span>
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
@@ -303,7 +315,7 @@ export default function RangesDiscoveryPage() {
                 {/* Card Action Button */}
                 <div className="mt-6 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] font-mono">
-                    <Camera size={14} className="text-emerald-400" />
+                    <Camera size={14} className="text-emerald-500" />
                     <span>Target Cam Ready</span>
                   </div>
                   <button
@@ -322,7 +334,7 @@ export default function RangesDiscoveryPage() {
         {/* Interactive Booking Modal */}
         {selectedRange && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-surface-container-high border border-outline-variant/40 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
               
               {!confirmedBooking ? (
                 <>
@@ -331,11 +343,11 @@ export default function RangesDiscoveryPage() {
                       <span className="text-[10px] uppercase tracking-widest text-[var(--accent-primary)] font-bold">
                         FACILITY RESERVATION
                       </span>
-                      <h3 className="text-2xl font-bold font-display text-white">{selectedRange.name}</h3>
+                      <h3 className="text-2xl font-bold font-display text-text-primary">{selectedRange.name}</h3>
                     </div>
                     <button 
                       onClick={() => setSelectedRange(null)}
-                      className="text-white/60 hover:text-white text-lg p-1"
+                      className="text-text-muted hover:text-text-primary text-lg p-1"
                     >
                       ✕
                     </button>
@@ -361,8 +373,8 @@ export default function RangesDiscoveryPage() {
                                 isSelected
                                   ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-black font-bold shadow-glow'
                                   : isAvail
-                                  ? 'bg-[var(--bg-void)] border-[var(--border-subtle)] text-white hover:border-white/40'
-                                  : 'bg-white/5 border-transparent text-white/40'
+                                  ? 'bg-[var(--bg-void)] border-[var(--border-subtle)] text-text-primary hover:border-[var(--accent-primary)]/40'
+                                  : 'bg-[var(--bg-surface)] border-transparent text-text-muted'
                               }`}
                             >
                               <span className="text-[10px] block font-mono">Lane {lane.laneNumber}</span>
@@ -384,7 +396,7 @@ export default function RangesDiscoveryPage() {
                           type="date"
                           value={selectedDate}
                           onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-white"
+                          className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-text-primary"
                           required
                         />
                       </div>
@@ -396,7 +408,7 @@ export default function RangesDiscoveryPage() {
                         <select
                           value={selectedSlot}
                           onChange={(e) => setSelectedSlot(e.target.value)}
-                          className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-white"
+                          className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-text-primary"
                         >
                           <option value="09:00 - 11:00 AM">09:00 - 11:00 AM (Morning Precision)</option>
                           <option value="11:30 - 01:30 PM">11:30 - 01:30 PM (Midday Session)</option>
@@ -414,7 +426,7 @@ export default function RangesDiscoveryPage() {
                       <select
                         value={discipline}
                         onChange={(e) => setDiscipline(e.target.value)}
-                        className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-white"
+                        className="w-full bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm text-text-primary"
                       >
                         <option value="10m Air Rifle (ISSF)">10m Air Rifle (ISSF)</option>
                         <option value="10m Air Pistol (ISSF)">10m Air Pistol (ISSF)</option>
@@ -427,9 +439,9 @@ export default function RangesDiscoveryPage() {
                     {/* Target Cam Checkbox */}
                     <div className="bg-[var(--bg-void)] border border-[var(--border-subtle)] p-4 rounded-2xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Camera className="text-emerald-400 w-5 h-5" />
+                        <Camera className="text-emerald-500 w-5 h-5" />
                         <div>
-                          <span className="text-sm font-bold text-white block">Auto-Link Target Camera</span>
+                          <span className="text-sm font-bold text-text-primary block">Auto-Link Target Camera</span>
                           <span className="text-xs text-[var(--text-muted)] block">Stream downrange optical hits straight to Live Analysis</span>
                         </div>
                       </div>
@@ -446,7 +458,7 @@ export default function RangesDiscoveryPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedRange(null)}
-                        className="flex-1 py-3 rounded-xl border border-[var(--border-subtle)] text-white hover:bg-white/5 font-bold text-sm"
+                        className="flex-1 py-3 rounded-xl border border-[var(--border-subtle)] text-text-primary hover:bg-[var(--bg-surface)] font-bold text-sm"
                       >
                         Cancel
                       </button>
@@ -464,44 +476,44 @@ export default function RangesDiscoveryPage() {
               ) : (
                 /* Confirmed Booking Chit */
                 <div className="space-y-6 text-center animate-in zoom-in-95">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto text-3xl font-bold">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-500 flex items-center justify-center mx-auto text-3xl font-bold">
                     ✓
                   </div>
                   <div>
-                    <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">
+                    <span className="text-xs font-mono font-bold text-emerald-500 uppercase tracking-widest">
                       RESERVATION CONFIRMED
                     </span>
-                    <h3 className="text-2xl font-bold text-white font-display mt-1">
+                    <h3 className="text-2xl font-bold text-text-primary font-display mt-1">
                       {confirmedBooking.rangeName}
                     </h3>
                     <p className="text-sm text-[var(--text-secondary)] mt-1">
-                      Booking Reference: <strong className="text-white font-mono">{confirmedBooking.id}</strong>
+                      Booking Reference: <strong className="text-text-primary font-mono">{confirmedBooking.id}</strong>
                     </p>
                   </div>
 
                   <div className="bg-[var(--bg-void)] border border-[var(--border-subtle)] rounded-2xl p-4 text-left grid grid-cols-2 gap-3 text-xs">
                     <div>
                       <span className="text-[var(--text-muted)] block uppercase font-mono">Assigned Lane</span>
-                      <span className="text-white font-bold text-sm">Lane {confirmedBooking.laneNumber} ({confirmedBooking.distance}m)</span>
+                      <span className="text-text-primary font-bold text-sm">Lane {confirmedBooking.laneNumber} ({confirmedBooking.distance}m)</span>
                     </div>
                     <div>
                       <span className="text-[var(--text-muted)] block uppercase font-mono">Date &amp; Slot</span>
-                      <span className="text-white font-bold text-sm">{confirmedBooking.timeSlot}</span>
+                      <span className="text-text-primary font-bold text-sm">{confirmedBooking.timeSlot}</span>
                     </div>
                     <div>
                       <span className="text-[var(--text-muted)] block uppercase font-mono">Discipline</span>
-                      <span className="text-white font-bold text-sm">{confirmedBooking.discipline}</span>
+                      <span className="text-text-primary font-bold text-sm">{confirmedBooking.discipline}</span>
                     </div>
                     <div>
                       <span className="text-[var(--text-muted)] block uppercase font-mono">Gate Status</span>
-                      <span className="text-emerald-400 font-bold text-sm">Active on Digital Pass</span>
+                      <span className="text-emerald-500 font-bold text-sm">Active on Digital Pass</span>
                     </div>
                   </div>
 
                   <div className="flex gap-3">
                     <button
                       onClick={() => setSelectedRange(null)}
-                      className="flex-1 py-3 rounded-xl border border-[var(--border-subtle)] text-white hover:bg-white/5 font-bold text-sm"
+                      className="flex-1 py-3 rounded-xl border border-[var(--border-subtle)] text-text-primary hover:bg-[var(--bg-surface)] font-bold text-sm"
                     >
                       Close
                     </button>

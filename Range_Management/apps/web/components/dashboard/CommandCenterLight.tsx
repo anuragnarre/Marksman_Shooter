@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "../../contexts/toast-context";
+import { MaterialIcon } from "../ui/TacticalIcons";
 
 interface CommandCenterLightProps {
   rangeStatus: "HOT" | "COLD";
@@ -25,11 +28,23 @@ const DEFAULT_LANES = [
 ];
 
 export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStatus }: CommandCenterLightProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [activeBay, setActiveBay] = useState<"ALPHA" | "BRAVO" | "CELL_C">("ALPHA");
   const [autoCycle, setAutoCycle] = useState(true);
   const [zuluTime, setZuluTime] = useState("");
+  const [localLanes, setLocalLanes] = useState<any[]>(lanes.length > 0 ? lanes : DEFAULT_LANES);
 
-  const displayLanes = lanes.length > 0 ? lanes : DEFAULT_LANES;
+  useEffect(() => {
+    if (lanes.length > 0) setLocalLanes(lanes);
+  }, [lanes]);
+
+  const bayMeta =
+    activeBay === "ALPHA"
+      ? { label: "Bay Alpha (25 YDS)", util: "78.3%", activeText: "10 of 12 Lanes Active in Bay Alpha", flow: "8,420", subset: localLanes }
+      : activeBay === "BRAVO"
+      ? { label: "Bay Bravo (50 YDS)", util: "64.0%", activeText: "4 of 6 Rifle Bays Active in Bay Bravo", flow: "8,180", subset: localLanes.slice(0, 6) }
+      : { label: "Tactical Cell C", util: "91.5%", activeText: "6 of 6 Dynamic Bays Active in Cell C", flow: "8,495", subset: localLanes.slice(6, 12) };
 
   useEffect(() => {
     const updateTime = () => {
@@ -41,19 +56,46 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
     return () => clearInterval(interval);
   }, []);
 
+  const handleExportAudit = () => {
+    const csvRows = [
+      ["Lane", "Status", "Shooter", "Caliber", "Distance", "Impulse dB"].join(","),
+      ...bayMeta.subset.map((l) =>
+        [
+          `LANE-${String(l.laneNumber).padStart(2, "0")}`,
+          l.status,
+          l.activeSession?.shooter?.name || "Unoccupied",
+          l.activeSession?.caliber || "NONE",
+          l.activeSession?.distance || "PARKED",
+          l.activeSession?.db || "00 dB",
+        ].join(",")
+      ),
+    ];
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `facility-audit-${activeBay.toLowerCase()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast(`Exported ${bayMeta.label} audit log CSV`, "success");
+  };
+
   return (
     <div className="flex flex-col w-full gap-4 select-none pb-12">
       {/* Global Range Status Banner */}
       {rangeStatus === "COLD" && (
         <div className="w-full bg-error border border-error-container rounded-xl p-3 flex items-center justify-between shadow-sm animate-pulse shrink-0 text-white">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-white text-[24px]">campaign</span>
+            <MaterialIcon name="campaign" className="text-white w-6 h-6 shrink-0" />
             <div>
               <h3 className="font-bold text-sm uppercase tracking-wider">Master All-Range Cease-Fire Engaged</h3>
               <p className="text-[11px] text-white/90">All firing has ceased. Siren sounding. Awaiting RSO clearance.</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onToggleStatus}
             className="px-3 py-1 bg-white text-error font-bold text-xs uppercase rounded-lg hover:bg-neutral-100 transition-colors"
           >
@@ -66,12 +108,15 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-xs border border-outline-variant/20 shrink-0">
         <div className="flex flex-wrap items-center gap-3">
           <button 
+            type="button"
+            disabled={isLoading}
             className="flex items-center gap-2 bg-error hover:bg-on-error-container text-white px-4 py-2 rounded-lg font-label-md text-[12px] uppercase tracking-wider font-bold transition-all shadow-xs focus:outline-none" 
             onClick={onToggleStatus}
           >
-            <span className={`material-symbols-outlined text-[18px] ${rangeStatus === 'HOT' ? 'animate-pulse' : ''}`}>
-              {rangeStatus === 'HOT' ? 'pan_tool' : 'check_circle'}
-            </span>
+            <MaterialIcon
+              name={rangeStatus === "HOT" ? "pan_tool" : "check_circle"}
+              className={`w-[18px] h-[18px] ${rangeStatus === "HOT" ? "animate-pulse" : ""}`}
+            />
             <span>{rangeStatus === "HOT" ? "Call Range Cold" : "Clear & Resume"}</span>
           </button>
           
@@ -80,7 +125,11 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
             <label className="relative inline-flex items-center cursor-pointer">
               <input 
                 checked={autoCycle} 
-                onChange={(e) => setAutoCycle(e.target.checked)} 
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setAutoCycle(checked);
+                  toast(checked ? "Target carrier auto-cycle ENABLED" : "Target carrier auto-cycle PAUSED", "info");
+                }} 
                 className="sr-only peer" 
                 type="checkbox" 
               />
@@ -88,8 +137,9 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
             </label>
           </div>
           
-          <div className="flex items-center bg-surface-container-low p-1 rounded-lg border border-outline-variant/20">
+          <div className="flex items-center flex-wrap gap-1 bg-surface-container-low p-1 rounded-lg border border-outline-variant/20">
             <button 
+              type="button"
               onClick={() => setActiveBay("ALPHA")}
               className={`px-3 py-1.5 rounded-md font-label-md text-[11px] font-bold transition-all ${
                 activeBay === "ALPHA" ? "bg-primary text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
@@ -98,6 +148,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
               BAY ALPHA (25Y)
             </button>
             <button 
+              type="button"
               onClick={() => setActiveBay("BRAVO")}
               className={`px-3 py-1.5 rounded-md font-label-md text-[11px] font-bold transition-all ${
                 activeBay === "BRAVO" ? "bg-primary text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
@@ -106,6 +157,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
               BAY BRAVO (50Y)
             </button>
             <button 
+              type="button"
               onClick={() => setActiveBay("CELL_C")}
               className={`px-3 py-1.5 rounded-md font-label-md text-[11px] font-bold transition-all ${
                 activeBay === "CELL_C" ? "bg-primary text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
@@ -116,16 +168,16 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/20">
-            <span className="material-symbols-outlined text-[18px] text-tertiary">cyclone</span>
+            <MaterialIcon name="cyclone" className="w-[18px] h-[18px] text-tertiary" />
             <div className="flex flex-col">
               <span className="font-label-sm text-[10px] text-on-surface-variant uppercase leading-none font-semibold">Flow Vector</span>
-              <span className="font-telemetry-lg text-[14px] leading-tight text-on-surface font-bold">8,420 <span className="text-outline font-normal text-[10px]">/ 8,500 FPM</span></span>
+              <span className="font-telemetry-lg text-[14px] leading-tight text-on-surface font-bold">{bayMeta.flow} <span className="text-outline font-normal text-[10px]">/ 8,500 FPM</span></span>
             </div>
           </div>
           <div className="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/20">
-            <span className="material-symbols-outlined text-[18px] text-secondary">schedule</span>
+            <MaterialIcon name="schedule" className="w-[18px] h-[18px] text-secondary" />
             <div className="flex flex-col text-right">
               <span className="font-label-sm text-[10px] text-on-surface-variant uppercase leading-none font-semibold">Console Zulu</span>
               <span className="font-telemetry-lg text-[14px] leading-tight text-on-surface font-bold">{zuluTime || "18:42:09 UTC"}</span>
@@ -139,24 +191,24 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
         <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between shadow-xs border border-outline-variant/20">
           <div className="flex items-center justify-between">
             <span className="font-label-sm text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">Bay Capacity Utilization</span>
-            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><span className="material-symbols-outlined text-[18px]">meeting_room</span></span>
+            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><MaterialIcon name="meeting_room" className="w-[18px] h-[18px]" /></span>
           </div>
           <div className="flex items-baseline gap-2 my-2.5">
-            <span className="font-telemetry-xl text-[28px] text-on-surface font-bold">78.3%</span>
+            <span className="font-telemetry-xl text-[28px] text-on-surface font-bold">{bayMeta.util}</span>
             <span className="font-label-sm text-[11px] text-tertiary font-semibold bg-surface-container-low px-2 py-0.5 rounded">+4.2% pk</span>
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
-              <div className="bg-tertiary h-full rounded-full" style={{width: '78.3%'}}></div>
+              <div className="bg-tertiary h-full rounded-full" style={{ width: bayMeta.util }}></div>
             </div>
-            <span className="font-body-sm text-[11px] text-on-surface-variant">10 of 12 Lanes Active in Bay Alpha</span>
+            <span className="font-body-sm text-[11px] text-on-surface-variant">{bayMeta.activeText}</span>
           </div>
         </div>
 
         <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between shadow-xs border border-outline-variant/20">
           <div className="flex items-center justify-between">
             <span className="font-label-sm text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">Staging Queue / Waitlist</span>
-            <span className="p-1.5 rounded bg-secondary/15 text-secondary"><span className="material-symbols-outlined text-[18px]">group</span></span>
+            <span className="p-1.5 rounded bg-secondary/15 text-secondary"><MaterialIcon name="group" className="w-[18px] h-[18px]" /></span>
           </div>
           <div className="flex items-baseline gap-3 my-2.5">
             <span className="font-telemetry-xl text-[28px] text-on-surface font-bold">04</span>
@@ -171,7 +223,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
         <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between shadow-xs border border-outline-variant/20">
           <div className="flex items-center justify-between">
             <span className="font-label-sm text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">Diurnal Throughput</span>
-            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><span className="material-symbols-outlined text-[18px]">insights</span></span>
+            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><MaterialIcon name="insights" className="w-[18px] h-[18px]" /></span>
           </div>
           <div className="flex items-baseline gap-2 my-2.5">
             <span className="font-telemetry-xl text-[28px] text-on-surface font-bold">142</span>
@@ -186,7 +238,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
         <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between shadow-xs border border-outline-variant/20">
           <div className="flex items-center justify-between">
             <span className="font-label-sm text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">Operational Integrity</span>
-            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><span className="material-symbols-outlined text-[18px]">verified_user</span></span>
+            <span className="p-1.5 rounded bg-surface-container-low text-on-surface"><MaterialIcon name="verified_user" className="w-[18px] h-[18px]" /></span>
           </div>
           <div className="flex items-center gap-2 my-2.5">
             <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -206,10 +258,10 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 gap-3 border-b border-outline-variant/15">
             <div>
               <h2 className="font-headline-md text-[18px] text-on-surface font-bold uppercase tracking-tight">
-                Live Firing Matrix // Bay Alpha
+                Live Firing Matrix // {bayMeta.label}
               </h2>
               <p className="font-body-sm text-[12px] text-on-surface-variant">
-                12 Integrated Acoustic Microphones &amp; Lane Optical Feeds Active
+                {bayMeta.subset.length} Integrated Acoustic Microphones &amp; Lane Optical Feeds Active
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
@@ -221,7 +273,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-            {displayLanes.map((lane: any) => (
+            {bayMeta.subset.map((lane: any) => (
               <div key={lane.id} className="bg-surface-container-low/70 p-3.5 rounded-lg flex flex-col gap-2 hover:bg-surface-container-low transition-colors border border-outline-variant/15 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-label-md text-[11px] font-bold text-on-surface bg-surface-container px-2 py-0.5 rounded">
@@ -240,11 +292,11 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
                      lane.status === 'MAINTENANCE' ? 'MAINT' : 'OPEN / STBY'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className={`font-headline-sm text-[13px] font-semibold truncate ${lane.status === 'READY' || lane.status === 'MAINTENANCE' || lane.status === 'OPEN' ? 'text-outline' : ''}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`font-headline-sm text-[13px] font-semibold truncate ${lane.status === 'READY' || lane.status === 'MAINTENANCE' || lane.status === 'OPEN' ? 'text-outline' : 'text-on-surface'}`}>
                     {lane.activeSession?.shooter?.name || (lane.status === 'MAINTENANCE' ? 'Pulley Check' : 'Unoccupied')}
                   </span>
-                  <span className="font-label-sm text-[10px] text-on-surface-variant font-mono">
+                  <span className="font-label-sm text-[10px] text-on-surface-variant font-mono shrink-0">
                     {lane.activeSession?.caliber || (lane.status === 'MAINTENANCE' ? 'SERVICING' : 'CLEARED')}
                   </span>
                 </div>
@@ -260,8 +312,8 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
                     lane.status === 'READY' || lane.status === 'CEASE_FIRE' ? 'text-on-surface-variant font-medium' :
                     'text-outline font-medium'
                   }`}>
-                    {lane.status === 'OCCUPIED' ? <span className="material-symbols-outlined text-[13px]">volume_up</span> :
-                     (lane.status === 'READY' || lane.status === 'CEASE_FIRE') ? <span className="material-symbols-outlined text-[13px]">volume_mute</span> : null}
+                    {lane.status === 'OCCUPIED' ? <MaterialIcon name="volume_up" className="w-[13px] h-[13px]" /> :
+                     (lane.status === 'READY' || lane.status === 'CEASE_FIRE') ? <MaterialIcon name="volume_mute" className="w-[13px] h-[13px]" /> : null}
                     <span>
                       {lane.status === 'OCCUPIED' ? (lane.activeSession?.db || '141 dB') :
                        lane.status === 'CEASE_FIRE' ? 'STAGED' :
@@ -279,7 +331,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
           <div className="bg-surface-container-lowest p-5 rounded-xl shadow-xs border border-outline-variant/20 flex flex-col gap-3.5">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/15">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-primary">hvac</span>
+                <MaterialIcon name="hvac" className="w-5 h-5 text-primary" />
                 <h3 className="font-headline-sm text-[14px] uppercase tracking-wide text-on-surface font-bold">Ventilation &amp; Lead Traps</h3>
               </div>
               <span className="font-label-sm text-[10px] bg-surface-container-low text-tertiary px-2 py-0.5 rounded-md font-semibold">ALL SENSORS NORMAL</span>
@@ -327,7 +379,7 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
           <div className="bg-surface-container-lowest p-5 rounded-xl shadow-xs border border-outline-variant/20 flex flex-col justify-between gap-3.5">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/15">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-primary">history_toggle_off</span>
+                <MaterialIcon name="history_toggle_off" className="w-5 h-5 text-primary" />
                 <h3 className="font-headline-sm text-[14px] uppercase tracking-wide text-on-surface font-bold">Chronological Range Feed</h3>
               </div>
               <span className="font-label-sm text-[10px] bg-surface-container-low text-on-surface-variant px-2 py-0.5 rounded font-semibold font-mono">STREAMING</span>
@@ -353,10 +405,18 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
             </div>
             
             <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/15">
-              <button className="flex-1 bg-surface-container hover:bg-surface-container-high py-1.5 rounded-lg text-center font-label-md text-[11px] uppercase font-semibold text-on-surface transition-colors border border-outline-variant/20">
+              <button
+                type="button"
+                onClick={() => router.push("/safety")}
+                className="flex-1 bg-surface-container hover:bg-surface-container-high py-1.5 rounded-lg text-center font-label-md text-[11px] uppercase font-semibold text-on-surface transition-colors border border-outline-variant/20"
+              >
                 + Log Incident
               </button>
-              <button className="flex-1 bg-surface-container hover:bg-surface-container-high py-1.5 rounded-lg text-center font-label-md text-[11px] uppercase font-semibold text-on-surface transition-colors border border-outline-variant/20">
+              <button
+                type="button"
+                onClick={handleExportAudit}
+                className="flex-1 bg-surface-container hover:bg-surface-container-high py-1.5 rounded-lg text-center font-label-md text-[11px] uppercase font-semibold text-on-surface transition-colors border border-outline-variant/20"
+              >
                 Audit Export
               </button>
             </div>
@@ -368,10 +428,10 @@ export function CommandCenterLight({ rangeStatus, lanes, isLoading, onToggleStat
       <div className="bg-surface-container-lowest p-4 rounded-xl shadow-xs border border-outline-variant/20 grid grid-cols-1 md:grid-cols-12 gap-4 items-center shrink-0">
         <div className="md:col-span-6 flex items-center gap-3">
           <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
-            <span className="material-symbols-outlined text-[22px] text-on-surface">shield_with_heart</span>
+            <MaterialIcon name="shield_with_heart" className="w-[22px] h-[22px] text-on-surface" />
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-headline-sm text-[13px] font-bold uppercase text-on-surface">Steel Granular Trap Containment</span>
               <span className="font-label-sm text-[10px] px-2 py-0.5 bg-surface-container-low text-tertiary rounded-md font-bold">99.4% INTEGRITY</span>
             </div>

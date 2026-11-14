@@ -5,6 +5,7 @@
 import React, { useState, useCallback } from 'react';
 import { useLiveRange, LiveShot } from '../../../hooks/useLiveRange';
 import LiveFeedPanel from '../../../components/LiveFeedPanel';
+import { AppShell } from '../../../components/AppShell';
 
 const TARGET_TYPES = [
   { value: 'air_rifle_10m',    label: '10m Air Rifle' },
@@ -52,7 +53,8 @@ export default function LiveSessionPage() {
   const avgScore = shots.length > 0 ? runningTotal / shots.length : 0;
 
   return (
-    <div className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-12 pb-24 overflow-y-auto">
+    <AppShell title="Live Range" isLive={sessionActive && isConnected}>
+    <div className="w-full space-y-6 pb-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
@@ -219,5 +221,6 @@ export default function LiveSessionPage() {
         </div>
       </div>
     </div>
+    </AppShell>
   );
 }

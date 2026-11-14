@@ -30,13 +30,21 @@ async function bootstrap(): Promise<void> {
       // Server-to-server requests (Next.js server actions, curl, background workers)
       if (!origin) return callback(null, true);
 
-      // Localhost variants (Shooter App :3000, Range Ops App :3002, Vite dev tools)
-      if (LOCALHOST_REGEX.test(origin)) {
+      // Localhost variants (Shooter App :3000, Range Ops App :3002, Vite dev tools, Capacitor)
+      if (LOCALHOST_REGEX.test(origin) || origin.startsWith('capacitor://') || origin.includes('localhost')) {
         return callback(null, true);
       }
 
       // LAN private networks in dev or local range networks (Camera phone, Range tablet)
       if (isDev && PRIVATE_LAN_REGEX.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Production domains (marksmanshooter.in and pages.dev previews)
+      if (
+        /^https?:\/\/([a-z0-9-]+\.)?marksmanshooter\.in$/i.test(origin) ||
+        /^https?:\/\/([a-z0-9-]+\.)?pages\.dev$/i.test(origin)
+      ) {
         return callback(null, true);
       }
 

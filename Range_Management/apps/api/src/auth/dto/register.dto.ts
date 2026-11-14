@@ -1,7 +1,8 @@
 // apps/api/src/auth/dto/register.dto.ts
 import {
   IsEmail,
-  IsEnum,
+  IsIn,
+  IsOptional,
   IsString,
   MinLength,
   MaxLength,
@@ -22,6 +23,7 @@ export class RegisterDto {
   @MaxLength(128)
   password!: string;
 
-  @IsEnum(['SHOOTER', 'COACH'] as const)
-  role!: UserRole;
+  @IsOptional()
+  @IsIn(['SHOOTER', 'COACH', 'RANGE_OPERATOR'])
+  role?: UserRole;
 }

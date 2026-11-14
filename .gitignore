@@ -43,3 +43,10 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Temporary screenshot captures
+/*.png
+*.apk
+
+.wrangler/
+find_button.ps1

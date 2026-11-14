@@ -10,6 +10,8 @@ import {
   syncToBackend,
 } from '../lib/health-connect';
 import { HealthConnectSetup } from './HealthConnectSetup';
+import { ConfirmModal } from './ui/ConfirmModal';
+import { useToast } from '../contexts/toast-context';
 import type { DeviceRegistration, BiometricReading } from '@shooting-platform/shared-types';
 
 interface Device {
@@ -36,6 +38,7 @@ interface DeviceDetail {
 }
 
 export function DeviceManager() {
+  const { toast } = useToast();
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +53,8 @@ export function DeviceManager() {
   const [detail, setDetail] = useState<DeviceDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [pendingDeleteDevice, setPendingDeleteDevice] = useState<Device | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function loadDevices() {
     try {
@@ -109,16 +114,23 @@ export function DeviceManager() {
     } catch {}
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Remove this device and all its readings?')) return;
+  async function executeDelete(id: string) {
+    setDeleting(true);
     try {
       await apiFetch(`/biometrics/devices/${id}`, { method: 'DELETE' });
       if (expandedId === id) {
         setExpandedId(null);
         setDetail(null);
       }
+      setDevices((prev) => prev.filter((item) => item.id !== id));
+      toast('Device and readings removed', 'success');
       loadDevices();
-    } catch {}
+    } catch {
+      toast('Could not remove device (offline or server unreachable)', 'error');
+    } finally {
+      setDeleting(false);
+      setPendingDeleteDevice(null);
+    }
   }
 
   async function handleCopyKey() {
@@ -368,7 +380,7 @@ export function DeviceManager() {
                           {d.isActive ? 'Disable Device' : 'Enable Device'}
                         </button>
                         <button
-                          onClick={() => handleDelete(d.id)}
+                          onClick={() => setPendingDeleteDevice(d)}
                           className="px-3 py-1.5 rounded-lg text-xs font-display font-semibold transition-all"
                           style={{
                             background: 'rgba(255,77,109,0.06)',
@@ -605,6 +617,18 @@ export function DeviceManager() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={Boolean(pendingDeleteDevice)}
+        title="Remove Biometric Device"
+        message={`Remove "${pendingDeleteDevice?.deviceName ?? 'this device'}" and all associated biometric readings? This action cannot be undone.`}
+        confirmLabel="Remove Device"
+        cancelLabel="Cancel"
+        danger
+        loading={deleting}
+        onCancel={() => setPendingDeleteDevice(null)}
+        onConfirm={() => { if (pendingDeleteDevice) void executeDelete(pendingDeleteDevice.id); }}
+      />
     </div>
   );
 }

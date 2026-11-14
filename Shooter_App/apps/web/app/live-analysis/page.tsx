@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { LiveAnalysisDashboard } from './LiveAnalysisDashboard';
+import { AppShell } from '../../components/AppShell';
 
 export const metadata: Metadata = {
   title: 'Live Target Analysis — Marksman',
@@ -8,19 +9,19 @@ export const metadata: Metadata = {
 
 export default function LiveAnalysisPage() {
   return (
-    <main className="min-h-screen bg-bg-void pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <header className="mb-8">
-          <h1 className="font-display text-4xl font-bold tracking-wide text-text-primary">
+    <AppShell title="Live Analysis">
+      <div className="space-y-6 pb-8">
+        <header className="mb-2">
+          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-wide text-text-primary">
             Live Analysis
           </h1>
-          <p className="font-body text-text-secondary mt-2">
+          <p className="font-body text-text-secondary mt-1.5 text-sm sm:text-base">
             Real-time telemetry and grouping analysis for standardized targets.
           </p>
         </header>
 
         <LiveAnalysisDashboard />
       </div>
-    </main>
+    </AppShell>
   );
 }

@@ -19,7 +19,7 @@ export function LiveAnalysisDashboard() {
 
   useEffect(() => {
     // Connect to WebSocket Server
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3003';
     const socket = io(socketUrl, { transports: ['websocket'] });
     socketRef.current = socket;
 
