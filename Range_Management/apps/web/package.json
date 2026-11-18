@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3002 --hostname 0.0.0.0",
-    "dev:mobile": "node -e \"const{execSync}=require('child_process');const ip=execSync('hostname -I').toString().trim().split(' ')[0];console.log('\\n  Starting dev server (LAN mode)');console.log('  WSL2 IP: '+ip);console.log('\\n  On Windows run ONCE (as Admin):');console.log('  powershell -ExecutionPolicy Bypass -File mobile-dev.ps1');console.log('\\n  Then open on phone: http://'+ip+':3000\\n');\" && next dev --port 3000 --hostname 0.0.0.0",
+    "dev:mobile": "node -e \"const os=require('os'),ifs=os.networkInterfaces();const ip=Object.values(ifs).flat().find(i=>i&&i.family==='IPv4'&&!i.internal)?.address||'localhost';console.log('\\n  Starting Range Ops dev server (LAN mode): http://'+ip+':3002\\n');\" && next dev --port 3002 --hostname 0.0.0.0",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3002",
     "lint": "next lint"
   },
   "dependencies": {

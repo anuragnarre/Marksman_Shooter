@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 
 // apps/api/src/app.module.ts
@@ -72,6 +73,7 @@ import { RangeOperationsModule } from './range-operations/range-operations.modul
     SafetyModule,
     RangeOperationsModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

@@ -17,7 +17,8 @@ COPY apps/web/ apps/web/
 
 # Build shared types
 RUN npm run build:shared
-# Build Next.js app
+# Build Next.js app in server mode (next start requires non-export build)
+ENV NEXT_EXPORT=false
 RUN cd apps/web && npm run build
 
 WORKDIR /app/apps/web

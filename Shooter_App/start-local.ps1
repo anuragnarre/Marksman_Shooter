@@ -20,32 +20,35 @@ param(
     [switch]$Help
 )
 
-# Ensure running as Administrator
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $isAdmin) {
-    Write-Host "Administrator privileges are required for Cloudflare Tunnel service." -ForegroundColor Yellow
-    Write-Host "Relaunching with elevation..." -ForegroundColor Yellow
-    
-    $argsArray = @()
-    if ($NoVision) { $argsArray += "-NoVision" }
-    if ($DbOnly) { $argsArray += "-DbOnly" }
-    if ($Check) { $argsArray += "-Check" }
-    if ($Help) { $argsArray += "-Help" }
-
-    $argString = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" $($argsArray -join ' ')"
-    Start-Process powershell.exe -Verb RunAs -ArgumentList $argString
-    exit
-}
-
 if ($Help) {
     Write-Host @"
 Marksman Local Dev Stack
   .\start-local.ps1              Start all services
-  .\start-local.ps1 -NoVision   Skip vision service (saves ~2s startup)
-  .\start-local.ps1 -DbOnly     Only start PostgreSQL
-  .\start-local.ps1 -Check      Health check all services, then exit
+  .\start-local.ps1 -NoVision    Skip vision service (saves ~2s startup)
+  .\start-local.ps1 -DbOnly      Only start PostgreSQL
+  .\start-local.ps1 -Check       Health check all services, then exit
 "@
     exit 0
+}
+
+# Only elevate if running interactively without -Check/-Help and cloudflared service exists and is stopped
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin -and -not $Check) {
+    $cfSvcPre = Get-Service -Name "cloudflared" -ErrorAction SilentlyContinue
+    if ($cfSvcPre -and $cfSvcPre.Status -ne 'Running') {
+        Write-Host "Administrator privileges recommended for cloudflared Windows service. Trying UAC elevation..." -ForegroundColor Yellow
+        $argsArray = @()
+        if ($NoVision) { $argsArray += "-NoVision" }
+        if ($DbOnly) { $argsArray += "-DbOnly" }
+
+        $argString = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" $($argsArray -join ' ')"
+        try {
+            Start-Process powershell.exe -Verb RunAs -ArgumentList $argString -ErrorAction Stop
+            exit 0
+        } catch {
+            Write-Host "UAC elevation unavailable; continuing in user mode (tunnel will run via token-file if present)." -ForegroundColor Yellow
+        }
+    }
 }
 
 $Root = $PSScriptRoot
@@ -123,6 +126,28 @@ try {
     }
 } catch { Write-Warn "Universal domain check failed." }
 
+if ($Check) {
+    Write-Header "Health checks"
+    $pgOk = $false
+    try { $tcp = New-Object System.Net.Sockets.TcpClient; $tcp.Connect("127.0.0.1", 5433); $tcp.Close(); $pgOk = $true } catch {}
+    if ($pgOk) { Write-Ok "PostgreSQL  TCP :5433 listening" } else { Write-Warn "PostgreSQL  not reachable on :5433" }
+
+    $checks = @(
+        @{ url="http://localhost:3001/health"; label="NestJS API" },
+        @{ url="http://localhost:8000/health"; label="Vision Service" },
+        @{ url="http://localhost:3000"; label="Next.js Web" }
+    )
+    foreach ($c in $checks) {
+        try {
+            $r = Invoke-WebRequest -Uri $c.url -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+            Write-Ok "$($c.label)  HTTP $($r.StatusCode)"
+        } catch {
+            Write-Warn "$($c.label)  not reachable at $($c.url)"
+        }
+    }
+    exit 0
+}
+
 #  Pre-flight checks 
 Write-Header "Pre-flight checks"
 
@@ -130,7 +155,7 @@ Write-Header "Pre-flight checks"
 $dockerRunning = $false
 try {
     $null = docker info 2>&1
-    $dockerRunning = $true
+    if ($LASTEXITCODE -eq 0) { $dockerRunning = $true }
 } catch {}
 
 if (-not $dockerRunning) {
@@ -144,8 +169,10 @@ if (-not $dockerRunning) {
             Start-Sleep -Seconds 2
             try {
                 $null = docker info 2>&1
-                $dockerRunning = $true
-                break
+                if ($LASTEXITCODE -eq 0) {
+                    $dockerRunning = $true
+                    break
+                }
             } catch {}
             $retries--
         }
@@ -162,7 +189,7 @@ if ($dockerRunning) {
 }
 
 # Cloudflare Tunnel Service
-$cfToken = "eyJhIjoiZDQ2OTgxNjBmZWEwNWU0N2U4MjBlNTkyMTUyNWU0NjciLCJ0IjoiYWE3ZDMwMTUtMTBjZi00OWYxLThhYTktMDdhNGYzMmQzYmI2IiwicyI6Ik5HSXlObU0yWWpVdFltRTJOQzAwT0RSa0xUaGpOR1V0TkRRMk1ERTNNR0k0WWpGbSJ9"
+$cfTokenFile = Join-Path $env:USERPROFILE ".cloudflared\marksman_tunnel_token.txt"
 $cfService = Get-Service -Name "cloudflared" -ErrorAction SilentlyContinue
 $cfManualRun = $false
 
@@ -190,16 +217,22 @@ if ($cfService) {
 }
 
 if ($cfManualRun) {
-    Write-Info "Attempting to start Cloudflare tunnel manually..."
-    try {
-        $cfJob = Start-Job -ScriptBlock {
-            param($token)
-            cloudflared tunnel run --token $token
-        } -ArgumentList $cfToken
-        $Jobs += $cfJob
-        Write-Ok "Cloudflare Tunnel started manually in background job."
-    } catch {
-        Write-Warn "Failed to start Cloudflare tunnel manually."
+    $cfExeCmd = Get-Command cloudflared -ErrorAction SilentlyContinue
+    $cfExePath = if ($cfExeCmd) { $cfExeCmd.Source } elseif (Test-Path "C:\Program Files (x86)\cloudflared\cloudflared.exe") { "C:\Program Files (x86)\cloudflared\cloudflared.exe" } else { $null }
+    if ($cfExePath -and (Test-Path $cfTokenFile)) {
+        Write-Info "Attempting to start Cloudflare tunnel using token file..."
+        try {
+            $cfJob = Start-Job -ScriptBlock {
+                param($exe, $tokenFile)
+                & $exe tunnel run --token-file $tokenFile
+            } -ArgumentList $cfExePath, $cfTokenFile
+            $Jobs += $cfJob
+            Write-Ok "Cloudflare Tunnel started manually in background job."
+        } catch {
+            Write-Warn "Failed to start Cloudflare tunnel manually."
+        }
+    } else {
+        Write-Warn "Skipping manual Cloudflare Tunnel (cloudflared binary or token file missing: $cfTokenFile)."
     }
 }
 
@@ -231,34 +264,31 @@ if (-not $NoVision -and -not $DbOnly) {
     }
 }
 
-if ($Check) {
-    Write-Header "Health checks"
-    $checks = @(
-        @{ url="http://localhost:5433"; label="PostgreSQL" },
-        @{ url="http://localhost:3001/health"; label="NestJS API" },
-        @{ url="http://localhost:8000/health"; label="Vision Service" },
-        @{ url="http://localhost:3000"; label="Next.js Web" }
-    )
-    foreach ($c in $checks) {
-        try {
-            $r = Invoke-WebRequest -Uri $c.url -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
-            Write-Ok "$($c.label)  HTTP $($r.StatusCode)"
-        } catch {
-            Write-Warn "$($c.label)  not reachable at $($c.url)"
-        }
-    }
-    exit 0
-}
-
 #  Step 1: PostgreSQL via Docker 
 Write-Header "1/4  Starting PostgreSQL"
 Set-Location $Root
-$dbRunning = docker ps --filter "name=marksman-db" --format "{{.Names}}" 2>&1
-if ($dbRunning -match "marksman-db") {
-    Write-Ok "PostgreSQL already running"
+$dbContainer = "marksman-db"
+$pgPortOpen = $false
+try { $tcp = New-Object System.Net.Sockets.TcpClient; $tcp.Connect("127.0.0.1", 5433); $tcp.Close(); $pgPortOpen = $true } catch {}
+
+if ($pgPortOpen) {
+    $runningNames = @(docker ps --format "{{.Names}}" 2>$null)
+    if ($runningNames -contains "marksman-postgres") { $dbContainer = "marksman-postgres" }
+    Write-Ok "PostgreSQL already running on :5433 ($dbContainer)"
 } else {
-    Write-Info "Starting Postgres container..."
-    docker compose up -d db 2>&1 | Out-Null
+    $allContainers = @(docker ps -a --format "{{.Names}}" 2>$null)
+    if ($allContainers -contains "marksman-db") {
+        Write-Info "Starting container marksman-db..."
+        docker start marksman-db 2>&1 | Out-Null
+        $dbContainer = "marksman-db"
+    } elseif ($allContainers -contains "marksman-postgres") {
+        Write-Info "Starting container marksman-postgres..."
+        docker start marksman-postgres 2>&1 | Out-Null
+        $dbContainer = "marksman-postgres"
+    } else {
+        Write-Info "Starting Postgres container..."
+        docker compose up -d db 2>&1 | Out-Null
+    }
     $null = Wait-For-Port 5433 "PostgreSQL" 30
 }
 
@@ -419,9 +449,10 @@ try {
             $allGood = $true
             
             # Check DB
-            $dbStatus = docker inspect -f '{{.State.Status}}' marksman-db 2>&1
-            if ($dbStatus -notmatch "running") { 
-                Write-Host "[Monitor] ❌ PostgreSQL Database container is stopped!" -ForegroundColor Red
+            $dbPortCheck = $false
+            try { $tcp = New-Object System.Net.Sockets.TcpClient; $tcp.Connect("127.0.0.1", 5433); $tcp.Close(); $dbPortCheck = $true } catch {}
+            if (-not $dbPortCheck) { 
+                Write-Host "[Monitor] [ERR] PostgreSQL database is not reachable on :5433!" -ForegroundColor Red
                 $allGood = $false
             }
             
@@ -429,7 +460,7 @@ try {
             $apiUp = $false
             try { $tcp = New-Object System.Net.Sockets.TcpClient; $tcp.Connect("127.0.0.1", 3001); $tcp.Close(); $apiUp = $true } catch {}
             if (-not $apiUp) {
-                Write-Host "[Monitor] ❌ NestJS API is unresponsive or crashed!" -ForegroundColor Red
+                Write-Host "[Monitor] [ERR] NestJS API is unresponsive or crashed!" -ForegroundColor Red
                 $allGood = $false
             }
 
@@ -437,12 +468,12 @@ try {
             $webUp = $false
             try { $tcp = New-Object System.Net.Sockets.TcpClient; $tcp.Connect("127.0.0.1", 3000); $tcp.Close(); $webUp = $true } catch {}
             if (-not $webUp) {
-                Write-Host "[Monitor] ❌ Next.js Web App is unresponsive or crashed!" -ForegroundColor Red
+                Write-Host "[Monitor] [ERR] Next.js Web App is unresponsive or crashed!" -ForegroundColor Red
                 $allGood = $false
             }
 
             if ($allGood) {
-                Write-Host "[Monitor] ✅ All systems functional ($(Get-Date -Format 'HH:mm:ss'))" -ForegroundColor DarkGray
+                Write-Host "[Monitor] [OK] All systems functional ($(Get-Date -Format 'HH:mm:ss'))" -ForegroundColor DarkGray
             }
         }
 
@@ -462,9 +493,9 @@ try {
         $latestFile = Join-Path $backupDir "marksman_db_latest.sql"
 
         Write-Info "Creating snapshot of all database records (users, sessions, telemetry)..."
-        $dumpResult = docker exec marksman-db pg_dump -U postgres -d shooting_platform -f /tmp/backup.sql 2>&1
+        $dumpResult = docker exec $dbContainer pg_dump -U postgres -d shooting_platform -f /tmp/backup.sql 2>&1
         if ($LASTEXITCODE -eq 0) {
-            docker cp marksman-db:/tmp/backup.sql $backupFile 2>&1 | Out-Null
+            docker cp "${dbContainer}:/tmp/backup.sql" $backupFile 2>&1 | Out-Null
             Copy-Item -Path $backupFile -Destination $latestFile -Force
             Write-Ok "All database records safely archived to: backups/marksman_db_latest.sql"
         } else {
@@ -476,8 +507,8 @@ try {
 
     Write-Info "Flushing buffers and safely stopping Docker containers..."
     Set-Location $Root
-    docker compose stop db 2>&1 | Out-Null
-    Write-Ok "All database data preserved in volume 'shooting_db_data'."
+    docker stop $dbContainer 2>&1 | Out-Null
+    Write-Ok "All database data preserved in container '$dbContainer'."
     Write-Ok "All services stopped cleanly."
 }
 

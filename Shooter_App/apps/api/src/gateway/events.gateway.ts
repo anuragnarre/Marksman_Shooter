@@ -20,12 +20,25 @@ import {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:3002',
-      'http://127.0.0.1:3002',
-    ],
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (!origin) return callback(null, true);
+      if (
+        /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(origin) ||
+        origin.startsWith('capacitor://') ||
+        /^https?:\/\/([a-z0-9-]+\.)?marksmanshooter\.in$/i.test(origin) ||
+        /^https?:\/\/([a-z0-9-]+\.)?pages\.dev$/i.test(origin) ||
+        (process.env.NODE_ENV !== 'production' &&
+          /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/.test(origin))
+      ) {
+        return callback(null, true);
+      }
+      const envOrigins = (process.env.CORS_ORIGINS ?? '')
+        .split(',')
+        .map((o) => o.trim())
+        .filter(Boolean);
+      if (envOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`WS CORS blocked: ${origin}`));
+    },
     credentials: true,
   },
   namespace: '/',

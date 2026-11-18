@@ -1,13 +1,20 @@
 # install_all_apks.ps1 - Automated Marksman APK Installer & Environment Configurator
 param(
+    [ValidateSet("release", "debug")]
     [string]$Target = "release",
     [string]$DeviceId = ""
 )
 
+$rootDir = $PSScriptRoot
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 if (-not (Test-Path $adb)) {
-    Write-Error "ADB not found at $adb. Ensure Android SDK platform-tools is installed."
-    exit 1
+    $adbCmd = Get-Command adb -ErrorAction SilentlyContinue
+    if ($adbCmd) {
+        $adb = $adbCmd.Source
+    } else {
+        Write-Error "ADB not found at $adb or in PATH. Ensure Android SDK platform-tools is installed."
+        exit 1
+    }
 }
 
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -18,7 +25,7 @@ Write-Host "==========================================================" -Foregro
 $rawDevices = & $adb devices
 $deviceList = @()
 foreach ($line in ($rawDevices -split "`r?`n")) {
-    if ($line -match '^([a-zA-Z0-9_\-:]+)\s+device$') {
+    if ($line -match '^([a-zA-Z0-9_\-:.\[\]]+)\s+device$') {
         $deviceList += $matches[1]
     }
 }
@@ -34,42 +41,53 @@ if ($deviceList.Count -eq 0) {
 
 Write-Host "Detected active devices: $($deviceList -join ', ')" -ForegroundColor Green
 
-# 2. Determine APK paths
+# 2. Determine APK paths (matches official v1.0.0 release & debug filenames)
 if ($Target -eq "release") {
-    $shooterApk = "release_apks\Marksman_ShooterApp_v1.0_release.apk"
-    $rangeApk   = "release_apks\Marksman_RangeManagement_v1.0_release.apk"
-    $cameraApk  = "release_apks\Marksman_TargetCamera_v1.0_release.apk"
+    $shooterApk = Join-Path $rootDir "release_apks\Marksman_Shooter_v1.0.apk"
+    $rangeApk   = Join-Path $rootDir "release_apks\Marksman_Range_v1.0.apk"
+    $cameraApk  = Join-Path $rootDir "release_apks\Marksman_Target_Camera_v1.0.apk"
 } else {
-    $shooterApk = "release_apks\Marksman_ShooterApp_v1.0_debug.apk"
-    $rangeApk   = "release_apks\Marksman_RangeManagement_v1.0_debug.apk"
-    $cameraApk  = "release_apks\Marksman_TargetCamera_v1.0_debug.apk"
+    $shooterApk = Join-Path $rootDir "release_apks\Marksman_Shooter_v1.0_debug.apk"
+    $rangeApk   = Join-Path $rootDir "release_apks\Marksman_Range_v1.0_debug.apk"
+    $cameraApk  = Join-Path $rootDir "release_apks\Marksman_Target_Camera_v1.0_debug.apk"
+}
+
+foreach ($apk in @($shooterApk, $rangeApk, $cameraApk)) {
+    if (-not (Test-Path $apk)) {
+        Write-Warning "APK not found on disk: $apk"
+    }
 }
 
 foreach ($dev in $deviceList) {
-    $avdName = & $adb -s $dev emu avd name 2>$null
+    $avdName = & $adb -s $dev emu avd name 2>$null | Select-Object -First 1
     Write-Host "`n----------------------------------------------------------" -ForegroundColor DarkCyan
     Write-Host "Configuring Device [$dev] ($avdName)..." -ForegroundColor Cyan
     Write-Host "----------------------------------------------------------" -ForegroundColor DarkCyan
 
-    # Setup ADB reverse port forwardings
+    # Setup ADB reverse port forwardings for all Marksman services
     Write-Host "[1/4] Setting up ADB reverse port forwarding to host services..." -ForegroundColor Yellow
-    & $adb -s $dev reverse tcp:3001 tcp:3001
-    & $adb -s $dev reverse tcp:3002 tcp:3002
-    & $adb -s $dev reverse tcp:3003 tcp:3003
-    & $adb -s $dev reverse tcp:8081 tcp:8081
-    Write-Host "  -> Ports 3001, 3002, 3003, 8081 forwarded to Windows host!" -ForegroundColor Green
+    foreach ($p in @(3000, 3001, 3002, 3003, 8000, 8081)) {
+        & $adb -s $dev reverse "tcp:$p" "tcp:$p"
+    }
+    Write-Host "  -> Ports 3000, 3001, 3002, 3003, 8000, 8081 forwarded to Windows host!" -ForegroundColor Green
 
     # Install APKs
-    Write-Host "`n[2/4] Installing Marksman Shooter App ($shooterApk)..." -ForegroundColor Yellow
-    & $adb -s $dev install -r $shooterApk
+    if (Test-Path $shooterApk) {
+        Write-Host "`n[2/4] Installing Marksman Shooter App ($shooterApk)..." -ForegroundColor Yellow
+        & $adb -s $dev install -r "$shooterApk"
+    }
 
-    Write-Host "`n[3/4] Installing Marksman Range Management ($rangeApk)..." -ForegroundColor Yellow
-    & $adb -s $dev install -r $rangeApk
+    if (Test-Path $rangeApk) {
+        Write-Host "`n[3/4] Installing Marksman Range Management ($rangeApk)..." -ForegroundColor Yellow
+        & $adb -s $dev install -r "$rangeApk"
+    }
 
-    Write-Host "`n[4/4] Installing Marksman Target Camera ($cameraApk)..." -ForegroundColor Yellow
-    & $adb -s $dev install -r $cameraApk
+    if (Test-Path $cameraApk) {
+        Write-Host "`n[4/4] Installing Marksman Target Camera ($cameraApk)..." -ForegroundColor Yellow
+        & $adb -s $dev install -r "$cameraApk"
+    }
 
-    Write-Host "`n[OK] All Marksman APKs installed successfully on $dev!" -ForegroundColor Green
+    Write-Host "`n[OK] Marksman APK installation finished on $dev!" -ForegroundColor Green
 }
 
 Write-Host "`n==========================================================" -ForegroundColor Cyan

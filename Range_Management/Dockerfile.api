@@ -35,13 +35,14 @@ COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/
 COPY packages/shared-types/package.json packages/shared-types/
 
-# Install production dependencies
-RUN npm ci --omit=dev
+# Install production dependencies + pinned prisma CLI for offline migrate deploy
+RUN npm ci --omit=dev && npm install --no-save prisma@5.8.0
 
-# Copy built code
+# Copy built code & generated Prisma Client
 COPY --from=builder /app/packages/shared-types/dist packages/shared-types/dist
 COPY --from=builder /app/apps/api/dist apps/api/dist
 COPY --from=builder /app/apps/api/prisma apps/api/prisma
+COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
 
 WORKDIR /app/apps/api
 

@@ -51,6 +51,15 @@ services:
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-marksman-jwt-secret-replace-in-production}
       VISION_SERVICE_URL: http://vision-service:8000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://marksmanshooter.in,https://www.marksmanshooter.in,https://range.marksmanshooter.in}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,10 +83,21 @@ services:
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-marksman-jwt-secret-replace-in-production}
       VISION_SERVICE_URL: http://vision-service:8000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://marksmanshooter.in,https://www.marksmanshooter.in,https://range.marksmanshooter.in}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3003/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      shooter-api:
         condition: service_healthy
     networks:
       - marksman-internal

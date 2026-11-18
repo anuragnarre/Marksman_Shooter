@@ -1,9 +1,9 @@
-# 
-# start-tailscale.ps1 — Marksman Deployment & Hosting over Tailscale VPN
+#
+# start-tailscale.ps1 - Marksman Deployment & Hosting over Tailscale VPN
 #
 # Usage:
 #   .\start-tailscale.ps1              # Launch entire stack bound to Tailscale IP
-#   .\start-tailscale.ps1 -NoVision   # Skip vision service
+#   .\start-tailscale.ps1 -NoVision    # Skip vision service
 #
 
 param(
@@ -15,7 +15,7 @@ if ($Help) {
     Write-Host @"
 Marksman Tailscale Host & Deploy Launcher
   .\start-tailscale.ps1             Start all services configured for Tailscale VPN
-  .\start-tailscale.ps1 -NoVision  Skip vision service
+  .\start-tailscale.ps1 -NoVision   Skip vision service
 "@
     exit 0
 }
@@ -45,20 +45,28 @@ try {
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "     MARKSMAN — TAILSCALE VPN DEPLOYMENT LAUNCHER           " -ForegroundColor Yellow
+Write-Host "     MARKSMAN - TAILSCALE VPN DEPLOYMENT LAUNCHER           " -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  Tailscale IPv4 : $tsIp" -ForegroundColor Green
 Write-Host "  Tailscale Host : $tsHost" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Cyan
 
-# 3. Write Tailscale-aware .env.local to apps/web
+# 3. Preserve existing Google Client ID if configured in apps/web/.env.local
 $webEnvPath = Join-Path $Root "apps\web\.env.local"
+$googleClientId = '""'
+if (Test-Path $webEnvPath) {
+    $match = Select-String -Path $webEnvPath -Pattern '^\s*NEXT_PUBLIC_GOOGLE_CLIENT_ID=(.+)$' | Select-Object -First 1
+    if ($match) {
+        $googleClientId = $match.Matches.Groups[1].Value.Trim()
+    }
+}
+
 $envContent = @"
 NEXT_PUBLIC_API_URL=http://${tsIp}:3001
 NEXT_PUBLIC_WS_URL=http://${tsIp}:3001
 NEXT_PUBLIC_VISION_URL=http://${tsIp}:8000
-NEXT_PUBLIC_STREAM_URL=http://${tsIp}:8001
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=dummy
+NEXT_PUBLIC_STREAM_URL=http://${tsIp}:3001/stream
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=${googleClientId}
 "@
 
 Set-Content -Path $webEnvPath -Value $envContent -Encoding UTF8
@@ -69,9 +77,9 @@ $env:CORS_ORIGINS = "http://localhost:3000,http://${tsIp}:3000,http://${tsHost}:
 
 Write-Host ""
 Write-Host "  [ACCESS LINKS] Any device connected to your Tailscale VPN can open:" -ForegroundColor Cyan
-Write-Host "  ► Web App    : http://${tsIp}:3000  (or http://${tsHost}:3000)" -ForegroundColor Yellow
-Write-Host "  ► API Server : http://${tsIp}:3001" -ForegroundColor Yellow
-Write-Host "  ► Vision API : http://${tsIp}:8000/docs" -ForegroundColor Yellow
+Write-Host "  -> Web App    : http://${tsIp}:3000  (or http://${tsHost}:3000)" -ForegroundColor Yellow
+Write-Host "  -> API Server : http://${tsIp}:3001" -ForegroundColor Yellow
+Write-Host "  -> Vision API : http://${tsIp}:8000/docs" -ForegroundColor Yellow
 Write-Host ""
 
 # 5. Delegate to start-local.ps1

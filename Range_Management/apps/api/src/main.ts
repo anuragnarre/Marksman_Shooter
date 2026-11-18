@@ -16,6 +16,10 @@ async function bootstrap(): Promise<void> {
     .map((o) => o.trim())
     .filter(Boolean);
 
+  const isDev = process.env.NODE_ENV !== 'production';
+  const PRIVATE_LAN_REGEX =
+    /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/;
+
   app.enableCors({
     origin: (origin, callback) => {
       // No origin = server-to-server request (Next.js proxy, curl, etc.) — always allow
@@ -27,6 +31,10 @@ async function bootstrap(): Promise<void> {
         origin.startsWith('capacitor://') ||
         origin.startsWith('http://[::1]')
       ) {
+        return callback(null, true);
+      }
+      // LAN private networks in dev for range tablets & downrange phones
+      if (isDev && PRIVATE_LAN_REGEX.test(origin)) {
         return callback(null, true);
       }
       // Production domains (marksmanshooter.in and pages.dev previews)
@@ -41,11 +49,11 @@ async function bootstrap(): Promise<void> {
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      // Reject everything else — port 3001 is internal only
+      // Reject everything else
       callback(new Error(`CORS blocked: ${origin}`));
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Operation-Id'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Operation-Id', 'X-Device-Key', 'X-Device-Id'],
     credentials: true,
   });
 

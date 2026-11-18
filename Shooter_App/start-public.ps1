@@ -34,7 +34,7 @@ if (-not (Test-Path $keyPath)) {
 $url = "https://1c1d224d098426.lhr.life"
 
 Write-Host "`n========================================================" -ForegroundColor Yellow
-Write-Host "🚀 Starting Public Tunnel..." -ForegroundColor Yellow
+Write-Host "[*] Starting Public Tunnel..." -ForegroundColor Yellow
 Write-Host "Your static public URL is: $url" -ForegroundColor Green
 Write-Host "Users can visit this link directly with no warning popups." -ForegroundColor Green
 Write-Host "========================================================`n" -ForegroundColor Yellow

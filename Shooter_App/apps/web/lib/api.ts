@@ -5,22 +5,26 @@
 
 import { isOnline, setOnline } from './network-state';
 
-function getApiBase(): string {
+export function getApiBase(): string {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
   if (typeof window !== 'undefined') {
     const customUrl = localStorage.getItem('marksman_server_url');
     if (customUrl) return customUrl;
 
-    const isCapacitor = 
-      window.location.protocol === 'capacitor:' || 
+    const isCapacitor =
+      window.location.protocol === 'capacitor:' ||
       (typeof (window as any).Capacitor !== 'undefined' && typeof (window as any).Capacitor.isNativePlatform === 'function' && (window as any).Capacitor.isNativePlatform());
 
-    // Only force localhost:3001 if testing on a desktop web browser at localhost (not on native mobile)
-    if (!isCapacitor && (
-      (window.location.protocol === 'https:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ||
-      (window.location.protocol === 'http:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    )) {
-      return 'http://localhost:3001';
+    if (!isCapacitor) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:3001';
+      }
+      if (
+        window.location.hostname.endsWith('marksmanshooter.in') ||
+        window.location.hostname.endsWith('pages.dev')
+      ) {
+        return 'https://api.marksmanshooter.in';
+      }
     }
   }
   return envUrl && envUrl !== '/api' ? envUrl : 'https://api.marksmanshooter.in';

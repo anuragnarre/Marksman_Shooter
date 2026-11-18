@@ -10,7 +10,7 @@
   "scripts": {
     "dev:api": "cd apps/api && npm run start:dev",
     "dev:web": "cd apps/web && npm run dev",
-    "dev:vision": "cd apps/vision && .venv-linux/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000",
+    "dev:vision": "node -e \"const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process');const cwd=fs.existsSync('apps/vision/main.py')?'apps/vision':'../Shooter_App/apps/vision';const p=['venv/Scripts/python.exe','.venv-linux/bin/python','.venv/bin/python'].map(f=>path.join(cwd,f)).find(f=>fs.existsSync(f))||'python';execFileSync(p,['-m','uvicorn','main:app','--host','0.0.0.0','--port','8000'],{cwd,stdio:'inherit'});\"",
     "build:shared": "cd packages/shared-types && npm run build",
     "build:api": "npm run build:shared && cd apps/api && npm run build",
     "build:web": "npm run build:shared && cd apps/web && npm run build",
@@ -19,7 +19,7 @@
     "db:push": "cd apps/api && npx prisma db push",
     "db:seed": "cd apps/api && npx prisma db seed",
     "db:studio": "cd apps/api && npx prisma studio",
-    "install:all": "npm install && cd apps/vision && pip install -r requirements.txt"
+    "install:all": "npm install"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

@@ -1,10 +1,10 @@
 // apps/web/next.config.ts
 import type { NextConfig } from 'next';
 
-const isExport = process.env.NEXT_EXPORT === 'true' || process.env.CAPACITOR_BUILD === 'true' || true;
+const isExport = process.env.NEXT_EXPORT !== 'false';
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  ...(isExport ? { output: 'export' as const } : {}),
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
     '*.netbird.services',
     '*.ts.net',
     '192.168.*',
+    'marksmanshooter.in',
+    '*.marksmanshooter.in',
   ],
   ...(isExport
     ? {}
@@ -35,27 +37,24 @@ const nextConfig: NextConfig = {
             { source: '/vision/:path*', destination: `${visionBase}/:path*` },
           ];
         },
+        async headers() {
+          return [
+            {
+              source: '/(.*)',
+              headers: [
+                {
+                  key: 'Cross-Origin-Opener-Policy',
+                  value: 'same-origin-allow-popups',
+                },
+                {
+                  key: 'Cross-Origin-Embedder-Policy',
+                  value: 'unsafe-none',
+                },
+              ],
+            },
+          ];
+        },
       }),
-  async headers() {
-    return [
-      {
-        // Google Sign-In popup/iframe needs allow-popups — apply site-wide
-        // (restricting to /auth/* breaks the button on any page it appears on)
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin-allow-popups',
-          },
-          {
-            // Required alongside COOP for cross-origin iframes (GSI One Tap)
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
-          },
-        ],
-      },
-    ];
-  },
 };
 
 export default nextConfig;

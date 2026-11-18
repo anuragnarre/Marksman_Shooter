@@ -2405,8 +2405,8 @@
     "semantic_hash": ""
   },
   "Range_Management/ServerController.ps1": {
-    "mtime": 1791256344.492667,
-    "ast_hash": "a66ec93f3496ec2dc05c40159d5b9626",
+    "mtime": 1794969772.6759894,
+    "ast_hash": "c4b730f6417595faa41464ddd72625bc",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/package.json": {
@@ -2530,8 +2530,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/app.module.ts": {
-    "mtime": 1789309591.374159,
-    "ast_hash": "a115c5423886cd6641f12080ce4e9b6c",
+    "mtime": 1794968598.4672027,
+    "ast_hash": "6f79d12b81fcec8790a43d0c4213889d",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/auth/auth.controller.ts": {
@@ -2805,8 +2805,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/gateway/events.gateway.ts": {
-    "mtime": 1791740419.2530982,
-    "ast_hash": "41269d84837fef10f4ceddc590dc0265",
+    "mtime": 1794970735.3585253,
+    "ast_hash": "43f61142bee1ab271a5b54b02efc49ef",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/gateway/gateway.module.ts": {
@@ -2815,8 +2815,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/main.ts": {
-    "mtime": 1794646165.0346725,
-    "ast_hash": "62c9cba245ceb27c849b310fe8cb38de",
+    "mtime": 1794968624.5133996,
+    "ast_hash": "99e63bc936228004ebf07e412cd83921",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/memberships/memberships.controller.ts": {
@@ -3120,27 +3120,27 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/capacitor.config.json": {
-    "mtime": 1794261249.7835586,
+    "mtime": 1794973189.002787,
     "ast_hash": "09cb3be53c2d73819835042674257d6a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/capacitor.plugins.json": {
-    "mtime": 1794261250.8230782,
+    "mtime": 1794973191.412768,
     "ast_hash": "4bdc7498b1437676c6718050f412d099",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/polyfills-42372ed130431b0a.js": {
-    "mtime": 1794261178.559634,
+    "mtime": 1794973152.128585,
     "ast_hash": "846118c33b2c0e922d7b3a7676f81f6f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/cordova.js": {
-    "mtime": 1794261250.9480782,
+    "mtime": 1794973191.8611388,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/cordova_plugins.js": {
-    "mtime": 1794261250.9480782,
+    "mtime": 1794973191.8611388,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
@@ -3150,17 +3150,17 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/capacitor-cordova-android-plugins/build.gradle": {
-    "mtime": 1794261250.9520795,
+    "mtime": 1794973191.8651378,
     "ast_hash": "2af61653d70c95d20802c8b5c433ba90",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/capacitor-cordova-android-plugins/cordova.variables.gradle": {
-    "mtime": 1794261250.9840772,
+    "mtime": 1794973191.869498,
     "ast_hash": "d2372a0ae9aa60abb8d03e7f06bf9194",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/capacitor.settings.gradle": {
-    "mtime": 1794261250.9500778,
+    "mtime": 1794973191.8631387,
     "ast_hash": "7142b66aa178aabd29bd23d06e6e89f9",
     "semantic_hash": ""
   },
@@ -3880,8 +3880,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/lib/api.ts": {
-    "mtime": 1794642704.4810069,
-    "ast_hash": "552ae384e91a96eac4a3d4a3b912e091",
+    "mtime": 1794972564.575354,
+    "ast_hash": "065886010755090adf9be57bbe5fb6aa",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/lib/auth.ts": {
@@ -3975,13 +3975,13 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/next.config.ts": {
-    "mtime": 1794259741.0978324,
-    "ast_hash": "ab787df8d898fca5e4d969a4148ba850",
+    "mtime": 1794969010.1218696,
+    "ast_hash": "a7a6176344cae0abe25364a2fe038b8f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/package.json": {
-    "mtime": 1792033812.4332106,
-    "ast_hash": "adff220947137f099ae8034a06d15cb3",
+    "mtime": 1794968978.3348472,
+    "ast_hash": "5470aaf0348dd7bdaa7b07f64f1d0063",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/postcss.config.js": {
@@ -4010,8 +4010,8 @@
     "semantic_hash": ""
   },
   "Range_Management/package.json": {
-    "mtime": 1790789150.3124473,
-    "ast_hash": "095234f57fb3fa3056fe978dfc5c99d7",
+    "mtime": 1794968967.286048,
+    "ast_hash": "1bfb471a62d17392ed2b6580224ebbcd",
     "semantic_hash": ""
   },
   "Range_Management/packages/shared-types/index.ts": {
@@ -4030,8 +4030,8 @@
     "semantic_hash": ""
   },
   "ServerController.ps1": {
-    "mtime": 1791719013.2981095,
-    "ast_hash": "966e5dc0a2e9bf2c78ce7c4a6b561cb0",
+    "mtime": 1794972075.8695626,
+    "ast_hash": "e7ef4ba2c55b44d20dd097cbc74f1ac4",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/fix.js": {
@@ -4170,8 +4170,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/app.module.ts": {
-    "mtime": 1789309591.374159,
-    "ast_hash": "a115c5423886cd6641f12080ce4e9b6c",
+    "mtime": 1794968578.2222037,
+    "ast_hash": "6f79d12b81fcec8790a43d0c4213889d",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/auth/auth.controller.ts": {
@@ -4460,8 +4460,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/gateway/events.gateway.ts": {
-    "mtime": 1791740434.7192392,
-    "ast_hash": "41269d84837fef10f4ceddc590dc0265",
+    "mtime": 1794970723.785396,
+    "ast_hash": "43f61142bee1ab271a5b54b02efc49ef",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/src/gateway/gateway.module.ts": {
@@ -4955,7 +4955,7 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/capacitor.build.gradle": {
-    "mtime": 1794261609.1911309,
+    "mtime": 1794972871.333696,
     "ast_hash": "55c72c38495632160f26c772d8f4193a",
     "semantic_hash": ""
   },
@@ -4970,22 +4970,22 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/capacitor.config.json": {
-    "mtime": 1794261608.3468661,
+    "mtime": 1794972870.2408166,
     "ast_hash": "0b861c7b33fe84fe5e2b5a6f3b81d7d4",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/capacitor.plugins.json": {
-    "mtime": 1794261608.783335,
+    "mtime": 1794972871.0645165,
     "ast_hash": "372bbffaf279de19b53ce5cedc87fe2b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/cordova.js": {
-    "mtime": 1794261609.187771,
+    "mtime": 1794972871.3306956,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/cordova_plugins.js": {
-    "mtime": 1794261609.1887705,
+    "mtime": 1794972871.331695,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
@@ -5005,17 +5005,17 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/capacitor-cordova-android-plugins/build.gradle": {
-    "mtime": 1794261609.1916378,
+    "mtime": 1794972871.334697,
     "ast_hash": "2af61653d70c95d20802c8b5c433ba90",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/capacitor-cordova-android-plugins/cordova.variables.gradle": {
-    "mtime": 1794261609.192644,
+    "mtime": 1794972871.3356948,
     "ast_hash": "d2372a0ae9aa60abb8d03e7f06bf9194",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/capacitor.settings.gradle": {
-    "mtime": 1794261609.1907706,
+    "mtime": 1794972871.333696,
     "ast_hash": "3671a748713305b512de9bd71efa5c17",
     "semantic_hash": ""
   },
@@ -5140,8 +5140,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/page.tsx": {
-    "mtime": 1794647337.2423704,
-    "ast_hash": "ea4a86e2f2750f2d2923fe72a76fdfe1",
+    "mtime": 1794647769.4686608,
+    "ast_hash": "05e7d8a0fbf74f2bb43e1ee3c625e2f8",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/pass/page.tsx": {
@@ -5345,8 +5345,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/MarketingNav.tsx": {
-    "mtime": 1794647107.389668,
-    "ast_hash": "b8f2b1fa2eea8c2ee78adb10395aaf11",
+    "mtime": 1794647769.4699159,
+    "ast_hash": "35b876ca6d9baae33dcba9c558318cfb",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/MiniTargetCanvas.tsx": {
@@ -5600,8 +5600,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/api.ts": {
-    "mtime": 1794642700.672358,
-    "ast_hash": "3534a8f589208c348e3a980cc6d7a2ab",
+    "mtime": 1794972552.9365976,
+    "ast_hash": "c037f84c647bfe2ea794e064085ffcad",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/auth.ts": {
@@ -5700,8 +5700,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/next.config.ts": {
-    "mtime": 1794261118.3349476,
-    "ast_hash": "351fc65f252fc26571ab6021a26d376c",
+    "mtime": 1794968993.7391336,
+    "ast_hash": "199cc4123965b7560cac2e30e9325cd6",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/package.json": {
@@ -5790,13 +5790,13 @@
     "semantic_hash": ""
   },
   "Shooter_App/mobile-dev.ps1": {
-    "mtime": 1787548699.6614716,
-    "ast_hash": "7293444c95a5b508c9875c1f707bc2a1",
+    "mtime": 1794969102.4996727,
+    "ast_hash": "042ed99ed847616eb77ddce709eeeb8e",
     "semantic_hash": ""
   },
   "Shooter_App/package.json": {
-    "mtime": 1789316391.4013672,
-    "ast_hash": "7b4ff47aa95d5ad8867596c47c7c14d9",
+    "mtime": 1794968953.1703794,
+    "ast_hash": "3707b4ef4554d4cdb9e6e25fe2dc13a2",
     "semantic_hash": ""
   },
   "Shooter_App/packages/shared-types/index.ts": {
@@ -5815,28 +5815,23 @@
     "semantic_hash": ""
   },
   "Shooter_App/start-local.ps1": {
-    "mtime": 1789310687.3217034,
-    "ast_hash": "bf45548b2d854b1029b43cb5e0b7695e",
+    "mtime": 1794969773.0495548,
+    "ast_hash": "5ff32257b158787f6156b6d6e5f84239",
     "semantic_hash": ""
   },
   "Shooter_App/start-netbird.ps1": {
-    "mtime": 1789127518.349875,
-    "ast_hash": "181fce5a1b7795f00d1b346eedc9fc87",
+    "mtime": 1794969773.1135523,
+    "ast_hash": "d57b1b392bc63936cabed06d4fe7b66c",
     "semantic_hash": ""
   },
   "Shooter_App/start-public.ps1": {
-    "mtime": 1788671421.3786497,
-    "ast_hash": "50a8100ffb5e1f55b9955fbcd8634a18",
+    "mtime": 1794969773.1615522,
+    "ast_hash": "411611551c3d1dc371da2e899ac2b177",
     "semantic_hash": ""
   },
   "Shooter_App/start-tailscale.ps1": {
-    "mtime": 1788277305.320984,
-    "ast_hash": "c142d5418128ec8d788db9b36c156d3e",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/.claude/settings.json": {
-    "mtime": 1790142572.0627575,
-    "ast_hash": "dc580fca35a0e98ed20777ede5e545a1",
+    "mtime": 1794969773.1962347,
+    "ast_hash": "6711fa35d8500b8febc4fc5b172dcde6",
     "semantic_hash": ""
   },
   "Target_Camera_App/App.tsx": {
@@ -5934,16 +5929,6 @@
     "ast_hash": "4e7eec30d8967cbe4760088f539c10dc",
     "semantic_hash": ""
   },
-  "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/x86/.cmake/api/v1/reply/cache-v2-7f450fb7f1406abcce23.json": {
-    "mtime": 1790375743.247987,
-    "ast_hash": "c31628a1b1796a76e5050a54032ab4b2",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/x86/.cmake/api/v1/reply/cmakeFiles-v1-eb08522be4bd8ad9cf6f.json": {
-    "mtime": 1790375743.25599,
-    "ast_hash": "e6507845f8433559c51141cc906d3850",
-    "semantic_hash": ""
-  },
   "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/x86/.cmake/api/v1/reply/directory-.-Debug-d0094a50bb2071803777.json": {
     "mtime": 1790373175.0257955,
     "ast_hash": "9f40cd23d42f6f64a253672a38c7ce57",
@@ -6034,186 +6019,6 @@
     "ast_hash": "4e7eec30d8967cbe4760088f539c10dc",
     "semantic_hash": ""
   },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/.cmake/api/v1/reply/directory-.-RelWithDebInfo-d0094a50bb2071803777.json": {
-    "mtime": 1790440977.2667358,
-    "ast_hash": "9f40cd23d42f6f64a253672a38c7ce57",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.cpp": {
-    "mtime": 1790440854.315717,
-    "ast_hash": "493a7cc5e29a3cf2b0d95a50ee58d987",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c": {
-    "mtime": 1790440753.213673,
-    "ast_hash": "245b894a1d9b5e1b569506b0cfe5d36b",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/src/foo.cpp": {
-    "mtime": 1790440946.1877005,
-    "ast_hash": "bbf8a05ecab16853fd9ad99b367175f8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/src/main.cpp": {
-    "mtime": 1790440946.189701,
-    "ast_hash": "6155bf9e179fd0f9c2529e16119d24d8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/android_gradle_build.json": {
-    "mtime": 1790440977.3456051,
-    "ast_hash": "c356a101669272a01a7633ae9602f799",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/android_gradle_build_mini.json": {
-    "mtime": 1790440977.8691921,
-    "ast_hash": "4a8a1c45ed50b01b7b0fcd07ff268257",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/compile_commands.json": {
-    "mtime": 1790440977.2050333,
-    "ast_hash": "a57fc482bd01dd151dc76ea74e3ba9af",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/prefab_config.json": {
-    "mtime": 1790440977.871066,
-    "ast_hash": "039a29c7557f6c1f58222f96892b75e2",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/.cmake/api/v1/reply/directory-.-RelWithDebInfo-d0094a50bb2071803777.json": {
-    "mtime": 1790441079.4910042,
-    "ast_hash": "9f40cd23d42f6f64a253672a38c7ce57",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.cpp": {
-    "mtime": 1790441071.7339592,
-    "ast_hash": "493a7cc5e29a3cf2b0d95a50ee58d987",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c": {
-    "mtime": 1790441063.8205197,
-    "ast_hash": "245b894a1d9b5e1b569506b0cfe5d36b",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/src/foo.cpp": {
-    "mtime": 1790441079.1172059,
-    "ast_hash": "bbf8a05ecab16853fd9ad99b367175f8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/src/main.cpp": {
-    "mtime": 1790441079.1191683,
-    "ast_hash": "6155bf9e179fd0f9c2529e16119d24d8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/android_gradle_build.json": {
-    "mtime": 1790441079.5027225,
-    "ast_hash": "b62962be108309faae0ca3d15dc3ce44",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/android_gradle_build_mini.json": {
-    "mtime": 1790441079.5824776,
-    "ast_hash": "93f33448d71bac4e62afb74a6cd2d1d3",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/compile_commands.json": {
-    "mtime": 1790441079.445951,
-    "ast_hash": "f0ee7a8c030cbab0afe845b20b1522df",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/prefab_config.json": {
-    "mtime": 1790441079.5834756,
-    "ast_hash": "039a29c7557f6c1f58222f96892b75e2",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/.cmake/api/v1/reply/directory-.-RelWithDebInfo-d0094a50bb2071803777.json": {
-    "mtime": 1790441183.0980089,
-    "ast_hash": "9f40cd23d42f6f64a253672a38c7ce57",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.cpp": {
-    "mtime": 1790441176.7301488,
-    "ast_hash": "493a7cc5e29a3cf2b0d95a50ee58d987",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c": {
-    "mtime": 1790441133.1735213,
-    "ast_hash": "245b894a1d9b5e1b569506b0cfe5d36b",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/_CMakeLTOTest-CXX/src/foo.cpp": {
-    "mtime": 1790441182.7687457,
-    "ast_hash": "bbf8a05ecab16853fd9ad99b367175f8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/_CMakeLTOTest-CXX/src/main.cpp": {
-    "mtime": 1790441182.769747,
-    "ast_hash": "6155bf9e179fd0f9c2529e16119d24d8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/android_gradle_build.json": {
-    "mtime": 1790441183.1102257,
-    "ast_hash": "2378cab9260169bff2a05f06d83e067b",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/android_gradle_build_mini.json": {
-    "mtime": 1790441183.257679,
-    "ast_hash": "247c9bdd1ffaa5e67124621cc72811f1",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/compile_commands.json": {
-    "mtime": 1790441183.0770092,
-    "ast_hash": "c9a23489206876de9d830d1830915e66",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/prefab_config.json": {
-    "mtime": 1790441183.282261,
-    "ast_hash": "039a29c7557f6c1f58222f96892b75e2",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/.cmake/api/v1/reply/directory-.-RelWithDebInfo-d0094a50bb2071803777.json": {
-    "mtime": 1790441201.1564457,
-    "ast_hash": "9f40cd23d42f6f64a253672a38c7ce57",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.cpp": {
-    "mtime": 1790441199.4315763,
-    "ast_hash": "493a7cc5e29a3cf2b0d95a50ee58d987",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c": {
-    "mtime": 1790441199.0033636,
-    "ast_hash": "245b894a1d9b5e1b569506b0cfe5d36b",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/_CMakeLTOTest-CXX/src/foo.cpp": {
-    "mtime": 1790441200.814469,
-    "ast_hash": "bbf8a05ecab16853fd9ad99b367175f8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/_CMakeLTOTest-CXX/src/main.cpp": {
-    "mtime": 1790441200.8164709,
-    "ast_hash": "6155bf9e179fd0f9c2529e16119d24d8",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/android_gradle_build.json": {
-    "mtime": 1790441201.167444,
-    "ast_hash": "35d5e0bb9ed9915f0a717bfd9f927401",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/android_gradle_build_mini.json": {
-    "mtime": 1790441201.2074444,
-    "ast_hash": "6f5a0555da3930e3997661c5ebe65650",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/compile_commands.json": {
-    "mtime": 1790441201.141445,
-    "ast_hash": "06ddee880102966812b048054366734f",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/prefab_config.json": {
-    "mtime": 1790441201.208443,
-    "ast_hash": "039a29c7557f6c1f58222f96892b75e2",
-    "semantic_hash": ""
-  },
   "Target_Camera_App/android/app/.cxx/tools/debug/arm64-v8a/compile_commands.json": {
     "mtime": 1790436252.9858642,
     "ast_hash": "23cc6f20e9908ca175868f1e82f43862",
@@ -6232,26 +6037,6 @@
   "Target_Camera_App/android/app/.cxx/tools/debug/x86_64/compile_commands.json": {
     "mtime": 1790375339.0157046,
     "ast_hash": "31e5c1358b544c6bbed9369af6d80a68",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/tools/release/arm64-v8a/compile_commands.json": {
-    "mtime": 1790440977.2050333,
-    "ast_hash": "a57fc482bd01dd151dc76ea74e3ba9af",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/tools/release/armeabi-v7a/compile_commands.json": {
-    "mtime": 1790441079.445951,
-    "ast_hash": "f0ee7a8c030cbab0afe845b20b1522df",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/tools/release/x86/compile_commands.json": {
-    "mtime": 1790441183.0770092,
-    "ast_hash": "c9a23489206876de9d830d1830915e66",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/tools/release/x86_64/compile_commands.json": {
-    "mtime": 1790441201.141445,
-    "ast_hash": "06ddee880102966812b048054366734f",
     "semantic_hash": ""
   },
   "Target_Camera_App/android/app/build.gradle": {
@@ -9060,18 +8845,18 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/404.html": {
-    "mtime": 1794261219.8973162,
-    "ast_hash": "638ec8d2626d3fa349583ff8dfb7937e",
+    "mtime": 1794973179.921498,
+    "ast_hash": "6555a8f980481586182ff4e78a28b569",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/index.html": {
-    "mtime": 1794261204.4625797,
-    "ast_hash": "265e8e668eecef8e85f28b23fbb47584",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "a38967142219093aafea7c2564eb3f77",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/index.txt": {
-    "mtime": 1794261204.462044,
-    "ast_hash": "45a8d8852b72e0fae81d811595606269",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "968f441ed4340b4e735d76529ff34bfa",
     "semantic_hash": ""
   },
   "Range_Management/md/context.md": {
@@ -9099,19 +8884,14 @@
     "ast_hash": "484f41fa91be936104ed1d80e8c9da0a",
     "semantic_hash": ""
   },
-  "Shooter_App/CLAUDE.md": {
-    "mtime": 1787548698.5712154,
-    "ast_hash": "5207f535561a9935f01c993314105e9e",
-    "semantic_hash": ""
-  },
   "Shooter_App/DEPLOYMENT_WARNING.md": {
     "mtime": 1791254336.7456293,
     "ast_hash": "a03ebd22ae798db71e01f72fb1da209b",
     "semantic_hash": ""
   },
   "Shooter_App/README.md": {
-    "mtime": 1787548698.5712154,
-    "ast_hash": "fb389652bec3518861c61d4b9326ad9e",
+    "mtime": 1794972700.3624043,
+    "ast_hash": "0a74e87ea4fa49ead19f7d6f2a38110b",
     "semantic_hash": ""
   },
   "Shooter_App/TEST_ACCOUNTS.md": {
@@ -9190,8 +8970,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/render.yaml": {
-    "mtime": 1789124733.0073965,
-    "ast_hash": "31c1df75238d62c95351ff31fc18c5d0",
+    "mtime": 1794969054.1827216,
+    "ast_hash": "8bda6f58763281b68cde4d2f6ad457f4",
     "semantic_hash": ""
   },
   "Shooter_App/runs/detect/runs/yolo26s_bullets/train/args.yaml": {
@@ -9207,11 +8987,6 @@
   "Target_Camera_App/AGENTS.md": {
     "mtime": 1790142384.6285462,
     "ast_hash": "233d1484702a528f5dcb4333cd01bb43",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/CLAUDE.md": {
-    "mtime": 1790142384.6305468,
-    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
     "semantic_hash": ""
   },
   "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/arm64-v8a/CMakeCache.txt": {
@@ -9397,191 +9172,6 @@
   "Target_Camera_App/android/app/.cxx/Debug/1r2q2z6u/x86_64/symbol_folder_index.txt": {
     "mtime": 1790375339.167209,
     "ast_hash": "fc2c2f2026108a98966a18a4f1089b72",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeCache.txt": {
-    "mtime": 1790440977.1870236,
-    "ast_hash": "cd25b3a36a62f0f5c7254cdc2ae03fc7",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790440977.2030334,
-    "ast_hash": "1f95cdf26fbf0d44e5af6241e1ae2db1",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeCache.txt": {
-    "mtime": 1790440946.2077007,
-    "ast_hash": "46d4983bac401961ab93f01553470ec4",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790440966.0447888,
-    "ast_hash": "5596107076a534c9e7edb3adc7e1e4ff",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/src/CMakeLists.txt": {
-    "mtime": 1790440946.1857016,
-    "ast_hash": "4da62ef32315d0f698473abc5d91ca05",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/additional_project_files.txt": {
-    "mtime": 1790440977.2777345,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/build_file_index.txt": {
-    "mtime": 1790440977.871066,
-    "ast_hash": "3bbf2755b77e7dae0c1495a23f212b2d",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/metadata_generation_command.txt": {
-    "mtime": 1790440977.871066,
-    "ast_hash": "a5ab39938f1275367f9df024fcd343ff",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/arm64-v8a/symbol_folder_index.txt": {
-    "mtime": 1790440977.871066,
-    "ast_hash": "dd459e8c26ee7229710d5ef9d4a6d4be",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeCache.txt": {
-    "mtime": 1790441079.4283998,
-    "ast_hash": "75773a04901c276e1a45e29aaa8a095c",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441079.4429483,
-    "ast_hash": "fd2281a9988bfb125385c38ed8f50c80",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeCache.txt": {
-    "mtime": 1790441079.1371968,
-    "ast_hash": "46631bba1112b63075a3131f3ce2afe5",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441079.1452692,
-    "ast_hash": "acd849fa6c5d5c1cbba962f5edbbf790",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/src/CMakeLists.txt": {
-    "mtime": 1790441079.1156542,
-    "ast_hash": "4da62ef32315d0f698473abc5d91ca05",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/additional_project_files.txt": {
-    "mtime": 1790441079.5011637,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/build_file_index.txt": {
-    "mtime": 1790441079.5844765,
-    "ast_hash": "3bbf2755b77e7dae0c1495a23f212b2d",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/metadata_generation_command.txt": {
-    "mtime": 1790441079.5834756,
-    "ast_hash": "a347d3b33a9b4d55206e71e60f005ba2",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/armeabi-v7a/symbol_folder_index.txt": {
-    "mtime": 1790441079.5834756,
-    "ast_hash": "c0795a5936e879ef03e9d9c22a497416",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/hash_key.txt": {
-    "mtime": 1790440977.8830655,
-    "ast_hash": "89d23eb51903edeef1d6d20367ba4ee3",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeCache.txt": {
-    "mtime": 1790441183.0207398,
-    "ast_hash": "d9b0bb47fbc9ca22c58fafdfaba2f317",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441183.0750098,
-    "ast_hash": "6cf3072cd7cf769013dca5328db7dc5f",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeCache.txt": {
-    "mtime": 1790441182.7876525,
-    "ast_hash": "9fe53075b536f80c9a2c46944a290cd3",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441182.7946572,
-    "ast_hash": "1a7612b27613b8f4097860a127e08c56",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/CMakeFiles/_CMakeLTOTest-CXX/src/CMakeLists.txt": {
-    "mtime": 1790441182.7667458,
-    "ast_hash": "4da62ef32315d0f698473abc5d91ca05",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/additional_project_files.txt": {
-    "mtime": 1790441183.109161,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/build_file_index.txt": {
-    "mtime": 1790441183.283268,
-    "ast_hash": "3bbf2755b77e7dae0c1495a23f212b2d",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/metadata_generation_command.txt": {
-    "mtime": 1790441183.282261,
-    "ast_hash": "10a5ce0e6405c745c5e6974b30d18a47",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86/symbol_folder_index.txt": {
-    "mtime": 1790441183.283268,
-    "ast_hash": "fb45e26f4617453662ee2018d2c2178f",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeCache.txt": {
-    "mtime": 1790441201.1034973,
-    "ast_hash": "07adfeff7782bc20abcff6f77dc0ab0c",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441201.1384466,
-    "ast_hash": "1b7437aa210940a04f87f063c88535d9",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeCache.txt": {
-    "mtime": 1790441200.83447,
-    "ast_hash": "1bfffe00926ce12e9f5c275308afdff0",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/TargetDirectories.txt": {
-    "mtime": 1790441200.8407736,
-    "ast_hash": "d731e78c84387f8a28a75dbcb88c0576",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/CMakeFiles/_CMakeLTOTest-CXX/src/CMakeLists.txt": {
-    "mtime": 1790441200.8124695,
-    "ast_hash": "4da62ef32315d0f698473abc5d91ca05",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/additional_project_files.txt": {
-    "mtime": 1790441201.1664438,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/build_file_index.txt": {
-    "mtime": 1790441201.209445,
-    "ast_hash": "3bbf2755b77e7dae0c1495a23f212b2d",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/metadata_generation_command.txt": {
-    "mtime": 1790441201.208443,
-    "ast_hash": "d2d92a229436d7cb7ba52a54642378a0",
-    "semantic_hash": ""
-  },
-  "Target_Camera_App/android/app/.cxx/RelWithDebInfo/1e57105u/x86_64/symbol_folder_index.txt": {
-    "mtime": 1790441201.208443,
-    "ast_hash": "34d70c825632574953cf0f2c0583ec7b",
     "semantic_hash": ""
   },
   "Version_2_Range_Ops.md": {
@@ -18635,232 +18225,212 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/capacitor.build.gradle": {
-    "mtime": 1794261250.9510796,
+    "mtime": 1794973191.8641374,
     "ast_hash": "9ad205ab846e5acb05e19fda2a7a1008",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/196.db43f069825b52b4.js": {
-    "mtime": 1794261178.583632,
+    "mtime": 1794973152.2572646,
     "ast_hash": "3bf7342b72da5245dc1e891191a66cd7",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2063.47ad62e6c17143be.js": {
-    "mtime": 1794261178.580632,
-    "ast_hash": "6e11bed0eb7e0a0b90655fb85593677c",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2388.fa61afabed9b32c7.js": {
-    "mtime": 1794261178.5776322,
+    "mtime": 1794973152.2126856,
     "ast_hash": "fd7ecbc27795bc72eb82d53bafb8cfb1",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2838-c8297fa4cb439e4d.js": {
-    "mtime": 1794261178.580632,
+    "mtime": 1794973152.2556846,
     "ast_hash": "433bf4d010fec6e4c20e51b2533a0464",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/310.317bbbcb90bead7c.js": {
-    "mtime": 1794261178.5776322,
+    "mtime": 1794973152.2126856,
     "ast_hash": "062d0170ce0c1b7b8bdc936835b1320f",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3128.fdcb3ce0e1b318fe.js": {
-    "mtime": 1794261178.581632,
-    "ast_hash": "5337549cea4cb49683571dc7733628af",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3826.1e73c87af964d137.js": {
-    "mtime": 1794261178.5766327,
+    "mtime": 1794973152.2126856,
     "ast_hash": "c08214aaee2b69fd332d6a9fa4700be8",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4118.65774478503d9b38.js": {
-    "mtime": 1794261178.581632,
+    "mtime": 1794973152.2556846,
     "ast_hash": "6a379280740be255d225c691f6e17229",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4232-533dc5e2948366ad.js": {
-    "mtime": 1794261178.652633,
+    "mtime": 1794973152.2622745,
     "ast_hash": "12f3723fa1f8825678ba6c550bb75329",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4344-268cdb8a8db42eb5.js": {
-    "mtime": 1794261178.6486325,
+    "mtime": 1794973152.2592745,
     "ast_hash": "5169a07f4946caed044e03772ca73b4a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4512.e5de203077bd58a5.js": {
-    "mtime": 1794261178.582631,
+    "mtime": 1794973152.2567565,
     "ast_hash": "bd8bffa0b652c356420324a425929b78",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2582774,
     "ast_hash": "c95dc2a7376f837778426fa0c16f0c79",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/6524-b42246ec36ecf8f8.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2592745,
     "ast_hash": "00c748aeaa521c6db20d3fc808c05d97",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7460-b8f31f3f5a166655.js": {
-    "mtime": 1794261178.6486325,
+    "mtime": 1794973152.2592745,
     "ast_hash": "5bcb060a033ac2ab0d23c0be1fd48b27",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7655.ab77175f0ba71705.js": {
-    "mtime": 1794261178.5766327,
+    "mtime": 1794973152.2126856,
     "ast_hash": "0eb1c89d314827e9d8c4fa7995fbc91e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7713.e6929c5ded17a0b4.js": {
-    "mtime": 1794261178.5796337,
+    "mtime": 1794973152.2506826,
     "ast_hash": "ad38c9219de9097d044afca5be4683c6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/8069.67321cdd0da8105c.js": {
-    "mtime": 1794261178.6496327,
+    "mtime": 1794973152.2592745,
     "ast_hash": "4eff8be72260a9fbbb713626eb4da091",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/8332.cd45c73afa3c3338.js": {
-    "mtime": 1794261178.581632,
+    "mtime": 1794973152.2556846,
     "ast_hash": "e6feb3a91a743b6f1c9101dc3c545c53",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/8626.7ad448606b7d2f0c.js": {
-    "mtime": 1794261178.5776322,
+    "mtime": 1794973152.2126856,
     "ast_hash": "90de9418e0c19667c53a2c50c0cc6478",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/8752.858b48d8a68cc10f.js": {
-    "mtime": 1794261178.5776322,
+    "mtime": 1794973152.2126856,
     "ast_hash": "4445ca63a54eb19806117c588e413bfc",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2582774,
     "ast_hash": "6a5ec91830bfff51667105517ff988f8",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9132.f491bc84b6b0682e.js": {
-    "mtime": 1794261178.580632,
-    "ast_hash": "571c94f61fb419ee7d854089f726bdeb",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/94.41d56a5e420469ad.js": {
-    "mtime": 1794261178.5796337,
+    "mtime": 1794973152.2516851,
     "ast_hash": "bb5e1136dfaba5111f38dcb1fa1590d2",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9664-bbf55e28a0306eec.js": {
-    "mtime": 1794261178.6466298,
+    "mtime": 1794973152.2582774,
     "ast_hash": "8c80c3b4da377aa71357bd8cf3c0fec5",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9918.c507dadf07f07acf.js": {
-    "mtime": 1794261178.581632,
+    "mtime": 1794973152.2556846,
     "ast_hash": "4cde71a428fb9372c4672b623fdfbe3b",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/_not-found/page-be31438602c39fb9.js": {
-    "mtime": 1794261178.560633,
+    "mtime": 1794973152.1295843,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/auth/[...nextauth]/route-be31438602c39fb9.js": {
-    "mtime": 1794261178.5646317,
+    "mtime": 1794973152.130585,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/download/android/route-be31438602c39fb9.js": {
-    "mtime": 1794261178.5646317,
+    "mtime": 1794973152.130585,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/feedback/route-be31438602c39fb9.js": {
-    "mtime": 1794261178.5636313,
+    "mtime": 1794973152.130585,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/vitals/route-be31438602c39fb9.js": {
-    "mtime": 1794261178.5636313,
+    "mtime": 1794973152.130585,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/error-009e236eeec0b54e.js": {
-    "mtime": 1794261178.5626326,
+    "mtime": 1794973152.130585,
     "ast_hash": "6c5f033d3eeeb4cdbdcc72d4afc1a63b",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/loading-be31438602c39fb9.js": {
-    "mtime": 1794261178.5636313,
+    "mtime": 1794973152.130585,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/manifest.webmanifest/route-be31438602c39fb9.js": {
-    "mtime": 1794261178.5626326,
+    "mtime": 1794973152.1295843,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/not-found-da60a5dc77998b72.js": {
-    "mtime": 1794261178.5636313,
+    "mtime": 1794973152.1295843,
     "ast_hash": "a91011101eb5ed2432e549512d304b0f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/offline/page-3d756f1167874617.js": {
-    "mtime": 1794261178.5676312,
+    "mtime": 1794973152.1335852,
     "ast_hash": "3514f72f8e10d41386e2aa24fc90ea4e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/competitions/page-dec2bf2e50141f92.js": {
-    "mtime": 1794261178.569632,
+    "mtime": 1794973152.1545866,
     "ast_hash": "4c62c6d503b4b8ec587141cbc569373d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/drills/page-9e9115f2ba494ce8.js": {
-    "mtime": 1794261178.569632,
+    "mtime": 1794973152.2065845,
     "ast_hash": "0c66f272be47b776254ab07cd2e3c658",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/privacy-policy/page-692cf0d2e91ea917.js": {
-    "mtime": 1794261178.5756316,
+    "mtime": 1794973152.2106972,
     "ast_hash": "a70a7a54ab57dfb6a01121b67e48529a",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/live/page-8ab8214ad6375ed6.js": {
-    "mtime": 1794261178.5736325,
-    "ast_hash": "3be2e7684a7726622d8a2f14623e0d95",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/terms-of-service/page-692cf0d2e91ea917.js": {
-    "mtime": 1794261178.5766327,
+    "mtime": 1794973152.211684,
     "ast_hash": "a70a7a54ab57dfb6a01121b67e48529a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2572646,
     "ast_hash": "bb92a19aaaacccaf5c71d7ef6ca55794",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/framework-18f3d10fd924e320.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2572646,
     "ast_hash": "a6c9370ffae744ee7acfd1aaeea08c38",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/main-app-8dfd302f606a2db1.js": {
-    "mtime": 1794261178.559634,
+    "mtime": 1794973152.128585,
     "ast_hash": "e1a95936b493c19b103e0d73db39eeb7",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/pages/_app-b3211e4e8d39f344.js": {
-    "mtime": 1794261178.560633,
+    "mtime": 1794973152.128585,
     "ast_hash": "320c2d5a0ddf7ac8cf856e1b987a722c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/pages/_error-d163c3b70c3b32fd.js": {
-    "mtime": 1794261178.559634,
+    "mtime": 1794973152.128585,
     "ast_hash": "48d09cd265beeb95fc5380fd956f735e",
     "semantic_hash": ""
   },
@@ -18880,222 +18450,202 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/18-42c4a5dc21c4444d.js": {
-    "mtime": 1794261580.5078223,
+    "mtime": 1794972827.772033,
     "ast_hash": "22d6228e57de1c10b29454ab1f76f991",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/196.db43f069825b52b4.js": {
-    "mtime": 1794261580.504823,
+    "mtime": 1794972827.7690327,
     "ast_hash": "3bf7342b72da5245dc1e891191a66cd7",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/2063.47ad62e6c17143be.js": {
-    "mtime": 1794261580.5038218,
-    "ast_hash": "6e11bed0eb7e0a0b90655fb85593677c",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/2388.fa61afabed9b32c7.js": {
-    "mtime": 1794261580.5018225,
+    "mtime": 1794972827.7660322,
     "ast_hash": "fd7ecbc27795bc72eb82d53bafb8cfb1",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/2838-ae949fda8ce4cabd.js": {
-    "mtime": 1794261580.502824,
+    "mtime": 1794972827.7670326,
     "ast_hash": "599db76149087fa8c3bfaf3c0f3bb67a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/310.317bbbcb90bead7c.js": {
-    "mtime": 1794261580.5008228,
+    "mtime": 1794972827.7660322,
     "ast_hash": "062d0170ce0c1b7b8bdc936835b1320f",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/3128.7f380151779995fa.js": {
-    "mtime": 1794261580.5038218,
-    "ast_hash": "03308a1730b462169834664d35030b69",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/3826.1e73c87af964d137.js": {
-    "mtime": 1794261580.5008228,
+    "mtime": 1794972827.7640321,
     "ast_hash": "c08214aaee2b69fd332d6a9fa4700be8",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4118.65774478503d9b38.js": {
-    "mtime": 1794261580.504823,
+    "mtime": 1794972827.7690327,
     "ast_hash": "6a379280740be255d225c691f6e17229",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4232-d7c35c1c8209bbd3.js": {
-    "mtime": 1794261580.5098226,
+    "mtime": 1794972827.7730343,
     "ast_hash": "ff15ba5b0565c9e558eacd0371530f26",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4344-268cdb8a8db42eb5.js": {
-    "mtime": 1794261580.5078223,
+    "mtime": 1794972827.772033,
     "ast_hash": "5169a07f4946caed044e03772ca73b4a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4512.e5de203077bd58a5.js": {
-    "mtime": 1794261580.504823,
+    "mtime": 1794972827.7690327,
     "ast_hash": "bd8bffa0b652c356420324a425929b78",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4991-9b15c88d77618594.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.772033,
     "ast_hash": "5f1312d7b16dd273cb7cebba7275f65b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.770033,
     "ast_hash": "4e6961df4e796e5a276ddd7d43f8d0e4",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7460-2c9d7c20ac671853.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.772033,
     "ast_hash": "19ee53c52f9fbe8ec6a8b5afdae49635",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7655.ab77175f0ba71705.js": {
-    "mtime": 1794261580.5008228,
+    "mtime": 1794972827.7640321,
     "ast_hash": "0eb1c89d314827e9d8c4fa7995fbc91e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7713.e6929c5ded17a0b4.js": {
-    "mtime": 1794261580.5018225,
+    "mtime": 1794972827.7660322,
     "ast_hash": "ad38c9219de9097d044afca5be4683c6",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7899.757140469e5baac4.js": {
-    "mtime": 1794261580.5078223,
+    "mtime": 1794972827.7730343,
     "ast_hash": "cfcef192444816c6c6de0fd267dc277c",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8069.67321cdd0da8105c.js": {
-    "mtime": 1794261580.5078223,
+    "mtime": 1794972827.7730343,
     "ast_hash": "4eff8be72260a9fbbb713626eb4da091",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8332.cd45c73afa3c3338.js": {
-    "mtime": 1794261580.5038218,
+    "mtime": 1794972827.768034,
     "ast_hash": "e6feb3a91a743b6f1c9101dc3c545c53",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8626.7ad448606b7d2f0c.js": {
-    "mtime": 1794261580.5018225,
+    "mtime": 1794972827.7660322,
     "ast_hash": "90de9418e0c19667c53a2c50c0cc6478",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8752.858b48d8a68cc10f.js": {
-    "mtime": 1794261580.5008228,
+    "mtime": 1794972827.7640321,
     "ast_hash": "4445ca63a54eb19806117c588e413bfc",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.770033,
     "ast_hash": "6a5ec91830bfff51667105517ff988f8",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9132.f491bc84b6b0682e.js": {
-    "mtime": 1794261580.5038218,
-    "ast_hash": "571c94f61fb419ee7d854089f726bdeb",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/94.41d56a5e420469ad.js": {
-    "mtime": 1794261580.502824,
+    "mtime": 1794972827.7670326,
     "ast_hash": "bb5e1136dfaba5111f38dcb1fa1590d2",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9664-bbf55e28a0306eec.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.770033,
     "ast_hash": "8c80c3b4da377aa71357bd8cf3c0fec5",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9918.c507dadf07f07acf.js": {
-    "mtime": 1794261580.5038218,
+    "mtime": 1794972827.768034,
     "ast_hash": "4cde71a428fb9372c4672b623fdfbe3b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/_not-found/page-be31438602c39fb9.js": {
-    "mtime": 1794261580.4928238,
+    "mtime": 1794972827.7530315,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/auth/[...nextauth]/route-be31438602c39fb9.js": {
-    "mtime": 1794261580.4958222,
+    "mtime": 1794972827.758033,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/download/android/route-be31438602c39fb9.js": {
-    "mtime": 1794261580.4958222,
+    "mtime": 1794972827.759032,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/feedback/route-be31438602c39fb9.js": {
-    "mtime": 1794261580.4958222,
+    "mtime": 1794972827.7630317,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/api/vitals/route-be31438602c39fb9.js": {
-    "mtime": 1794261580.4958222,
+    "mtime": 1794972827.7630317,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/error-5c710c98929c3017.js": {
-    "mtime": 1794261580.4938228,
+    "mtime": 1794972827.756033,
     "ast_hash": "69395d6bb7c00853a3f012ea1102b801",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/loading-be31438602c39fb9.js": {
-    "mtime": 1794261580.4938228,
+    "mtime": 1794972827.756033,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/manifest.webmanifest/route-be31438602c39fb9.js": {
-    "mtime": 1794261580.4938228,
+    "mtime": 1794972827.756033,
     "ast_hash": "50ebba3dd83b746466acc963adc3ca7e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/not-found-74749f568efbbcea.js": {
-    "mtime": 1794261580.4938228,
+    "mtime": 1794972827.756033,
     "ast_hash": "9959b91d91e4319ccf3747b8a95c474a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/offline/page-89c44da5cd880de4.js": {
-    "mtime": 1794261580.496822,
+    "mtime": 1794972827.759032,
     "ast_hash": "c33cee15165d45273de73970b9504098",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js": {
-    "mtime": 1794261580.5058222,
+    "mtime": 1794972827.770033,
     "ast_hash": "bb92a19aaaacccaf5c71d7ef6ca55794",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/framework-18f3d10fd924e320.js": {
-    "mtime": 1794261580.5058222,
+    "mtime": 1794972827.770033,
     "ast_hash": "a6c9370ffae744ee7acfd1aaeea08c38",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/main-app-fcbd03564a2499d2.js": {
-    "mtime": 1794261580.4918232,
+    "mtime": 1794972827.7530315,
     "ast_hash": "b375e8fdda9ca392521a61dbb3e5e392",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/main-e09240bd7e26a7e2.js": {
-    "mtime": 1794261580.4918232,
-    "ast_hash": "45cb1781a625578cb98a20195f030f4c",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/pages/_app-b3211e4e8d39f344.js": {
-    "mtime": 1794261580.4928238,
+    "mtime": 1794972827.756033,
     "ast_hash": "320c2d5a0ddf7ac8cf856e1b987a722c",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/pages/_error-d163c3b70c3b32fd.js": {
-    "mtime": 1794261580.4938228,
+    "mtime": 1794972827.756033,
     "ast_hash": "48d09cd265beeb95fc5380fd956f735e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/polyfills-42372ed130431b0a.js": {
-    "mtime": 1794261580.4918232,
+    "mtime": 1794972827.7430348,
     "ast_hash": "846118c33b2c0e922d7b3a7676f81f6f",
     "semantic_hash": ""
   },
@@ -19125,298 +18675,298 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/404.html": {
-    "mtime": 1794261602.7771282,
-    "ast_hash": "f8e6fa1f1093d660ffcabcac265a068b",
+    "mtime": 1794972858.3666394,
+    "ast_hash": "a5a0352389e3f11ea806e009758c3a46",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/admin/feedback.html": {
-    "mtime": 1794261595.4993596,
-    "ast_hash": "4ff8531beccaf34b18298ff0d3a3e449",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "26426882315730ed7d8d9e859a606e08",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/admin/feedback.txt": {
-    "mtime": 1794261595.4993596,
-    "ast_hash": "0ba956e9cd717f5493e7cbd925c39d5a",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "10aac9775cf41806972164f67812c33a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/armory.html": {
-    "mtime": 1794261595.4983592,
-    "ast_hash": "004d6127fbba740e792725a5bb4af0b8",
+    "mtime": 1794972852.11013,
+    "ast_hash": "61d1876a9644a5327388947f759a904d",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/armory.txt": {
-    "mtime": 1794261595.4983592,
-    "ast_hash": "9705cbc3edb87afe8ddf2cc90498a043",
+    "mtime": 1794972852.11013,
+    "ast_hash": "80ada11f6b5d6685889790da6cfa88f0",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/auth/login.html": {
-    "mtime": 1794261595.6805613,
-    "ast_hash": "87dc537216b9db158725f880a0ef5390",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "69a498dcadb2701e8ee791946be2126e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/auth/login.txt": {
-    "mtime": 1794261595.6805613,
-    "ast_hash": "e81dcffa5a4dd8d683bd4caedc6a5b9a",
+    "mtime": 1794972852.1131299,
+    "ast_hash": "74587a6a5dc3d9699fd89020b6f357b9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/auth/register.html": {
-    "mtime": 1794261595.4983592,
-    "ast_hash": "e84293148de1f22d251f6329dcd217fa",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "6b8359994f7f9f14ba2d1d2b06e4787b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/auth/register.txt": {
-    "mtime": 1794261595.4983592,
-    "ast_hash": "be3515ae9f99b5a45e98b3f4a813629d",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "cc72e64cdc0cb3a39f0492cf80bbb2e3",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/ballistics.html": {
-    "mtime": 1794261595.679561,
-    "ast_hash": "e21e89924f6a51eb3a0c7fa2c8b191d8",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "ad1757bac420a5a048b09e9ae8d54de4",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/ballistics.txt": {
-    "mtime": 1794261595.6785605,
-    "ast_hash": "909f59b6fd2e75e0eea966619e8a2d0f",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "80dccb1ea849452d7ee31de032387967",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/connect.html": {
-    "mtime": 1794261595.4993596,
-    "ast_hash": "263d19aad3de60e4ecfbc42a7c281a6a",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "87d3bd9704fc48932433119c5c5fce4d",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/connect.txt": {
-    "mtime": 1794261595.4993596,
-    "ast_hash": "0f5e809152335ddddde8c4ae9cef61a7",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "17a2fe3051497fa15a2ce2a678bf6a1e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/dashboard.html": {
-    "mtime": 1794261595.679561,
-    "ast_hash": "767ed93db7f940c09361adf8457b101e",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "ec002b5ade911e8f4d5983081f2f44ea",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/dashboard.txt": {
-    "mtime": 1794261595.679561,
-    "ast_hash": "2e4316dd984a5d6621589169dbf46903",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "21d366ba78a74e594abdad0c36b936b9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/docs.html": {
-    "mtime": 1794261595.6365628,
-    "ast_hash": "d7c9bf784e32bc28857d1f16a23d2af9",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "6eaed1ae7d367ec7f62c002cf0cd3a42",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/docs.txt": {
-    "mtime": 1794261595.6375613,
-    "ast_hash": "cb308f9eeb918e967ae1bad4f70952dd",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "444507d68e54dd291d1cf52a71cf147f",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/index.html": {
-    "mtime": 1794261595.6805613,
-    "ast_hash": "1f5fc8b4c5d229b22e5891a650cd5377",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "c3ef19906775ddc986704fda3bd8e08e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/index.txt": {
-    "mtime": 1794261595.6805613,
-    "ast_hash": "56b41e1df15e9b4308cda45630d92988",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "02acaba3099ad2a449dbe07970d44098",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/live-analysis.html": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "10aab1372ba5caa9fdf817c819b8d756",
+    "mtime": 1794972852.1131299,
+    "ast_hash": "e7a0bc72d6085f887f0946994f5b83a9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/live-analysis.txt": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "89822dbb2698020d8aff98409ca404bc",
+    "mtime": 1794972852.1111298,
+    "ast_hash": "d475b147ac3b20d904c8654993b2a9db",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/offline.html": {
-    "mtime": 1794261595.6365628,
-    "ast_hash": "b3399a0517614e01e1c135ba8300845a",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "6f0a000364e1538b95837220ee7b72c0",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/offline.txt": {
-    "mtime": 1794261595.635563,
-    "ast_hash": "0ed6234d5e2e9ba688561757df3f5bcc",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "a7255958c2576d4664763bd98bb1c871",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/pass.html": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "76e7b174d24779cd84eab3509865644c",
+    "mtime": 1794972852.115131,
+    "ast_hash": "1648ff0d6fdbe2b42d153bb0357ba368",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/pass.txt": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "f7dfebd88b2f9daf86780d7ded38bfa9",
+    "mtime": 1794972852.115131,
+    "ast_hash": "d2fb83ed5a41f31e068fd160461e03d8",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance.html": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "16e65b31510572b82bd1f1ac819feeb4",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "3e05c50270d337c76375554e2a22ca55",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance.txt": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "450e0e9b40cf5ea0a79074fe25a0ec0d",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "3ee244dc2cf8ae894015520b867d0d6b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/ai-assistant.html": {
-    "mtime": 1794261595.6105626,
-    "ast_hash": "ab2d0d8dbab8d34bf9bda8bdc0c1d8f8",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "6c747bd4f6e536fe92e7b9fae29992df",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/ai-assistant.txt": {
-    "mtime": 1794261595.6095612,
-    "ast_hash": "c670c903eaccea0e2739e1bcd49f6c56",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "3853c6962affa94721ee2c75ba05678e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/ai-coach.html": {
-    "mtime": 1794261595.4803596,
-    "ast_hash": "0f56361a06d20d735ae0541732a56db9",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "42de225bdec94972552cfe955fd3ee86",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/ai-coach.txt": {
-    "mtime": 1794261595.4803596,
-    "ast_hash": "06897741a4a7bc079f7d768a72d119d9",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "812c3d56719cfd2da1ac5a37271955fa",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/competitions.html": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "736c34c71160cea9e4369e8802ad615d",
+    "mtime": 1794972852.1576095,
+    "ast_hash": "fa2fc47c4fec06195b49bdd9993e7ffc",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/competitions.txt": {
-    "mtime": 1794261595.6115623,
-    "ast_hash": "ab9fa93c61b8fe7074b51512e105d9a6",
+    "mtime": 1794972852.1570752,
+    "ast_hash": "83f20d958ab6d8799ee72c88e39f0986",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/health.html": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "a5db1a130233a972c2699457f976c1db",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "0afeb1bdb5a9614d8c185d31b643bbdd",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/performance/health.txt": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "4c204b873941459bb0c368dfc51a593f",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "7fe50373c3daac76891d4219c606bbd2",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning.html": {
-    "mtime": 1794261595.7245615,
-    "ast_hash": "e57a8fd131c30f51def44a0531ba24f9",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "ee7853897456055d024dc274d52b866a",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning.txt": {
-    "mtime": 1794261595.7245615,
-    "ast_hash": "00bd07d28179604a709f45f5cb213e33",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "902a9dcf9c9f3dc020b81818480bf5fd",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning/drills.html": {
-    "mtime": 1794261595.481361,
-    "ast_hash": "7c018f7fa50f2dc57e795dde4411c59f",
+    "mtime": 1794972852.1411304,
+    "ast_hash": "96663a47025fea985c0d60cb2439b79c",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning/drills.txt": {
-    "mtime": 1794261595.481361,
-    "ast_hash": "c0a40ff1905e75a6fd3c6ea3ad913cbe",
+    "mtime": 1794972852.1411304,
+    "ast_hash": "a43b395b98fec9ba114340f0fc861bf0",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning/training-plan.html": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "7ce4578d79d8cea33b3419c6eb1764d0",
+    "mtime": 1794972852.1411304,
+    "ast_hash": "8de3ecd994b47024ac17933e184a5637",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/planning/training-plan.txt": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "79a87b039103a02c1b370435189b61f1",
+    "mtime": 1794972852.1411304,
+    "ast_hash": "fb7227b182105ef5cf17a80485f18686",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/profile.html": {
-    "mtime": 1794261595.4993596,
-    "ast_hash": "66e4912e31373b250956541fd0b77edd",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "925315e1682a59509c6884b57c68a687",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/profile.txt": {
-    "mtime": 1794261595.4983592,
-    "ast_hash": "8943ab7ac47475a1fac13c3994569a2b",
+    "mtime": 1794972852.1141305,
+    "ast_hash": "057beed017cdc98bf2f1f422c0f453a9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/ranges.html": {
-    "mtime": 1794261595.7235625,
-    "ast_hash": "48281d4d4d591ef6620fdc4c591c00e1",
+    "mtime": 1794972852.1565368,
+    "ast_hash": "6ebe316b9f76598f871a06cac28fdb30",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/ranges.txt": {
-    "mtime": 1794261595.7235625,
-    "ast_hash": "967f905eaa7e2636ca10efc6483470c4",
+    "mtime": 1794972852.1565368,
+    "ast_hash": "713458939595d3cc81de4e751eddf9f7",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions.html": {
-    "mtime": 1794261595.7245615,
-    "ast_hash": "cc0d6a70dbb2406d6ed11a02796b59f0",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "ebe957f35f1bc46bbba8595ddc40f7fc",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions.txt": {
-    "mtime": 1794261595.7245615,
-    "ast_hash": "3fc07429ad4209e0c5bba2d9101a9c87",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "3d8ebe7b9fabad838fcd08aaa995d1f9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/compare.html": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "4e7f94b3fcb1343e2a346f612ced3f92",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "e323650f1f7cc6bdc2c94725b5092221",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/compare.txt": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "61f5163355d30dfbf20b9178f92c19bc",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "91524ef2b2d8207d15dc9f41b6c2f1a5",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/live.html": {
-    "mtime": 1794261595.481361,
-    "ast_hash": "fe9b16a052e7f5d6849d3d26aaa12e91",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "9f11585db85c332434a0ec43fe8369f1",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/live.txt": {
-    "mtime": 1794261595.481361,
-    "ast_hash": "61033690d1b20b7035b04c047398f2a6",
+    "mtime": 1794972851.9891899,
+    "ast_hash": "32f52a3519ad20eb21f7ea169dd83ae9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/new.html": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "ef7db5d7797aa02d00686bd45e50aa68",
+    "mtime": 1794972852.1570752,
+    "ast_hash": "ad42e9dd22bdb2521379d5ce374f7564",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/new.txt": {
-    "mtime": 1794261595.6125612,
-    "ast_hash": "1dd1eae47d01a5097b28b51a89d3efd9",
+    "mtime": 1794972852.1570752,
+    "ast_hash": "662ccd3a24b00e023c1b4bf7f8715353",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/sample.html": {
-    "mtime": 1794261595.4803596,
-    "ast_hash": "312f309b39cb1142f6474479d6e94ba0",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "765df7f8341b30b2eccb6df5db15885b",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/sample.txt": {
-    "mtime": 1794261595.4803596,
-    "ast_hash": "f5ccf87e4734c9fc33e07d182e293873",
+    "mtime": 1794972852.1161306,
+    "ast_hash": "f5877d7cccafaaad864b842938bfb3bc",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/zen.html": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "54c29e86edae57fe24047fdc24d0565e",
+    "mtime": 1794972851.992188,
+    "ast_hash": "22c04a5750fd37d2f6b8c3263c03c5f4",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/sessions/zen.txt": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "fffa527c9e178a43a9724f5174f2b002",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "fcef1d8720c166a75810c0aab3f296dc",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/settings.html": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "3e2c07534d8064fb73c86ef2d2069f2b",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "11e262c5db6930b5e0155fe74bbafa3e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/settings.txt": {
-    "mtime": 1794261595.4793606,
-    "ast_hash": "1fa70dbc792167ad6a1d25e8d3945d62",
+    "mtime": 1794972851.9911866,
+    "ast_hash": "b005eb87c6f30f891d86c57551dc08dd",
     "semantic_hash": ""
   },
   "Target_Camera_App/.expo/README.md": {
@@ -19430,8 +18980,8 @@
     "semantic_hash": ""
   },
   "release_apks/README.md": {
-    "mtime": 1791979175.1266892,
-    "ast_hash": "d5036900881e6af2678797395ccc5483",
+    "mtime": 1794973852.987057,
+    "ast_hash": "9136b8777f4bb16780bb91714d49937a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/apple-touch-icon.png": {
@@ -19825,28 +19375,13 @@
     "semantic_hash": ""
   },
   "install_all_apks.ps1": {
-    "mtime": 1793889887.7727132,
-    "ast_hash": "13f3405a9fc4100b68020dcf59ea7c94",
+    "mtime": 1794969773.2567887,
+    "ast_hash": "c31cc8ae7948f451d7121722f84d3474",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/nest-cli.json": {
     "mtime": 1792024626.6089134,
     "ast_hash": "ef337c0df19d9a88a7208e5aba169df9",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/admin/feedback/page-4b9a035101c05388.js": {
-    "mtime": 1794261178.5646317,
-    "ast_hash": "dc2430c170bcebd70d29d7b911f97ee8",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/delete-account/page-25afc3ef7a421092.js": {
-    "mtime": 1794261178.5666325,
-    "ast_hash": "9b911d8d8ad90500e2234a54550d81af",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/zen/page-fa44d416c5a0ae3b.js": {
-    "mtime": 1794261178.574632,
-    "ast_hash": "d622cb9c8f39e20d326efff56841c183",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/ui/TacticalIcons.tsx": {
@@ -19857,16 +19392,6 @@
   "Shooter_App/apps/api/nest-cli.json": {
     "mtime": 1792024618.8000038,
     "ast_hash": "ef337c0df19d9a88a7208e5aba169df9",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/admin/feedback/page-1092a9d7499c8ff1.js": {
-    "mtime": 1794261580.4958222,
-    "ast_hash": "b75ce49bf22765c49b6158c64fc19790",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/zen/page-a39172f7f4efe452.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "f680cb677b90932d0e0a084c15d3a94e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/scripts/generate_shooter_icons.py": {
@@ -19887,11 +19412,6 @@
   "Target_Camera_App/src/components/VisualFilterOverlay.tsx": {
     "mtime": 1794255619.835546,
     "ast_hash": "ae14b0df68b8bba20495af53cbbd33ea",
-    "semantic_hash": ""
-  },
-  "find_button.ps1": {
-    "mtime": 1792015823.302862,
-    "ast_hash": "c66814b22cdc1c08952b6c53e2e6f6fe",
     "semantic_hash": ""
   },
   "Target_Camera_App/src/components/ShotHistoryModal.tsx": {
@@ -19944,304 +19464,114 @@
     "ast_hash": "75c0b232c9f40066cf052e090806d89a",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/HYV1IRjDLZfiG9Os1klEM/_buildManifest.js": {
-    "mtime": 1794261178.559634,
-    "ast_hash": "439d07f554779ce4ed844742571f3c87",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/HYV1IRjDLZfiG9Os1klEM/_ssgManifest.js": {
-    "mtime": 1794261207.8943908,
-    "ast_hash": "c43e779dda44ec6b294e32bbfa0471b0",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/1105.43c952b623706269.js": {
-    "mtime": 1794261178.5796337,
+    "mtime": 1794973152.2516851,
     "ast_hash": "2dbc6d41c11c71e8f9320e0bb7b73ad6",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/146-de1a3b03cff710c2.js": {
-    "mtime": 1794261178.6516309,
-    "ast_hash": "de95b466c767b61ba05bc96ac04b7094",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/18-e170b0797d34e2ab.js": {
-    "mtime": 1794261178.6486325,
+    "mtime": 1794973152.2592745,
     "ast_hash": "42ee3d4d257fdd3acd6e50c913733ff3",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2750.38aadb3279bf479d.js": {
-    "mtime": 1794261178.5776322,
+    "mtime": 1794973152.2126856,
     "ast_hash": "4823f5e56d696504beb010020ecacdee",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2853-a8292f0c797f2198.js": {
-    "mtime": 1794261178.6516309,
-    "ast_hash": "764cfb805c09b131ae6538cb3ba7f13d",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2894-c5f64cd7028f2a80.js": {
-    "mtime": 1794261178.6506314,
+    "mtime": 1794973152.2602758,
     "ast_hash": "c65b16ec726381f3afe78b4d288ea0e1",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3688-c42b3b15c599a03d.js": {
-    "mtime": 1794261178.6516309,
-    "ast_hash": "92253299ed113e814549040f514ae0ed",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/369.38aadb3279bf479d.js": {
-    "mtime": 1794261178.5796337,
+    "mtime": 1794973152.2516851,
     "ast_hash": "4823f5e56d696504beb010020ecacdee",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3786-418fd8cf80ae2e5f.js": {
-    "mtime": 1794261178.6496327,
+    "mtime": 1794973152.2592745,
     "ast_hash": "158d93c13e37e9ce17fd527613a66f9f",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4101.612a51b7d979a310.js": {
-    "mtime": 1794261178.580632,
-    "ast_hash": "029c7a50621c0e9c391926d760e2a002",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4681-f0a8e0fed59fd101.js": {
-    "mtime": 1794261178.6516309,
+    "mtime": 1794973152.2622745,
     "ast_hash": "0ffabd2dbb7fe0e9bd966b976b397087",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/6331-00dd064aa271158b.js": {
-    "mtime": 1794261178.652633,
+    "mtime": 1794973152.2622745,
     "ast_hash": "a4e47d4b0b5c0346d8cbd28036c5e624",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/6699.205ef38bf819c62a.js": {
-    "mtime": 1794261178.581632,
+    "mtime": 1794973152.2567565,
     "ast_hash": "0f4fb5e1bb03a5da05e55732cda8897c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/73-27ec2066b702922b.js": {
-    "mtime": 1794261178.5796337,
+    "mtime": 1794973152.2506826,
     "ast_hash": "e0e082d499f7e4f7606ca04ed7525701",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7594-3527dae03caa23e3.js": {
-    "mtime": 1794261178.6506314,
-    "ast_hash": "e44ff0c41993ffbdb1753ff8082c3f8f",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/768.8b8f06d42ed1767a.js": {
-    "mtime": 1794261178.6496327,
+    "mtime": 1794973152.2592745,
     "ast_hash": "7b4b7163eed924c418968938ce236d0c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7700-1c704824f742b947.js": {
-    "mtime": 1794261178.6476302,
+    "mtime": 1794973152.2592745,
     "ast_hash": "8d8cda637b41d0c4ccf6b7c589a2374b",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9401-480e084c26221176.js": {
-    "mtime": 1794261178.6516309,
-    "ast_hash": "b19fb48b11ab519b56b02af807e701c0",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9601-f01012eb9e14e62e.js": {
-    "mtime": 1794261178.6516309,
+    "mtime": 1794973152.2612758,
     "ast_hash": "e9716068c1edd08f19fd5bfc0efbdd67",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/login/page-5b4506148d0d52c2.js": {
-    "mtime": 1794261178.565633,
-    "ast_hash": "ef612f74c644e26293f5addc1aca9075",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/register/page-cde5e8f77bd24d07.js": {
-    "mtime": 1794261178.565633,
-    "ast_hash": "08f06095924e64ed4b9dc3111497f154",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ballistics/page-d6dc7e96b5354fbe.js": {
-    "mtime": 1794261178.5646317,
-    "ast_hash": "3518fbb7a076becbc49c94b9758df51d",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/bookings/page-9ace552dd4868271.js": {
-    "mtime": 1794261178.5756316,
-    "ast_hash": "e784ea3e6de1a2124ddbca9ed6f5c958",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/checkin/page-ca6ab38dd0562997.js": {
-    "mtime": 1794261178.565633,
-    "ast_hash": "ac428e9ea4cd58598654fc5d3caaa49a",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/connect/page-1cf06f68d2f75de0.js": {
-    "mtime": 1794261178.5646317,
-    "ast_hash": "cab17274d41458910f65a374beb360aa",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/dashboard/page-dbc3908dd096d954.js": {
-    "mtime": 1794261178.565633,
-    "ast_hash": "08241209f09894957c1e8003ec65ea32",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/docs/page-8c829e4a09d12491.js": {
-    "mtime": 1794261178.5666325,
+    "mtime": 1794973152.1315854,
     "ast_hash": "5da88ecd8696be9fd5e3f3ad85600f53",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/equipment/page-de72be1d8aa7562e.js": {
-    "mtime": 1794261178.5676312,
-    "ast_hash": "e5741214be308c5a7663b66607cf1fd6",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/lanes/config/page-dd24ced71d620dcb.js": {
-    "mtime": 1794261178.568632,
-    "ast_hash": "7371408039014f6258308c66a4fc1942",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/lanes/page-95464795d4c80e88.js": {
-    "mtime": 1794261178.5676312,
-    "ast_hash": "12afa8c32eeeae31f34c4b28f8ba0a3a",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/lanes/vision/page-3f020bf2075c1d5c.js": {
-    "mtime": 1794261178.568632,
+    "mtime": 1794973152.1325881,
     "ast_hash": "90f014ae8b996ad5baf6ca8c3064922c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/layout-59d607a26a35d54d.js": {
-    "mtime": 1794261178.5626326,
+    "mtime": 1794973152.1295843,
     "ast_hash": "0af98c9269bda92f30e154c916242c8c",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/live-analysis/page-28cd36ccc9335eee.js": {
-    "mtime": 1794261178.5756316,
-    "ast_hash": "d261a5139e3f4a417c5e53b84502d5ea",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/page-a464e0ea7e8c80b2.js": {
-    "mtime": 1794261178.5676312,
-    "ast_hash": "7720662c8319c8e778691d22b790e2d7",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-assistant/page-99433df70851205e.js": {
-    "mtime": 1794261178.569632,
-    "ast_hash": "98ff6631556608ab9a2385045a1a14c4",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-coach/page-169db97555a5c9b1.js": {
-    "mtime": 1794261178.569632,
-    "ast_hash": "561e69406b6bd8f6828b52b34bdeb6fd",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/health/page-4db85a88e2f685db.js": {
-    "mtime": 1794261178.568632,
-    "ast_hash": "d656e7f1ce6f4029b0e1f9d6114ccb60",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/page-dc5a623fde36fd4e.js": {
-    "mtime": 1794261178.568632,
+    "mtime": 1794973152.2055895,
     "ast_hash": "1e13df0fd38ff2f12eeba7bf1fbea59e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/page-c4419d990e0eb12c.js": {
-    "mtime": 1794261178.569632,
+    "mtime": 1794973152.2101655,
     "ast_hash": "5c4ecfb80d1cde0ea0fd800d4f703f23",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/training-plan/page-f9db38ab54d90a39.js": {
-    "mtime": 1794261178.5706313,
-    "ast_hash": "3b112a651e7079822f4099227cb76d7e",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-admin/dashboard/page-bf67a43e9c1702bb.js": {
-    "mtime": 1794261178.5716324,
+    "mtime": 1794973152.2065845,
     "ast_hash": "cda8f606cbbed91fc9284772c0ecbc2e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-admin/financials/page-c407e02c19d32d22.js": {
-    "mtime": 1794261178.5726323,
+    "mtime": 1794973152.2065845,
     "ast_hash": "47927ddabb73926be0ca24c0f5287e80",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-admin/operating-hours/page-68aa3fec97e16148.js": {
-    "mtime": 1794261178.5716324,
-    "ast_hash": "368e538a77a826e4770ee3cc67b00b4b",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/bookings/page-0f92514310d5d52a.js": {
-    "mtime": 1794261178.5726323,
-    "ast_hash": "69e7f20aa2c6c917ad1064912b5a060b",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/dashboard/page-df212bd373f405d6.js": {
-    "mtime": 1794261178.5726323,
-    "ast_hash": "4433d50ad0af92453b30a79264c82c8c",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/walk-in/page-be079440e829e94a.js": {
-    "mtime": 1794261178.5726323,
-    "ast_hash": "562e2a52cedbebe7ff7e61222baf8141",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ranges/page-c2c4979601aa70e4.js": {
-    "mtime": 1794261178.5726323,
-    "ast_hash": "7dc06839b34e9e61e5b3da879d1500c9",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/rso/dashboard/page-8d9388ae924f87a5.js": {
-    "mtime": 1794261178.574632,
-    "ast_hash": "d806224794a08abb16883a682fcb8464",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/safety/page-517be00e86269ad7.js": {
-    "mtime": 1794261178.5726323,
-    "ast_hash": "821357b6e2cc936c84638ff6807ccb85",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/[id]/page-0678174357fdf5fe.js": {
-    "mtime": 1794261178.5766327,
-    "ast_hash": "7b149c77c22efa88688d475aa7c3c99b",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/compare/page-f331e00e563b00cc.js": {
-    "mtime": 1794261178.574632,
-    "ast_hash": "e7fd3041fa524794f83bb410413e09c2",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/new/page-6d47f1d6a629f24d.js": {
-    "mtime": 1794261178.574632,
-    "ast_hash": "1d21cfa6baef8ce6cae2309eb95109bc",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/page-623d290330f2f143.js": {
-    "mtime": 1794261178.5736325,
-    "ast_hash": "d4a340aa28d2a4f92fc33fa36398d743",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/settings/page-06d4e3e51cf76600.js": {
-    "mtime": 1794261178.574632,
-    "ast_hash": "1de9ac9cea1d0b9131a646e07134ea8d",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/staff/dashboard/page-208831d68cf041b9.js": {
-    "mtime": 1794261178.5766327,
+    "mtime": 1794973152.2106972,
     "ast_hash": "bc0c86479094a3796cedaf91952ed4ca",
     "semantic_hash": ""
   },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/staff/schedule/page-a36f8b9dac2ecb63.js": {
-    "mtime": 1794261178.5766327,
-    "ast_hash": "ef58ec1d6099dc36ce92d8927f338852",
-    "semantic_hash": ""
-  },
   "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/main-0aa558925596052e.js": {
-    "mtime": 1794261178.559634,
+    "mtime": 1794973152.128585,
     "ast_hash": "631dac453951615ffbf62534189d8f35",
-    "semantic_hash": ""
-  },
-  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/webpack-d17c7eccc43848cb.js": {
-    "mtime": 1794261178.5756316,
-    "ast_hash": "e28592c0069bf874d3b2d87d6a1b209e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/components/ui/ConfirmModal.tsx": {
@@ -20249,674 +19579,529 @@
     "ast_hash": "5ca461f553df40b8c18926dec6b45973",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/6e0OQpX7nWT_vPYNiM_E_/_buildManifest.js": {
-    "mtime": 1794261580.4918232,
-    "ast_hash": "4a7c405f4b4d842bccdd3e51e664d09e",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/6e0OQpX7nWT_vPYNiM_E_/_ssgManifest.js": {
-    "mtime": 1794261596.5697882,
-    "ast_hash": "c43e779dda44ec6b294e32bbfa0471b0",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/146-186169e227a74716.js": {
-    "mtime": 1794261580.5098226,
-    "ast_hash": "e94b71262a93fb8cbebdaa2958076379",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/2750.38aadb3279bf479d.js": {
-    "mtime": 1794261580.5008228,
+    "mtime": 1794972827.7640321,
     "ast_hash": "4823f5e56d696504beb010020ecacdee",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/3623-5b4d14ef376b4b80.js": {
-    "mtime": 1794261580.5078223,
+    "mtime": 1794972827.772033,
     "ast_hash": "4175532974dababbdb72202975848f60",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/3688-f755afffb54dae39.js": {
-    "mtime": 1794261580.5088215,
+    "mtime": 1794972827.7730343,
     "ast_hash": "ce40aee9541ef8d8757f697e158952f5",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/369.38aadb3279bf479d.js": {
-    "mtime": 1794261580.5018225,
+    "mtime": 1794972827.7660322,
     "ast_hash": "4823f5e56d696504beb010020ecacdee",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4101.b33869e3f9803371.js": {
-    "mtime": 1794261580.5038218,
-    "ast_hash": "ea739699975da6df803eebbbe51b6ca3",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/5380-07c11be08530991e.js": {
-    "mtime": 1794261580.5088215,
+    "mtime": 1794972827.7730343,
     "ast_hash": "d29e1695ef237caa35f2b04428601374",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/5568-4124bb667159fbf2.js": {
-    "mtime": 1794261580.5088215,
+    "mtime": 1794972827.7730343,
     "ast_hash": "6f8e5f1ca43fbbe24fd58bc267ab44bb",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/6524-b42246ec36ecf8f8.js": {
-    "mtime": 1794261580.506822,
+    "mtime": 1794972827.771034,
     "ast_hash": "00c748aeaa521c6db20d3fc808c05d97",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/73-27ec2066b702922b.js": {
-    "mtime": 1794261580.5018225,
+    "mtime": 1794972827.7670326,
     "ast_hash": "e0e082d499f7e4f7606ca04ed7525701",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7594-080fe25221239d55.js": {
-    "mtime": 1794261580.5088215,
-    "ast_hash": "165266d99d598d399d03eaa13c27d996",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8307-fcd5366ef89f4f34.js": {
-    "mtime": 1794261580.5098226,
-    "ast_hash": "1834614b87c7feb253d6574c4a0321b3",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9019.84f0a12424bf660a.js": {
-    "mtime": 1794261580.5038218,
+    "mtime": 1794972827.768034,
     "ast_hash": "461f22194576efb4b6e55ed364fbd450",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9fb599d8-d3fe1d4a9bf56043.js": {
-    "mtime": 1794261580.5058222,
+    "mtime": 1794972827.770033,
     "ast_hash": "f385d65c121840e98ae707fb2c04a79b",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/(dashboard)/armory/page-4b0e16e720565872.js": {
-    "mtime": 1794261580.4958222,
-    "ast_hash": "ffd06277467b4014ed828564ecce1561",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/(dashboard)/profile/page-b8b352fae3331058.js": {
-    "mtime": 1794261580.4958222,
-    "ast_hash": "6cba1bbf37361f88a88f1e946f8b1b23",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/login/page-056a5c061c7045df.js": {
-    "mtime": 1794261580.496822,
-    "ast_hash": "d84030f5a5ea6a496046d359e007b406",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/register/page-7d9bf6a61a278dab.js": {
-    "mtime": 1794261580.4958222,
+    "mtime": 1794972827.759032,
     "ast_hash": "bafa2bd14f6ec8153a81d7a77c23c8ea",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ballistics/page-cd0070b98b0eaed3.js": {
-    "mtime": 1794261580.4958222,
-    "ast_hash": "9a2ac889025984eb9c864ac65a700e85",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/connect/page-89933d32857d9efa.js": {
-    "mtime": 1794261580.4958222,
-    "ast_hash": "4d427d13730ac1192642cca8688e025b",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/dashboard/page-15ed15eba33714a9.js": {
-    "mtime": 1794261580.496822,
-    "ast_hash": "cc27bf14f59226dfadc07cf94436160d",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/docs/page-1efbc5a7c02e3f47.js": {
-    "mtime": 1794261580.496822,
+    "mtime": 1794972827.759032,
     "ast_hash": "7b7e54745ed40727b2557626d7da47b8",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/layout-9079d34bf89814d7.js": {
-    "mtime": 1794261580.4938228,
-    "ast_hash": "01eac561804b3e47d1951cf33ae5f7b4",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/live-analysis/page-6ee328e389cc00c9.js": {
-    "mtime": 1794261580.5008228,
-    "ast_hash": "58a7815d83692dab51e7a7a675023142",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/page-681c8843eee9dda3.js": {
-    "mtime": 1794261580.497822,
-    "ast_hash": "c69c7854939641d992146fe03e031286",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/pass/page-23894530b1de51a1.js": {
-    "mtime": 1794261580.496822,
+    "mtime": 1794972827.759032,
     "ast_hash": "615d9728f81bf7d365795fa5ecfb52d3",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-assistant/page-13af118c1312df64.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "e9ea257ea5e44a8bd94e457a37c17d93",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-coach/page-ec5016bf8d5f2fda.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "d9f0dbb6c298cae556643ed7a41894aa",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/competitions/page-8dbced0d699512dd.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "5bac8ce1bc11304b6f5347c2127514dc",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/health/page-f6cee062ce5b03dc.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "8ba588e5a170c059d217600afad2e982",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/page-3832cc5cf0237334.js": {
-    "mtime": 1794261580.498823,
+    "mtime": 1794972827.761033,
     "ast_hash": "82fa8aa4885b841533fc6f500b9cd96f",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/drills/page-c20c6706e2d9354d.js": {
-    "mtime": 1794261580.4998224,
-    "ast_hash": "b1e5269911e610b95aa5ff6d38d6f0be",
-    "semantic_hash": ""
-  },
   "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/page-ffab412dd3c27097.js": {
-    "mtime": 1794261580.498823,
+    "mtime": 1794972827.7600324,
     "ast_hash": "e795a6af8e214d501126e8d5572caaf9",
     "semantic_hash": ""
   },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/training-plan/page-a5e0e1c517cbcd61.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "584221a6936e445ef9111425144db1c5",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ranges/page-89ab896139f6f75a.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "6b2bb29b39388aa0af21107e57c27281",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/[id]/page-3198e817b22085cf.js": {
-    "mtime": 1794261580.5008228,
-    "ast_hash": "d59cf89e2eee58ec463e780f2a57943e",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/compare/page-efdf7e9ef1bd4dc3.js": {
-    "mtime": 1794261580.4998224,
-    "ast_hash": "8eb8c47b893d33f1bbaba04efb78d80e",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/live/page-2ccd099553bfddda.js": {
-    "mtime": 1794261580.4998224,
-    "ast_hash": "f88873366ef9c5230bad10690d2e3d53",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/new/page-d193e96a80517255.js": {
-    "mtime": 1794261580.4998224,
-    "ast_hash": "6b6b102418e70d793d223786aeab209e",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/page-29bb5b394e4e2fa2.js": {
-    "mtime": 1794261580.498823,
-    "ast_hash": "fb98372a9cc4b2322cdd97f4eb7d1b7e",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/settings/page-876e9c88e19f2e1e.js": {
-    "mtime": 1794261580.4998224,
-    "ast_hash": "e6ca7e272708cc31194b3257e0cceb71",
-    "semantic_hash": ""
-  },
-  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/webpack-c1ef619ba6adbbfe.js": {
-    "mtime": 1794261580.5008228,
-    "ast_hash": "db832c9b09f68e67bc127afa87948f5c",
-    "semantic_hash": ""
-  },
   "run_orchestrator.ps1": {
-    "mtime": 1794646481.0698652,
-    "ast_hash": "d06a1e667c6aaa2a60593165bfd8814a",
+    "mtime": 1794972075.944471,
+    "ast_hash": "cde398a8c0ca6696e8438bee722fd79c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/404/index.html": {
-    "mtime": 1794261219.8973162,
-    "ast_hash": "638ec8d2626d3fa349583ff8dfb7937e",
+    "mtime": 1794973179.920498,
+    "ast_hash": "6555a8f980481586182ff4e78a28b569",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/admin/feedback/index.html": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "d4393aff213bfa73132d0ed98059f824",
+    "mtime": 1794973172.2203865,
+    "ast_hash": "bc9802b1688dd3931d527b2bde38d4bb",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/admin/feedback/index.txt": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "00f3e4b8ad7625b05aedbcaaa3ce837f",
+    "mtime": 1794973172.219391,
+    "ast_hash": "a671b847d2bb29623ec569c10b72934c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/auth/login/index.html": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "e45f92e5330470c7a78585751a5d7a77",
+    "mtime": 1794973172.2233863,
+    "ast_hash": "7d0508e3e33f70f671527d7af8d59bd6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/auth/login/index.txt": {
-    "mtime": 1794261204.4565363,
-    "ast_hash": "4dc59c4fc3f7f860ad3a18476cd6844b",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "2ab9f39584714bcbeb52938570b2550d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/auth/register/index.html": {
-    "mtime": 1794261204.8692777,
-    "ast_hash": "b6d6b4370f878899d7c00c7ca96e72cb",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "a956c0c27e72d61ab676f2ff771fa64c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/auth/register/index.txt": {
-    "mtime": 1794261204.8692777,
-    "ast_hash": "317f80f8e3734f6750fdcbe714358edf",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "d1f6492cc7290d20743feacf72f2087d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/ballistics/index.html": {
-    "mtime": 1794261204.8672764,
-    "ast_hash": "39977fbff4b7c306c6eb4a146b10628d",
+    "mtime": 1794973172.2233863,
+    "ast_hash": "9f89cdb2c6c52a83b3bf87244cbe6bbc",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/ballistics/index.txt": {
-    "mtime": 1794261204.8672764,
-    "ast_hash": "a97985cab4199075b1adb6beaad4cc8b",
+    "mtime": 1794973172.2233863,
+    "ast_hash": "983e1542a738e0cf1a43c215264cbfae",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/bookings/index.html": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "d440ffbde00a7ed6f6476432e97e53a8",
+    "mtime": 1794973172.2830734,
+    "ast_hash": "3ae6b3dbd62f24f730b68cca77af2ca3",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/bookings/index.txt": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "90c89b200f44c3d702faf065cd9f4061",
+    "mtime": 1794973172.2830734,
+    "ast_hash": "2eb5aee98bde39cc8e6269dffb210394",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/checkin/index.html": {
-    "mtime": 1794261204.868278,
-    "ast_hash": "cf6c6c9528782a69f0d850d70df13ddd",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "d53a5696deb1073bb4a0b60ae0d65583",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/checkin/index.txt": {
-    "mtime": 1794261204.868278,
-    "ast_hash": "625439e34b829bd05a84d490cdd56843",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "917d80a9022067be3f8f82c0c8075c81",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/connect/index.html": {
-    "mtime": 1794261204.868278,
-    "ast_hash": "0a1bff8b6ea02eff11a57504f0ce6bfe",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "68a177964d10afeab211b3963b46189d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/connect/index.txt": {
-    "mtime": 1794261204.868278,
-    "ast_hash": "a4c2a0c096cf1386234299c4bfb4fbd5",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "627ef3f2863940fceadc08877301b54e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/dashboard/index.html": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "7e8e97986c92695fe8f0c68443d085b1",
+    "mtime": 1794973172.2233863,
+    "ast_hash": "7822255b914656dbfe462c57991c6006",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/dashboard/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "c385cec42ae2193b04fac445dbab252b",
+    "mtime": 1794973172.2223861,
+    "ast_hash": "766f3e9f6784d481425295b114688b29",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/delete-account/index.html": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "6859c5ba54f36a752791f6166ea9ddd6",
+    "mtime": 1794973171.9650471,
+    "ast_hash": "be47bd82d79d4b3a16622f8b0622b0f7",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/delete-account/index.txt": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "602151ac8734fde4e1ec82b23093262c",
+    "mtime": 1794973171.9650471,
+    "ast_hash": "7ef739386ed02b071fae163c69a2332c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/docs/index.html": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "848d638e1dbee4ca75115a615bd9f07c",
+    "mtime": 1794973172.2704978,
+    "ast_hash": "16a676bbdbcaba33f8134a469b2951f0",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/docs/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "05267ac81d7264071cbadee9701493b1",
+    "mtime": 1794973172.2704978,
+    "ast_hash": "3b97c1c35734ec60778e23aec7fe8c7e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/equipment/index.html": {
-    "mtime": 1794261205.2105734,
-    "ast_hash": "dd7d746529bbe6074042c5bc1e6b64c7",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "27e12ca469ce911743f89c2cf9568108",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/equipment/index.txt": {
-    "mtime": 1794261205.2105734,
-    "ast_hash": "f2f259f050626ba4e88c281523a790d3",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "9bbdcbc2aab1cae397026bb57d7cdcb7",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/config/index.html": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "99ef4322e219131e923743c270c1df88",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "2709444724affe0b173dae5db04516aa",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/config/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "cde3601d099998181bbea442fe697462",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "ba9f89f18f5fa38a132b6810edab3d4a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/index.html": {
-    "mtime": 1794261205.049186,
-    "ast_hash": "758a69ccf3b92293a7f6e6d3a96ce297",
+    "mtime": 1794973172.3052938,
+    "ast_hash": "00351d6409a68970714190eddc8f23ba",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/index.txt": {
-    "mtime": 1794261205.049186,
-    "ast_hash": "93af385044a6e0403281727818ae9c20",
+    "mtime": 1794973172.3052938,
+    "ast_hash": "a682b27fbbbb63591304ad5b98c6b6db",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/vision/index.html": {
-    "mtime": 1794261204.868278,
-    "ast_hash": "c5afc9925a5999b8ccfd7aee3e3ce8bf",
+    "mtime": 1794973172.2704978,
+    "ast_hash": "2784f3292afe1de0f629e62a8e46e51b",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/lanes/vision/index.txt": {
-    "mtime": 1794261204.8692777,
-    "ast_hash": "995b807ec514f76bf778b2a3bb114e9a",
+    "mtime": 1794973172.2704978,
+    "ast_hash": "766772a8573a35f29a2391e1a85c619a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/live-analysis/index.html": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "8814dce8a31c4f5e24317c896ee3c55e",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "a6e1970d858903d209b143c66b3bbec7",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/live-analysis/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "3d4071465dbfae8a5f42efb5c1218185",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "c4ab5f7a628a80a2a276f3cceda46a93",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/offline/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "6129e10e8d5e8283a509dd4fd35f9a8b",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "1c9093f7c5140b2b56cc184629bf7afc",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/offline/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "19c92b63ff1d94979b92c7002545c914",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "62608fe5f4251b0781093cb4eaf8bdc3",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/ai-assistant/index.html": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "a40f333ed2401a7b9bbccade8ba9b1c9",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "13d704321656f17d23140164959bb308",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/ai-assistant/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "0cfb055c44c5ee23a0a939aee4da0a3d",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "ee2c9a560013dbff2fdda69e6018f447",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/ai-coach/index.html": {
-    "mtime": 1794261204.463683,
-    "ast_hash": "5c3ad46f28465935bca835cbbf1b7d66",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "ec620f3bdd4ceee5f10feb9f7bd6540d",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/ai-coach/index.txt": {
-    "mtime": 1794261204.463683,
-    "ast_hash": "787c040cf631ed6ddaf690e58d89fd9b",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "8f8e29c99eb2c7f48cd48aa74bba1370",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/competitions/index.html": {
-    "mtime": 1794261204.8692777,
-    "ast_hash": "436d91f324bac18dd819aa1b90cc0007",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "eeb8cbf9e1ec0f18207e16081fc676f6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/competitions/index.txt": {
-    "mtime": 1794261204.8692777,
-    "ast_hash": "006137830374cb7ac66a20177b6d7e79",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "c7c2aa67e8b4d284588f800905bfbda6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/health/index.html": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "10eb0dc7ec15954132652ac3028970aa",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "6df3763587a8db16e9fd1208c5ac1fa6",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/health/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "b0495c5053704fce0dad4cf68cc01bf5",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "b90045fe3ce930613861fa75f3be0066",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/index.html": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "3900bfb774c24d0d6496c33ad7c6e6c7",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "bd30975ab39cf53870de8d6f8216b480",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/performance/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "e28a424a18c3b3ec423106ff120b97d5",
+    "mtime": 1794973172.2023883,
+    "ast_hash": "79d617499387064b83c3864e91e2b993",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/drills/index.html": {
-    "mtime": 1794261204.4636261,
-    "ast_hash": "721bfa0078a603a957238ad74605d535",
+    "mtime": 1794973171.9750483,
+    "ast_hash": "cb588d2a97813a9c099341633ebd8cde",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/drills/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "4be014a2a52600a6cc93b042b58a6511",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "5dcf0384b9e5cd0743b6fa95defb6631",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/index.html": {
-    "mtime": 1794261205.1925714,
-    "ast_hash": "5ca6ffec80af039ff6fd8f3be6b69ca6",
+    "mtime": 1794973172.2333875,
+    "ast_hash": "c4ca8b48b0b045156a58cb5a6417f5d8",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/index.txt": {
-    "mtime": 1794261205.1925714,
-    "ast_hash": "b4013177e94523bbfcdf6afb59e7fced",
+    "mtime": 1794973172.2323873,
+    "ast_hash": "2ebd0eac5cde58a8cd1b8581b76b0d16",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/training-plan/index.html": {
-    "mtime": 1794261205.196572,
-    "ast_hash": "9fcd484f4d464d560ba70d247283cd75",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "aeda5534e8756775e0250329970bc11c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/planning/training-plan/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "5afcf31dc8df2b0e0b555e28d7f21097",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "86438a464fc519d4d8f14f7502340002",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/privacy-policy/index.html": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "d30fd15cb453b843f9b79ea56e7142ec",
+    "mtime": 1794973172.0576262,
+    "ast_hash": "aad1000033f66b525a4db98070206f99",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/privacy-policy/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "ec66c80d33c4b040c16f0a6d660c899f",
+    "mtime": 1794973172.0576262,
+    "ast_hash": "3035caf5626a5cb3a54c38f698f13fae",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/dashboard/index.html": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "a29b558a8de3252d01e470a1be024360",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "8d57b84418b4c55d15efd70fe3a311dd",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/dashboard/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "c36a76440157aec8253aa5b0e1d66e5d",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "f1d37948314581fcc830eb244d934dbc",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/financials/index.html": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "ef17059255d95daf932e9473876dc8a2",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "1dd76021d2659dd45a5650bb5a906e86",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/financials/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "e0c10e5e4ff86006f4527c3d5bb5440b",
+    "mtime": 1794973171.9760475,
+    "ast_hash": "17953e756e8293b55eaa91e6a174e197",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/operating-hours/index.html": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "22b3647e1a00596fc8d99bc2bb339efe",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "21b02fdaf2bc2d490b322b864fd787c2",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-admin/operating-hours/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "1cd86a580c0c30af5f27e85662f921e3",
+    "mtime": 1794973171.9740467,
+    "ast_hash": "faa0c0028ac704c12422fe4c39483161",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/bookings/index.html": {
-    "mtime": 1794261204.4785905,
-    "ast_hash": "d9e9e3678bf29794a513baa40f7ae7c2",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "28df7de0f07b10700f2a99d56ae83edb",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/bookings/index.txt": {
-    "mtime": 1794261204.4631164,
-    "ast_hash": "908aa238155015471dc55ff66543abe2",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "d27525c1796948befb911c566807688c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/dashboard/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "4d862270df66140ac9dd1791660c062f",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "b58f7caf295cb635d81f411c43df76af",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/dashboard/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "ed9e85d3428512ec123d73c877faf51f",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "a7a2fc53ef1edaa82ddc49ea57a12393",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/walk-in/index.html": {
-    "mtime": 1794261204.683278,
-    "ast_hash": "9a83ec11ca801b8787a47325c0b4b10c",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "924f186cd0b2642d3001f6019d0ea496",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/range-operator/walk-in/index.txt": {
-    "mtime": 1794261204.683278,
-    "ast_hash": "fec9005cdc12b73412037d57d11b4f58",
+    "mtime": 1794973172.2003865,
+    "ast_hash": "22c63037f1f7b969ba246027cbd27655",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/ranges/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "d6eaafa94b373bcefdb8b2591f888f26",
+    "mtime": 1794973172.16982,
+    "ast_hash": "3649147ccb950eb7a4e7b8c5913288e0",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/ranges/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "a462334ef3788a1427bdadf625af5c0a",
+    "mtime": 1794973172.16982,
+    "ast_hash": "63650f3296ebe98b087dbd83fb61db12",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/rso/dashboard/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "769e9357ccf7580928442bc01fdfffc7",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "37f47c75fd22606010d039e45abf9fac",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/rso/dashboard/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "5b9bff1951725183f1310b572812e463",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "2f5a972fcf6078892709873f75b2de9c",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/safety/index.html": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "9b295d26d6905bbc56558443df1e9434",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "b9aecada07e458d57b4fcd1377f3d403",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/safety/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "4474c4039f3178bc8d70f80b731ee521",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "b4e27c63edd526e23670c638a408a6a3",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/compare/index.html": {
-    "mtime": 1794261204.4575343,
-    "ast_hash": "2a6c24d405011fe47df7e8d559ec0430",
+    "mtime": 1794973172.2333875,
+    "ast_hash": "9edd4897750f1e4adf88d81883d1f0a9",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/compare/index.txt": {
-    "mtime": 1794261204.1793725,
-    "ast_hash": "1f4b83e979daa912d9e5eaa1da087e89",
+    "mtime": 1794973172.2333875,
+    "ast_hash": "7672bda80967d7e1f1acfabc4300fe78",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/index.html": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "178a802bbf6acc890d83802afa100aa7",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "aaedb9f1d7b1e515e3391d053cc25239",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "1e54611892bf35b6b42ee1bfe550b070",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "5bf4f6e8d14256fc496909bd92910d2a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/live/index.html": {
-    "mtime": 1794261204.683278,
-    "ast_hash": "ff26a65c75ed704909f64ea6624c03d3",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "4c6ed0ebf1dafa40a5cfd133e3d1ea53",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/live/index.txt": {
-    "mtime": 1794261204.683278,
-    "ast_hash": "bcfb76f47d34ccd684f64957699b06cf",
+    "mtime": 1794973172.2013893,
+    "ast_hash": "f1ffacfa37edf2fa240fc2f9c8a0e321",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/new/index.html": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "f8316bcd060d9b396df66c3218687b3f",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "cd42a33a6a2b1c3488a0e7af5c79080f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/new/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "ef2394c9fb0f17bf190984cdf3352d75",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "99f20f6bbd5a84b3cbe31abccc127ca4",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/sample/index.html": {
-    "mtime": 1794261205.196572,
-    "ast_hash": "bbbeadca2922c423c9a2b10a3333ca0b",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "51622089e687533b9d19c3e5e01aec80",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/sample/index.txt": {
-    "mtime": 1794261205.1955707,
-    "ast_hash": "b47bb23aeca9899b5f8bbac195c1d52d",
+    "mtime": 1794973172.2870727,
+    "ast_hash": "f0f7442f7b51d3ca71f6031931ce7d8f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/zen/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "c7f7b865a662f592ab9d865705189d04",
+    "mtime": 1794973172.0576262,
+    "ast_hash": "f50468bd665ada61b44ab849328f8d63",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/sessions/zen/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "31c8807e0b14d3840282804aac06243a",
+    "mtime": 1794973172.0446255,
+    "ast_hash": "893eec88cdf8c2b53218d8281348de9e",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/settings/index.html": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "ddbd747835141af2a8b388689e641d55",
+    "mtime": 1794973172.2860723,
+    "ast_hash": "42f33a099a9460d62ed8954dcc3652a4",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/settings/index.txt": {
-    "mtime": 1794261204.7402763,
-    "ast_hash": "3aaf871925300f84d5a8c9c907f79b2c",
+    "mtime": 1794973172.2860723,
+    "ast_hash": "e75e29ec35cf5a05c3e6ba85d247898f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/staff/dashboard/index.html": {
-    "mtime": 1794261205.1409352,
-    "ast_hash": "d80e64a9aabfa51cb0993b1949b7c54f",
+    "mtime": 1794973172.0576262,
+    "ast_hash": "2b6bce8c1c887b63e30ca40331275b9f",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/staff/dashboard/index.txt": {
-    "mtime": 1794261205.061778,
-    "ast_hash": "ffe8aef3e885c9276549e31dcf737866",
+    "mtime": 1794973172.0576262,
+    "ast_hash": "c51b945462915da9e0c67f6a6e0e16cc",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/staff/schedule/index.html": {
-    "mtime": 1794261205.060778,
-    "ast_hash": "090ebcec841acde556f1d34bd8a8ae46",
+    "mtime": 1794973172.0586295,
+    "ast_hash": "58c6d011a4b2c5f380a4a42ead7edfd4",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/staff/schedule/index.txt": {
-    "mtime": 1794261205.060778,
-    "ast_hash": "44da13dde1699d74a6622bea7ac8d0fd",
+    "mtime": 1794973172.0586295,
+    "ast_hash": "00c4d752be68494ad6144dc4669447ff",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/terms-of-service/index.html": {
-    "mtime": 1794261204.4605355,
-    "ast_hash": "fe6dd95011f5716190e9782d5f41add1",
+    "mtime": 1794973172.0586295,
+    "ast_hash": "4d9bf3543e63e4584c598326b5f92110",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/terms-of-service/index.txt": {
-    "mtime": 1794261204.4585342,
-    "ast_hash": "2f31905c2881a2a2e49eb16c69c8d4be",
+    "mtime": 1794973172.0586295,
+    "ast_hash": "a31c84a21e39504549fa2d5576152745",
     "semantic_hash": ""
   },
   "cloudflare-tunnel.yml": {
@@ -20925,8 +20110,423 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1794641253.567456,
-    "ast_hash": "a7a9ceb6303a430f28dec914a54fd8a9",
+    "mtime": 1794969082.5817933,
+    "ast_hash": "1298cc19f14f0a20d1e9dfc7b142363d",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/api/src/app.controller.ts": {
+    "mtime": 1794968558.2855768,
+    "ast_hash": "e1da8c501bca7fbfbc9f9f94549fcdba",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/live-analysis/page-bfe14f56cbee25fb.js": {
+    "mtime": 1794973152.2106972,
+    "ast_hash": "94f1026b04d381483378b10f55e11e65",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/live/page-0622868b90b4a2c9.js": {
+    "mtime": 1794973152.2096436,
+    "ast_hash": "11e09c930ca05a1e055f1a7f0a37f016",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/api/src/app.controller.ts": {
+    "mtime": 1794968549.0256717,
+    "ast_hash": "b5c2e54e0a40c98ec6281ec3ab8f3174",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/layout-67e3f360d8949cd0.js": {
+    "mtime": 1794972827.756033,
+    "ast_hash": "5aa78ac9ff9ae8bf47db0b38e10273f8",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/live-analysis/page-b967f722ac4ee3ac.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "8e4ec43d617d748757993fec5e103ca0",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/live/page-8d33eac78097f698.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "c5a77e2b0a57a6b5ce9ebb4b3a45e9bb",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/Zn4qxqKKj6gxzqsud9A0H/_buildManifest.js": {
+    "mtime": 1794973152.128585,
+    "ast_hash": "439d07f554779ce4ed844742571f3c87",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/Zn4qxqKKj6gxzqsud9A0H/_ssgManifest.js": {
+    "mtime": 1794973173.1506062,
+    "ast_hash": "c43e779dda44ec6b294e32bbfa0471b0",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/146-4f075ddc920f84a5.js": {
+    "mtime": 1794973152.2612758,
+    "ast_hash": "1c7cc7d48b4e78a729d241da53bedea2",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2063.b362cade779c914c.js": {
+    "mtime": 1794973152.2556846,
+    "ast_hash": "2c399872321a23a96982e7d45dac5369",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/2853-4438d9bac3648dda.js": {
+    "mtime": 1794973152.2622745,
+    "ast_hash": "607dcfc5b39b85a02180d09b55be6250",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3128.128abadb818703c0.js": {
+    "mtime": 1794973152.2556846,
+    "ast_hash": "c04835acbf424d293d95652d573b20f2",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/3688-c42b3b15c599a03d.js": {
+    "mtime": 1794973152.2602758,
+    "ast_hash": "92253299ed113e814549040f514ae0ed",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/4101.852b3efe5daccbc6.js": {
+    "mtime": 1794973152.2556846,
+    "ast_hash": "59533214d3f44a9400775352cfb9b1ca",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/7594-835ee530e44c1718.js": {
+    "mtime": 1794973152.2602758,
+    "ast_hash": "1e980d05072a7dd9e5f59105c0db1676",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9132.4215f07e9ebe3255.js": {
+    "mtime": 1794973152.2556846,
+    "ast_hash": "095264de3a2b25936294eca5b12e6c6f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/9401-150885ba4046d26e.js": {
+    "mtime": 1794973152.2622745,
+    "ast_hash": "5d3e52338db332ee91801f4b3d8a1132",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/admin/feedback/page-030c76d83206a86c.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "413bb7b2d5478fc35b7d4ad7d39d0e31",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/login/page-a971c4275d080272.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "66eb8274496b7cedefb93fcc8ce85901",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/register/page-7e082c63693a42be.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "0db179519b18c5b8e318021c42e91ea6",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ballistics/page-f80dedfba5fdde4b.js": {
+    "mtime": 1794973152.130585,
+    "ast_hash": "54fefd1d5a363a4ed5d0d1b4c6065c5e",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/bookings/page-a49d7c792f8b3714.js": {
+    "mtime": 1794973152.2106972,
+    "ast_hash": "c756d43a7bce3dd49b07b7114e131327",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/checkin/page-add43f0d7774daed.js": {
+    "mtime": 1794973152.130585,
+    "ast_hash": "dbf0a84e8594c096797e0d976b21273f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/connect/page-19f44c488492f5b9.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "754c4c91cbc260cbf800741c20bf2cf2",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/dashboard/page-e98446182a0be870.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "1ebdc6a903c7bc9ceed04cd617eaf51f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/delete-account/page-c80edad4106b230e.js": {
+    "mtime": 1794973152.1315854,
+    "ast_hash": "238be6a05f0ab1e08f7e33626bb1ad6c",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/equipment/page-6d47e9e5382a28b5.js": {
+    "mtime": 1794973152.1325881,
+    "ast_hash": "b374d0355df7fcebaba65227cdb34bce",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/lanes/config/page-43c88293b80a2fdf.js": {
+    "mtime": 1794973152.1335852,
+    "ast_hash": "6da2dc90dfd659543a39ae4f6ca7c33f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/lanes/page-d4ea577386052917.js": {
+    "mtime": 1794973152.1325881,
+    "ast_hash": "1f01359cf5120ca0e8b8e4ab67f8eecc",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/page-2e6eed8a4f87c04c.js": {
+    "mtime": 1794973152.1335852,
+    "ast_hash": "e51e8c9b7c8ba617e1b3562e6cfaca60",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-assistant/page-c9f8e90585504551.js": {
+    "mtime": 1794973152.2055895,
+    "ast_hash": "005aee61ef6ef48ab4a44375a82ee3a5",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-coach/page-613e7c39c024ff13.js": {
+    "mtime": 1794973152.2101655,
+    "ast_hash": "6eb3175013a2065be998eff702e25a82",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/health/page-59d0315fe6738a3d.js": {
+    "mtime": 1794973152.2055895,
+    "ast_hash": "056a4a3a99810fa7afbd6bfd359d1db0",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/training-plan/page-930bd61908bd7ba2.js": {
+    "mtime": 1794973152.2065845,
+    "ast_hash": "8c8207ff63b85697795a3382b38166e4",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-admin/operating-hours/page-4b896c16687d1b2c.js": {
+    "mtime": 1794973152.2075844,
+    "ast_hash": "6d6c20d7f3a2e832b3f2ae2731de4852",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/bookings/page-336795e9034f2f12.js": {
+    "mtime": 1794973152.2075844,
+    "ast_hash": "1ed238a4970cddf0618fc329d78c7e2b",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/dashboard/page-a0be26b52a4a39be.js": {
+    "mtime": 1794973152.2075844,
+    "ast_hash": "54925156e9106f7970ca47f885d0f138",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/range-operator/walk-in/page-b769377b4e77f2fa.js": {
+    "mtime": 1794973152.2075844,
+    "ast_hash": "f0130f2af28838e147054b6db6b91c4f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ranges/page-74fad9dbb5bd4ca5.js": {
+    "mtime": 1794973152.2075844,
+    "ast_hash": "4561b7b61f4218a1740cee84c69cf849",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/rso/dashboard/page-7a24424c36ac45b8.js": {
+    "mtime": 1794973152.2096436,
+    "ast_hash": "adfbb23fa9436a5689696055ed727dc4",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/safety/page-4367cf6ca06c65d0.js": {
+    "mtime": 1794973152.208586,
+    "ast_hash": "4a985379051c1064e0669721e5025381",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/[id]/page-a1520d2e2edb2914.js": {
+    "mtime": 1794973152.211684,
+    "ast_hash": "417be69acc153abe6db5c332df7854f3",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/compare/page-c36698e92592a5ff.js": {
+    "mtime": 1794973152.2096436,
+    "ast_hash": "c3bc8628e54cb6f4e661266b5c6e8f6a",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/new/page-5bfba151527c016e.js": {
+    "mtime": 1794973152.2101655,
+    "ast_hash": "1ca6f5067e6f9fb2501a4e9e25448061",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/page-c0e7ad3ad8600c83.js": {
+    "mtime": 1794973152.2096436,
+    "ast_hash": "0d3565408c914c963d3abb88f3e4d89c",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/zen/page-32f765458d1c600b.js": {
+    "mtime": 1794973152.2101655,
+    "ast_hash": "735011b2b8180724d49bee986259105d",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/settings/page-78a0aebc5730ab8f.js": {
+    "mtime": 1794973152.2101655,
+    "ast_hash": "02fbc37758535d514bbda8075f75e27f",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/staff/schedule/page-d58407556d1cbdb4.js": {
+    "mtime": 1794973152.2106972,
+    "ast_hash": "07eba11e80a0f4b32838aa602e66b8fc",
+    "semantic_hash": ""
+  },
+  "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/webpack-0e9ecbb554491e69.js": {
+    "mtime": 1794973152.211684,
+    "ast_hash": "8467290706c110057f49ccda2fc12903",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/146-5039c11550699782.js": {
+    "mtime": 1794972827.7730343,
+    "ast_hash": "acac372f7662763e93795cf67e57c730",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/2063.b362cade779c914c.js": {
+    "mtime": 1794972827.768034,
+    "ast_hash": "2c399872321a23a96982e7d45dac5369",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/3128.a111277068e7fabb.js": {
+    "mtime": 1794972827.7670326,
+    "ast_hash": "e231b62dcf4d8666a1bb8bb354480195",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/4101.5d76ee0cca4e59c4.js": {
+    "mtime": 1794972827.7670326,
+    "ast_hash": "eb3071d2b883311a4974299598f7e190",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/7594-f872335579cc08a1.js": {
+    "mtime": 1794972827.7730343,
+    "ast_hash": "f75d8e5f42b69fe36a00e7f2a9346c1a",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/8307-b041adc1deed6578.js": {
+    "mtime": 1794972827.7740343,
+    "ast_hash": "5c14cb210c27b851c36ad870021f737b",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/9132.4215f07e9ebe3255.js": {
+    "mtime": 1794972827.7670326,
+    "ast_hash": "095264de3a2b25936294eca5b12e6c6f",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/(dashboard)/armory/page-c38bd115725aedb8.js": {
+    "mtime": 1794972827.758033,
+    "ast_hash": "efee83b7e4b79567c2aa61aa2d69e1ac",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/(dashboard)/profile/page-2b02912ec9ee3985.js": {
+    "mtime": 1794972827.758033,
+    "ast_hash": "c5368f2a7fc61f18e1334bf67cce9cee",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/admin/feedback/page-52840429703008de.js": {
+    "mtime": 1794972827.758033,
+    "ast_hash": "ef4a2f73523637923c499be17eb6f2d1",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/auth/login/page-dc0a8cfb903bad85.js": {
+    "mtime": 1794972827.758033,
+    "ast_hash": "31f638259f980257fd9eaecee3fe0306",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ballistics/page-66cf31db8271996e.js": {
+    "mtime": 1794972827.759032,
+    "ast_hash": "92c2ce138fa8608b78a5116d754c59d7",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/connect/page-143359626d3099ac.js": {
+    "mtime": 1794972827.758033,
+    "ast_hash": "effffc5ee7bd4139eb4da05c9fee0296",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/dashboard/page-5018ff2fd57dfe2f.js": {
+    "mtime": 1794972827.759032,
+    "ast_hash": "9e86de661ff6d79a0a527367714fcb90",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/page-6b7768cc5c710a7f.js": {
+    "mtime": 1794972827.759032,
+    "ast_hash": "9221ecebb027f4c4d9172ef597c79561",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-assistant/page-6537c6bbcccbec43.js": {
+    "mtime": 1794972827.7600324,
+    "ast_hash": "8bdb0c8eafad97a085e9bf6d3ee3518a",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/ai-coach/page-294973d19b1e7fd4.js": {
+    "mtime": 1794972827.761033,
+    "ast_hash": "d2ff4127a0d4bfb7cc5b6db64b2735e1",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/competitions/page-98cc9b351eff0c03.js": {
+    "mtime": 1794972827.7600324,
+    "ast_hash": "192697fcc845f21fed2cdd8b6b29b36d",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/performance/health/page-da486ca26031b1a0.js": {
+    "mtime": 1794972827.7620313,
+    "ast_hash": "97303e6b6122cdabade92765bdd9add4",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/drills/page-61611394dbc4b940.js": {
+    "mtime": 1794972827.761033,
+    "ast_hash": "e625f23be3c13e8d50ab95db3a4dcab2",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/planning/training-plan/page-bfb6e032441c9fb8.js": {
+    "mtime": 1794972827.761033,
+    "ast_hash": "9ead0dfa938fd892d2a724feb3fe3199",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/ranges/page-926da870fd4cd84f.js": {
+    "mtime": 1794972827.761033,
+    "ast_hash": "2b250ab96ec0b5ad3a89d859783a8f90",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/[id]/page-8d28445598ebc1e4.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "ae9d242f284dbe2db6b79b3d468ec2b1",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/compare/page-50ca5d0171eb0f35.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "3e6a7db57c533d8432a35657a1a9e083",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/new/page-7e9f66772a39d8e2.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "ce8afd0c706d7f49ebde0104d9960965",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/page-04c92b8d1c617ffa.js": {
+    "mtime": 1794972827.7620313,
+    "ast_hash": "bae6139d9e3d6bb75dece13c64d95afc",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/sessions/zen/page-1a5df04d3f76e2bf.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "058e14abaf2124df73b51289804adf00",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/app/settings/page-67a9e9d592057bb2.js": {
+    "mtime": 1794972827.7620313,
+    "ast_hash": "f7c5a20fc4a991317e9bdda49a462f1f",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/main-73e76b162b96d11b.js": {
+    "mtime": 1794972827.7430348,
+    "ast_hash": "5f30c815785e6d737105d9d0d7f2d96f",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/webpack-4d493fcd53a7e87c.js": {
+    "mtime": 1794972827.7630317,
+    "ast_hash": "8ca489388f7379956237bdf1ef5cffb7",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/pP2RrO0dFSUZoq3j-U6u-/_buildManifest.js": {
+    "mtime": 1794972827.7430348,
+    "ast_hash": "9ddfeab363464aacf4de71096d1e38b6",
+    "semantic_hash": ""
+  },
+  "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/pP2RrO0dFSUZoq3j-U6u-/_ssgManifest.js": {
+    "mtime": 1794972852.8506804,
+    "ast_hash": "c43e779dda44ec6b294e32bbfa0471b0",
+    "semantic_hash": ""
+  },
+  "Shooter_App/DESIGN_SYSTEM.md": {
+    "mtime": 1794972680.0137217,
+    "ast_hash": "86b0d8b7b03a9536e0ca2cb26c7c8a50",
     "semantic_hash": ""
   }
 }

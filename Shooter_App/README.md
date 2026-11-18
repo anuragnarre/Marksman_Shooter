@@ -177,7 +177,7 @@ Built with **Next.js 15**, **NestJS**, **Prisma**, **PostgreSQL**, and a **Pytho
 │   └── shared-types/
 │       └── index.ts
 │
-├── CLAUDE.md                     ← Claude Code design system guide
+├── DESIGN_SYSTEM.md              ← Design system guide
 ├── DESIGN.md                     ← Homepage audit & fix specs
 ├── .env.example
 └── package.json
@@ -190,7 +190,7 @@ Built with **Next.js 15**, **NestJS**, **Prisma**, **PostgreSQL**, and a **Pytho
 **Aesthetic: Dark Luxury Precision** — high-contrast readability in low-light environments.
 Built for serious athletes, not casual consumers.
 
-> For full design system documentation used with Claude Code, see [`CLAUDE.md`](./CLAUDE.md).
+> For full design system documentation, see [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 > For the homepage-specific audit and fix specs, see [`DESIGN.md`](./DESIGN.md).
 
 ### Color Tokens
@@ -499,7 +499,7 @@ Consistency      =  10 − stdDev × 2   (clamped 0–10)
 ## Contributing
 
 1. Fork and clone the repo
-2. Follow the [Design System](./CLAUDE.md) and [Homepage Specs](./DESIGN.md)
+2. Follow the [Design System](./DESIGN_SYSTEM.md) and [Homepage Specs](./DESIGN.md)
 3. Run `npm run dev` to start all services
 4. Open a PR against `main`
 

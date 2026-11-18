@@ -10,7 +10,7 @@
   "scripts": {
     "dev:api": "cd apps/api && npm run start:dev",
     "dev:web": "cd apps/web && npm run dev",
-    "dev:vision": "cd apps/vision && .venv-linux/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000",
+    "dev:vision": "node -e \"const fs=require('fs'),{execFileSync}=require('child_process');const p=['apps/vision/venv/Scripts/python.exe','apps/vision/.venv-linux/bin/python','apps/vision/.venv/bin/python'].find(f=>fs.existsSync(f))||'python';execFileSync(p,['-m','uvicorn','main:app','--host','0.0.0.0','--port','8000'],{cwd:'apps/vision',stdio:'inherit'});\"",
     "build:shared": "cd packages/shared-types && npm run build",
     "build:api": "npm run build:shared && cd apps/api && npm run build",
     "build:web": "npm run build:shared && cd apps/web && npm run build",

@@ -1,4 +1,4 @@
-# mobile-dev.ps1
+﻿# mobile-dev.ps1
 # Run as Administrator on Windows to expose the WSL2 dev server to your LAN.
 # Usage: Right-click -> "Run with PowerShell" (as Admin), or:
 #   powershell -ExecutionPolicy Bypass -File mobile-dev.ps1

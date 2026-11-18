@@ -6,6 +6,6 @@ echo   - Web UI: http://localhost:3002
 echo   - API:    http://localhost:3003
 echo ===================================================
 echo.
-start "Range API (:3003)" cmd /k "cd /d %~dp0Range_Management\apps\api && npm run start:dev"
-start "Range Web (:3002)" cmd /k "cd /d %~dp0Range_Management\apps\web && npm run dev"
+start "Range API (:3003)" cmd /k "cd /d "%~dp0Range_Management\apps\api" && npm.cmd run start:dev"
+start "Range Web (:3002)" cmd /k "cd /d "%~dp0Range_Management\apps\web" && npm.cmd run dev"
 echo Range Management App started in separate windows!
