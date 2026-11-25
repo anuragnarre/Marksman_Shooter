@@ -182,7 +182,16 @@ function Ensure-Postgres {
                 Start-Service -Name $pgService.Name -ErrorAction Stop
                 $pgStartedOk = $true
             } catch {
-                Write-Host " ${cYellow}[ADMIN REQUIRED - run elevated to start $($pgService.Name)]${cReset}"
+                Write-Host " ${cYellow}[Requesting UAC elevation for $($pgService.Name)...]${cReset}" -NoNewline
+                try {
+                    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "-NoProfile -Command `"Start-Service -Name '$($pgService.Name)'`"" -Wait -ErrorAction Stop
+                    $pgService.Refresh()
+                    if ($pgService.Status -eq 'Running') {
+                        $pgStartedOk = $true
+                    }
+                } catch {
+                    Write-Host " ${cYellow}[UAC CANCELLED - falling back to Docker]${cReset}"
+                }
             }
         }
         if ($pgStartedOk) {

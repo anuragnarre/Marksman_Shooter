@@ -8271,7 +8271,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L1",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer",
-      "community": 169,
+      "community": 872,
       "norm_label": "analyzer.py"
     },
     {
@@ -8280,7 +8280,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L48",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_scale_calibration",
-      "community": 169,
+      "community": 872,
       "norm_label": "_scale_calibration()"
     },
     {
@@ -8289,7 +8289,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L48",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_targetcalibration",
-      "community": 169,
+      "community": 872,
       "norm_label": "targetcalibration"
     },
     {
@@ -8298,7 +8298,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L73",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_analyze_target_image",
-      "community": 169,
+      "community": 872,
       "norm_label": "analyze_target_image()"
     },
     {
@@ -8307,7 +8307,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L73",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_analysisresponse",
-      "community": 169,
+      "community": 872,
       "norm_label": "analysisresponse"
     },
     {
@@ -8316,7 +8316,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L369",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_draw_debug",
-      "community": 169,
+      "community": 872,
       "norm_label": "_draw_debug()"
     },
     {
@@ -8325,7 +8325,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L1",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_rationale_1",
-      "community": 169,
+      "community": 872,
       "norm_label": "shot detection pipeline orchestrator.  multi-stage local cv pipeline (v5 \u2014 cla"
     },
     {
@@ -8334,7 +8334,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L49",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_rationale_49",
-      "community": 169,
+      "community": 872,
       "norm_label": "scale spatial calibration fields when the working image is resized.      pixel"
     },
     {
@@ -8343,7 +8343,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L80",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_rationale_80",
-      "community": 169,
+      "community": 872,
       "norm_label": "full analysis pipeline."
     },
     {
@@ -8352,7 +8352,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/analyzer.py",
       "source_location": "L370",
       "id": "range_app_shooter_app_apps_vision_analyzer_py_vision_analyzer_rationale_370",
-      "community": 169,
+      "community": 872,
       "norm_label": "draw detected holes and scores on debug output."
     },
     {
@@ -8487,7 +8487,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/models.py",
       "source_location": "L1",
       "id": "range_app_shooter_app_apps_vision_models_py_vision_models",
-      "community": 872,
+      "community": 169,
       "norm_label": "models.py"
     },
     {
@@ -8496,7 +8496,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/models.py",
       "source_location": "L6",
       "id": "range_app_shooter_app_apps_vision_models_py_vision_models_shotresult",
-      "community": 872,
+      "community": 169,
       "norm_label": "shotresult"
     },
     {
@@ -8505,7 +8505,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basemodel",
-      "community": 872,
+      "community": 169,
       "norm_label": "basemodel"
     },
     {
@@ -8514,7 +8514,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/models.py",
       "source_location": "L19",
       "id": "range_app_shooter_app_apps_vision_models_py_vision_models_analysisresponse",
-      "community": 872,
+      "community": 169,
       "norm_label": "analysisresponse"
     },
     {
@@ -8523,7 +8523,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/models.py",
       "source_location": "L7",
       "id": "range_app_shooter_app_apps_vision_models_py_vision_models_rationale_7",
-      "community": 872,
+      "community": 169,
       "norm_label": "a single detected bullet hole mapped to target coordinates."
     },
     {
@@ -8532,7 +8532,7 @@
       "source_file": "Range_App/Shooter_App/apps/vision/models.py",
       "source_location": "L20",
       "id": "range_app_shooter_app_apps_vision_models_py_vision_models_rationale_20",
-      "community": 872,
+      "community": 169,
       "norm_label": "full response returned by post /analyze."
     },
     {
@@ -36305,7 +36305,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_o",
-      "community": 424,
+      "community": 236,
       "norm_label": "o()"
     },
     {
@@ -36341,7 +36341,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_tv",
-      "community": 424,
+      "community": 236,
       "norm_label": "tv()"
     },
     {
@@ -36368,7 +36368,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_tg",
-      "community": 424,
+      "community": 236,
       "norm_label": "tg()"
     },
     {
@@ -36503,7 +36503,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_t5",
-      "community": 1403,
+      "community": 236,
       "norm_label": "t5()"
     },
     {
@@ -36512,7 +36512,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_t7",
-      "community": 1403,
+      "community": 149,
       "norm_label": "t7()"
     },
     {
@@ -36521,7 +36521,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_nn",
-      "community": 1403,
+      "community": 236,
       "norm_label": "nn()"
     },
     {
@@ -36530,7 +36530,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_nr",
-      "community": 1403,
+      "community": 149,
       "norm_label": "nr()"
     },
     {
@@ -36539,7 +36539,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_ni",
-      "community": 1403,
+      "community": 149,
       "norm_label": "ni()"
     },
     {
@@ -36656,7 +36656,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-aaffb86770681860.js",
       "source_location": "L1",
       "id": "chunks_575_aaffb86770681860_nj",
-      "community": 1403,
+      "community": 149,
       "norm_label": "nj()"
     },
     {
@@ -52136,7 +52136,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_er",
-      "community": 70,
+      "community": 263,
       "norm_label": "er()"
     },
     {
@@ -52145,7 +52145,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_ei",
-      "community": 70,
+      "community": 263,
       "norm_label": "ei()"
     },
     {
@@ -53189,7 +53189,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_te",
-      "community": 70,
+      "community": 263,
       "norm_label": "te()"
     },
     {
@@ -53540,7 +53540,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8",
-      "community": 135,
+      "community": 263,
       "norm_label": "t8"
     },
     {
@@ -53549,7 +53549,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_constructor",
-      "community": 135,
+      "community": 263,
       "norm_label": ".constructor()"
     },
     {
@@ -53558,7 +53558,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_remove",
-      "community": 135,
+      "community": 263,
       "norm_label": ".remove()"
     },
     {
@@ -53567,7 +53567,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_refetch",
-      "community": 135,
+      "community": 263,
       "norm_label": ".refetch()"
     },
     {
@@ -53576,7 +53576,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_id",
-      "community": 135,
+      "community": 263,
       "norm_label": ".id()"
     },
     {
@@ -53585,7 +53585,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_url",
-      "community": 135,
+      "community": 263,
       "norm_label": ".url()"
     },
     {
@@ -53594,7 +53594,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_format",
-      "community": 135,
+      "community": 263,
       "norm_label": ".format()"
     },
     {
@@ -53702,7 +53702,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t9_formatrange",
-      "community": 135,
+      "community": 263,
       "norm_label": ".formatrange()"
     },
     {
@@ -54017,7 +54017,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_na",
-      "community": 221,
+      "community": 263,
       "norm_label": "na()"
     },
     {
@@ -54089,7 +54089,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_na_constructor",
-      "community": 221,
+      "community": 263,
       "norm_label": ".constructor()"
     },
     {
@@ -55241,7 +55241,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_n9",
-      "community": 135,
+      "community": 2,
       "norm_label": "n9"
     },
     {
@@ -55250,7 +55250,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_n9_render",
-      "community": 135,
+      "community": 2,
       "norm_label": ".render()"
     },
     {
@@ -55277,7 +55277,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rt",
-      "community": 596,
+      "community": 364,
       "norm_label": "rt"
     },
     {
@@ -55286,7 +55286,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rt_constructor",
-      "community": 596,
+      "community": 364,
       "norm_label": ".constructor()"
     },
     {
@@ -55295,7 +55295,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rt_render",
-      "community": 596,
+      "community": 364,
       "norm_label": ".render()"
     },
     {
@@ -55313,7 +55313,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr",
-      "community": 70,
+      "community": 263,
       "norm_label": "rr"
     },
     {
@@ -55331,7 +55331,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr_slicerange",
-      "community": 70,
+      "community": 263,
       "norm_label": ".slicerange()"
     },
     {
@@ -55340,7 +55340,7 @@
       "source_file": "Range_Management/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "range_management_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr_getdatedayindex",
-      "community": 70,
+      "community": 263,
       "norm_label": ".getdatedayindex()"
     },
     {
@@ -64853,7 +64853,7 @@
       "source_file": "Range_Management/apps/web/components/dashboard/KpiGrid.tsx",
       "source_location": "L1",
       "id": "range_management_apps_web_components_dashboard_kpigrid_tsx_dashboard_kpigrid",
-      "community": 83,
+      "community": 1171,
       "norm_label": "kpigrid.tsx"
     },
     {
@@ -64862,7 +64862,7 @@
       "source_file": "Range_Management/apps/web/components/dashboard/KpiGrid.tsx",
       "source_location": "L6",
       "id": "range_management_apps_web_components_dashboard_kpigrid_tsx_dashboard_kpigrid_kpigrid",
-      "community": 83,
+      "community": 1171,
       "norm_label": "kpigrid()"
     },
     {
@@ -64988,7 +64988,7 @@
       "source_file": "Range_Management/apps/web/components/dashboard/RightPanel.tsx",
       "source_location": "L1",
       "id": "range_management_apps_web_components_dashboard_rightpanel_tsx_dashboard_rightpanel",
-      "community": 83,
+      "community": 1171,
       "norm_label": "rightpanel.tsx"
     },
     {
@@ -64997,7 +64997,7 @@
       "source_file": "Range_Management/apps/web/components/dashboard/RightPanel.tsx",
       "source_location": "L7",
       "id": "range_management_apps_web_components_dashboard_rightpanel_tsx_dashboard_rightpanel_rightpanelprops",
-      "community": 83,
+      "community": 1171,
       "norm_label": "rightpanelprops"
     },
     {
@@ -65006,7 +65006,7 @@
       "source_file": "Range_Management/apps/web/components/dashboard/RightPanel.tsx",
       "source_location": "L13",
       "id": "range_management_apps_web_components_dashboard_rightpanel_tsx_dashboard_rightpanel_rightpanel",
-      "community": 83,
+      "community": 1171,
       "norm_label": "rightpanel()"
     },
     {
@@ -66221,7 +66221,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyDark.tsx",
       "source_location": "L1",
       "id": "range_management_apps_web_components_safety_safetydark_tsx_safety_safetydark",
-      "community": 83,
+      "community": 1171,
       "norm_label": "safetydark.tsx"
     },
     {
@@ -66230,7 +66230,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyDark.tsx",
       "source_location": "L7",
       "id": "safety_safetydark_downloadtextfile",
-      "community": 83,
+      "community": 1171,
       "norm_label": "downloadtextfile()"
     },
     {
@@ -66239,7 +66239,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyDark.tsx",
       "source_location": "L24",
       "id": "range_management_apps_web_components_safety_safetydark_tsx_safety_safetydark_safetydark",
-      "community": 83,
+      "community": 1171,
       "norm_label": "safetydark()"
     },
     {
@@ -66248,7 +66248,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyLight.tsx",
       "source_location": "L1",
       "id": "range_management_apps_web_components_safety_safetylight_tsx_safety_safetylight",
-      "community": 83,
+      "community": 1171,
       "norm_label": "safetylight.tsx"
     },
     {
@@ -66257,7 +66257,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyLight.tsx",
       "source_location": "L7",
       "id": "safety_safetylight_downloadtextfile",
-      "community": 83,
+      "community": 1171,
       "norm_label": "downloadtextfile()"
     },
     {
@@ -66266,7 +66266,7 @@
       "source_file": "Range_Management/apps/web/components/safety/SafetyLight.tsx",
       "source_location": "L22",
       "id": "range_management_apps_web_components_safety_safetylight_tsx_safety_safetylight_safetylight",
-      "community": 83,
+      "community": 1171,
       "norm_label": "safetylight()"
     },
     {
@@ -67103,7 +67103,7 @@
       "source_file": "Range_Management/apps/web/components/ui/TacticalIcons.tsx",
       "source_location": "L328",
       "id": "ui_tacticalicons_materialicon",
-      "community": 83,
+      "community": 1171,
       "norm_label": "materialicon()"
     },
     {
@@ -67148,7 +67148,7 @@
       "source_file": "Range_Management/apps/web/components/vision/LiveVisionLight.tsx",
       "source_location": "L1",
       "id": "vision_livevisionlight",
-      "community": 83,
+      "community": 294,
       "norm_label": "livevisionlight.tsx"
     },
     {
@@ -67157,7 +67157,7 @@
       "source_file": "Range_Management/apps/web/components/vision/LiveVisionLight.tsx",
       "source_location": "L12",
       "id": "vision_livevisionlight_lanedata",
-      "community": 83,
+      "community": 294,
       "norm_label": "lanedata"
     },
     {
@@ -67175,7 +67175,7 @@
       "source_file": "Range_Management/apps/web/components/vision/StreamTunerModal.tsx",
       "source_location": "L1",
       "id": "vision_streamtunermodal",
-      "community": 83,
+      "community": 294,
       "norm_label": "streamtunermodal.tsx"
     },
     {
@@ -67184,7 +67184,7 @@
       "source_file": "Range_Management/apps/web/components/vision/StreamTunerModal.tsx",
       "source_location": "L19",
       "id": "vision_streamtunermodal_streamtunermodalprops",
-      "community": 83,
+      "community": 294,
       "norm_label": "streamtunermodalprops"
     },
     {
@@ -67193,7 +67193,7 @@
       "source_file": "Range_Management/apps/web/components/vision/StreamTunerModal.tsx",
       "source_location": "L29",
       "id": "vision_streamtunermodal_streamtunermodal",
-      "community": 83,
+      "community": 294,
       "norm_label": "streamtunermodal()"
     },
     {
@@ -79976,7 +79976,7 @@
       "source_file": "Shooter_App/apps/vision/models.py",
       "source_location": "L1",
       "id": "shooter_app_apps_vision_models_py_vision_models",
-      "community": 872,
+      "community": 169,
       "norm_label": "models.py"
     },
     {
@@ -79985,7 +79985,7 @@
       "source_file": "Shooter_App/apps/vision/models.py",
       "source_location": "L6",
       "id": "shooter_app_apps_vision_models_py_vision_models_shotresult",
-      "community": 872,
+      "community": 169,
       "norm_label": "shotresult"
     },
     {
@@ -79994,7 +79994,7 @@
       "source_file": "Shooter_App/apps/vision/models.py",
       "source_location": "L19",
       "id": "shooter_app_apps_vision_models_py_vision_models_analysisresponse",
-      "community": 872,
+      "community": 169,
       "norm_label": "analysisresponse"
     },
     {
@@ -80003,7 +80003,7 @@
       "source_file": "Shooter_App/apps/vision/models.py",
       "source_location": "L7",
       "id": "shooter_app_apps_vision_models_py_vision_models_rationale_7",
-      "community": 872,
+      "community": 169,
       "norm_label": "a single detected bullet hole mapped to target coordinates."
     },
     {
@@ -80012,7 +80012,7 @@
       "source_file": "Shooter_App/apps/vision/models.py",
       "source_location": "L20",
       "id": "shooter_app_apps_vision_models_py_vision_models_rationale_20",
-      "community": 872,
+      "community": 169,
       "norm_label": "full response returned by post /analyze."
     },
     {
@@ -87400,7 +87400,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_j",
-      "community": 1179,
+      "community": 352,
       "norm_label": "j()"
     },
     {
@@ -87679,7 +87679,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_e5",
-      "community": 1179,
+      "community": 352,
       "norm_label": "e5()"
     },
     {
@@ -87832,7 +87832,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_i",
-      "community": 1179,
+      "community": 352,
       "norm_label": "i()"
     },
     {
@@ -87868,7 +87868,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_tv",
-      "community": 1179,
+      "community": 352,
       "norm_label": "tv()"
     },
     {
@@ -87895,7 +87895,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_tg",
-      "community": 1179,
+      "community": 352,
       "norm_label": "tg()"
     },
     {
@@ -87976,7 +87976,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t1",
-      "community": 1016,
+      "community": 334,
       "norm_label": "t1()"
     },
     {
@@ -87985,7 +87985,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t3",
-      "community": 1016,
+      "community": 352,
       "norm_label": "t3()"
     },
     {
@@ -88012,7 +88012,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t4",
-      "community": 1016,
+      "community": 334,
       "norm_label": "t4()"
     },
     {
@@ -88021,7 +88021,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t5",
-      "community": 1016,
+      "community": 334,
       "norm_label": "t5()"
     },
     {
@@ -88030,7 +88030,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t6",
-      "community": 1016,
+      "community": 352,
       "norm_label": "t6()"
     },
     {
@@ -88039,7 +88039,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_t7",
-      "community": 1016,
+      "community": 170,
       "norm_label": "t7()"
     },
     {
@@ -88048,7 +88048,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_nn",
-      "community": 1016,
+      "community": 170,
       "norm_label": "nn()"
     },
     {
@@ -88057,7 +88057,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_nr",
-      "community": 1016,
+      "community": 170,
       "norm_label": "nr()"
     },
     {
@@ -88066,7 +88066,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_no",
-      "community": 1016,
+      "community": 170,
       "norm_label": "no()"
     },
     {
@@ -88093,7 +88093,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_ns",
-      "community": 1179,
+      "community": 352,
       "norm_label": "ns()"
     },
     {
@@ -88183,7 +88183,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/575-43cac0b5f14b90c1.js",
       "source_location": "L1",
       "id": "chunks_575_43cac0b5f14b90c1_nj",
-      "community": 1016,
+      "community": 170,
       "norm_label": "nj()"
     },
     {
@@ -96436,7 +96436,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_ek",
-      "community": 12,
+      "community": 268,
       "norm_label": "ek()"
     },
     {
@@ -96643,7 +96643,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_ny",
-      "community": 54,
+      "community": 268,
       "norm_label": "ny()"
     },
     {
@@ -96751,7 +96751,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_tg",
-      "community": 12,
+      "community": 268,
       "norm_label": "tg()"
     },
     {
@@ -96796,7 +96796,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_te",
-      "community": 12,
+      "community": 268,
       "norm_label": "te()"
     },
     {
@@ -96805,7 +96805,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_tz",
-      "community": 12,
+      "community": 268,
       "norm_label": "tz()"
     },
     {
@@ -96814,7 +96814,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_tc",
-      "community": 12,
+      "community": 268,
       "norm_label": "tc()"
     },
     {
@@ -96832,7 +96832,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_tl",
-      "community": 126,
+      "community": 12,
       "norm_label": "tl()"
     },
     {
@@ -96841,7 +96841,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_tt",
-      "community": 126,
+      "community": 12,
       "norm_label": "tt()"
     },
     {
@@ -96850,7 +96850,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_t",
-      "community": 126,
+      "community": 12,
       "norm_label": "t_()"
     },
     {
@@ -97183,7 +97183,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_lc",
-      "community": 12,
+      "community": 324,
       "norm_label": "lc()"
     },
     {
@@ -97210,7 +97210,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_lm",
-      "community": 12,
+      "community": 324,
       "norm_label": "lm()"
     },
     {
@@ -97219,7 +97219,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_ly",
-      "community": 12,
+      "community": 324,
       "norm_label": "ly()"
     },
     {
@@ -98272,7 +98272,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_ic",
-      "community": 126,
+      "community": 12,
       "norm_label": "ic()"
     },
     {
@@ -98443,7 +98443,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_ij",
-      "community": 54,
+      "community": 268,
       "norm_label": "ij()"
     },
     {
@@ -98479,7 +98479,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_i5",
-      "community": 54,
+      "community": 12,
       "norm_label": "i5()"
     },
     {
@@ -98488,7 +98488,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/87c73c54-09e1ba5c70e60a51.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_87c73c54_09e1ba5c70e60a51_js_chunks_87c73c54_09e1ba5c70e60a51_i7",
-      "community": 54,
+      "community": 12,
       "norm_label": "i7()"
     },
     {
@@ -103285,7 +103285,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_en",
-      "community": 759,
+      "community": 229,
       "norm_label": "en()"
     },
     {
@@ -103294,7 +103294,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_er",
-      "community": 5,
+      "community": 31,
       "norm_label": "er()"
     },
     {
@@ -103303,7 +103303,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_ei",
-      "community": 5,
+      "community": 31,
       "norm_label": "ei()"
     },
     {
@@ -103492,7 +103492,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_en_constructor",
-      "community": 759,
+      "community": 229,
       "norm_label": ".constructor()"
     },
     {
@@ -103501,7 +103501,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_en_format",
-      "community": 759,
+      "community": 229,
       "norm_label": ".format()"
     },
     {
@@ -103510,7 +103510,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_en_formatrange",
-      "community": 759,
+      "community": 229,
       "norm_label": ".formatrange()"
     },
     {
@@ -104347,7 +104347,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_te",
-      "community": 5,
+      "community": 31,
       "norm_label": "te()"
     },
     {
@@ -104698,7 +104698,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8",
-      "community": 759,
+      "community": 37,
       "norm_label": "t8"
     },
     {
@@ -104707,7 +104707,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_constructor",
-      "community": 759,
+      "community": 37,
       "norm_label": ".constructor()"
     },
     {
@@ -104716,7 +104716,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_remove",
-      "community": 759,
+      "community": 37,
       "norm_label": ".remove()"
     },
     {
@@ -104725,7 +104725,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_refetch",
-      "community": 759,
+      "community": 37,
       "norm_label": ".refetch()"
     },
     {
@@ -104734,7 +104734,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_id",
-      "community": 759,
+      "community": 37,
       "norm_label": ".id()"
     },
     {
@@ -104743,7 +104743,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_url",
-      "community": 759,
+      "community": 37,
       "norm_label": ".url()"
     },
     {
@@ -104752,7 +104752,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t8_format",
-      "community": 759,
+      "community": 37,
       "norm_label": ".format()"
     },
     {
@@ -104860,7 +104860,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_t9_formatrange",
-      "community": 759,
+      "community": 37,
       "norm_label": ".formatrange()"
     },
     {
@@ -105175,7 +105175,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_na",
-      "community": 759,
+      "community": 37,
       "norm_label": "na()"
     },
     {
@@ -105247,7 +105247,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_na_constructor",
-      "community": 759,
+      "community": 37,
       "norm_label": ".constructor()"
     },
     {
@@ -106399,7 +106399,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_n9",
-      "community": 759,
+      "community": 48,
       "norm_label": "n9"
     },
     {
@@ -106408,7 +106408,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_n9_render",
-      "community": 759,
+      "community": 48,
       "norm_label": ".render()"
     },
     {
@@ -106471,7 +106471,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr",
-      "community": 759,
+      "community": 31,
       "norm_label": "rr"
     },
     {
@@ -106489,7 +106489,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr_slicerange",
-      "community": 759,
+      "community": 31,
       "norm_label": ".slicerange()"
     },
     {
@@ -106498,7 +106498,7 @@
       "source_file": "Shooter_App/apps/web/android/app/src/main/assets/public/_next/static/chunks/c6ab2f3e.718ea100465e41a7.js",
       "source_location": "L1",
       "id": "shooter_app_apps_web_android_app_src_main_assets_public_next_static_chunks_c6ab2f3e_718ea100465e41a7_js_chunks_c6ab2f3e_718ea100465e41a7_rr_getdatedayindex",
-      "community": 759,
+      "community": 31,
       "norm_label": ".getdatedayindex()"
     },
     {
@@ -122806,7 +122806,7 @@
       "source_file": "Target_Camera_App/android/app/src/main/java/com/anonymous/Target_Camera_App/TargetHardwareModule.kt",
       "source_location": "L361",
       "id": "target_camera_app_targethardwaremodule_targethardwaremodule_findpreviewtarget",
-      "community": 165,
+      "community": 138,
       "norm_label": ".findpreviewtarget()"
     },
     {
@@ -122815,7 +122815,7 @@
       "source_file": "Target_Camera_App/android/app/src/main/java/com/anonymous/Target_Camera_App/TargetHardwareModule.kt",
       "source_location": "L361",
       "id": "activity",
-      "community": 165,
+      "community": 138,
       "norm_label": "activity"
     },
     {
@@ -122842,7 +122842,7 @@
       "source_file": "Target_Camera_App/android/app/src/main/java/com/anonymous/Target_Camera_App/TargetHardwareModule.kt",
       "source_location": "L505",
       "id": "target_camera_app_targethardwaremodule_targethardwaremodule_computequadhomography",
-      "community": 1336,
+      "community": 165,
       "norm_label": ".computequadhomography()"
     },
     {
@@ -122851,7 +122851,7 @@
       "source_file": "Target_Camera_App/android/app/src/main/java/com/anonymous/Target_Camera_App/TargetHardwareModule.kt",
       "source_location": "L505",
       "id": "float",
-      "community": 1336,
+      "community": 165,
       "norm_label": "float"
     },
     {
@@ -122860,7 +122860,7 @@
       "source_file": "Target_Camera_App/android/app/src/main/java/com/anonymous/Target_Camera_App/TargetHardwareModule.kt",
       "source_location": "L505",
       "id": "doublearray",
-      "community": 1336,
+      "community": 165,
       "norm_label": "doublearray"
     },
     {
@@ -151124,7 +151124,7 @@
       "label": "Ensure-MonorepoArtifacts()",
       "file_type": "code",
       "source_file": "run_orchestrator.ps1",
-      "source_location": "L286",
+      "source_location": "L295",
       "id": "run_orchestrator_ensure_monorepoartifacts",
       "community": 565,
       "norm_label": "ensure-monorepoartifacts()"
@@ -151133,7 +151133,7 @@
       "label": "Ensure-VisionEnv()",
       "file_type": "code",
       "source_file": "run_orchestrator.ps1",
-      "source_location": "L382",
+      "source_location": "L391",
       "id": "run_orchestrator_ensure_visionenv",
       "community": 565,
       "norm_label": "ensure-visionenv()"
@@ -151142,7 +151142,7 @@
       "label": "Run-HttpProbe()",
       "file_type": "code",
       "source_file": "run_orchestrator.ps1",
-      "source_location": "L544",
+      "source_location": "L553",
       "id": "run_orchestrator_run_httpprobe",
       "community": 565,
       "norm_label": "run-httpprobe()"
@@ -151151,7 +151151,7 @@
       "label": "Render-StatusDashboard()",
       "file_type": "code",
       "source_file": "run_orchestrator.ps1",
-      "source_location": "L576",
+      "source_location": "L585",
       "id": "run_orchestrator_render_statusdashboard",
       "community": 565,
       "norm_label": "render-statusdashboard()"
@@ -151160,7 +151160,7 @@
       "label": "Start-ManagedProcess()",
       "file_type": "code",
       "source_file": "run_orchestrator.ps1",
-      "source_location": "L677",
+      "source_location": "L686",
       "id": "run_orchestrator_start_managedprocess",
       "community": 565,
       "norm_label": "start-managedprocess()"
@@ -283335,9 +283335,9 @@
       "source_file": "Range_Management/apps/web/lib/api.ts",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "range_management_apps_web_lib_api_ts_lib_api_apifetch",
-      "target": "range_management_apps_web_lib_api_ts_lib_api_getapibase",
-      "confidence_score": 1.0
+      "target": "range_management_apps_web_lib_api_ts_lib_api_getapibase"
     },
     {
       "relation": "method",
@@ -372684,9 +372684,9 @@
       "source_file": "Shooter_App/apps/web/lib/api.ts",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "shooter_app_apps_web_lib_api_ts_lib_api_apifetch",
-      "target": "shooter_app_apps_web_lib_api_ts_lib_api_getapibase",
-      "confidence_score": 1.0
+      "target": "shooter_app_apps_web_lib_api_ts_lib_api_getapibase"
     },
     {
       "relation": "method",
@@ -411388,9 +411388,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L382",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator",
-      "target": "run_orchestrator_ensure_visionenv",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_ensure_visionenv"
     },
     {
       "relation": "contains",
@@ -411398,9 +411398,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator",
-      "target": "run_orchestrator_get_httpstatuscode",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_get_httpstatuscode"
     },
     {
       "relation": "contains",
@@ -411408,9 +411408,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator",
-      "target": "run_orchestrator_invoke_stopall",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_invoke_stopall"
     },
     {
       "relation": "contains",
@@ -411488,9 +411488,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator",
-      "target": "run_orchestrator_test_interactiveconsole",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_test_interactiveconsole"
     },
     {
       "relation": "contains",
@@ -411508,9 +411508,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L142",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator",
-      "target": "run_orchestrator_wait_dockerpgready",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_wait_dockerpgready"
     },
     {
       "relation": "calls",
@@ -411518,9 +411518,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_print_banner",
-      "target": "run_orchestrator_test_interactiveconsole",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_test_interactiveconsole"
     },
     {
       "relation": "calls",
@@ -411528,9 +411528,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L609",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_render_statusdashboard",
-      "target": "run_orchestrator_test_interactiveconsole",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_test_interactiveconsole"
     },
     {
       "relation": "calls",
@@ -411538,9 +411538,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_invoke_stopall",
-      "target": "run_orchestrator_stop_processtree",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_stop_processtree"
     },
     {
       "relation": "calls",
@@ -411578,9 +411578,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L549",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_run_httpprobe",
-      "target": "run_orchestrator_get_httpstatuscode",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_get_httpstatuscode"
     },
     {
       "relation": "calls",
@@ -411588,9 +411588,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_test_httphealth",
-      "target": "run_orchestrator_get_httpstatuscode",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_get_httpstatuscode"
     },
     {
       "relation": "calls",
@@ -411618,9 +411618,9 @@
       "source_file": "run_orchestrator.ps1",
       "source_location": "L166",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_orchestrator_ensure_postgres",
-      "target": "run_orchestrator_wait_dockerpgready",
-      "confidence_score": 1.0
+      "target": "run_orchestrator_wait_dockerpgready"
     },
     {
       "relation": "contains",
@@ -439846,5 +439846,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c9ac54ff1675f2bf7f42660903fd65cabf7ad808"
+  "built_at_commit": "60e52ddd95bd780e9441d1a3c725ac3459c5c221"
 }
