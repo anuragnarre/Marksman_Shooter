@@ -9,6 +9,7 @@ param(
     [string]$Mode = "Prod",
     [switch]$Rebuild,
     [switch]$Detach,
+    [switch]$KeepAlive,
     [switch]$Stop,
     [switch]$NoTunnel,
     [switch]$SkipDbPush,
@@ -26,6 +27,9 @@ if (-not (Test-Path $logDir)) {
 }
 $pidFile = Join-Path $logDir "orchestrator.pids.json"
 $tunnelTokenFile = Join-Path $env:USERPROFILE ".cloudflared\marksman_tunnel_token.txt"
+$localPgBin = "C:\PostgreSQL16\bin"
+$localPgData = Join-Path $env:LOCALAPPDATA "Marksman\pgdata"
+$script:OwnedLocalPg = $false
 
 # ANSI Colors
 $esc = [char]27
@@ -40,7 +44,7 @@ $cGray   = "$esc[90m"
 $cBgBlue = "$esc[44m"
 
 function Test-InteractiveConsole {
-    if ($Detach -or $BuildOnly -or $VerifyOnly -or $Stop) { return $false }
+    if ($Detach -or $KeepAlive -or $BuildOnly -or $VerifyOnly -or $Stop) { return $false }
     if (-not [Environment]::UserInteractive) { return $false }
     try {
         if ([Console]::IsInputRedirected -or [Console]::IsOutputRedirected) { return $false }
@@ -130,6 +134,11 @@ function Invoke-StopAll {
         }
     }
 
+    if ((Test-Path (Join-Path $localPgData "postmaster.pid")) -and (Test-Path (Join-Path $localPgBin "pg_ctl.exe"))) {
+        Write-Host "  -> Stopping user-space PostgreSQL ($localPgData)"
+        & (Join-Path $localPgBin "pg_ctl.exe") -D $localPgData -m fast stop 2>$null | Out-Null
+    }
+
     Write-Host "${cGreen}[OK] Marksman stop sequence complete.${cReset}"
 }
 
@@ -169,6 +178,11 @@ function Ensure-Postgres {
                 }
             }
         }
+        $pgReadyExe = Join-Path $localPgBin "pg_isready.exe"
+        if (Test-Path $pgReadyExe) {
+            & $pgReadyExe -h 127.0.0.1 -p 5433 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) { return $true }
+        }
         return $true
     }
 
@@ -182,15 +196,20 @@ function Ensure-Postgres {
                 Start-Service -Name $pgService.Name -ErrorAction Stop
                 $pgStartedOk = $true
             } catch {
-                Write-Host " ${cYellow}[Requesting UAC elevation for $($pgService.Name)...]${cReset}" -NoNewline
-                try {
-                    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "-NoProfile -Command `"Start-Service -Name '$($pgService.Name)'`"" -Wait -ErrorAction Stop
-                    $pgService.Refresh()
-                    if ($pgService.Status -eq 'Running') {
-                        $pgStartedOk = $true
+                $canPromptUac = [Environment]::UserInteractive -and (-not [Console]::IsInputRedirected)
+                if ($canPromptUac) {
+                    Write-Host " ${cYellow}[Requesting UAC elevation for $($pgService.Name)...]${cReset}" -NoNewline
+                    try {
+                        Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "-NoProfile -Command `"Start-Service -Name '$($pgService.Name)'`"" -Wait -ErrorAction Stop
+                        $pgService.Refresh()
+                        if ($pgService.Status -eq 'Running') {
+                            $pgStartedOk = $true
+                        }
+                    } catch {
+                        Write-Host " ${cYellow}[UAC CANCELLED - falling back]${cReset}"
                     }
-                } catch {
-                    Write-Host " ${cYellow}[UAC CANCELLED - falling back to Docker]${cReset}"
+                } else {
+                    Write-Host " ${cYellow}[SKIPPED - non-interactive shell, falling back]${cReset}"
                 }
             }
         }
@@ -198,7 +217,7 @@ function Ensure-Postgres {
             for ($i = 0; $i -lt 15; $i++) {
                 Start-Sleep -Seconds 1
                 if (Test-PortListening 5433) {
-                    $pgReadyExe = "C:\PostgreSQL16\bin\pg_isready.exe"
+                    $pgReadyExe = Join-Path $localPgBin "pg_isready.exe"
                     if (Test-Path $pgReadyExe) {
                         & $pgReadyExe -h 127.0.0.1 -p 5433 2>$null | Out-Null
                         if ($LASTEXITCODE -eq 0) {
@@ -214,7 +233,7 @@ function Ensure-Postgres {
         }
     }
 
-    # Docker fallback (auto-starts Docker Desktop if closed)
+    # Docker fallback (auto-starts Docker Desktop only if System32 wsl.exe works)
     if (Get-Command docker -ErrorAction SilentlyContinue) {
         $dockerReady = $false
         docker info 2>$null | Out-Null
@@ -222,23 +241,17 @@ function Ensure-Postgres {
             $dockerReady = $true
         } else {
             $dockerExe = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-            if (Test-Path $dockerExe) {
-                $sysWsl = "C:\Windows\System32\wsl.exe"
-                $wslOk = $true
-                if (Test-Path $sysWsl) {
-                    & $sysWsl --version 2>$null | Out-Null
-                    if ($LASTEXITCODE -ne 0) {
-                        $wslOk = $false
-                        Write-Host ""
-                        Write-Host "  ${cYellow}[WARN] System32 wsl.exe failed - Docker Desktop WSL2 engine may fail; fix WSL App Execution Alias or start postgresql-16 as Administrator.${cReset}"
-                    }
-                }
-                $maxDockerPolls = if ($wslOk) { 45 } else { 15 }
-                $timeoutLabel = if ($wslOk) { "90s" } else { "30s" }
+            $sysWsl = "C:\Windows\System32\wsl.exe"
+            $wslOk = $false
+            if (Test-Path $sysWsl) {
+                & $sysWsl --version 2>$null | Out-Null
+                $wslOk = ($LASTEXITCODE -eq 0)
+            }
+            if ((Test-Path $dockerExe) -and $wslOk) {
                 Write-Host ""
-                Write-Host "  ${cYellow}[*] Starting Docker Desktop daemon (up to $timeoutLabel)...${cReset}" -NoNewline
+                Write-Host "  ${cYellow}[*] Starting Docker Desktop daemon (up to 90s)...${cReset}" -NoNewline
                 Start-Process $dockerExe
-                for ($d = 0; $d -lt $maxDockerPolls; $d++) {
+                for ($d = 0; $d -lt 45; $d++) {
                     Start-Sleep -Seconds 2
                     docker info 2>$null | Out-Null
                     if ($LASTEXITCODE -eq 0) {
@@ -248,9 +261,10 @@ function Ensure-Postgres {
                     }
                 }
                 if (-not $dockerReady) {
-                    Write-Host " ${cRed}[DOCKER TIMEOUT]${cReset}"
-                    return $false
+                    Write-Host " ${cYellow}[DOCKER TIMEOUT - trying user-space fallback]${cReset}"
                 }
+            } elseif (Test-Path $dockerExe) {
+                Write-Host "  ${cYellow}[SKIPPED Docker - System32 wsl.exe unavailable]${cReset}"
             }
         }
 
@@ -286,6 +300,56 @@ function Ensure-Postgres {
                 return (Wait-DockerPgReady $containerName)
             }
         }
+    }
+
+    # User-space PostgreSQL 16 fallback (requires no Admin rights or Docker/WSL2)
+    $pgCtlExe     = Join-Path $localPgBin "pg_ctl.exe"
+    $initDbExe    = Join-Path $localPgBin "initdb.exe"
+    $pgReadyExe   = Join-Path $localPgBin "pg_isready.exe"
+    $psqlExe      = Join-Path $localPgBin "psql.exe"
+    $createdbExe  = Join-Path $localPgBin "createdb.exe"
+    if ((Test-Path $pgCtlExe) -and (Test-Path $initDbExe)) {
+        $pgParent = Split-Path $localPgData -Parent
+        if (-not (Test-Path $pgParent)) {
+            New-Item -ItemType Directory -Path $pgParent -Force | Out-Null
+        }
+        if (-not (Test-Path (Join-Path $localPgData "PG_VERSION"))) {
+            Write-Host "  ${cYellow}[*] Initializing user-space PostgreSQL data dir ($localPgData)...${cReset}" -NoNewline
+            & $initDbExe -D $localPgData -U postgres -A trust --encoding=UTF8 --no-locale > (Join-Path $logDir "postgres-init.log") 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host " ${cRed}[INITDB FAILED - see logs\postgres-init.log]${cReset}"
+                return $false
+            }
+            Write-Host " ${cGreen}[OK]${cReset}"
+        }
+
+        Write-Host "  ${cYellow}[*] Starting user-space PostgreSQL 16 on 127.0.0.1:5433...${cReset}" -NoNewline
+        $pgPsi = New-Object System.Diagnostics.ProcessStartInfo
+        $pgPsi.FileName = "cmd.exe"
+        $pgPsi.Arguments = "/s /c `"`"$pgCtlExe`" -D `"$localPgData`" -l `"$logDir\postgres-local.log`" -o `"-p 5433 -h 127.0.0.1`" start > `"$logDir\postgres-ctl.log`" 2>&1`""
+        $pgPsi.UseShellExecute = $false
+        $pgPsi.CreateNoWindow = $true
+        $pgStartProc = [System.Diagnostics.Process]::Start($pgPsi)
+        if ($pgStartProc) { $null = $pgStartProc.WaitForExit(15000) }
+        $pgUp = $false
+        for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            & $pgReadyExe -h 127.0.0.1 -p 5433 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                $pgUp = $true
+                break
+            }
+        }
+        if ($pgUp) {
+            $hasDb = (& $psqlExe -h 127.0.0.1 -p 5433 -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='shooting_platform'" 2>$null)
+            if (-not $hasDb -or $hasDb.Trim() -ne "1") {
+                & $createdbExe -h 127.0.0.1 -p 5433 -U postgres shooting_platform > (Join-Path $logDir "postgres-createdb.log") 2>&1
+            }
+            $script:OwnedLocalPg = $true
+            Write-Host " ${cGreen}[STARTED USER-SPACE PG]${cReset}"
+            return $true
+        }
+        Write-Host " ${cRed}[PG_CTL START FAILED - see logs\postgres-ctl.log]${cReset}"
     }
 
     Write-Host " ${cRed}[FAILED: PostgreSQL not ready on 5433]${cReset}"
@@ -719,7 +783,7 @@ function Start-ManagedProcess ($svc) {
         Write-Host "  -> Launching $($svc.Name) (:$( $svc.Port ))... " -NoNewline
 
         $online = $false
-        for ($s = 0; $s -lt 90; $s++) {
+        for ($s = 0; $s -lt 180; $s++) {
             Start-Sleep -Milliseconds 500
             if ($proc.HasExited) { break }
             if ($svc.Port -and (Test-PortListening $svc.Port)) {
@@ -823,6 +887,37 @@ if ($Detach) {
     if ($allOk) { exit 0 } else { exit 1 }
 }
 
+if ($KeepAlive) {
+    Render-StatusDashboard
+    $allOk = Run-HttpProbe (-not $NoTunnel)
+    Write-Host ""
+    if ($allOk) {
+        Write-Host "${cGreen}[*] KEEPALIVE ACTIVE - supervising all services + Cloudflare tunnel.${cReset}"
+    } else {
+        Write-Host "${cYellow}[!] KEEPALIVE ACTIVE (some probes warned; supervising processes).${cReset}"
+    }
+    try {
+        while ($true) {
+            Start-Sleep -Seconds 10
+        }
+    } finally {
+        Write-Host "${cYellow}[*] KeepAlive ending - stopping Marksman services...${cReset}"
+        foreach ($svc in $services) {
+            if ($svc.Owned -and $svc.Process -and -not $svc.Process.HasExited) {
+                Stop-ProcessTree $svc.Process.Id
+            }
+        }
+        if ($tunnelService.Owned -and $tunnelService.Process -and -not $tunnelService.Process.HasExited) {
+            Stop-ProcessTree $tunnelService.Process.Id
+        }
+        if ($script:OwnedLocalPg -and (Test-Path (Join-Path $localPgData "postmaster.pid"))) {
+            & (Join-Path $localPgBin "pg_ctl.exe") -D $localPgData -m fast stop 2>$null | Out-Null
+        }
+        Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
+    }
+    exit 0
+}
+
 if (-not (Test-InteractiveConsole)) {
     Render-StatusDashboard
     $allOk = Run-HttpProbe (-not $NoTunnel)
@@ -872,6 +967,11 @@ try {
     if ($tunnelService.Owned -and $tunnelService.Process -and -not $tunnelService.Process.HasExited) {
         Write-Host "  -> Stopping Cloudflare Tunnel (PID $($tunnelService.Process.Id))..." -NoNewline
         Stop-ProcessTree $tunnelService.Process.Id
+        Write-Host " ${cGreen}[STOPPED]${cReset}"
+    }
+    if ($script:OwnedLocalPg -and (Test-Path (Join-Path $localPgData "postmaster.pid"))) {
+        Write-Host "  -> Stopping user-space PostgreSQL..." -NoNewline
+        & (Join-Path $localPgBin "pg_ctl.exe") -D $localPgData -m fast stop 2>$null | Out-Null
         Write-Host " ${cGreen}[STOPPED]${cReset}"
     }
     Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
