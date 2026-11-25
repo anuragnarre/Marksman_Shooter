@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 19134 nodes · 25781 edges · 2007 communities (1176 shown, 831 thin omitted)
+- 19134 nodes · 25783 edges · 2006 communities (1176 shown, 830 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 180 edges (avg confidence: 0.52)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2955e3cc`
+- Built from commit: `76b671b6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1304,7 +1304,6 @@
 - [[_COMMUNITY_Community 1332|Community 1332]]
 - [[_COMMUNITY_Community 1333|Community 1333]]
 - [[_COMMUNITY_Community 1334|Community 1334]]
-- [[_COMMUNITY_Community 1336|Community 1336]]
 - [[_COMMUNITY_Community 1337|Community 1337]]
 - [[_COMMUNITY_Community 1340|Community 1340]]
 - [[_COMMUNITY_Community 1341|Community 1341]]
@@ -1709,7 +1708,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (2007 total, 831 thin omitted)
+## Communities (2006 total, 830 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.02
@@ -1761,7 +1760,7 @@ Nodes (43): _(), eD(), eN(), eq(), eU(), nB(), nD(), nG() (+35 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.06
-Nodes (62): _(), c(), ca(), cc(), ce(), cf(), ci(), cl() (+54 more)
+Nodes (46): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+38 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.05
@@ -1769,7 +1768,7 @@ Nodes (48): _(), A(), aA(), ac(), ag(), aI(), aL(), am() (+40 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.05
-Nodes (51): _(), A(), aE(), aN(), ap(), as(), aT(), aw() (+43 more)
+Nodes (48): _(), A(), aA(), ac(), ag(), aI(), aL(), am() (+40 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.09
@@ -1793,7 +1792,7 @@ Nodes (45): allowNavigation, url, android, allowMixedContent, backgroundColor, c
 
 ### Community 20 - "Community 20"
 Cohesion: 0.06
-Nodes (46): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+38 more)
+Nodes (48): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+40 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.05
@@ -1828,8 +1827,8 @@ Cohesion: 0.10
 Nodes (12): e2, e5, ea(), ec(), ed(), ee(), ef(), eh() (+4 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.10
-Nodes (12): e2, e5, ea(), ec(), ed(), ee(), ef(), eh() (+4 more)
+Cohesion: 0.09
+Nodes (13): e2, e5, ec(), ed(), ee(), eh(), ei(), er() (+5 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.06
@@ -1837,7 +1836,7 @@ Nodes (31): Architecture, Backend: add `?save=false` to `POST /shots/analyze-pho
 
 ### Community 31 - "Community 31"
 Cohesion: 0.10
-Nodes (14): ei(), el(), eo(), er(), et(), eu(), N(), rr (+6 more)
+Nodes (13): ea(), ef(), el(), eo(), et(), eu(), N(), t3() (+5 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.06
@@ -1892,8 +1891,8 @@ Cohesion: 0.05
 Nodes (23): _(), E(), e1(), ek(), el(), eN(), eO(), eR() (+15 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.08
-Nodes (40): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ax() (+32 more)
+Cohesion: 0.09
+Nodes (36): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ab() (+28 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.06
@@ -1904,8 +1903,8 @@ Cohesion: 0.07
 Nodes (5): CoachService, PrismaConnection, SHOOTER_PROFILE_SELECT, USER_SELECT, USER_SELECT_WITH_PROFILE
 
 ### Community 48 - "Community 48"
-Cohesion: 0.07
-Nodes (6): e7, n9, nQ(), ny, Q(), t8
+Cohesion: 0.10
+Nodes (4): e7, nQ(), ny, Q()
 
 ### Community 49 - "Community 49"
 Cohesion: 0.06
@@ -1924,12 +1923,12 @@ Cohesion: 0.05
 Nodes (38): 1. Install dependencies, 2. Configure environment, 3. Set up the database, AI Coach, AI Coach, Analytics, Analytics, Analytics Formulas (+30 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.10
-Nodes (35): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+27 more)
-
-### Community 54 - "Community 54"
 Cohesion: 0.08
 Nodes (39): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+31 more)
+
+### Community 54 - "Community 54"
+Cohesion: 0.10
+Nodes (35): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+27 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.05
@@ -2004,8 +2003,8 @@ Cohesion: 0.08
 Nodes (10): a(), d, h(), iD, is(), ix(), M(), n() (+2 more)
 
 ### Community 75 - "Community 75"
-Cohesion: 0.09
-Nodes (36): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ab() (+28 more)
+Cohesion: 0.08
+Nodes (40): a0(), a4(), a5(), a6(), a7(), a8(), a9(), ax() (+32 more)
 
 ### Community 76 - "Community 76"
 Cohesion: 0.06
@@ -2036,7 +2035,7 @@ Cohesion: 0.09
 Nodes (7): _(), E(), fetch(), q(), S(), y(), z()
 
 ### Community 83 - "Community 83"
-Cohesion: 0.09
+Cohesion: 0.11
 Nodes (17): ConfiguredLane, DEFAULT_CORNERS, DEFAULT_LANES, inferDistance(), LaneCalibration, LaneCornerPoint, normalizeLane(), useLiveVision() (+9 more)
 
 ### Community 84 - "Community 84"
@@ -2145,7 +2144,7 @@ Nodes (31): Architecture, Backend: add `?save=false` to `POST /shots/analyze-pho
 
 ### Community 112 - "Community 112"
 Cohesion: 0.10
-Nodes (23): DEFAULT_LANES, LaneCardProps, RangeConsoleHeaderProps, CommandCenterDarkProps, Lane, LaneMatrixProps, IconAnalytics(), IconArrowDown() (+15 more)
+Nodes (17): DEFAULT_LANES, LaneCardProps, CommandCenterDarkProps, Lane, LaneMatrixProps, IconAnalytics(), IconArrowDown(), IconCampaign() (+9 more)
 
 ### Community 113 - "Community 113"
 Cohesion: 0.33
@@ -2196,8 +2195,8 @@ Cohesion: 0.10
 Nodes (4): B(), tl, tp, tr()
 
 ### Community 126 - "Community 126"
-Cohesion: 0.10
-Nodes (31): lD(), lO(), o1(), o2(), o3(), o4(), o5(), o6() (+23 more)
+Cohesion: 0.17
+Nodes (21): o2(), o4(), o6(), o7(), r4(), s1(), s2(), sP() (+13 more)
 
 ### Community 127 - "Community 127"
 Cohesion: 0.07
@@ -2232,8 +2231,8 @@ Cohesion: 0.50
 Nodes (4): 5.1 — Competition Setup, 5.2 — Live Scoring System, 5.3 — Post-Competition Analytics, CATEGORY 5: COMPETITION & TOURNAMENT MANAGEMENT
 
 ### Community 138 - "Community 138"
-Cohesion: 0.09
-Nodes (13): Handler, HandlerThread, LifecycleEventListener, Long, ReactContextBaseJavaModule, Sensor, SensorEvent, SensorEventListener (+5 more)
+Cohesion: 0.10
+Nodes (15): Activity, BooleanArray, Handler, HandlerThread, Int, LifecycleEventListener, Long, Promise (+7 more)
 
 ### Community 139 - "Community 139"
 Cohesion: 0.50
@@ -2256,8 +2255,8 @@ Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
 
 ### Community 145 - "Community 145"
-Cohesion: 0.09
-Nodes (31): ea(), ei(), ek(), em(), eo(), es(), et(), eu() (+23 more)
+Cohesion: 0.10
+Nodes (29): ea(), ei(), ek(), em(), eo(), es(), et(), eu() (+21 more)
 
 ### Community 146 - "Community 146"
 Cohesion: 0.08
@@ -2304,12 +2303,12 @@ Cohesion: 0.25
 Nodes (8): 3.1 Overview & Architecture, 3.2 Key User Interface Routes, 3.3 Detailed Features & Operational Working, 3. Application 2: Range Management App (Operator & RSO Command), A. Multi-Facility Management Architecture, B. 1-Hour Time Slot Booking Matrix, C. Cross-Application Emergency Ceasefire System, D. Environmental Telemetry & Crosswind Analysis
 
 ### Community 163 - "Community 163"
-Cohesion: 0.14
-Nodes (27): al(), eE(), eN(), ex(), ib(), id(), iF(), ig() (+19 more)
+Cohesion: 0.08
+Nodes (53): al(), eD(), eE(), eL(), eN(), ex(), i(), ib() (+45 more)
 
 ### Community 165 - "Community 165"
-Cohesion: 0.17
-Nodes (12): Activity, Bitmap, BooleanArray, Double, FloatArray, Int, Promise, ReadableMap (+4 more)
+Cohesion: 0.15
+Nodes (10): Bitmap, Double, DoubleArray, Float, FloatArray, ReadableMap, String, PreviewCaptureTarget (+2 more)
 
 ### Community 166 - "Community 166"
 Cohesion: 0.29
@@ -2508,8 +2507,8 @@ Cohesion: 0.16
 Nodes (18): A(), b(), d(), E(), g(), h(), I(), j() (+10 more)
 
 ### Community 220 - "Community 220"
-Cohesion: 0.10
-Nodes (30): c(), cf(), cp(), cz(), d(), eB(), eK(), eM() (+22 more)
+Cohesion: 0.08
+Nodes (38): c(), ca(), cc(), ce(), cf(), ci(), cl(), cp() (+30 more)
 
 ### Community 221 - "Community 221"
 Cohesion: 0.13
@@ -2544,8 +2543,8 @@ Cohesion: 0.16
 Nodes (18): A(), b(), d(), E(), g(), h(), I(), j() (+10 more)
 
 ### Community 229 - "Community 229"
-Cohesion: 0.13
-Nodes (8): en(), na(), nt(), ri, ro(), rs, tg(), tm()
+Cohesion: 0.19
+Nodes (6): nt(), ri, ro(), rs, tg(), tm()
 
 ### Community 230 - "Community 230"
 Cohesion: 0.09
@@ -2644,8 +2643,8 @@ Cohesion: 0.12
 Nodes (4): ea, eq, ez, ir()
 
 ### Community 268 - "Community 268"
-Cohesion: 0.18
-Nodes (21): i(), iE(), ix(), l6(), lc(), lm(), lU(), lW() (+13 more)
+Cohesion: 0.10
+Nodes (30): c(), cf(), cp(), cz(), d(), eB(), eK(), eM() (+22 more)
 
 ### Community 269 - "Community 269"
 Cohesion: 0.20
@@ -2816,8 +2815,8 @@ Cohesion: 0.11
 Nodes (19): devDependencies, jest, @nestjs/cli, @nestjs/schematics, @nestjs/testing, prisma, ts-jest, ts-node (+11 more)
 
 ### Community 317 - "Community 317"
-Cohesion: 0.13
-Nodes (22): lc(), lf(), lk(), ll(), lm(), lt(), ly(), oA() (+14 more)
+Cohesion: 0.15
+Nodes (19): lf(), lk(), ll(), lt(), oA(), oi(), oj(), oR() (+11 more)
 
 ### Community 318 - "Community 318"
 Cohesion: 0.13
@@ -2841,11 +2840,11 @@ Nodes (5): I(), td, tl(), to(), ts
 
 ### Community 323 - "Community 323"
 Cohesion: 0.07
-Nodes (17): RangeConsoleHeader(), RangeConsoleSidebar(), RangeConsoleSidebarProps, BOTTOM_NAV, PORTAL_NAV, fmtShort(), ShooterView(), useGreeting() (+9 more)
+Nodes (23): RangeConsoleHeader(), RangeConsoleHeaderProps, RangeConsoleSidebar(), RangeConsoleSidebarProps, BOTTOM_NAV, PORTAL_NAV, fmtShort(), ShooterView() (+15 more)
 
 ### Community 324 - "Community 324"
-Cohesion: 0.15
-Nodes (19): lf(), lk(), ll(), lt(), oA(), oi(), oj(), oR() (+11 more)
+Cohesion: 0.13
+Nodes (22): lc(), lf(), lk(), ll(), lm(), lt(), ly(), oA() (+14 more)
 
 ### Community 325 - "Community 325"
 Cohesion: 0.13
@@ -3240,8 +3239,8 @@ Cohesion: 0.19
 Nodes (9): _add_real_images_with_autolabel(), generate_yolo_dataset(), LiveReporter, Train YOLO26-S on synthetic bullet-hole data.  Usage -----     # From apps/v, Auto-label real photos using the CV pipeline and add them to the dataset.     I, Fine-tune YOLO26-S and save to output_model., Generate a YOLO-format dataset from synthetic cases.      Directory layout:, train() (+1 more)
 
 ### Community 491 - "Community 491"
-Cohesion: 0.15
-Nodes (19): a_(), a2(), a3(), ac(), ad(), af(), ag(), ah() (+11 more)
+Cohesion: 0.17
+Nodes (13): ec(), ef(), eL(), eP(), ez(), l0(), l1(), l3() (+5 more)
 
 ### Community 492 - "Community 492"
 Cohesion: 0.15
@@ -3484,8 +3483,8 @@ Cohesion: 0.20
 Nodes (10): ee(), eF(), eL(), eM(), eN(), eU(), eV(), eW() (+2 more)
 
 ### Community 587 - "Community 587"
-Cohesion: 0.22
-Nodes (7): CeasefireState, RangeEmergencyBanner(), dmSans, jetbrainsMono, metadata, rajdhani, viewport
+Cohesion: 0.12
+Nodes (14): CeasefireState, RangeEmergencyBanner(), API_BASE, getApiBase(), dmSans, jetbrainsMono, metadata, rajdhani (+6 more)
 
 ### Community 588 - "Community 588"
 Cohesion: 0.22
@@ -3907,6 +3906,10 @@ Nodes (7): Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
 Cohesion: 0.25
 Nodes (7): ndarray, calibrate_and_undistort(), get_default_esp32_intrinsics(), get_generic_android_intrinsics(), Returns rough estimate intrinsic matrix and distortion coefficients      for a t, Returns rough estimate intrinsic matrix and distortion coefficients     for an o, Applies standard lens distortion correction (undistort) using camera intrinsics.
 
+### Community 759 - "Community 759"
+Cohesion: 0.09
+Nodes (6): en(), n9, na(), nF(), rh, t8
+
 ### Community 760 - "Community 760"
 Cohesion: 0.39
 Nodes (6): ExportSessionModalProps, fmtDate(), getDistribution(), getThemeColors(), renderExport(), roundRect()
@@ -4120,8 +4123,8 @@ Cohesion: 0.38
 Nodes (3): Wait-For-Port(), Write-Ok(), Write-Warn()
 
 ### Community 872 - "Community 872"
-Cohesion: 0.20
-Nodes (12): aA(), ac(), ag(), aI(), aL(), am(), aO(), aR() (+4 more)
+Cohesion: 0.38
+Nodes (7): ab(), ak(), av(), ay(), eC(), ez(), ia()
 
 ### Community 873 - "Community 873"
 Cohesion: 0.38
@@ -4331,10 +4334,6 @@ Nodes (6): 18.1 — National Federation Integration, 18.2 — Video Analysis Int
 Cohesion: 0.53
 Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman Range Engine Entrypoint  Usage:   python start.py, setup_logging()
 
-### Community 959 - "Community 959"
-Cohesion: 0.25
-Nodes (6): API_BASE, API_BASE, ApiError, apiFetch(), ApiFetchOptions, getApiBase()
-
 ### Community 961 - "Community 961"
 Cohesion: 0.33
 Nodes (3): BASE_COMMANDS, Command, CommandPaletteProps
@@ -4480,8 +4479,8 @@ Cohesion: 0.53
 Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman Range Engine Entrypoint  Usage:   python start.py, setup_logging()
 
 ### Community 1016 - "Community 1016"
-Cohesion: 0.38
-Nodes (7): ab(), ak(), av(), ay(), eC(), ez(), ia()
+Cohesion: 0.67
+Nodes (4): aE(), as(), aw(), ax()
 
 ### Community 1017 - "Community 1017"
 Cohesion: 0.50
@@ -5054,7 +5053,7 @@ Nodes (4): 🔴 Critical (Broken), 🟠 High Impact (Visual Gaps), Homepage Issu
 ## Knowledge Gaps
 - **4706 isolated node(s):** `fs`, `path`, `srcDir`, `controllers`, `fs` (+4701 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **831 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **830 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

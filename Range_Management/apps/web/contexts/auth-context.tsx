@@ -75,14 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch(() => {
-        const demoOperator: User = {
-          id: 'rso-demo-01',
-          name: 'Sgt. Miller (Lead RSO)',
-          email: 'rso@marksmanspro.com',
-          role: 'RANGE_OPERATOR',
-          createdAt: new Date(),
-        };
-        setUserState(demoOperator);
+        if (isMounted.current) {
+          authLogout();
+          setUserState(null);
+        }
       })
       .finally(() => {
         if (isMounted.current) setIsLoading(false);

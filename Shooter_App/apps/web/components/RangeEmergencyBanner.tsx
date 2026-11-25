@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ShieldAlert, AlertTriangle, CheckCircle2, Volume2, VolumeX, X } from 'lucide-react';
+import { getApiBase } from '../lib/api';
 
 interface CeasefireState {
   active: boolean;
@@ -51,10 +52,12 @@ export function RangeEmergencyBanner() {
   };
 
   useEffect(() => {
-    const urls = [
-      process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001',
-      'http://localhost:3003',
-    ];
+    const isLocalHost =
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const urls = isLocalHost
+      ? ['http://localhost:3001', 'http://localhost:3003']
+      : [getApiBase(), 'https://range-api.marksmanshooter.in'];
 
     const sockets: Socket[] = [];
 

@@ -29,7 +29,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   { href: '/ballistics', label: 'Ballistics', icon: <TargetIcon /> },
   { href: '/ranges', label: 'Ranges', icon: <GridIcon /> },
-  { href: '/equipment', label: 'Equipment', icon: <ToolIcon /> },
+  { href: '/armory', label: 'Equipment', icon: <ToolIcon /> },
   {
     href: '/planning', label: 'Planning', icon: <CalendarIcon />,
     children: [

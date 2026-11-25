@@ -3,8 +3,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
-import { apiFetch } from '../../lib/api';
+import { apiFetch, getApiBase } from '../../lib/api';
 import { useAuth } from '../../contexts/auth-context';
 import { useTheme } from '../../contexts/theme-context';
 import { useToast } from '../../contexts/toast-context';
@@ -21,7 +22,8 @@ import {
 } from '../../components/ui/TacticalIcons';
 
 export default function DashboardPage() {
-  const { user, isLoading: authLoading, setUser } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const router = useRouter();
   const { dashboardTheme } = useTheme();
   const { toast } = useToast();
 
@@ -40,20 +42,14 @@ export default function DashboardPage() {
     }
   }, []);
 
-  // Auto-fill demo operator user if unauthenticated during inspection
   useEffect(() => {
     if (!authLoading && !user) {
-      setUser({
-        id: 'rso-demo-01',
-        name: 'Sgt. Miller (Lead RSO)',
-        email: 'rso@marksmanspro.com',
-        role: 'RANGE_OPERATOR',
-        createdAt: new Date(),
-      });
+      router.replace('/auth/login/');
     }
-  }, [authLoading, user, setUser]);
+  }, [authLoading, user, router]);
 
   useEffect(() => {
+    if (authLoading || !user) return;
     const loadData = async () => {
       try {
         const ranges = await apiFetch('/ranges').catch(() => []) as any[];
@@ -78,7 +74,7 @@ export default function DashboardPage() {
       }
     };
     loadData();
-  }, []);
+  }, [authLoading, user]);
 
   const handleToggleStatus = async () => {
     const newStatus = rangeStatus === "HOT" ? "COLD" : "HOT";
@@ -92,7 +88,7 @@ export default function DashboardPage() {
 
     // Broadcast instantaneously over WebSocket to all range monitors, cameras, and shooter apps
     try {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3003";
+      const wsUrl = getApiBase();
       const socket = io(wsUrl, { transports: ["websocket"] });
       if (newStatus === "COLD") {
         socket.emit("broadcastCeasefire", {
@@ -123,7 +119,7 @@ export default function DashboardPage() {
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  if (!mounted) {
+  if (!mounted || authLoading || !user) {
     return (
       <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
@@ -150,7 +146,7 @@ export default function DashboardPage() {
       />
 
       {/* Main Command Center Body - Dedicated scrolling viewport between fixed header & footer */}
-      <main className="flex-1 w-full pl-0 lg:pl-64 pt-[calc(3.5rem+var(--sat))] pb-[calc(4.75rem+var(--sab))] lg:pb-6 overflow-y-auto overflow-x-hidden bg-surface p-2 sm:p-4 md:p-6 overscroll-contain">
+      <main className="flex-1 w-full px-2 sm:px-4 md:px-6 lg:pl-[17.5rem] pt-[calc(4.25rem+var(--sat))] pb-[calc(4.75rem+var(--sab))] lg:pb-6 overflow-y-auto overflow-x-hidden bg-surface overscroll-contain">
         {dashboardTheme === "harmonized-precision" ? (
           <CommandCenterLight
             rangeStatus={rangeStatus}

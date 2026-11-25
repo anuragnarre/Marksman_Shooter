@@ -3235,8 +3235,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/dashboard/page.tsx": {
-    "mtime": 1794259958.6971383,
-    "ast_hash": "94251724559a7b56d73f8b05f70726f1",
+    "mtime": 1795634283.942338,
+    "ast_hash": "25934c27ead2f91dff0b9bcc87b5dca1",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/app/delete-account/page.tsx": {
@@ -3820,8 +3820,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/contexts/auth-context.tsx": {
-    "mtime": 1791926621.8426783,
-    "ast_hash": "27209824c8e44298c63d304cc655dfa4",
+    "mtime": 1795634275.3039887,
+    "ast_hash": "143c46c506451d3e2d7e6e1581b5f34a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/contexts/theme-context.tsx": {
@@ -5375,8 +5375,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/RangeEmergencyBanner.tsx": {
-    "mtime": 1791718657.5591679,
-    "ast_hash": "1e23ffb0f4ce48758d1ac25ee77fd66b",
+    "mtime": 1795634297.1784048,
+    "ast_hash": "0146aa7321d8a8272deb8c232c5ab784",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/ShotCorrectionCanvas.tsx": {
@@ -5400,8 +5400,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/Sidebar.tsx": {
-    "mtime": 1791736301.9514134,
-    "ast_hash": "37c5983a65c81debe0d8a74957fbb6ca",
+    "mtime": 1795634273.198866,
+    "ast_hash": "290347272d63b103dd6bcf83035866c9",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/components/StaggerGrid.tsx": {
@@ -19655,8 +19655,8 @@
     "semantic_hash": ""
   },
   "run_orchestrator.ps1": {
-    "mtime": 1795631723.0195193,
-    "ast_hash": "82e83aa227925b94a59f54b512625799",
+    "mtime": 1795632598.9252403,
+    "ast_hash": "a6534e4f496da38f1875c58e32ff0116",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/404/index.html": {
