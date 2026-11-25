@@ -6,7 +6,7 @@
     "dev": "next dev --port 3000 --hostname 0.0.0.0",
     "dev:mobile": "node -e \"const{execSync}=require('child_process');const ip=execSync('hostname -I').toString().trim().split(' ')[0];console.log('\\n  Starting dev server (LAN mode)');console.log('  WSL2 IP: '+ip);console.log('\\n  On Windows run ONCE (as Admin):');console.log('  powershell -ExecutionPolicy Bypass -File mobile-dev.ps1');console.log('\\n  Then open on phone: http://'+ip+':3000\\n');\" && next dev --port 3000 --hostname 0.0.0.0",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0 -p 3000",
     "lint": "next lint"
   },
   "dependencies": {

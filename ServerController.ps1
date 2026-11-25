@@ -128,11 +128,11 @@ $form.Controls.Add($logBox)
 # Handlers
 $orchBtn.Add_Click({
     $orchPath = Join-Path $projectDir "run_orchestrator.ps1"
-    $p = Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$orchPath`"" -PassThru
+    $p = Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$orchPath`" -Mode Prod" -PassThru
     if ($p) { [void]$script:ManagedProcesses.Add($p) }
     $statusLabel.Text = "SYSTEM STATUS: ORCHESTRATOR ACTIVE"
     $statusLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 229, 160)
-    $logBox.Text = "Master Orchestrator launched in terminal window."
+    $logBox.Text = "Master Orchestrator (-Mode Prod) launched in terminal window."
 })
 
 $startAllBtn.Add_Click({
@@ -195,6 +195,11 @@ $stopButton.Add_Click({
                 Stop-ProcessTree $c.OwningProcess
             }
         }
+    }
+
+    $orchPath = Join-Path $projectDir "run_orchestrator.ps1"
+    if (Test-Path $orchPath) {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $orchPath -Stop 2>$null | Out-Null
     }
 
     $statusLabel.Text = "SYSTEM STATUS: ALL STOPPED [COLD]"

@@ -6,7 +6,7 @@
     "dev": "next dev --port 3002 --hostname 0.0.0.0",
     "dev:mobile": "node -e \"const os=require('os'),ifs=os.networkInterfaces();const ip=Object.values(ifs).flat().find(i=>i&&i.family==='IPv4'&&!i.internal)?.address||'localhost';console.log('\\n  Starting Range Ops dev server (LAN mode): http://'+ip+':3002\\n');\" && next dev --port 3002 --hostname 0.0.0.0",
     "build": "next build",
-    "start": "next start -p 3002",
+    "start": "next start -H 0.0.0.0 -p 3002",
     "lint": "next lint"
   },
   "dependencies": {

@@ -53,5 +53,5 @@ ENV PORT=3003
 EXPOSE 3003
 
 # Run Prisma migrations and start server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
 

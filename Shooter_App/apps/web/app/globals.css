@@ -4,6 +4,9 @@
 
 /* ── Tokens ────────────────────────────────────────────────────── */
 :root {
+  --font-rajdhani:        'Rajdhani', system-ui, -apple-system, sans-serif;
+  --font-dm-sans:         'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-jetbrains:       'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
   --bg-void:              #080A0F;
   --bg-surface:           #0E1118;
   --bg-elevated:          #161B26;

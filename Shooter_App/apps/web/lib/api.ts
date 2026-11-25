@@ -30,8 +30,6 @@ export function getApiBase(): string {
   return envUrl && envUrl !== '/api' ? envUrl : 'https://api.marksmanshooter.in';
 }
 
-const API_BASE = getApiBase();
-
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -98,8 +96,9 @@ export async function apiFetch<T>(
   // ── Online path ───────────────────────────────────────────────────────────
 
   let res: Response;
+  const apiBase = getApiBase();
   try {
-    res = await fetch(`${API_BASE}${path}`, {
+    res = await fetch(`${apiBase}${path}`, {
       ...fetchOptions,
       headers,
       cache: 'no-store',

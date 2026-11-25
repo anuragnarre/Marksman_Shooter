@@ -3880,8 +3880,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/lib/api.ts": {
-    "mtime": 1794972564.575354,
-    "ast_hash": "065886010755090adf9be57bbe5fb6aa",
+    "mtime": 1795628544.8828814,
+    "ast_hash": "0222b848f3c5101fcfe8abb87095aa2a",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/lib/auth.ts": {
@@ -3980,8 +3980,8 @@
     "semantic_hash": ""
   },
   "Range_Management/apps/web/package.json": {
-    "mtime": 1794968978.3348472,
-    "ast_hash": "5470aaf0348dd7bdaa7b07f64f1d0063",
+    "mtime": 1795628551.9045792,
+    "ast_hash": "5784b2370f9a03829fd4732d8902aa95",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/postcss.config.js": {
@@ -4030,8 +4030,8 @@
     "semantic_hash": ""
   },
   "ServerController.ps1": {
-    "mtime": 1794972075.8695626,
-    "ast_hash": "e7ef4ba2c55b44d20dd097cbc74f1ac4",
+    "mtime": 1795628601.158101,
+    "ast_hash": "fd3f60cb82776e342de0c5596caee5c3",
     "semantic_hash": ""
   },
   "Shooter_App/apps/api/fix.js": {
@@ -5105,8 +5105,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/layout.tsx": {
-    "mtime": 1791710989.8180652,
-    "ast_hash": "0eaa999c9be2ab0bcf2d2fb6889a5922",
+    "mtime": 1795629829.1090271,
+    "ast_hash": "f4e0002468ac09dc6371b4393ef0730f",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/app/live-analysis/LiveAnalysisDashboard.tsx": {
@@ -5600,8 +5600,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/api.ts": {
-    "mtime": 1794972552.9365976,
-    "ast_hash": "c037f84c647bfe2ea794e064085ffcad",
+    "mtime": 1795628538.3062835,
+    "ast_hash": "2e15badd8d7837f0c618498cd9cfbed5",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/lib/auth.ts": {
@@ -5705,8 +5705,8 @@
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/package.json": {
-    "mtime": 1789313051.061555,
-    "ast_hash": "25e16a5c461abe468cacf4318ebd4cfd",
+    "mtime": 1795628549.0992923,
+    "ast_hash": "e50a1ed1bff1949a06fafd7bfbaa246e",
     "semantic_hash": ""
   },
   "Shooter_App/apps/web/postcss.config.js": {
@@ -19655,8 +19655,8 @@
     "semantic_hash": ""
   },
   "run_orchestrator.ps1": {
-    "mtime": 1794972075.944471,
-    "ast_hash": "cde398a8c0ca6696e8438bee722fd79c",
+    "mtime": 1795629410.1808975,
+    "ast_hash": "28dbd7850d95d728690d6c695ef8e0e5",
     "semantic_hash": ""
   },
   "Range_Management/apps/web/android/app/src/main/assets/public/404/index.html": {
@@ -20105,13 +20105,13 @@
     "semantic_hash": ""
   },
   "cloudflare-tunnel.yml": {
-    "mtime": 1794641250.819208,
-    "ast_hash": "4173d77a0d7b3790246384f096302a55",
+    "mtime": 1795628587.4140213,
+    "ast_hash": "3775a903c7c3820f848504fbc5d10009",
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1794969082.5817933,
-    "ast_hash": "1298cc19f14f0a20d1e9dfc7b142363d",
+    "mtime": 1795628573.235934,
+    "ast_hash": "37f75792f5c303d85b9b599e12ac2217",
     "semantic_hash": ""
   },
   "Range_Management/apps/api/src/app.controller.ts": {

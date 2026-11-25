@@ -5,22 +5,48 @@ tunnel: <YOUR_CLOUDFLARE_TUNNEL_UUID>
 credentials-file: /etc/cloudflared/<YOUR_CLOUDFLARE_TUNNEL_UUID>.json
 
 ingress:
-  # 1. Shooter App API (NestJS + Socket.IO WebSockets on port 3001)
-  - hostname: api.yourdomain.com
+  # 1. Shooter Web Portal (Next.js on port 3000)
+  - hostname: marksmanshooter.in
+    service: http://shooter-web:3000
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  - hostname: www.marksmanshooter.in
+    service: http://shooter-web:3000
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  - hostname: app.marksmanshooter.in
+    service: http://shooter-web:3000
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # 2. Range Management Web Portal (Next.js on port 3002)
+  - hostname: range.marksmanshooter.in
+    service: http://range-web:3002
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+
+  # 3. Shooter App API (NestJS + Socket.IO WebSockets on port 3001)
+  - hostname: api.marksmanshooter.in
     service: http://shooter-api:3001
     originRequest:
       noTLSVerify: true
       connectTimeout: 30s
 
-  # 2. Range Management API (NestJS + Socket.IO WebSockets on port 3003)
-  - hostname: range-api.yourdomain.com
+  # 4. Range Management API (NestJS + Socket.IO WebSockets on port 3003)
+  - hostname: range-api.marksmanshooter.in
     service: http://range-api:3003
     originRequest:
       noTLSVerify: true
       connectTimeout: 30s
 
-  # 3. Python FastAPI Target Vision Service (port 8000)
-  - hostname: vision.yourdomain.com
+  # 5. Python FastAPI Target Vision Service (port 8000)
+  - hostname: vision.marksmanshooter.in
     service: http://vision-service:8000
     originRequest:
       noTLSVerify: true
@@ -28,4 +54,3 @@ ingress:
 
   # Catch-all rule (required by cloudflared)
   - service: http_status:404
-

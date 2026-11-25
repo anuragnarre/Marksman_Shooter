@@ -1,6 +1,5 @@
 // apps/web/app/layout.tsx
 import type { Metadata, Viewport } from 'next';
-import { Rajdhani, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/auth-context';
 import { ThemeProvider } from '../contexts/theme-context';
@@ -22,27 +21,6 @@ const THEME_INIT_SCRIPT = `
 
 // DESIGN NOTE: Three-font system — display (Rajdhani) for drama, DM Sans for
 // readability, JetBrains Mono for data precision. Each font carries semantic meaning.
-
-const rajdhani = Rajdhani({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-rajdhani',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-jetbrains',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Marksman — Precision Shooting Analytics',
@@ -81,9 +59,14 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${rajdhani.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;600&family=Rajdhani:wght@500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning className="bg-void text-text-primary antialiased font-body">

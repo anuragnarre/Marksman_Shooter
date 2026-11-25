@@ -115,6 +115,54 @@ services:
     networks:
       - marksman-internal
 
+  # ── Shooter App Web Portal (:3000) ────────────────────────────────────────
+  shooter-web:
+    build:
+      context: ./Shooter_App
+      dockerfile: Dockerfile.web
+    container_name: marksman-shooter-web
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      NEXT_EXPORT: "false"
+      INTERNAL_API_URL: http://shooter-api:3001
+      INTERNAL_VISION_URL: http://vision-service:8000
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.status<400?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      shooter-api:
+        condition: service_healthy
+    networks:
+      - marksman-internal
+
+  # ── Range Management Web Portal (:3002) ───────────────────────────────────
+  range-web:
+    build:
+      context: ./Range_Management
+      dockerfile: Dockerfile.web
+    container_name: marksman-range-web
+    restart: always
+    environment:
+      PORT: 3002
+      NODE_ENV: production
+      NEXT_EXPORT: "false"
+      INTERNAL_API_URL: http://range-api:3003
+      INTERNAL_VISION_URL: http://vision-service:8000
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3002').then(r=>process.exit(r.status<400?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      range-api:
+        condition: service_healthy
+    networks:
+      - marksman-internal
+
   # ── Cloudflare Tunnel (cloudflared) ───────────────────────────────────────
   # Secure outbound-only tunnel to Cloudflare Edge. No open inbound ports required!
   cloudflared:
@@ -128,6 +176,8 @@ services:
       - shooter-api
       - range-api
       - vision-service
+      - shooter-web
+      - range-web
     networks:
       - marksman-internal
 

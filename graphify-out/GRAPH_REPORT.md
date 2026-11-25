@@ -1,16 +1,16 @@
-# Graph Report - Marksman  (2026-11-18)
+# Graph Report - Marksman  (2026-11-25)
 
 ## Corpus Check
-- 1795 files · ~7,552,535 words
+- 1795 files · ~7,554,262 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 19129 nodes · 25768 edges · 2008 communities (1178 shown, 830 thin omitted)
+- 19134 nodes · 25781 edges · 2009 communities (1178 shown, 831 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 180 edges (avg confidence: 0.52)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `605ec9cb`
+- Built from commit: `c9ac54ff`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1682,6 +1682,7 @@
 - [[_COMMUNITY_Community 1845|Community 1845]]
 - [[_COMMUNITY_Community 1860|Community 1860]]
 - [[_COMMUNITY_Community 1866|Community 1866]]
+- [[_COMMUNITY_Community 2008|Community 2008]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `_()` - 310 edges
@@ -1700,17 +1701,17 @@
   Range_App/Shooter_App/apps/vision/scripts/train_yolo26s.py → Version_2_Range_Ops/apps/vision/pipeline/target_specs.py
 - `TargetSpec` --uses--> `TargetSpec`  [INFERRED]
   Shooter_App/apps/vision/scripts/train_yolo26s.py → Version_2_Range_Ops/apps/vision/pipeline/target_specs.py
-- `TargetCalibration` --uses--> `AnalysisResponse`  [INFERRED]
-  Range_App/Shooter_App/apps/vision/analyzer.py → Version_2_Range_Ops/apps/vision/models.py
-- `TargetCalibration` --uses--> `ShotResult`  [INFERRED]
-  Range_App/Shooter_App/apps/vision/analyzer.py → Version_2_Range_Ops/apps/vision/models.py
 - `TargetCalibration` --uses--> `TargetCalibration`  [INFERRED]
   Range_App/Shooter_App/apps/vision/analyzer.py → Version_2_Range_Ops/apps/vision/pipeline/types.py
+- `AnalysisResponse` --uses--> `TargetCalibration`  [INFERRED]
+  Range_App/Shooter_App/apps/vision/analyzer.py → Version_2_Range_Ops/apps/vision/pipeline/types.py
+- `UploadFile` --uses--> `AnalysisResponse`  [INFERRED]
+  Range_App/Shooter_App/apps/vision/main.py → Version_2_Range_Ops/apps/vision/models.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (2008 total, 830 thin omitted)
+## Communities (2009 total, 831 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.02
@@ -1722,7 +1723,7 @@ Nodes (97): AdvancedBiometricInsights, AdvancedInsightDomain, AdvancedInsightIte
 
 ### Community 2 - "Community 2"
 Cohesion: 0.03
-Nodes (46): _(), b(), e8, eg(), ei(), ep(), eq(), er() (+38 more)
+Nodes (43): _(), b(), e0(), e8, eg(), ep(), eq(), ev() (+35 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.02
@@ -1762,7 +1763,7 @@ Nodes (43): _(), eD(), eN(), eq(), eU(), nB(), nD(), nG() (+35 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.06
-Nodes (46): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+38 more)
+Nodes (48): _(), a_(), a2(), a3(), ac(), ad(), af(), ag() (+40 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.05
@@ -1929,8 +1930,8 @@ Cohesion: 0.08
 Nodes (39): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+31 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.10
-Nodes (35): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+27 more)
+Cohesion: 0.08
+Nodes (39): cm(), e4(), e5(), e6(), e7(), e8(), e9(), eY() (+31 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.05
@@ -1985,8 +1986,8 @@ Cohesion: 0.12
 Nodes (36): ndarray, bench_throughput(), _col(), _img_bytes(), main(), _match_shots(), _ok(), Standalone vision pipeline accuracy test runner.  No pytest required — run dir (+28 more)
 
 ### Community 70 - "Community 70"
-Cohesion: 0.12
-Nodes (10): el(), eo(), et(), eu(), N(), t3(), t6(), tw (+2 more)
+Cohesion: 0.10
+Nodes (14): ei(), el(), eo(), er(), et(), eu(), N(), rr (+6 more)
 
 ### Community 71 - "Community 71"
 Cohesion: 0.25
@@ -2197,8 +2198,8 @@ Cohesion: 0.10
 Nodes (4): B(), tl, tp, tr()
 
 ### Community 126 - "Community 126"
-Cohesion: 0.17
-Nodes (21): o2(), o4(), o6(), o7(), r4(), s1(), s2(), sP() (+13 more)
+Cohesion: 0.13
+Nodes (25): ic(), o2(), o4(), o6(), o7(), r4(), s1(), s2() (+17 more)
 
 ### Community 127 - "Community 127"
 Cohesion: 0.07
@@ -2221,8 +2222,8 @@ Cohesion: 0.50
 Nodes (4): 🔴 Critical (Broken), 🟠 High Impact (Visual Gaps), Homepage Issues — Fix These First, 🟡 Polish
 
 ### Community 135 - "Community 135"
-Cohesion: 0.10
-Nodes (4): e7, nQ(), ny, Q()
+Cohesion: 0.07
+Nodes (6): e7, n9, nQ(), ny, Q(), t8
 
 ### Community 136 - "Community 136"
 Cohesion: 0.50
@@ -2233,8 +2234,8 @@ Cohesion: 0.50
 Nodes (4): 5.1 — Competition Setup, 5.2 — Live Scoring System, 5.3 — Post-Competition Analytics, CATEGORY 5: COMPETITION & TOURNAMENT MANAGEMENT
 
 ### Community 138 - "Community 138"
-Cohesion: 0.10
-Nodes (13): LifecycleEventListener, Long, Promise, ReactContextBaseJavaModule, Sensor, SensorEvent, SensorEventListener, SensorManager (+5 more)
+Cohesion: 0.11
+Nodes (14): BooleanArray, Handler, HandlerThread, Int, LifecycleEventListener, Long, Promise, ReactContextBaseJavaModule (+6 more)
 
 ### Community 139 - "Community 139"
 Cohesion: 0.50
@@ -2269,8 +2270,8 @@ Cohesion: 0.08
 Nodes (16): BLANK_FORM, BLANK_REQ, eventColor(), EventDetailModal(), EventFormState, EventModalProps, fmtDate(), fmtTime() (+8 more)
 
 ### Community 149 - "Community 149"
-Cohesion: 0.10
-Nodes (11): _(), e1(), ni(), nj(), nr(), t7(), tc(), to() (+3 more)
+Cohesion: 0.11
+Nodes (7): _(), e1(), tc(), to(), ts(), tu(), tz()
 
 ### Community 150 - "Community 150"
 Cohesion: 0.12
@@ -2309,8 +2310,8 @@ Cohesion: 0.08
 Nodes (53): al(), eD(), eE(), eL(), eN(), ex(), i(), ib() (+45 more)
 
 ### Community 165 - "Community 165"
-Cohesion: 0.14
-Nodes (12): Activity, Bitmap, BooleanArray, Double, FloatArray, Handler, HandlerThread, Int (+4 more)
+Cohesion: 0.16
+Nodes (9): Activity, Bitmap, Double, FloatArray, ReadableMap, String, PreviewCaptureTarget, QuadNorm (+1 more)
 
 ### Community 166 - "Community 166"
 Cohesion: 0.29
@@ -2325,12 +2326,12 @@ Cohesion: 0.50
 Nodes (4): 4.1 Overview & Architecture, 4.2 Hardware & Optical Specifications, 4.3 Operational Working, 4. Application 3: Target Camera App (Downrange Hardware Interface)
 
 ### Community 169 - "Community 169"
-Cohesion: 0.10
-Nodes (22): BaseModel, AnalysisResponse, Full response returned by POST /analyze., A single detected bullet hole mapped to target coordinates., ShotResult, AnalysisResponse, Full response returned by POST /analyze., A single detected bullet hole mapped to target coordinates. (+14 more)
+Cohesion: 0.11
+Nodes (22): AnalysisResponse, TargetCalibration, analyze_target_image(), _draw_debug(), Shot detection pipeline orchestrator.  Multi-stage local CV pipeline (v5 — CLA, Draw detected holes and scores on debug output., Scale spatial calibration fields when the working image is resized.      Pixel, Full analysis pipeline. (+14 more)
 
 ### Community 170 - "Community 170"
-Cohesion: 0.10
-Nodes (9): _(), e1(), eA(), eP(), tc(), ti(), ts(), tu() (+1 more)
+Cohesion: 0.11
+Nodes (7): _(), e1(), tc(), ti(), ts(), tu(), tz()
 
 ### Community 171 - "Community 171"
 Cohesion: 0.08
@@ -2381,8 +2382,8 @@ Cohesion: 0.10
 Nodes (3): b(), I(), m()
 
 ### Community 186 - "Community 186"
-Cohesion: 0.10
-Nodes (19): ndarray, compute_difference_image(), Difference imaging: subtract synthetic template from real image to isolate bulle, Create a boolean mask for pixels within the target boundary., Compute a difference image that isolates bullet holes.      1. Render syntheti, _target_mask(), TargetCalibration, ndarray (+11 more)
+Cohesion: 0.08
+Nodes (26): ndarray, compute_difference_image(), Difference imaging: subtract synthetic template from real image to isolate bulle, Create a boolean mask for pixels within the target boundary., Compute a difference image that isolates bullet holes.      1. Render syntheti, _target_mask(), TargetCalibration, ndarray (+18 more)
 
 ### Community 187 - "Community 187"
 Cohesion: 0.14
@@ -2513,8 +2514,8 @@ Cohesion: 0.08
 Nodes (38): c(), ca(), cc(), ce(), cf(), ci(), cl(), cp() (+30 more)
 
 ### Community 221 - "Community 221"
-Cohesion: 0.19
-Nodes (6): nt(), ri, ro(), rs, tg(), tm()
+Cohesion: 0.13
+Nodes (8): en(), na(), nt(), ri, ro(), rs, tg(), tm()
 
 ### Community 222 - "Community 222"
 Cohesion: 0.08
@@ -2573,8 +2574,8 @@ Cohesion: 0.09
 Nodes (6): ALERT_META, MENTAL_META, PHYSICAL_META, STATUS_META, TECHNIQUE_META, TREND_META
 
 ### Community 236 - "Community 236"
-Cohesion: 0.13
-Nodes (22): d(), e6(), f(), g(), H(), j(), k(), l() (+14 more)
+Cohesion: 0.16
+Nodes (17): d(), e6(), f(), g(), H(), j(), k(), l() (+9 more)
 
 ### Community 237 - "Community 237"
 Cohesion: 0.12
@@ -2632,10 +2633,6 @@ Nodes (20): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModu
 Cohesion: 0.12
 Nodes (4): ea, eq, ez, ir()
 
-### Community 263 - "Community 263"
-Cohesion: 0.09
-Nodes (6): en(), n9, na(), rh, rr, t8
-
 ### Community 264 - "Community 264"
 Cohesion: 0.20
 Nodes (21): a4(), ab(), aj(), ak(), aQ(), il(), lW(), no() (+13 more)
@@ -2649,8 +2646,8 @@ Cohesion: 0.12
 Nodes (4): ea, eq, ez, ir()
 
 ### Community 268 - "Community 268"
-Cohesion: 0.10
-Nodes (30): c(), cf(), cp(), cz(), d(), eB(), eK(), eM() (+22 more)
+Cohesion: 0.14
+Nodes (23): c(), cf(), cp(), cz(), d(), eB(), eM(), eW() (+15 more)
 
 ### Community 269 - "Community 269"
 Cohesion: 0.20
@@ -2849,8 +2846,8 @@ Cohesion: 0.07
 Nodes (17): RangeConsoleHeader(), RangeConsoleSidebar(), RangeConsoleSidebarProps, BOTTOM_NAV, PORTAL_NAV, fmtShort(), ShooterView(), useGreeting() (+9 more)
 
 ### Community 324 - "Community 324"
-Cohesion: 0.13
-Nodes (22): lc(), lf(), lk(), ll(), lm(), lt(), ly(), oA() (+14 more)
+Cohesion: 0.15
+Nodes (19): lf(), lk(), ll(), lt(), oA(), oi(), oj(), oR() (+11 more)
 
 ### Community 325 - "Community 325"
 Cohesion: 0.13
@@ -2881,8 +2878,8 @@ Cohesion: 0.13
 Nodes (4): M, q, U, x()
 
 ### Community 334 - "Community 334"
-Cohesion: 0.14
-Nodes (18): b(), d(), e4(), e6(), nb(), ng(), nk(), nm() (+10 more)
+Cohesion: 0.24
+Nodes (10): b(), e4(), e6(), ng(), nk(), t2(), t8(), tn() (+2 more)
 
 ### Community 338 - "Community 338"
 Cohesion: 0.18
@@ -2921,8 +2918,8 @@ Cohesion: 0.11
 Nodes (17): 1. Prerequisites, 2. Configure, 3. Start the vision service (on the same machine), 4. Run the engine, Architecture, Camera Sources, Dedicated Windows PC, Environment Variables (optional) (+9 more)
 
 ### Community 352 - "Community 352"
-Cohesion: 0.16
-Nodes (17): e5(), f(), g(), H(), i(), j(), k(), l() (+9 more)
+Cohesion: 0.20
+Nodes (14): d(), f(), g(), H(), k(), l(), na(), nb() (+6 more)
 
 ### Community 353 - "Community 353"
 Cohesion: 0.23
@@ -2961,8 +2958,8 @@ Cohesion: 0.15
 Nodes (3): ii(), P(), w()
 
 ### Community 364 - "Community 364"
-Cohesion: 0.09
-Nodes (8): eb(), I(), re, rt, td, tl(), to(), ts
+Cohesion: 0.17
+Nodes (5): I(), td, tl(), to(), ts
 
 ### Community 367 - "Community 367"
 Cohesion: 0.17
@@ -3081,16 +3078,16 @@ Cohesion: 0.18
 Nodes (4): _(), H(), i(), V()
 
 ### Community 422 - "Community 422"
-Cohesion: 0.22
-Nodes (14): eg(), ej(), ek(), eO(), eS(), ex(), n(), r() (+6 more)
+Cohesion: 0.19
+Nodes (14): A(), e2(), ej(), nf(), ni(), o(), r(), ta() (+6 more)
 
 ### Community 423 - "Community 423"
 Cohesion: 0.19
 Nodes (14): A(), e2(), ej(), i(), nf(), no(), r(), ta() (+6 more)
 
 ### Community 424 - "Community 424"
-Cohesion: 0.18
-Nodes (14): b(), e4(), e5(), ng(), nk(), t1(), t2(), t3() (+6 more)
+Cohesion: 0.14
+Nodes (17): b(), e4(), e5(), ng(), nk(), o(), t1(), t2() (+9 more)
 
 ### Community 425 - "Community 425"
 Cohesion: 0.18
@@ -3437,8 +3434,8 @@ Cohesion: 0.18
 Nodes (10): compilerOptions, declaration, declarationMap, esModuleInterop, module, outDir, skipLibCheck, strict (+2 more)
 
 ### Community 565 - "Community 565"
-Cohesion: 0.27
-Nodes (6): Ensure-Postgres(), Render-StatusDashboard(), Run-HttpProbe(), Start-ManagedProcess(), Test-HttpHealth(), Test-PortListening()
+Cohesion: 0.22
+Nodes (12): Ensure-Postgres(), Get-HttpStatusCode(), Invoke-StopAll(), Print-Banner(), Render-StatusDashboard(), Run-HttpProbe(), Start-ManagedProcess(), Stop-ProcessTree() (+4 more)
 
 ### Community 566 - "Community 566"
 Cohesion: 0.17
@@ -3485,8 +3482,8 @@ Cohesion: 0.17
 Nodes (12): `app/ai-coach/page.tsx`, `app/dashboard/page.tsx`, `app/layout.tsx`, `app/page.tsx` (marketing homepage), `app/sessions/page.tsx`, `components/AnalyticsCharts.tsx`, `components/AppShell.tsx`, `components/BottomNav.tsx` (+4 more)
 
 ### Community 582 - "Community 582"
-Cohesion: 0.22
-Nodes (9): ee(), eF(), eW(), m(), tb(), tj(), tm(), tW() (+1 more)
+Cohesion: 0.17
+Nodes (12): ee(), eF(), eU(), eV(), eW(), ez(), m(), tb() (+4 more)
 
 ### Community 587 - "Community 587"
 Cohesion: 0.22
@@ -3517,8 +3514,8 @@ Cohesion: 0.20
 Nodes (10): scripts, build, lint, start, start:debug, start:dev, start:prod, test (+2 more)
 
 ### Community 596 - "Community 596"
-Cohesion: 0.24
-Nodes (9): AnalysisResponse, TargetCalibration, analyze_target_image(), _draw_debug(), Shot detection pipeline orchestrator.  Multi-stage local CV pipeline (v5 — CLA, Draw detected holes and scores on debug output., Scale spatial calibration fields when the working image is resized.      Pixel, Full analysis pipeline. (+1 more)
+Cohesion: 0.12
+Nodes (4): eb(), no(), re, rt
 
 ### Community 597 - "Community 597"
 Cohesion: 0.20
@@ -4073,8 +4070,8 @@ Cohesion: 0.38
 Nodes (3): BiometricPulseWidget(), formatTimeAgo(), readinessLabel()
 
 ### Community 840 - "Community 840"
-Cohesion: 0.29
-Nodes (3): API_BASE, ApiError, ApiFetchOptions
+Cohesion: 0.33
+Nodes (5): API_BASE, ApiError, apiFetch(), ApiFetchOptions, getApiBase()
 
 ### Community 842 - "Community 842"
 Cohesion: 0.29
@@ -4129,8 +4126,8 @@ Cohesion: 0.38
 Nodes (3): Wait-For-Port(), Write-Ok(), Write-Warn()
 
 ### Community 872 - "Community 872"
-Cohesion: 0.32
-Nodes (7): ndarray, compute_difference_image(), Difference imaging: subtract synthetic template from real image to isolate bulle, Create a boolean mask for pixels within the target boundary., Compute a difference image that isolates bullet holes.      1. Render syntheti, _target_mask(), TargetCalibration
+Cohesion: 0.22
+Nodes (9): BaseModel, AnalysisResponse, Full response returned by POST /analyze., A single detected bullet hole mapped to target coordinates., ShotResult, AnalysisResponse, Full response returned by POST /analyze., A single detected bullet hole mapped to target coordinates. (+1 more)
 
 ### Community 873 - "Community 873"
 Cohesion: 0.38
@@ -4193,8 +4190,8 @@ Cohesion: 0.33
 Nodes (3): DEFAULT_ARMORY, EMPTY_FORM, Equipment
 
 ### Community 904 - "Community 904"
-Cohesion: 0.29
-Nodes (7): eL(), eM(), eN(), eU(), eV(), eY(), ez()
+Cohesion: 0.23
+Nodes (12): eA(), eg(), ek(), eL(), eM(), eN(), eO(), eP() (+4 more)
 
 ### Community 907 - "Community 907"
 Cohesion: 0.47
@@ -4341,8 +4338,8 @@ Cohesion: 0.53
 Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman Range Engine Entrypoint  Usage:   python start.py, setup_logging()
 
 ### Community 959 - "Community 959"
-Cohesion: 0.22
-Nodes (4): API_BASE, API_BASE, ApiError, ApiFetchOptions
+Cohesion: 0.25
+Nodes (6): API_BASE, API_BASE, ApiError, apiFetch(), ApiFetchOptions, getApiBase()
 
 ### Community 961 - "Community 961"
 Cohesion: 0.33
@@ -4489,8 +4486,8 @@ Cohesion: 0.53
 Nodes (5): health_check(), load_config(), main(), engine/start.py — Marksman Range Engine Entrypoint  Usage:   python start.py, setup_logging()
 
 ### Community 1016 - "Community 1016"
-Cohesion: 0.40
-Nodes (5): nj(), nn(), no(), nr(), t7()
+Cohesion: 0.20
+Nodes (10): nj(), nn(), no(), nr(), t1(), t3(), t4(), t5() (+2 more)
 
 ### Community 1017 - "Community 1017"
 Cohesion: 0.50
@@ -4882,7 +4879,7 @@ Nodes (4): 4.1 Overview & Architecture, 4.2 Hardware & Optical Specifications, 4
 
 ### Community 1179 - "Community 1179"
 Cohesion: 0.33
-Nodes (6): A(), e2(), nf(), ni(), o(), tH()
+Nodes (6): e5(), i(), j(), ns(), tg(), tv()
 
 ### Community 1183 - "Community 1183"
 Cohesion: 0.50
@@ -5036,6 +5033,10 @@ Nodes (3): 7.1 Five Standard Stream Profiles, 7.2 Real-Time Network Quality Metr
 Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
 
+### Community 1403 - "Community 1403"
+Cohesion: 0.33
+Nodes (6): ni(), nj(), nn(), nr(), t5(), t7()
+
 ### Community 1433 - "Community 1433"
 Cohesion: 0.67
 Nodes (3): Critical Gaps (By Stakeholder), 🔍 CURRENT STATE AUDIT, What Exists (Confirmed by Code Analysis)
@@ -5063,14 +5064,14 @@ Nodes (4): 🔴 Critical (Broken), 🟠 High Impact (Visual Gaps), Homepage Issu
 ## Knowledge Gaps
 - **4706 isolated node(s):** `fs`, `path`, `srcDir`, `controllers`, `fs` (+4701 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **830 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **831 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TargetCalibration` connect `Community 63` to `Community 289`, `Community 193`, `Community 611`, `Community 98`, `Community 197`, `Community 872`, `Community 169`, `Community 300`, `Community 528`, `Community 305`, `Community 596`, `Community 87`, `Community 186`, `Community 187`, `Community 541`, `Community 95`, `Community 511`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `TargetSpec` connect `Community 186` to `Community 64`, `Community 193`, `Community 226`, `Community 67`, `Community 197`, `Community 357`, `Community 69`, `Community 872`, `Community 233`, `Community 490`, `Community 501`, `Community 470`, `Community 215`, `Community 187`?**
+- **Why does `TargetSpec` connect `Community 186` to `Community 64`, `Community 193`, `Community 226`, `Community 67`, `Community 197`, `Community 357`, `Community 69`, `Community 233`, `Community 490`, `Community 501`, `Community 470`, `Community 215`, `Community 187`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `TargetCalibration` connect `Community 63` to `Community 289`, `Community 193`, `Community 611`, `Community 98`, `Community 197`, `Community 169`, `Community 300`, `Community 528`, `Community 305`, `Community 87`, `Community 186`, `Community 187`, `Community 541`, `Community 95`, `Community 511`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **Why does `TestResult` connect `Community 67` to `Community 186`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
@@ -5081,4 +5082,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.02040816326530612 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.03135498320268757 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.03368083400160385 - nodes in this community are weakly interconnected._

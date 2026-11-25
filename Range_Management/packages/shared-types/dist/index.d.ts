@@ -655,4 +655,50 @@ export interface AdvancedBiometricInsights {
     generatedAt: string;
     model: string;
 }
+export type StreamProfilePreset = 'AUTO_ADAPTIVE' | 'LAN_ULTRA_LOW_LAT' | 'BALANCED_WIRELESS' | 'BANDWIDTH_SAVER' | 'ECO_BATTERY' | 'CUSTOM';
+export type VideoTransportProtocol = 'WEBSOCKET_BINARY' | 'WEBRTC_DATA' | 'RTSP_OVER_WS' | 'MJPEG_HTTP';
+export type VideoHardwareAcceleration = 'WEBGL2' | 'CANVAS_2D' | 'OFFSCREEN_WORKER';
+export type CongestionPolicy = 'DROP_LATE' | 'SMOOTH_JITTER' | 'ADAPTIVE_DOWNSCALE';
+export type WiFiFrequencyBand = '2.4GHz' | '5GHz' | '6GHz+' | 'AUTO_DETECT';
+export type VideoComputationMode = 'SERVER_VISION' | 'ON_DEVICE_EDGE' | 'HYBRID_EDGE_STREAM';
+export interface CameraStreamConfig {
+    profile: StreamProfilePreset;
+    resolution: '1080p' | '720p' | '480p' | '360p' | 'custom';
+    customWidth?: number;
+    customHeight?: number;
+    targetFps: number;
+    bitrateCapKbps: number;
+    qualityFactor: number;
+    protocol: VideoTransportProtocol;
+    hardwareAcceleration: VideoHardwareAcceleration;
+    congestionPolicy: CongestionPolicy;
+    wifiBand: WiFiFrequencyBand;
+    computationMode: VideoComputationMode;
+    sendImpactSnapshot: boolean;
+    jitterBufferMs: number;
+    keyframeIntervalSec: number;
+    autoExposureLock: boolean;
+    auxTorchEnabled: boolean;
+    thermalThrottleTempC: number;
+    customRtspUrl?: string;
+    laneId?: string;
+}
+export interface StreamTelemetryMetrics {
+    currentFps: number;
+    targetFps: number;
+    rttMs: number;
+    jitterMs: number;
+    bandwidthKbps: number;
+    droppedFramesCount: number;
+    dropRatePercent: number;
+    networkQuality: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
+    batteryPercent?: number;
+    batteryTempC?: number;
+    isThrottled: boolean;
+    activeProfile: StreamProfilePreset;
+    wifiBand?: WiFiFrequencyBand;
+    computationMode?: VideoComputationMode;
+    onDeviceCalculationTimeMs?: number;
+    timestamp: number;
+}
 //# sourceMappingURL=index.d.ts.map
